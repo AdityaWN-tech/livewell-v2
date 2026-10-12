@@ -1,0 +1,27 @@
+# Decisions and changes to the spec
+
+Source spec: `docs/spec/LiveWell_v2_Specification.pdf` v1.0 draft (2026-09-30). Once signed off, this file wins over the spec where they differ.
+Status: **Agreed** (owner decided), **Needs client** (changes what the client wrote; Dr. Gokula's team must approve), **Open** (not decided yet).
+
+| ID | Date | Decision | Status | Spec affected |
+|---|---|---|---|---|
+| D-01 | 2026-10-12 | Greenfield build. No prototype code is used; the spec's "keep/refactor" items (10.4) are built new. T-FND-01 becomes a requirements check (prototype features listed in 10.4 must still exist in v2); T-FND-07 (migrate old Firestore user docs) is dropped unless old prototype data turns up. | Agreed (owner) | 1.1, 10.4, A-12, T-FND-01, T-FND-07 |
+| D-02 | 2026-10-12 | Add **phone OTP** login (Firebase Phone Auth) next to email, Google and Apple, because current users log in with +91 numbers. | Agreed (owner), needs client | FR-ONB-01 |
+| D-03 | 2026-10-12 | **Markets: India and US**, English only, 18+ (changes A-11). Consequences: (a) region-aware safety: India emergency 112, crisis Tele-MANAS 14416; US emergency 911, crisis 988, plain code before any AI, neutral voice, both sets in the 15.3 critical tests; (b) region chosen from the verified phone code (+91 = India; +1 = US only if the device region is also US, since +1 is shared with Canada and the Caribbean); for email/Google/Apple sign-in, device region, and the user confirms; never a silent guess; (c) legal: US texts plus India DPDP Act consent texts, both counsel-reviewed (T-CMP-01); (d) portal linking may match on verified phone as well as email (A-08); (e) units and time zones follow locale (NFR-11); portal prices shown as entered in the CMS. | Agreed (owner), needs client | A-08, A-11, FR-ONB-02/03, FR-SAF-01/02, 15.3, 16.1 |
+| D-04 | 2026-10-12 | Brand palette from the Live Well logo (deep teal + lime), not TagMango's blue. Owner confirmed again 2026-10-12. Hex values are provisional (sampled from a screenshot) until the original logo file arrives. | Agreed (owner) | 14.1 |
+| D-05 | 2026-10-12 | Environments as Flutter flavors `dev`, `staging`, `prod`. Firebase dev project = `my-livewell`. Staging and prod projects are created before T-FND-02 is closed. | Agreed (owner) | 10.3 |
+| D-06 | 2026-10-12 | App id `net.conciergeconnectedcare.livewell` (from the portal domain), with `.dev` / `.stg` suffixes for non-prod. Permanent once published to a store. | Needs client | — |
+| D-07 | 2026-10-12 | Stack exactly as the spec (Drift + SQLCipher, LangGraph or ADK, 4 services per 17.2, staging + Terraform). Any change needs the owner's approval. | Agreed (owner) | 10.2, 17.2 |
+| D-08 | 2026-10-12 | Feed posts, paid courses, video lectures, live workshops and payments stay on the TagMango portal; the app links to them. `portal_offers.offer_type` has no value for feed or workshops yet; proposal: add `workshop` and `community` link types. | Agreed (owner); type addition Open | 3.2, 11, 13 |
+| D-09 | 2026-10-12 | The portal course is titled "Diabetes **Reversal** Program", but the spec forbids reversal/cure promises and the Safety post-check blocks them. Need agreed wording for how the title appears in-app. | **Open**, needs client | 9.6, 13.4, FR-SAF |
+| D-10 | 2026-10-12 | iOS builds and TestFlight via Codemagic (this machine is Windows). Creating native Xcode targets (WidgetKit, watchOS) and per-flavor Xcode schemes needs a Mac (own, borrowed or rented cloud Mac) by the time widget work starts. | Agreed; Mac access Open | 10.3, FR-TCH |
+| D-11 | 2026-10-12 | Code repo lives at `D:\Adii voult\Adii\LiveWell`, new private GitHub repo. The earlier `LIVE_WELL_V2` repo is not used. | Agreed (owner) | — |
+| D-12 | 2026-10-12 | Portal screenshots are bundled in `apps/mobile/assets/design-reference/` for reference during the build; remove them from the bundle before the first store release. | Agreed (owner) | NFR-08 |
+| D-13 | 2026-10-12 | Launch: flutter_native_splash (teal background, no white flash), then a "Three words" logo reveal: logo settles, "Health. Habit. Happiness." appears word by word, teal expands into the next screen. Signed-in users: 1.2–1.6 s, ends as soon as Home is ready (NFR-01 < 2.0 s). New users: about 2 s, then Welcome. Reduce-motion: a short fade. App loads in the background during the reveal. | Agreed (owner) | NFR-01, NFR-06, 14.1 |
+| D-14 | 2026-10-12 | Firestore location **nam5 (US multi-region)** for dev, staging and prod, because most users are in the US. India users get slightly more delay, which is acceptable for check-ins and habits; Cloud Run services (agents, voice) may run in a US region and an India region to keep voice latency down (NFR-02). Permanent once a database is created. | Agreed (owner) | 10.1, NFR-02 |
+
+## Open questions from the spec (section 20), defaults apply until answered
+Q1 pricing (default: free core, premium flag off) · Q2 first portal offers and a free day-1 resource · Q3 TagMango SSO, catalog API, test course · Q4 Dr. Gokula video/photos (default: voice only) · Q5 memorial voices (default: no) · Q6 who staffs safety and content review · Q7 Spanish or other languages (default: English only).
+
+## Never cut
+Safety rules and crisis routing, consents, the closed-script voice rule, and the critical safety test set.

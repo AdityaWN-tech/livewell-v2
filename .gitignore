@@ -1,0 +1,24 @@
+# Originals dropped in the root by the owner (copies live in docs/spec and apps/mobile/assets)
+/WhatsApp Image*.jpeg
+/LiveWell_v2_Specification.pdf
+
+# Secrets: never commit (AGENTS.md rule 4)
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+key.properties
+service-account*.json
+
+# Tooling
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.terraform/
+*.tfstate*
+.DS_Store
+Thumbs.db
+.idea/
+*.log

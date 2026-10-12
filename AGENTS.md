@@ -1,0 +1,69 @@
+# AGENTS.md: rules for anyone (human or AI) writing code in this repo
+
+Live Well v2 "Companion" for Dr. Murthy Gokula. Read this before every task (spec 17.1).
+
+## Sources of truth, in order
+1. `docs/decisions.md`: agreed changes to the spec. Rows marked *needs client* are not final until signed off.
+2. `docs/spec/LiveWell_v2_Specification.pdf`: the product and technical spec (v1.0 draft, 2026-09-30).
+3. `docs/data-model.md` and `docs/api/openapi.yaml` once they exist.
+
+If a request conflicts with the spec, say so and stop before writing code.
+
+## Fixed stack (changes need the owner's approval, recorded in docs/decisions.md)
+| Part | Stack |
+|---|---|
+| Mobile (iOS + Android) | Flutter, Riverpod, go_router, Drift + SQLCipher (encrypted local DB) |
+| Auth, data, push | Firebase Auth (email, Google, Apple, phone OTP), Firestore, FCM/APNs, App Check, Remote Config |
+| Core API | TypeScript (strict, zod) on Cloud Functions 2nd gen or Cloud Run |
+| Agents | Python (ruff, mypy, pydantic I/O), LangGraph or Google ADK (chosen in T-FND-03), Cloud Run |
+| Watch | Native watchOS (SwiftUI) and Wear OS (Kotlin + Compose) |
+| Widgets | iOS WidgetKit, Android Jetpack Glance |
+| Admin, voice-owner page | Flutter Web or Next.js (chosen in T-FND-03) |
+| Infra | Terraform; three Firebase/GCP projects (dev, staging, prod); GitHub Actions |
+
+## Working agreement
+1. One task per branch: `task/<TASK-ID>-short-name` (e.g. `task/T-FND-04-app-shell`). The PR quotes the task's "Done when" and shows evidence.
+2. Read first: this file, the spec sections for the task, and existing code. Don't duplicate.
+3. Tests are part of the task. Safety-related code also needs evaluation cases.
+4. Never commit secrets, real user data, vendor keys or PHI. Use `.env.example` and Secret Manager references. Firebase *client* config files are allowed.
+5. **Never weaken a safety rule, consent check, frequency cap or the closed-script voice rule to make a test pass.** Stop and flag it.
+6. Ambiguous requirement: implement the most conservative option and record the question in docs/decisions.md.
+7. Conventions: Dart (effective_dart, Riverpod, feature-first folders); TypeScript (strict, zod); Python (ruff, mypy, pydantic).
+8. API change: update `docs/api/openapi.yaml`. Data change: update `docs/data-model.md` and add a migration.
+9. Human review is required for safety, consent, security, payments and legal-copy tasks.
+
+## Design rules (mobile)
+- Use only the design tokens in `apps/mobile/lib/core/design/` (colors, text styles, spacing, radius). No raw colors or sizes in feature code.
+- Look at `apps/mobile/assets/design-reference/` before building a screen. If an image can't be seen, ask the owner to upload it; never guess.
+- Feel (spec 14.1): warm, hopeful, calm, premium, inclusive. Never fear-based or overly clinical.
+- One primary action per screen (spec 4.1).
+
+## Safety rules that can never be removed
+- Markets are India and US (D-03). Emergency (IN 112 / US 911) and crisis (IN Tele-MANAS 14416 / US 988) routing is plain code, runs before any AI, uses fixed templates and the neutral voice.
+- Never guess a user's region silently: a wrong guess shows the wrong emergency number.
+- No medication or dose-change advice. No cure or reversal promises. No portal content in, or within 72 h of, a safety event.
+- Cloned voices only speak text with an approved `message_id` (closed-script rule).
+
+## Layout (spec 17.2)
+```
+apps/mobile/            Flutter app (lib/core, lib/features/<feature>/), widgets, iOS watch app
+apps/wear/              Wear OS app
+apps/admin/             Admin / CMS web
+apps/voice-owner-web/   Loved-one voice consent web flow
+services/core-api/      TypeScript API
+services/agents/        Python agents (prompts/, evals/)
+services/media/         TTS and avatar adapters and jobs
+services/portal-bridge/ TagMango webhooks and deep links
+packages/schemas/       Shared JSON Schemas (CoachMessage, ...)
+content/                Lessons, assessment bank, legal texts (versioned)
+infra/terraform/        Cloud resources
+docs/                   Spec, decisions, setup guides, API, data model, ADRs
+```
+
+## Commands (PowerShell; quote every path, the repo path has a space)
+| What | Command |
+|---|---|
+| Mobile analyze + tests | `cd "D:\Adii voult\Adii\LiveWell\apps\mobile"; flutter analyze; flutter test` |
+| Run dev flavor | `flutter run --flavor dev -t lib/main_dev.dart` |
+| Build dev APK | `flutter build apk --debug --flavor dev -t lib/main_dev.dart` |
+| Staging / prod | same with `staging` / `prod` and `lib/main_staging.dart` / `lib/main_prod.dart` |

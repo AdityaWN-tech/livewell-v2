@@ -1,0 +1,5 @@
+# Golden image tests render slightly differently per OS. They were recorded on
+# Windows, so CI runs them on a Windows runner (--tags golden) and everything
+# else on Linux (--exclude-tags golden).
+tags:
+  golden:

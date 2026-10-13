@@ -1,0 +1,61 @@
+# Mobile app checks (T-FND-02). Runs on every pull request and push to main
+# that touches the app. Free GitHub Actions minutes: Linux counts 1x, Windows 2x,
+# so only the golden-image tests (recorded on Windows) use a Windows runner.
+name: mobile
+
+on:
+  pull_request:
+    paths: ["apps/mobile/**", ".github/workflows/mobile.yml"]
+  push:
+    branches: [main]
+    paths: ["apps/mobile/**", ".github/workflows/mobile.yml"]
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: apps/mobile
+
+env:
+  FLUTTER_VERSION: "3.47.7"
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Generated strings are up to date (NFR-11)
+        run: |
+          flutter gen-l10n
+          git diff --exit-code -- lib/l10n
+      - run: dart format --output=none --set-exit-if-changed lib test integration_test
+      - run: flutter analyze
+      - run: flutter test --exclude-tags golden
+
+  goldens:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter test --tags golden
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: apps/mobile/test/**/failures/

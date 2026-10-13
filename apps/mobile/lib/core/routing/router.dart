@@ -4,15 +4,20 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
+import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/care/presentation/care_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/learn/presentation/learn_screen.dart';
+import '../../features/onboarding/presentation/about_screen.dart';
+import '../../features/onboarding/presentation/age_gate_screen.dart';
+import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/track/presentation/track_screen.dart';
 import '../../features/welcome/presentation/welcome_screen.dart';
+import '../../features/consent/domain/consent.dart';
 import '../config/flavor.dart';
 import 'app_shell.dart';
 
@@ -31,6 +36,37 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/welcome',
         pageBuilder: (context, state) =>
             _fadeFromSplash(state, const WelcomeScreen()),
+      ),
+      // Onboarding before an account exists (spec 5.2, D-19).
+      GoRoute(
+        path: '/onboarding/about',
+        builder: (context, state) => const AboutScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/age',
+        builder: (context, state) => const AgeGateScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding/under-18',
+        builder: (context, state) => const Under18Screen(),
+      ),
+      GoRoute(
+        path: '/onboarding/legal',
+        builder: (context, state) => const LegalScreen(),
+        routes: [
+          GoRoute(
+            path: ':doc',
+            builder: (context, state) => LegalDocumentScreen(
+              type:
+                  ConsentType.fromKey(state.pathParameters['doc']!) ??
+                  ConsentType.terms,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/sign-in',
+        builder: (context, state) => const SignInScreen(),
       ),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, shell) =>

@@ -76,5 +76,41 @@
   "consentMedicalDisclaimerTitle": "Medical disclaimer",
   "consentAiDisclosureTitle": "AI disclosure",
   "devPreviewApp": "Preview the app (dev build only)",
-  "devPreviewNotSaved": "Preview mode: changes here are not saved."
+  "devPreviewNotSaved": "Preview mode: changes here are not saved.",
+  "aboutTitle": "What Live Well does",
+  "aboutDoesHeader": "Live Well helps you",
+  "aboutDoes1": "Build small daily habits with Dr. Gokula's MY GOAL DO IT approach and the 8 drivers of health.",
+  "aboutDoes2": "Talk with a personal coach that speaks, listens and remembers only what you allow.",
+  "aboutDoes3": "Learn from the Live Well book and reviewed lessons.",
+  "aboutDoes4": "Go deeper on the Live Well portal when you want to.",
+  "aboutDoesNotHeader": "Live Well does not",
+  "aboutDoesNot1": "Diagnose illness or replace your doctor.",
+  "aboutDoesNot2": "Give medication, dose or supplement advice.",
+  "aboutDoesNot3": "Keep your medical records.",
+  "aboutDoesNot4": "Sell your data or show ads from other companies.",
+  "aboutEmergency": "In an emergency, call your local emergency number.",
+  "commonContinue": "Continue",
+  "ageTitle": "Are you 18 or older?",
+  "ageBody": "Live Well is for adults. We ask before you create an account, so nothing is saved for anyone under 18.",
+  "ageYes": "Yes, I'm 18 or older",
+  "ageNo": "No, I'm under 18",
+  "under18Title": "Live Well is for adults",
+  "under18Body": "Thank you for your interest. Live Well is made for people 18 and older, so we haven't saved anything. If you'd like support with your health, a parent, school nurse or doctor is a great place to start.",
+  "under18Back": "Back to start",
+  "legalTitle": "Before you start",
+  "legalBody": "Please read and accept each of these. Your acceptance is saved with the version and the date.",
+  "legalRead": "Read",
+  "legalAcceptAll": "Accept and continue",
+  "legalAcceptHint": "Tick all four to continue.",
+  "legalVersion": "Version {version}",
+  "@legalVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "legalLoadError": "We couldn't open this document. Please try again.",
+  "signInTitle": "Create your account",
+  "signInComingSoon": "Sign-in options are being added next."
 }

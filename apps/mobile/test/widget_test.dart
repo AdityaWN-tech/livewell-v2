@@ -34,11 +34,8 @@ void main() {
         (w) => w is Banner && w.message == flavor.label,
       );
       expect(banner, flavor.label == null ? findsNothing : findsOneWidget);
-      // The design-tokens gallery is reachable only in dev.
-      expect(
-        find.text('Design tokens'),
-        flavor == Flavor.dev ? findsOneWidget : findsNothing,
-      );
+      // Home never shows developer tools (AGENTS.md, Developer-only UI).
+      expect(find.text('Design tokens'), findsNothing);
     });
   }
 

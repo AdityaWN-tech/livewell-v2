@@ -1,0 +1,108 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:livewell/core/config/flavor.dart';
+import 'package:livewell/core/routing/router.dart';
+import 'package:livewell/features/account/data/profile_repository.dart';
+import 'package:livewell/features/auth/domain/auth.dart';
+import 'package:livewell/features/dev/application/preview_mode.dart';
+import 'package:livewell/features/dev/presentation/design_gallery.dart';
+import 'package:livewell/features/home/presentation/home_screen.dart';
+import 'package:livewell/features/settings/presentation/settings_screen.dart';
+
+import '../support/app_harness.dart';
+import '../support/fakes.dart';
+
+/// T-FND-04 follow-up: developer tools only in the dev flavour, never on
+/// Home, never routable in staging/prod (AGENTS.md, Developer-only UI).
+
+/// Signed in with a finished profile, so the app opens on Home.
+Harness signedIn(Flavor flavor) {
+  final h = Harness(
+    flavor: flavor,
+    auth: FakeAuthService(signedIn: const AuthUser(uid: 'u1')),
+  );
+  h.profiles.existing['u1'] = ProfileStep.assessment;
+  return h;
+}
+
+Future<void> openSettings(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Settings'));
+  await tester.pumpAndSettle();
+  expect(find.byType(SettingsScreen), findsOneWidget);
+}
+
+void main() {
+  for (final flavor in Flavor.values) {
+    testWidgets('Home has no "Design tokens" button (${flavor.name})', (
+      tester,
+    ) async {
+      await signedIn(flavor).boot(tester);
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.text('Design tokens'), findsNothing);
+    });
+  }
+
+  testWidgets('dev: Settings > Developer has Design tokens, and it opens', (
+    tester,
+  ) async {
+    await signedIn(Flavor.dev).boot(tester);
+    await openSettings(tester);
+    expect(find.text('Developer'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('dev-design-tokens')));
+    await tester.pumpAndSettle();
+    expect(find.byType(DesignGallery), findsOneWidget);
+  });
+
+  for (final flavor in [Flavor.staging, Flavor.prod]) {
+    testWidgets('${flavor.name}: Settings has no Developer section', (
+      tester,
+    ) async {
+      await signedIn(flavor).boot(tester);
+      await openSettings(tester);
+      expect(find.text('Developer'), findsNothing);
+      expect(find.text('Design tokens'), findsNothing);
+    });
+
+    test('${flavor.name}: the design-tokens route is not registered', () {
+      final container = ProviderContainer(
+        overrides: [flavorProvider.overrideWithValue(flavor)],
+      );
+      addTearDown(container.dispose);
+      final router = container.read(routerProvider);
+      final match = router.configuration.findMatch(Uri.parse('/dev/tokens'));
+      expect(match.matches, isEmpty);
+    });
+
+    testWidgets('${flavor.name}: a deep link to /dev/tokens does not open it', (
+      tester,
+    ) async {
+      await signedIn(flavor).boot(tester);
+      GoRouter.of(tester.element(find.byType(HomeScreen))).go('/dev/tokens');
+      await tester.pumpAndSettle();
+      expect(find.byType(DesignGallery), findsNothing);
+    });
+
+    test('${flavor.name}: preview mode cannot be switched on', () {
+      final container = ProviderContainer(
+        overrides: [flavorProvider.overrideWithValue(flavor)],
+      );
+      addTearDown(container.dispose);
+      container.read(previewModeProvider.notifier).enable();
+      expect(container.read(previewModeProvider), isFalse);
+    });
+  }
+
+  test('dev: the design-tokens route is registered', () {
+    final container = ProviderContainer(
+      overrides: [flavorProvider.overrideWithValue(Flavor.dev)],
+    );
+    addTearDown(container.dispose);
+    final match = container
+        .read(routerProvider)
+        .configuration
+        .findMatch(Uri.parse('/dev/tokens'));
+    expect(match.matches, isNotEmpty);
+  });
+}

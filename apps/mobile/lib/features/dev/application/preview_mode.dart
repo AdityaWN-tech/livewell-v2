@@ -2,18 +2,23 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/flavor.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
 
 /// Dev-flavor-only "Preview the app": skips sign-in so the shell, Settings and
 /// consents can be explored on a device before sign-in (T-ONB-01) exists.
 /// Nothing is saved: consents go to [InMemoryConsentRepository].
-/// The button that turns it on is shown only in the dev flavor.
+/// The button that turns it on is shown only in the dev flavor, and
+/// [enable] refuses to work in any other flavor (AGENTS.md, Developer-only UI).
 class PreviewMode extends Notifier<bool> {
   @override
   bool build() => false;
 
-  void enable() => state = true;
+  void enable() {
+    if (ref.read(flavorProvider) != Flavor.dev) return;
+    state = true;
+  }
 }
 
 final previewModeProvider = NotifierProvider<PreviewMode, bool>(

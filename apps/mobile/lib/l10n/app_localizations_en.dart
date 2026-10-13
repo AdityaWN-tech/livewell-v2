@@ -608,4 +608,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String safetyCallFailed(String number) {
     return 'We couldn\'t start the call. Please dial $number.';
   }
+
+  @override
+  String get settingsDeveloper => 'Developer';
+
+  @override
+  String get settingsDeveloperBody =>
+      'Tools for building the app. Only in the dev build.';
 }

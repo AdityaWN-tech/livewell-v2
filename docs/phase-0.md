@@ -11,7 +11,7 @@ Greenfield adjustments are in `decisions.md` (D-01).
 | S-3 | Firebase CLI, login, FlutterFire, PATH (owner, `setup/firebase-windows.md` steps 1–4) | `firebase projects:list` shows my-livewell; `flutterfire --version` works | Done 2026-10-13 |
 | S-4 | FlutterFire configure dev, Firebase init in `bootstrap.dart`, fingerprints, sign-in methods enabled | Dev app starts with Firebase on an Android device | Partly done 2026-10-13: configure, init and fingerprints done, verified on emulator. Left: sign-in methods + Firestore nam5 (console), iOS plist (Mac) |
 | S-5 | New private GitHub repo + first push | `git remote -v` shows the new repo | Done 2026-10-12: AdityaWN-tech/livewell-v2 (private) |
-| S-6 | Brand: original logo, design tokens (colors, text, spacing, radius) | Logo in `assets/brand/`, `docs/brand.md`, tokens used everywhere | Logo redrawn (D-15, `docs/brand.md`); tokens next |
+| S-6 | Brand: original logo, design tokens (colors, text, spacing, radius) | Logo in `assets/brand/`, `docs/brand.md`, tokens used everywhere | Done 2026-10-13: logo (D-15), tokens + theme, AA contrast tests, dev gallery |
 | S-7 | Splash: flutter_native_splash + logo reveal (≤ budget in NFR-01) | Cold start to Home < 2.0 s on a mid-range device | Chosen: "Three words" (D-13); ready to build |
 | T-FND-01 | Requirements check (greenfield form, D-01) | `docs/audit.md`: every 10.4 "keep/refactor" item mapped to a v2 task | To do |
 | T-FND-02 | CI (GitHub Actions: lint + tests), staging + prod Firebase projects, Terraform skeleton | CI green on an empty PR; dev, staging, prod deployable | To do |

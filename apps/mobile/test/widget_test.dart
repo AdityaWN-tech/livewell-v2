@@ -3,30 +3,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/app.dart';
 import 'package:livewell/core/config/flavor.dart';
+import 'package:livewell/core/startup/app_startup.dart';
+import 'package:livewell/features/splash/application/splash_handoff.dart';
+import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/firebase/firebase_options.dart';
+
+import 'support/frames.dart';
 
 void main() {
   for (final flavor in Flavor.values) {
-    testWidgets('${flavor.name} boots and shows its banner', (tester) async {
+    testWidgets('${flavor.name} boots to Home and shows its banner', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [flavorProvider.overrideWithValue(flavor)],
+          overrides: [
+            flavorProvider.overrideWithValue(flavor),
+            splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
+            appStartupProvider.overrideWith(
+              (ref) async => StartDestination.home,
+            ),
+          ],
           child: const LiveWellApp(),
         ),
       );
+      await pumpFrames(tester, const Duration(seconds: 3));
       await tester.pumpAndSettle();
-      expect(
-        find.text(
-          flavor == Flavor.dev
-              ? 'Design tokens'
-              : 'Live Well\nHealth. Habit. Happiness.',
-        ),
-        findsOneWidget,
-      );
+      expect(find.byType(HomeScreen), findsOneWidget);
       final banner = find.byWidgetPredicate(
         (w) => w is Banner && w.message == flavor.label,
       );
       expect(banner, flavor.label == null ? findsNothing : findsOneWidget);
+      // The design-tokens gallery is reachable only in dev.
+      expect(
+        find.text('Design tokens'),
+        flavor == Flavor.dev ? findsOneWidget : findsNothing,
+      );
     });
   }
 

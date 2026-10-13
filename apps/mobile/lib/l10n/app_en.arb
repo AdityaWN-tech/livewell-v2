@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "appTitle": "Live Well",
+  "taglineHealth": "Health.",
+  "taglineHabit": "Habit.",
+  "taglineHappiness": "Happiness.",
+  "splashSemanticLabel": "Live Well. Health. Habit. Happiness.",
+  "@splashSemanticLabel": {"description": "Read once by screen readers while the logo reveal plays."},
+  "welcomeTitle": "Your daily companion for health and happiness.",
+  "@welcomeTitle": {"description": "Welcome screen headline (spec 5.2 step 1)."},
+  "welcomeGetStarted": "Get started",
+  "welcomeHaveAccount": "I already have an account",
+  "homeTitle": "Home",
+  "startupErrorTitle": "We couldn't start Live Well",
+  "startupErrorBody": "Please check your connection and try again.",
+  "startupErrorRetry": "Try again",
+  "devDesignTokens": "Design tokens"
+}

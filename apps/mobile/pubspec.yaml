@@ -37,6 +37,11 @@ dependencies:
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.2
   firebase_core: ^4.15.0
+  firebase_auth: ^6.7.0
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  flutter_native_splash: ^2.4.8
 
 dev_dependencies:
   flutter_test:
@@ -48,12 +53,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
+  generate: true # ARB strings (NFR-11), see l10n.yaml
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -110,3 +111,16 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# First frame (S-7, D-13): teal background + the 160 dp mark, the same as the first
+# frame of the Flutter splash, so there is no white flash or jump. Same in light and
+# dark mode (brand moment). Regenerate after changes: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#0B3A4E"
+  image: assets/brand/splash/splash-mark.png
+  android_12:
+    color: "#0B3A4E"
+    image: assets/brand/splash/splash-mark-android12.png
+  android: true
+  ios: true
+  web: false

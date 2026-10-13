@@ -8,11 +8,11 @@ Greenfield adjustments are in `decisions.md` (D-01).
 |---|---|---|---|
 | S-1 | Monorepo per 17.2, AGENTS.md, decisions log | Folders exist; decisions D-01..D-12 recorded | Done 2026-10-12 |
 | S-2 | Flutter app with dev/staging/prod flavors | `flutter analyze` clean, `flutter test` green, dev APK installs as `…livewell.dev` | Done 2026-10-12 |
-| S-3 | Firebase CLI, login, FlutterFire, PATH (owner, `setup/firebase-windows.md` steps 1–4) | `firebase projects:list` shows my-livewell; `flutterfire --version` works | Waiting on owner |
-| S-4 | FlutterFire configure dev, Firebase init in `bootstrap.dart`, fingerprints, sign-in methods enabled | Dev app starts with Firebase on an Android device | Next |
-| S-5 | New private GitHub repo + first push | `git remote -v` shows the new repo | Waiting on repo name |
-| S-6 | Brand: original logo, design tokens (colors, text, spacing, radius) | Logo in `assets/brand/`, `docs/brand.md`, tokens used everywhere | Waiting on logo file |
-| S-7 | Splash: flutter_native_splash + logo reveal (≤ budget in NFR-01) | Cold start to Home < 2.0 s on a mid-range device | Chosen: "Three words" (D-13); waiting on logo file |
+| S-3 | Firebase CLI, login, FlutterFire, PATH (owner, `setup/firebase-windows.md` steps 1–4) | `firebase projects:list` shows my-livewell; `flutterfire --version` works | Done 2026-10-13 |
+| S-4 | FlutterFire configure dev, Firebase init in `bootstrap.dart`, fingerprints, sign-in methods enabled | Dev app starts with Firebase on an Android device | Partly done 2026-10-13: configure, init and fingerprints done, verified on emulator. Left: sign-in methods + Firestore nam5 (console), iOS plist (Mac) |
+| S-5 | New private GitHub repo + first push | `git remote -v` shows the new repo | Done 2026-10-12: AdityaWN-tech/livewell-v2 (private) |
+| S-6 | Brand: original logo, design tokens (colors, text, spacing, radius) | Logo in `assets/brand/`, `docs/brand.md`, tokens used everywhere | Logo redrawn (D-15, `docs/brand.md`); tokens next |
+| S-7 | Splash: flutter_native_splash + logo reveal (≤ budget in NFR-01) | Cold start to Home < 2.0 s on a mid-range device | Chosen: "Three words" (D-13); ready to build |
 | T-FND-01 | Requirements check (greenfield form, D-01) | `docs/audit.md`: every 10.4 "keep/refactor" item mapped to a v2 task | To do |
 | T-FND-02 | CI (GitHub Actions: lint + tests), staging + prod Firebase projects, Terraform skeleton | CI green on an empty PR; dev, staging, prod deployable | To do |
 | T-FND-03 | Vendor + framework spike (LangGraph vs ADK, TTS/clone, avatar, STT, LLM), ADRs | ADRs with 8.3 scorecards; morning-briefing prototype end to end | To do (needs vendor keys) |

@@ -35,5 +35,44 @@
   "learnEmptyTitle": "Learn something small",
   "learnEmptyBody": "Short lessons from the Live Well book, audio and breathing sessions will be here.",
   "careEmptyTitle": "Care and support",
-  "careEmptyBody": "Talk with your coach, see what it remembers, and find safety and clinician help here."
+  "careEmptyBody": "Talk with your coach, see what it remembers, and find safety and clinician help here.",
+  "settingsTitle": "Settings",
+  "settingsPrivacy": "Privacy and consents",
+  "settingsPrivacyBody": "Choose what Live Well may use. Change it any time.",
+  "consentsIntro": "Each switch is your choice, and you can change it any time. Every change is saved with the date and the wording you saw.",
+  "consentsDraftNote": "Draft wording. The final text comes after legal review.",
+  "consentsOptionalHeader": "Your choices",
+  "consentsLegalHeader": "Accepted to use Live Well",
+  "consentLegalAccepted": "Accepted · version {version}",
+  "@consentLegalAccepted": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "consentLegalNotAccepted": "Not accepted yet",
+  "consentLegalWithdrawNote": "These are needed to use Live Well. To withdraw, close your account from My data.",
+  "consentSaveError": "We couldn't save that change. Please try again.",
+  "consentLoadError": "We couldn't load your choices. Please try again.",
+  "consentNotificationsTitle": "Reminders and nudges",
+  "consentNotificationsBody": "Lets Live Well send your briefing, check-in and habit reminders. You choose the times and quiet hours.",
+  "consentHealthDataTitle": "Health data",
+  "consentHealthDataBody": "Lets Live Well read steps, sleep and activity from Apple Health or Health Connect for your tracking.",
+  "consentCameraTitle": "Camera",
+  "consentCameraBody": "Used only if you make an avatar from a selfie.",
+  "consentMicrophoneTitle": "Microphone",
+  "consentMicrophoneBody": "Used when you talk to your coach or answer a reflection by voice.",
+  "consentBiometricTitle": "Face and voice models",
+  "consentBiometricBody": "Needed to make an avatar from your face or a copy of a voice. You can delete them any time.",
+  "consentPortalLinkingTitle": "Link to the Live Well portal",
+  "consentPortalLinkingBody": "Connects your portal account so your coach can suggest courses that fit. Your health data is never shared with the portal.",
+  "consentMarketingTitle": "News and offers",
+  "consentMarketingBody": "Occasional emails about new Live Well courses and programs.",
+  "consentAnalyticsTitle": "Help improve the app",
+  "consentAnalyticsBody": "Shares anonymous usage counts, never your health details.",
+  "consentTermsTitle": "Terms of use",
+  "consentPrivacyTitle": "Privacy policy",
+  "consentMedicalDisclaimerTitle": "Medical disclaimer",
+  "consentAiDisclosureTitle": "AI disclosure"
 }

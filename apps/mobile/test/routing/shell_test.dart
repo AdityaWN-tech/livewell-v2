@@ -8,6 +8,7 @@ import 'package:livewell/features/care/presentation/care_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/learn/presentation/learn_screen.dart';
 import 'package:livewell/features/plan/presentation/plan_screen.dart';
+import 'package:livewell/features/settings/presentation/settings_screen.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
 import 'package:livewell/features/track/presentation/track_screen.dart';
 
@@ -76,6 +77,24 @@ void main() {
       final size = tester.getSize(tabs.at(i));
       expect(size.height, greaterThanOrEqualTo(48), reason: 'tab $i height');
       expect(size.width, greaterThanOrEqualTo(48), reason: 'tab $i width');
+    }
+  });
+
+  testWidgets('Settings opens from every tab', (tester) async {
+    await bootToShell(tester);
+    for (final label in ['Home', 'Plan', 'Track', 'Learn', 'Care']) {
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text(label),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Settings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsScreen), findsOneWidget, reason: label);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
     }
   });
 }

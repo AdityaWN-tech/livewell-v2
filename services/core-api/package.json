@@ -1,0 +1,25 @@
+{
+  "name": "livewell-core-api",
+  "private": true,
+  "type": "module",
+  "description": "Core API and Firestore triggers (TypeScript, Cloud Functions 2nd gen). Spec 10.2.",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && firebase emulators:exec --only firestore,functions --project demo-livewell \"vitest run\""
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "firebase-tools": "^15.33.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4"
+  }
+}

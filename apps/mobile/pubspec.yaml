@@ -43,6 +43,7 @@ dependencies:
   intl: any
   flutter_native_splash: ^2.4.8
   cloud_firestore: ^6.10.0
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:

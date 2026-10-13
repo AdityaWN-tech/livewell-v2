@@ -5,8 +5,37 @@
     "indexes": "firebase/firestore.indexes.json"
   },
   "emulators": {
-    "firestore": { "host": "127.0.0.1", "port": 8080 },
-    "ui": { "enabled": false },
-    "singleProjectMode": true
-  }
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8080
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true,
+    "functions": {
+      "host": "127.0.0.1",
+      "port": 5001
+    },
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    }
+  },
+  "functions": [
+    {
+      "source": "services/core-api",
+      "codebase": "core-api",
+      "ignore": [
+        "node_modules",
+        "test",
+        "src",
+        "*.log",
+        ".gitignore"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
 }

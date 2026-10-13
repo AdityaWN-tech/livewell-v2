@@ -255,6 +255,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Talk with your coach, see what it remembers, and find safety and clinician help here.'**
   String get careEmptyBody;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy and consents'**
+  String get settingsPrivacy;
+
+  /// No description provided for @settingsPrivacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose what Live Well may use. Change it any time.'**
+  String get settingsPrivacyBody;
+
+  /// No description provided for @consentsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Each switch is your choice, and you can change it any time. Every change is saved with the date and the wording you saw.'**
+  String get consentsIntro;
+
+  /// No description provided for @consentsDraftNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft wording. The final text comes after legal review.'**
+  String get consentsDraftNote;
+
+  /// No description provided for @consentsOptionalHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Your choices'**
+  String get consentsOptionalHeader;
+
+  /// No description provided for @consentsLegalHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted to use Live Well'**
+  String get consentsLegalHeader;
+
+  /// No description provided for @consentLegalAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted · version {version}'**
+  String consentLegalAccepted(String version);
+
+  /// No description provided for @consentLegalNotAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not accepted yet'**
+  String get consentLegalNotAccepted;
+
+  /// No description provided for @consentLegalWithdrawNote.
+  ///
+  /// In en, this message translates to:
+  /// **'These are needed to use Live Well. To withdraw, close your account from My data.'**
+  String get consentLegalWithdrawNote;
+
+  /// No description provided for @consentSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save that change. Please try again.'**
+  String get consentSaveError;
+
+  /// No description provided for @consentLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load your choices. Please try again.'**
+  String get consentLoadError;
+
+  /// No description provided for @consentNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders and nudges'**
+  String get consentNotificationsTitle;
+
+  /// No description provided for @consentNotificationsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Lets Live Well send your briefing, check-in and habit reminders. You choose the times and quiet hours.'**
+  String get consentNotificationsBody;
+
+  /// No description provided for @consentHealthDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Health data'**
+  String get consentHealthDataTitle;
+
+  /// No description provided for @consentHealthDataBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Lets Live Well read steps, sleep and activity from Apple Health or Health Connect for your tracking.'**
+  String get consentHealthDataBody;
+
+  /// No description provided for @consentCameraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get consentCameraTitle;
+
+  /// No description provided for @consentCameraBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Used only if you make an avatar from a selfie.'**
+  String get consentCameraBody;
+
+  /// No description provided for @consentMicrophoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone'**
+  String get consentMicrophoneTitle;
+
+  /// No description provided for @consentMicrophoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Used when you talk to your coach or answer a reflection by voice.'**
+  String get consentMicrophoneBody;
+
+  /// No description provided for @consentBiometricTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Face and voice models'**
+  String get consentBiometricTitle;
+
+  /// No description provided for @consentBiometricBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed to make an avatar from your face or a copy of a voice. You can delete them any time.'**
+  String get consentBiometricBody;
+
+  /// No description provided for @consentPortalLinkingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Link to the Live Well portal'**
+  String get consentPortalLinkingTitle;
+
+  /// No description provided for @consentPortalLinkingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Connects your portal account so your coach can suggest courses that fit. Your health data is never shared with the portal.'**
+  String get consentPortalLinkingBody;
+
+  /// No description provided for @consentMarketingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'News and offers'**
+  String get consentMarketingTitle;
+
+  /// No description provided for @consentMarketingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Occasional emails about new Live Well courses and programs.'**
+  String get consentMarketingBody;
+
+  /// No description provided for @consentAnalyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help improve the app'**
+  String get consentAnalyticsTitle;
+
+  /// No description provided for @consentAnalyticsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares anonymous usage counts, never your health details.'**
+  String get consentAnalyticsBody;
+
+  /// No description provided for @consentTermsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get consentTermsTitle;
+
+  /// No description provided for @consentPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get consentPrivacyTitle;
+
+  /// No description provided for @consentMedicalDisclaimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical disclaimer'**
+  String get consentMedicalDisclaimerTitle;
+
+  /// No description provided for @consentAiDisclosureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI disclosure'**
+  String get consentAiDisclosureTitle;
 }
 
 class _AppLocalizationsDelegate

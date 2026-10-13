@@ -24,6 +24,7 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `users/{uid}/portal_events/{id}` | event, offer_id, click_id, value | Owner read; **append-only** create of card_shown / clicked / dismissed | order / progress / completed (webhooks) |
 | `portal_offers/{id}` | title, url, offer_type, tags, price_display, active, review_status | Signed-in read of active + approved only (queries must filter the same way) | Admin |
 | `content_items/{id}` | lesson metadata, body, media | Signed-in read of approved only | Admin |
-| `safety_events/{id}`, `audit_log` | — | **None** | all |
+| `safety_events/{id}` | — | **None** | all |
+| `audit_log/{id}` | actor, action, target, timestamp, ip_hash, details (no health content) | **None** | Cloud Functions; interim Firestore store (D-18), idempotent ids e.g. `consent_{uid}_{consentId}` |
 
 Anything not listed is denied.

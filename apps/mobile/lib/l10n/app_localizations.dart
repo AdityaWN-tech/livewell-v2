@@ -142,12 +142,6 @@ abstract class AppLocalizations {
   /// **'I already have an account'**
   String get welcomeHaveAccount;
 
-  /// No description provided for @homeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Home'**
-  String get homeTitle;
-
   /// No description provided for @startupErrorTitle.
   ///
   /// In en, this message translates to:
@@ -171,6 +165,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Design tokens'**
   String get devDesignTokens;
+
+  /// Bottom navigation tabs (spec 14.2).
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get tabHome;
+
+  /// No description provided for @tabPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get tabPlan;
+
+  /// No description provided for @tabTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Track'**
+  String get tabTrack;
+
+  /// No description provided for @tabLearn.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn'**
+  String get tabLearn;
+
+  /// No description provided for @tabCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Care'**
+  String get tabCare;
+
+  /// No description provided for @homeEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your day starts here'**
+  String get homeEmptyTitle;
+
+  /// No description provided for @homeEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your morning briefing, one next step and a quick check-in will show up here.'**
+  String get homeEmptyBody;
+
+  /// No description provided for @planEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan'**
+  String get planEmptyTitle;
+
+  /// No description provided for @planEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Live Well Map, your 30-day goal and your daily habits will live here.'**
+  String get planEmptyBody;
+
+  /// No description provided for @trackEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress'**
+  String get trackEmptyTitle;
+
+  /// No description provided for @trackEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your check-ins, habits and the numbers you log will show here as simple charts.'**
+  String get trackEmptyBody;
+
+  /// No description provided for @learnEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn something small'**
+  String get learnEmptyTitle;
+
+  /// No description provided for @learnEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Short lessons from the Live Well book, audio and breathing sessions will be here.'**
+  String get learnEmptyBody;
+
+  /// No description provided for @careEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Care and support'**
+  String get careEmptyTitle;
+
+  /// No description provided for @careEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk with your coach, see what it remembers, and find safety and clinician help here.'**
+  String get careEmptyBody;
 }
 
 class _AppLocalizationsDelegate

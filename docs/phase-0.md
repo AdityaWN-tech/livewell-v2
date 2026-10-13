@@ -24,7 +24,7 @@ Greenfield adjustments are in `decisions.md` (D-01).
 | T-FND-09 | Audit log service (append-only) | Write-only service account; tamper test fails as expected | To do (human review) |
 | T-FND-10 | Crashlytics with PHI scrubbing, agent tracing, cost dashboard | Test crash shows no PHI; sample trace visible | To do |
 | T-FND-11 | Remote Config flags and kill switches | Each 10.2 flag toggles behaviour in staging | To do |
-| T-ASM-02 / T-AGT-02 | Red-flag rules + safety pre/post with fixed templates | 15.3 critical cases 100% | To do (India + US sets, D-03) |
+| T-ASM-02 / T-AGT-02 | Red-flag rules + safety pre/post with fixed templates | 15.3 critical cases 100% | T-ASM-02 done 2026-10-13 (**awaiting clinical review**): shared rules + 69 cases (critical 100%) in packages/safety-rules, Dart + Python engines, emergency/crisis cards with region numbers, notices, applied to the Why. Not yet: event logging (D-22), classifier and agent post-check (T-AGT-02) |
 
 ## Accounts to start now (slow to approve)
 Apple Developer (organisation), Google Play Console, Anthropic API, a TTS vendor sandbox, TagMango API key and a test course (Q3). Prefer the client organisation's name as owner.

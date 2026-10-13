@@ -9,12 +9,14 @@ import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
+import '../../safety/data/safety_rules_provider.dart';
+import '../../safety/presentation/safety_screens.dart';
 import 'about_screen.dart' show OnboardingScaffold;
 
 /// Personal "Why" (FR-ONB-05, T-ONB-02): typed, picked from suggestions, or
 /// spoken (with the microphone consent). Saved to the profile and shown on
-/// Home. Safety screening of this text arrives with the rules engine
-/// (T-ASM-02); until then nothing else reads it (D-21).
+/// Home. Checked by the red-flag rules before saving (T-ASM-02); nothing
+/// but the user's own Home reads it until the agents' checks exist (D-21).
 class WhyScreen extends ConsumerStatefulWidget {
   const WhyScreen({super.key});
 
@@ -129,6 +131,26 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
     setState(() => _saving = true);
     try {
       if (_listening) await _dictation.stop();
+
+      // Red flags first (FR-SAF, D-21): emergency, crisis and disordered
+      // eating are not saved; medication / pregnancy notes may continue.
+      final rules = await ref.read(safetyRulesProvider.future);
+      final result = rules.check(_text.text);
+      if (!result.isClear) {
+        final region = (await ref.read(profileRepositoryProvider).get(uid))
+            ?.region;
+        if (!mounted) return;
+        final proceed = await showSafetyResponse(
+          context,
+          result,
+          rules.contactsFor(region),
+        );
+        if (!proceed) {
+          if (mounted) setState(() => _saving = false);
+          return;
+        }
+      }
+
       await ref
           .read(profileRepositoryProvider)
           .saveWhy(uid, _text.text, nextStep: ProfileStep.assessment);

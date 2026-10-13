@@ -1,0 +1,31 @@
+# Shared red-flag rules (T-ASM-02): the generated rules.json must match its
+# source, and the reference engine must pass every case.
+name: safety-rules
+
+on:
+  pull_request:
+    paths: ["packages/safety-rules/**", ".github/workflows/safety-rules.yml"]
+  push:
+    branches: [main]
+    paths: ["packages/safety-rules/**", ".github/workflows/safety-rules.yml"]
+
+defaults:
+  run:
+    working-directory: packages/safety-rules
+
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: rules.json is generated from build_rules.py
+        run: |
+          python build_rules.py /tmp/rules.json
+          diff -u rules.json /tmp/rules.json
+      - name: bundled app copy matches
+        run: diff -u rules.json ../../apps/mobile/assets/safety/rules.json
+      - run: python check_cases.py

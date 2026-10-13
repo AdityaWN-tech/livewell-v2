@@ -373,7 +373,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countryIndia => 'India (+91)';
 
   @override
-  String get countryUs => 'United States (+1)';
+  String get countryUs => 'the US';
 
   @override
   String get phoneNumberLabel => 'Mobile number';
@@ -531,4 +531,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeWhyEyebrow => 'Your Why';
+
+  @override
+  String get safetyEmergencyTitle => 'This could be an emergency';
+
+  @override
+  String get safetyEmergencyBody =>
+      'Please call for emergency help now. If you can, unlock your door and ask someone to stay with you.';
+
+  @override
+  String safetyCallNumber(String number) {
+    return 'Call $number';
+  }
+
+  @override
+  String safetyCallNumberIn(String number, String country) {
+    return 'Call $number in $country';
+  }
+
+  @override
+  String get safetyCrisisTitle => 'You don\'t have to face this alone';
+
+  @override
+  String get safetyCrisisBody =>
+      'If you\'re thinking about suicide or hurting yourself, please reach out to someone right now. It\'s free and confidential, and they\'re there day and night.';
+
+  @override
+  String safetyCrisisCall(String name, String number) {
+    return 'Call $name: $number';
+  }
+
+  @override
+  String safetyCrisisText(String number) {
+    return 'Text $number';
+  }
+
+  @override
+  String get safetyCrisisDanger =>
+      'If you\'re in danger right now, call emergency services.';
+
+  @override
+  String get safetyEdTitle => 'Let\'s take care of you first';
+
+  @override
+  String get safetyEdBody =>
+      'It sounds like food or your body may feel hard right now. Live Well won\'t help with very low-calorie or fast weight-loss plans. A doctor or an eating-disorder specialist can support you, and you deserve that support.';
+
+  @override
+  String get safetyMedTitle =>
+      'Medicine changes are for you and your prescriber';
+
+  @override
+  String get safetyMedBody =>
+      'Please don\'t start, stop or change any medicine or supplement without talking to the doctor who prescribed it. Live Well can help with daily habits alongside your treatment.';
+
+  @override
+  String get safetyComplexTitle => 'Check with your clinician first';
+
+  @override
+  String get safetyComplexBody =>
+      'Pregnancy and some health conditions change what\'s safe for you. Please talk to your doctor or midwife before changing how you eat or move.';
+
+  @override
+  String get safetyBack => 'Go back';
+
+  @override
+  String get safetyChangeIt => 'Change it';
+
+  @override
+  String get safetySaveAnyway => 'Save my Why';
+
+  @override
+  String get countryIndiaName => 'India';
+
+  @override
+  String safetyCallFailed(String number) {
+    return 'We couldn\'t start the call. Please dial $number.';
+  }
 }

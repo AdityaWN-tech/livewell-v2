@@ -97,7 +97,7 @@ String legalAssetPath(ConsentType type) =>
     'assets/legal/${ConsentTexts.versionOf(type)}.md';
 
 final legalTextProvider = FutureProvider.family<String, ConsentType>(
-  (ref, type) => rootBundle.loadString(legalAssetPath(type)),
+  (ref, type) => rootBundle.loadString(legalAssetPath(type), cache: false),
 );
 
 /// Full text of one legal document.

@@ -46,6 +46,7 @@ dependencies:
   package_info_plus: ^10.2.2
   shared_preferences: ^2.5.6
   speech_to_text: ^7.5.0
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +72,8 @@ flutter:
     - assets/brand/
     # Legal texts users accept (copies of content/legal, checked by a test).
     - assets/legal/
+    # Red-flag rules (copy of packages/safety-rules/rules.json, checked by a test).
+    - assets/safety/
     # Design references (portal screenshots). Remove before the first store release
     # so they don't ship in the app (NFR-08 size budget).
     - assets/design-reference/

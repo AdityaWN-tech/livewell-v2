@@ -459,4 +459,76 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountSetupError =>
       'We couldn\'t finish setting up your account. Please try again.';
+
+  @override
+  String get whyTitle => 'Your Why';
+
+  @override
+  String get whyHeading => 'What matters most to you?';
+
+  @override
+  String get whyBody =>
+      'Your Why is the reason behind your habits. Your coach will remind you of it on hard days.';
+
+  @override
+  String get whyFieldLabel => 'My Why';
+
+  @override
+  String get whyHint => 'I want to...';
+
+  @override
+  String get whySuggestionsLabel =>
+      'Need an idea? Tap one, then make it yours.';
+
+  @override
+  String get whySuggestion1 => 'I want energy to travel with my family.';
+
+  @override
+  String get whySuggestion2 => 'I want to stay active for my grandchildren.';
+
+  @override
+  String get whySuggestion3 =>
+      'I want to sleep well and wake up feeling rested.';
+
+  @override
+  String get whySuggestion4 =>
+      'I want to feel strong and confident in my body.';
+
+  @override
+  String get whySuggestion5 => 'I want to stay healthy for the people I love.';
+
+  @override
+  String get whySave => 'Save my Why';
+
+  @override
+  String get whyTooShort => 'Write a few words about what matters to you.';
+
+  @override
+  String get whyDictate => 'Speak instead';
+
+  @override
+  String get whyListening => 'Listening. Tap to stop.';
+
+  @override
+  String get whyMicTitle => 'Use your microphone?';
+
+  @override
+  String get whyMicBody =>
+      'Live Well uses the microphone only when you tap to speak, to turn your words into text. You can turn this off any time in Privacy and consents.';
+
+  @override
+  String get whyMicAllow => 'Allow';
+
+  @override
+  String get whyMicNotNow => 'Not now';
+
+  @override
+  String get whyDictationUnavailable =>
+      'Voice typing isn\'t available on this phone. You can type instead.';
+
+  @override
+  String get whySaveError => 'We couldn\'t save your Why. Please try again.';
+
+  @override
+  String get homeWhyEyebrow => 'Your Why';
 }

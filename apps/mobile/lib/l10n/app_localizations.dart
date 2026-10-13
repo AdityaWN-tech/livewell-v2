@@ -897,6 +897,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t finish setting up your account. Please try again.'**
   String get accountSetupError;
+
+  /// No description provided for @whyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Why'**
+  String get whyTitle;
+
+  /// No description provided for @whyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'What matters most to you?'**
+  String get whyHeading;
+
+  /// No description provided for @whyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Why is the reason behind your habits. Your coach will remind you of it on hard days.'**
+  String get whyBody;
+
+  /// No description provided for @whyFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'My Why'**
+  String get whyFieldLabel;
+
+  /// No description provided for @whyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'I want to...'**
+  String get whyHint;
+
+  /// No description provided for @whySuggestionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Need an idea? Tap one, then make it yours.'**
+  String get whySuggestionsLabel;
+
+  /// No description provided for @whySuggestion1.
+  ///
+  /// In en, this message translates to:
+  /// **'I want energy to travel with my family.'**
+  String get whySuggestion1;
+
+  /// No description provided for @whySuggestion2.
+  ///
+  /// In en, this message translates to:
+  /// **'I want to stay active for my grandchildren.'**
+  String get whySuggestion2;
+
+  /// No description provided for @whySuggestion3.
+  ///
+  /// In en, this message translates to:
+  /// **'I want to sleep well and wake up feeling rested.'**
+  String get whySuggestion3;
+
+  /// No description provided for @whySuggestion4.
+  ///
+  /// In en, this message translates to:
+  /// **'I want to feel strong and confident in my body.'**
+  String get whySuggestion4;
+
+  /// No description provided for @whySuggestion5.
+  ///
+  /// In en, this message translates to:
+  /// **'I want to stay healthy for the people I love.'**
+  String get whySuggestion5;
+
+  /// No description provided for @whySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save my Why'**
+  String get whySave;
+
+  /// No description provided for @whyTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a few words about what matters to you.'**
+  String get whyTooShort;
+
+  /// No description provided for @whyDictate.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak instead'**
+  String get whyDictate;
+
+  /// No description provided for @whyListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening. Tap to stop.'**
+  String get whyListening;
+
+  /// No description provided for @whyMicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your microphone?'**
+  String get whyMicTitle;
+
+  /// No description provided for @whyMicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well uses the microphone only when you tap to speak, to turn your words into text. You can turn this off any time in Privacy and consents.'**
+  String get whyMicBody;
+
+  /// No description provided for @whyMicAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get whyMicAllow;
+
+  /// No description provided for @whyMicNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get whyMicNotNow;
+
+  /// No description provided for @whyDictationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice typing isn\'t available on this phone. You can type instead.'**
+  String get whyDictationUnavailable;
+
+  /// No description provided for @whySaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save your Why. Please try again.'**
+  String get whySaveError;
+
+  /// No description provided for @homeWhyEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Why'**
+  String get homeWhyEyebrow;
 }
 
 class _AppLocalizationsDelegate

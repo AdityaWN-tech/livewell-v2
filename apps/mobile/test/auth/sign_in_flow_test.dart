@@ -5,6 +5,7 @@ import 'package:livewell/features/auth/presentation/phone_sign_in_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/onboarding/domain/onboarding_progress.dart';
 import 'package:livewell/features/onboarding/presentation/about_screen.dart';
+import 'package:livewell/features/onboarding/presentation/why_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fake_onboarding_store.dart';
@@ -66,7 +67,7 @@ void main() {
 
     await tester.enterText(find.byKey(const Key('code')), '123456');
     await tapText(tester, 'Verify');
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(WhyScreen), findsOneWidget);
 
     const uid = 'phone:+919876543210';
     expect(h.profiles.created[uid]!.region, 'IN');
@@ -107,7 +108,7 @@ void main() {
     );
     await tester.tap(find.widgetWithText(FilledButton, 'Create account'));
     await tester.pumpAndSettle();
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(WhyScreen), findsOneWidget);
     expect(
       h.profiles.created['email:priya@example.com']!.email,
       'priya@example.com',
@@ -145,7 +146,7 @@ void main() {
     tester,
   ) async {
     final h = Harness();
-    h.profiles.existing.add('google:1');
+    h.profiles.existing['google:1'] = 'assessment';
     await h.boot(tester);
     await tapText(tester, 'I already have an account');
     await tapText(tester, 'Continue with Google');
@@ -170,7 +171,7 @@ void main() {
       await tester.pumpAndSettle();
     }
     await tapText(tester, 'Accept and continue');
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(WhyScreen), findsOneWidget);
     expect(h.profiles.created.keys, ['google:1']);
     expect(h.consents.records, hasLength(4));
   });

@@ -10,6 +10,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/data/firestore.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
+import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/data/firebase_auth_service.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
@@ -113,15 +114,33 @@ void main() {
     final user = await auth.createAccountWithEmail(email, 'walk-after-lunch');
 
     final next = await container.read(signInCompletionProvider).complete(user);
-    expect(next, '/home');
+    expect(next, whyPath, reason: 'new accounts write their Why next');
     await expectAccountCreated(user.uid);
 
-    // Signing in again on the same account goes straight to Home.
+    // Save the Why through the real rules (FR-ONB-05); the account is then
+    // past onboarding, so signing in again goes straight to Home.
+    final profiles = container.read(profileRepositoryProvider);
+    await profiles.saveWhy(
+      user.uid,
+      'Energy to travel with my family.',
+      nextStep: ProfileStep.assessment,
+    );
+    expect(
+      (await profiles.get(user.uid))!.whyStatement,
+      'Energy to travel with my family.',
+    );
+
     await auth.signOut();
     final again = await auth.signInWithEmail(email, 'walk-after-lunch');
     expect(
       await container.read(signInCompletionProvider).complete(again),
       '/home',
+    );
+
+    // A Why over 280 characters is refused by the rules.
+    await expectLater(
+      profiles.saveWhy(again.uid, 'x' * 281, nextStep: ProfileStep.assessment),
+      throwsA(isA<FirebaseException>()),
     );
   });
 
@@ -154,7 +173,7 @@ void main() {
 
     expect(
       await container.read(signInCompletionProvider).complete(user),
-      '/home',
+      whyPath,
     );
     await expectAccountCreated(user.uid, region: 'IN');
   });

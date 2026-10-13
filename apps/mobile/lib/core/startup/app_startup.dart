@@ -54,7 +54,7 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
     final next = await ref
         .read(signInCompletionProvider)
         .complete(FirebaseAuthService.toAuthUser(user));
-    return StartDestination(next, signedIn: next == '/home');
+    return StartDestination(next, signedIn: true);
   }
   return signedOutDestination(await ref.read(onboardingProvider.future));
 });

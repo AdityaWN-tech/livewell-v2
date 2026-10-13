@@ -13,6 +13,8 @@ import '../../features/learn/presentation/learn_screen.dart';
 import '../../features/onboarding/presentation/about_screen.dart';
 import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
+import '../../features/onboarding/presentation/why_screen.dart';
+import '../../features/account/application/account_setup.dart' show whyPath;
 import '../../features/plan/presentation/plan_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
@@ -66,6 +68,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      GoRoute(path: whyPath, builder: (context, state) => const WhyScreen()),
       GoRoute(
         path: '/sign-in',
         builder: (context, state) => const SignInScreen(),

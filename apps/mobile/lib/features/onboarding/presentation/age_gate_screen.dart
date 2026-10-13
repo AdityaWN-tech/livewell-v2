@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../auth/data/firebase_auth_service.dart';
 import '../data/onboarding_store.dart';
 import '../domain/onboarding_progress.dart';
 
@@ -41,7 +42,16 @@ class AgeGateScreen extends ConsumerWidget {
               const SizedBox(height: LwSpacing.xs),
               OutlinedButton(
                 onPressed: () async {
-                  // Under 18: forget everything collected so far.
+                  // Under 18: forget everything collected so far, including
+                  // a sign-in account made before this check (FR-ONB-04).
+                  final auth = ref.read(authServiceProvider);
+                  if (auth.currentUser != null) {
+                    try {
+                      await auth.deleteCurrentUser();
+                    } catch (_) {
+                      await auth.signOut();
+                    }
+                  }
                   await ref.read(onboardingProvider.notifier).finish();
                   if (context.mounted) context.go('/onboarding/under-18');
                 },

@@ -13,8 +13,14 @@ abstract class ConsentRepository {
   /// All of the signed-in user's consent records, live.
   Stream<List<ConsentRecord>> watchRecords();
 
-  /// Adds a record for [type] with the current text version.
-  Future<void> record(ConsentType type, {required bool granted});
+  /// Adds a record for [type] with the current text version. [grantedAt] is
+  /// when the user decided, if earlier than now (onboarding acceptances are
+  /// saved once the account exists); created_at is always the server time.
+  Future<void> record(
+    ConsentType type, {
+    required bool granted,
+    DateTime? grantedAt,
+  });
 }
 
 class FirestoreConsentRepository implements ConsentRepository {
@@ -41,12 +47,18 @@ class FirestoreConsentRepository implements ConsentRepository {
       .map((s) => [for (final d in s.docs) ?_fromDoc(d.data())]);
 
   @override
-  Future<void> record(ConsentType type, {required bool granted}) async {
+  Future<void> record(
+    ConsentType type, {
+    required bool granted,
+    DateTime? grantedAt,
+  }) async {
     final now = FieldValue.serverTimestamp();
     await _consents().add({
       'type': type.key,
       'doc_version': ConsentTexts.versionOf(type),
       'granted': granted,
+      if (grantedAt != null && granted)
+        'granted_at': Timestamp.fromDate(grantedAt),
       'app_version': await _appVersion(),
       'created_at': now,
       'updated_at': now,

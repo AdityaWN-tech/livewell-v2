@@ -1,51 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:livewell/app.dart';
-import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/auth/presentation/sign_in_screen.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
-import 'package:livewell/features/onboarding/data/onboarding_store.dart';
 import 'package:livewell/features/onboarding/domain/onboarding_progress.dart';
 import 'package:livewell/features/onboarding/presentation/about_screen.dart';
 import 'package:livewell/features/onboarding/presentation/age_gate_screen.dart';
 import 'package:livewell/features/onboarding/presentation/legal_screen.dart';
-import 'package:livewell/features/splash/application/splash_handoff.dart';
 import 'package:livewell/features/welcome/presentation/welcome_screen.dart';
 
 import '../support/fake_onboarding_store.dart';
-import '../support/frames.dart';
+import '../support/app_harness.dart';
 
-/// Boots the real app the way a cold start would: the splash resumes at
-/// whatever step the store holds.
-Future<void> boot(WidgetTester tester, FakeOnboardingStore store) async {
-  tester.view.physicalSize = const Size(1080, 2400);
-  tester.view.devicePixelRatio = 2.625;
-  addTearDown(tester.view.reset);
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        flavorProvider.overrideWithValue(Flavor.prod),
-        splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
-        onboardingStoreProvider.overrideWithValue(store),
-        appStartupProvider.overrideWith(
-          (ref) async =>
-              signedOutDestination(await ref.read(onboardingProvider.future)),
-        ),
-      ],
-      child: const LiveWellApp(),
-    ),
-  );
-  await pumpFrames(tester, const Duration(seconds: 3));
-  await tester.pumpAndSettle();
-}
-
-Future<void> tapText(WidgetTester tester, String text) async {
-  await tester.ensureVisible(find.text(text));
-  await tester.tap(find.text(text));
-  await tester.pumpAndSettle();
-}
+Future<void> boot(WidgetTester tester, FakeOnboardingStore store) =>
+    Harness(store: store).boot(tester);
 
 FilledButton primaryButton(WidgetTester tester) =>
     tester.widget<FilledButton>(find.byType(FilledButton));

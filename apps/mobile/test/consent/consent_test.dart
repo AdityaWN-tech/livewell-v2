@@ -12,6 +12,9 @@ import 'package:livewell/l10n/app_localizations.dart';
 /// In-memory append-only store, standing in for Firestore.
 class FakeConsentRepository implements ConsentRepository {
   final records = <ConsentRecord>[];
+
+  /// The `grantedAt` passed for each type's latest record.
+  final grantedAt = <ConsentType, DateTime?>{};
   final _changes = StreamController<List<ConsentRecord>>.broadcast();
   var _clock = DateTime.utc(2026, 10, 13);
   bool failNext = false;
@@ -23,12 +26,17 @@ class FakeConsentRepository implements ConsentRepository {
   }
 
   @override
-  Future<void> record(ConsentType type, {required bool granted}) async {
+  Future<void> record(
+    ConsentType type, {
+    required bool granted,
+    DateTime? grantedAt,
+  }) async {
     if (failNext) {
       failNext = false;
       throw StateError('offline and rejected');
     }
     _clock = _clock.add(const Duration(minutes: 1));
+    this.grantedAt[type] = grantedAt;
     records.add(
       ConsentRecord(
         type: type,

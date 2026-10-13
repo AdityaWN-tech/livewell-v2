@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/account/application/account_setup.dart';
+import '../../features/auth/data/firebase_auth_service.dart';
 import '../../features/onboarding/data/onboarding_store.dart';
 import '../../features/onboarding/domain/onboarding_progress.dart';
 import '../../firebase/firebase_options.dart';
@@ -47,7 +49,13 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
     onTimeout: () => null,
   );
   StartupTrace.mark('startup_ready signedIn=${user != null}');
-  if (user != null) return StartDestination.home;
+  if (user != null) {
+    // Signed in: Home if the account is set up, otherwise finish onboarding.
+    final next = await ref
+        .read(signInCompletionProvider)
+        .complete(FirebaseAuthService.toAuthUser(user));
+    return StartDestination(next, signedIn: next == '/home');
+  }
   return signedOutDestination(await ref.read(onboardingProvider.future));
 });
 

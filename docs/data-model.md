@@ -1,0 +1,29 @@
+# Data model (Firestore)
+
+Source: spec Section 11. Security rules: `firebase/firestore.rules` (T-FND-06, human review required).
+Database: Standard `(default)` in nam5 per project (D-16). Every document carries `created_at`, `updated_at`, `schema_version`.
+App code gets Firestore only through `firestoreProvider` (D-16).
+
+| Path | Key fields | App (client) access | Written by server |
+|---|---|---|---|
+| `users/{uid}` | display_name, email, tz, locale, region, age_confirmed, onboarding_step, focus_driver, why_statement | Owner read; create only with `age_confirmed == true`; update listed fields only; no delete | plan_tier, ed_safe_mode, safety state; account deletion |
+| `users/{uid}/consents/{id}` | type, doc_version, granted, granted_at, revoked_at, app_version, evidence_ref | Owner read; **append-only** create (created_at = server time); no update/delete | — |
+| `users/{uid}/avatar/current` | type (stylized \| photoreal), style_config, raw_media_retained | Owner read; create/update those fields; no delete | vendor, vendor_avatar_id, thumbnail_urls; deletion |
+| `users/{uid}/voices/{voice_id}` | kind, vendor_voice_id, consent_id, status, speed, style | Owner read; update speed (0.8–1.2) and style only | everything else (create, status, revoke) |
+| `voice_consents/{id}` | consent record (spec 11 example) | **None** | all |
+| `users/{uid}/assessments/{id}` | bank_version, answers[], driver_scores, red_flags, map_result, completed_at | Owner read; create; update until completed; bank_version fixed | — |
+| `users/{uid}/goals/{id}` | SMART fields, FITT, status, driver | Owner read/create/update; no delete (pause) | — |
+| `users/{uid}/habits/{id}` | goal_id, title, anchor, window, size_variants, active | Owner read/create/update; no delete | — |
+| `users/{uid}/habit_logs/{date_habitId}` | date, habit_id, status, source, size_done | Owner read/create/update; id must equal `date_habitId`; date and habit fixed | — |
+| `users/{uid}/checkins/{date}` | energy, sleep, stress, mood (1–5), time_available (2/5/10/30), barrier_text, source | Owner read/create/update; id `YYYY-MM-DD` | — |
+| `users/{uid}/daily_plans/{date}` | next_step, alternatives, briefing ids/urls, mode | Owner read only | nightly job |
+| `users/{uid}/messages/{id}` | CoachMessage (spec 9.5) | Owner read only | orchestrator |
+| `users/{uid}/memory_facts/{id}` | fact, category, confidence, source_message_id, status | Owner read; change status to saved/deleted only; deleted is final | Memory Agent proposals |
+| `users/{uid}/streaks/current` | length, grace_used_week, best, restart_count | Owner read only | streak engine |
+| `users/{uid}/portal_link/{doc}` | tagmango_customer_ref, matched_email_hash, status | Owner read only | link/unlink |
+| `users/{uid}/portal_events/{id}` | event, offer_id, click_id, value | Owner read; **append-only** create of card_shown / clicked / dismissed | order / progress / completed (webhooks) |
+| `portal_offers/{id}` | title, url, offer_type, tags, price_display, active, review_status | Signed-in read of active + approved only (queries must filter the same way) | Admin |
+| `content_items/{id}` | lesson metadata, body, media | Signed-in read of approved only | Admin |
+| `safety_events/{id}`, `audit_log` | — | **None** | all |
+
+Anything not listed is denied.

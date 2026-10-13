@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "my-livewell",
+    "dev": "my-livewell"
+  }
+}

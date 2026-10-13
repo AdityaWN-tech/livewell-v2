@@ -18,7 +18,7 @@ Greenfield adjustments are in `decisions.md` (D-01).
 | T-FND-03 | Vendor + framework spike (LangGraph vs ADK, TTS/clone, avatar, STT, LLM), ADRs | ADRs with 8.3 scorecards; morning-briefing prototype end to end | To do (needs vendor keys) |
 | T-FND-04 | go_router 5-tab shell (Home, Plan, Track, Learn, Care), Riverpod, design system components | All screens reachable; golden tests for core components | Done 2026-10-13: 5-tab shell (StatefulShellRoute), core components (LwScreen, LwSectionHeader, LwCard, LwTag, LwEmptyState), tab placeholders, goldens light + dark. Greenfield form of "prototype screens" = the 5 spec 14.2 tabs (D-01) |
 | T-FND-05 | Consent service (append-only) + Settings UI | Grant/revoke every consent type; emulator tests; audit entries | To do (human review) |
-| T-FND-06 | Firestore security rules + emulator tests (all Section 11 collections) | 100% rule coverage | To do (human review) |
+| T-FND-06 | Firestore security rules + emulator tests (all Section 11 collections) | 100% rule coverage | Done 2026-10-13 (**awaiting human review**): rules for every Section 11 collection, 42 emulator tests, coverage gate 35/35 conditional allows + 20 constant denies asserted, mutation check passed, CI job. Not deployed: my-livewell keeps locked production rules until review |
 | T-FND-07 | Migration of old prototype data | Dropped (D-01) | N/A |
 | T-FND-08 | Drift + SQLCipher local DB + offline sync queue with idempotency keys | Offline log → reconnect syncs exactly once | To do |
 | T-FND-09 | Audit log service (append-only) | Write-only service account; tamper test fails as expected | To do (human review) |

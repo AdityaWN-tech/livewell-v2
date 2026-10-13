@@ -1,0 +1,258 @@
+rules_version = '2';
+
+// Live Well v2 Firestore security rules (spec Section 11 / 11.1, T-FND-06).
+// HUMAN REVIEW REQUIRED (security). Tests: firebase/test/*.test.ts (npm test).
+//
+// Principles:
+// - A user reads and writes only their own users/{uid}/** documents.
+// - Server-only fields and documents (vendor ids, safety state, plan tier,
+//   voice status, portal links, daily plans, coach messages, streaks) are
+//   written by Cloud Functions / Admin SDK, which bypass these rules.
+// - Nothing is stored for anyone who hasn't confirmed they are 18+ (FR-ONB-04).
+// - Append-only where the spec says so (consents, portal events).
+// - Everything not matched below is denied.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function userDoc(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    // The profile exists and the 18+ age gate was passed.
+    function isAdultOwner(uid) {
+      return isOwner(uid)
+        && exists(userDoc(uid))
+        && get(userDoc(uid)).data.age_confirmed == true;
+    }
+
+    // Spec 11: every document carries created_at, updated_at, schema_version.
+    function hasMeta(data) {
+      return data.created_at is timestamp
+        && data.updated_at is timestamp
+        && data.schema_version is int;
+    }
+
+    // Only these keys changed in this update.
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    function isScore(v) {
+      return v is int && v >= 1 && v <= 5;
+    }
+
+    // ---------- users/{uid} (root profile) ----------
+
+    match /users/{uid} {
+      // Fields the app may write. Not listed = server-only
+      // (plan_tier, ed_safe_mode, safety state, anything else).
+      function clientProfileKeys() {
+        return ['display_name', 'email', 'tz', 'locale', 'region',
+                'age_confirmed', 'onboarding_step', 'focus_driver',
+                'why_statement', 'created_at', 'updated_at', 'schema_version'];
+      }
+
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(clientProfileKeys())
+        && request.resource.data.age_confirmed == true
+        && hasMeta(request.resource.data);
+      allow update: if isOwner(uid)
+        && onlyChanges(clientProfileKeys())
+        && request.resource.data.age_confirmed == true
+        && request.resource.data.updated_at is timestamp;
+      // Account deletion runs on the server (FR-SET-02).
+      allow delete: if false;
+
+      // ---------- consents: append-only (FR-ONB-02/03) ----------
+      match /consents/{consentId} {
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && request.resource.data.keys().hasOnly(
+               ['type', 'doc_version', 'granted', 'granted_at', 'revoked_at',
+                'app_version', 'evidence_ref', 'created_at', 'updated_at',
+                'schema_version'])
+          && request.resource.data.type is string
+          && request.resource.data.doc_version is string
+          && request.resource.data.granted is bool
+          && request.resource.data.app_version is string
+          && request.resource.data.created_at == request.time
+          && hasMeta(request.resource.data);
+        // Never overwrite or delete: a revocation is a new record.
+        allow update, delete: if false;
+      }
+
+      // ---------- avatar: client style only, vendor fields server-only ----------
+      match /avatar/{docId} {
+        function clientAvatarKeys() {
+          return ['type', 'style_config', 'raw_media_retained',
+                  'created_at', 'updated_at', 'schema_version'];
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid) && docId == 'current'
+          && request.resource.data.keys().hasOnly(clientAvatarKeys())
+          && request.resource.data.type in ['stylized', 'photoreal']
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid) && docId == 'current'
+          && onlyChanges(['type', 'style_config', 'raw_media_retained', 'updated_at'])
+          && request.resource.data.type in ['stylized', 'photoreal'];
+        allow delete: if false; // "Delete my avatar" runs on the server (FR-SET-03)
+      }
+
+      // ---------- voices: status and vendor ids are server-only (16.2) ----------
+      match /voices/{voiceId} {
+        allow read: if isOwner(uid);
+        // The app may only change playback preferences on an existing voice.
+        allow update: if isAdultOwner(uid)
+          && onlyChanges(['speed', 'style', 'updated_at'])
+          && request.resource.data.speed is number
+          && request.resource.data.speed >= 0.8
+          && request.resource.data.speed <= 1.2;
+        allow create, delete: if false;
+      }
+
+      // ---------- assessments: saveable until completed (FR-ONB-06) ----------
+      match /assessments/{assessmentId} {
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && request.resource.data.bank_version is string
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && resource.data.get('completed_at', null) == null
+          && request.resource.data.bank_version == resource.data.bank_version;
+        allow delete: if false;
+      }
+
+      // ---------- goals and habits (FR-GOL) ----------
+      match /goals/{goalId} {
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid) && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid);
+        allow delete: if false; // pause instead (FR-GOL-02)
+      }
+
+      match /habits/{habitId} {
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && request.resource.data.title is string
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid);
+        allow delete: if false;
+      }
+
+      // ---------- habit logs: idempotent id date_habitId (11, NFR-05) ----------
+      match /habit_logs/{logId} {
+        function validLog(d) {
+          return logId == d.date + '_' + d.habit_id
+            && d.status in ['done', 'skipped', 'partial']
+            && d.source in ['app', 'widget', 'watch', 'auto'];
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && validLog(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && validLog(request.resource.data)
+          && request.resource.data.date == resource.data.date
+          && request.resource.data.habit_id == resource.data.habit_id;
+        allow delete: if false;
+      }
+
+      // ---------- check-ins: one per date (FR-DLY-02) ----------
+      match /checkins/{date} {
+        function validCheckin(d) {
+          return isScore(d.energy) && isScore(d.sleep)
+            && isScore(d.stress) && isScore(d.mood)
+            && d.time_available in [2, 5, 10, 30]
+            && d.source in ['app', 'widget', 'watch'];
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && validCheckin(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid) && validCheckin(request.resource.data);
+        allow delete: if false;
+      }
+
+      // ---------- memory facts: user approves or deletes (FR-CNV-05) ----------
+      match /memory_facts/{factId} {
+        allow read: if isOwner(uid);
+        // Facts are proposed by the Memory Agent (server); the user only
+        // changes their status. A deleted fact can't be brought back.
+        allow update: if isAdultOwner(uid)
+          && onlyChanges(['status', 'updated_at'])
+          && resource.data.status != 'deleted'
+          && request.resource.data.status in ['saved', 'deleted'];
+        allow create, delete: if false;
+      }
+
+      // ---------- portal events: app-side events only, append-only (13.2) ----------
+      match /portal_events/{eventId} {
+        allow read: if isOwner(uid);
+        // order / progress / completed come only from TagMango webhooks (server).
+        allow create: if isAdultOwner(uid)
+          && request.resource.data.event in ['card_shown', 'clicked', 'dismissed']
+          && request.resource.data.offer_id is string
+          && hasMeta(request.resource.data);
+        allow update, delete: if false;
+      }
+
+      // ---------- server-written, read-only for the app ----------
+      match /daily_plans/{date} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+      match /messages/{messageId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+      match /streaks/{docId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+      match /portal_link/{docId} {
+        allow read: if isOwner(uid);
+        allow write: if false; // linking and unlinking run on the server (FR-SET-04)
+      }
+    }
+
+    // ---------- global catalogues: read-only, approved items only ----------
+    // Rules are not filters: app queries must include these same conditions.
+    match /portal_offers/{offerId} {
+      allow read: if signedIn()
+        && resource.data.active == true
+        && resource.data.review_status == 'approved';
+      allow write: if false;
+    }
+
+    match /content_items/{itemId} {
+      allow read: if signedIn() && resource.data.review_status == 'approved';
+      allow write: if false;
+    }
+
+    // ---------- server-only, never readable by clients (11.1) ----------
+    match /voice_consents/{id} {
+      allow read, write: if false;
+    }
+    match /safety_events/{id} {
+      allow read, write: if false;
+    }
+    match /audit_log/{id} {
+      allow read, write: if false;
+    }
+
+    // Anything else: denied by default (no other match blocks).
+  }
+}

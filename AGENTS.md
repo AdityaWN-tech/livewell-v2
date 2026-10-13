@@ -59,6 +59,7 @@ services/media/         TTS and avatar adapters and jobs
 services/portal-bridge/ TagMango webhooks and deep links
 packages/schemas/       Shared JSON Schemas (CoachMessage, ...)
 content/                Lessons, assessment bank, legal texts (versioned)
+firebase/               Firestore rules, indexes and their emulator tests
 infra/terraform/        Cloud resources
 docs/                   Spec, decisions, setup guides, API, data model, ADRs
 ```
@@ -69,6 +70,7 @@ docs/                   Spec, decisions, setup guides, API, data model, ADRs
 | Mobile analyze + tests | `cd "D:\Adii voult\Adii\LiveWell\apps\mobile"; flutter analyze; flutter test` |
 | Golden images only / update them | `flutter test --tags golden` / `flutter test --update-goldens --tags golden` |
 | Firestore smoke test on a device | `flutter test integration_test/firestore_smoke_test.dart --flavor dev -d DEVICE` |
+| Firestore rules tests (emulator + coverage gate) | `cd firebase; $env:JAVA_HOME="D:\android\jbr"; npm test` (JAVA_HOME = the `jbr` folder inside your Android Studio / Android SDK install) |
 | CI (GitHub Actions) | `.github/workflows/mobile.yml`: Linux runs everything except goldens; Windows runs goldens |
 | Run dev flavor | `flutter run --flavor dev -t lib/main_dev.dart` |
 | Build dev APK | `flutter build apk --debug --flavor dev -t lib/main_dev.dart` |

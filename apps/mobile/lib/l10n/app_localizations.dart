@@ -447,6 +447,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI disclosure'**
   String get consentAiDisclosureTitle;
+
+  /// No description provided for @devPreviewApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview the app (dev build only)'**
+  String get devPreviewApp;
+
+  /// No description provided for @devPreviewNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview mode: changes here are not saved.'**
+  String get devPreviewNotSaved;
 }
 
 class _AppLocalizationsDelegate

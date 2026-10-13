@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../dev/application/preview_mode.dart';
 import '../data/consent_repository.dart';
 import '../domain/consent.dart';
 import 'consent_copy.dart';
@@ -36,6 +37,13 @@ class ConsentsScreen extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     return [
       Text(l.consentsIntro, style: t.bodyMedium),
+      if (ref.watch(previewModeProvider)) ...[
+        const SizedBox(height: LwSpacing.xs),
+        Text(
+          l.devPreviewNotSaved,
+          style: t.labelSmall?.copyWith(color: LwPalette.of(context).caution),
+        ),
+      ],
       if (ConsentTexts.draftVersion.contains('draft')) ...[
         const SizedBox(height: LwSpacing.xs),
         Text(

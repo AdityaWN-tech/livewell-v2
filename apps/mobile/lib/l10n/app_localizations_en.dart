@@ -206,4 +206,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get consentAiDisclosureTitle => 'AI disclosure';
+
+  @override
+  String get devPreviewApp => 'Preview the app (dev build only)';
+
+  @override
+  String get devPreviewNotSaved => 'Preview mode: changes here are not saved.';
 }

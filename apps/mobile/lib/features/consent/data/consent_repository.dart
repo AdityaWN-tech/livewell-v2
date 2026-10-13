@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../core/data/firestore.dart';
+import '../../dev/application/preview_mode.dart';
 import '../domain/consent.dart';
 
 /// Append-only consent store (T-FND-05). Grant and revoke both *add* a
@@ -66,13 +67,14 @@ class FirestoreConsentRepository implements ConsentRepository {
   }
 }
 
-final consentRepositoryProvider = Provider<ConsentRepository>(
-  (ref) => FirestoreConsentRepository(
+final consentRepositoryProvider = Provider<ConsentRepository>((ref) {
+  if (ref.watch(previewModeProvider)) return InMemoryConsentRepository();
+  return FirestoreConsentRepository(
     ref.watch(firestoreProvider),
     FirebaseAuth.instance,
     () async => (await PackageInfo.fromPlatform()).version,
-  ),
-);
+  );
+});
 
 /// Current decision per consent type.
 final currentConsentsProvider = StreamProvider<Map<ConsentType, ConsentRecord>>(

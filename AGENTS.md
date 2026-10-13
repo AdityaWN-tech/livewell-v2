@@ -77,3 +77,19 @@ docs/                   Spec, decisions, setup guides, API, data model, ADRs
 | Run dev flavor | `flutter run --flavor dev -t lib/main_dev.dart` |
 | Build dev APK | `flutter build apk --debug --flavor dev -t lib/main_dev.dart` |
 | Staging / prod | same with `staging` / `prod` and `lib/main_staging.dart` / `lib/main_prod.dart` |
+
+## Developer-only UI
+
+- Any developer tool, debug button, test screen or sample data must appear ONLY in the dev flavour. It must not render, and its route must not be registered, in staging or prod builds.
+- Developer entry points live in Settings > Developer (dev flavour only), never on Home.
+- Every dev-only feature needs a widget test proving it is hidden in prod.
+
+## Sensitive values in logs and analytics
+
+- Never send mood, energy, sleep, stress, health metrics or any free text (Why, barrier notes, reflections, chat) to analytics, Crashlytics or logs. Log only event names, IDs, counts and durations.
+- Nothing personal or health-related appears in notifications or on the lock screen.
+
+## Task files
+
+- Task prompts live in `docs/tasks/<TASK-ID>-short-name.md`.
+- When asked to "do the task in docs/tasks/...", follow that file plus this AGENTS.md. If they conflict, this AGENTS.md wins; flag the conflict in the PR.

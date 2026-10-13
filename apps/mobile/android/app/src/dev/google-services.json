@@ -12,7 +12,20 @@
           "package_name": "net.conciergeconnectedcare.livewell.dev"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "623153208660-2t2vg5sh0l3vfsvb4kceg1qrkmgc6fcf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.conciergeconnectedcare.livewell.dev",
+            "certificate_hash": "1d3b032313ca8d9f33bd47ab4cdad5f27b4d949a"
+          }
+        },
+        {
+          "client_id": "623153208660-dg1osjuqsdblsac6b9buog6k710ov2jl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDbHFefJ01DqkJ1dzKqrKR01ACMn8qGEi0"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623153208660-dg1osjuqsdblsac6b9buog6k710ov2jl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "623153208660-soat1bkodfkq1bouudc2k37kescf9rlc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.conciergeconnectedcare.livewell.dev"
+              }
+            }
+          ]
         }
       }
     }

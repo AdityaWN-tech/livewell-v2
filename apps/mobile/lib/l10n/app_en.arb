@@ -74,5 +74,7 @@
   "consentTermsTitle": "Terms of use",
   "consentPrivacyTitle": "Privacy policy",
   "consentMedicalDisclaimerTitle": "Medical disclaimer",
-  "consentAiDisclosureTitle": "AI disclosure"
+  "consentAiDisclosureTitle": "AI disclosure",
+  "devPreviewApp": "Preview the app (dev build only)",
+  "devPreviewNotSaved": "Preview mode: changes here are not saved."
 }

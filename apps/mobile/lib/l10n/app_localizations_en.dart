@@ -61,13 +61,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabCare => 'Care';
 
   @override
-  String get careEmptyTitle => 'Care and support';
-
-  @override
-  String get careEmptyBody =>
-      'Talk with your coach, see what it remembers, and find safety and clinician help here.';
-
-  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -1193,4 +1186,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get learnLibraryTitle => 'Library';
+
+  @override
+  String get careEyebrow => 'Direct support';
+
+  @override
+  String get careTitle => 'Talk to your coach';
+
+  @override
+  String get careStatusSoon => 'Coming soon';
+
+  @override
+  String get careStatusAiVoice => 'AI voice';
+
+  @override
+  String get careStatusAiVoiceLabel => 'Your coach speaks with an AI voice';
+
+  @override
+  String get careHelpNow => 'Get help now';
+
+  @override
+  String get careSoonTitle => 'Your coach is coming soon';
+
+  @override
+  String get careSoonBody =>
+      'Soon you can talk or type to your coach here, any time of day. If you need help right now, tap \"Get help now\".';
+
+  @override
+  String get careNotSent =>
+      'Your coach isn’t available yet, so this message wasn’t sent. It stays on this screen only.';
+
+  @override
+  String careSources(String sources) {
+    return 'Sources: $sources';
+  }
+
+  @override
+  String get careSourcesTitle => 'Where this comes from';
+
+  @override
+  String get careYou => 'You';
+
+  @override
+  String careCoachSaid(String coach) {
+    return '$coach said';
+  }
+
+  @override
+  String get careDisclaimer =>
+      'Educational companion · Does not prescribe or change medication';
+
+  @override
+  String get careTypeHint => 'Type a message';
+
+  @override
+  String get careSend => 'Send';
+
+  @override
+  String get careHoldToTalk => 'Hold to talk';
+
+  @override
+  String get careListening => 'Listening… let go to stop';
+
+  @override
+  String get careTalkHint => 'Or tap once to start and again to stop';
+
+  @override
+  String get helpNowTitle => 'Get help now';
+
+  @override
+  String get helpNowBody =>
+      'If you or someone else is in danger, call emergency services now. If you are struggling with how you feel, you can call or text a support line any time.';
+
+  @override
+  String get helpNowEmergency => 'Emergency';
+
+  @override
+  String get helpNowSupport => 'Talk to someone';
 }

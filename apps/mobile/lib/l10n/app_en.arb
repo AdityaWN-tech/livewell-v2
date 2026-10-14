@@ -26,8 +26,6 @@
   "@tabHome": {
     "description": "Bottom navigation tabs (spec 14.2)."
   },
-  "careEmptyTitle": "Care and support",
-  "careEmptyBody": "Talk with your coach, see what it remembers, and find safety and clinician help here.",
   "settingsTitle": "Settings",
   "settingsPrivacy": "Privacy and consents",
   "settingsPrivacyBody": "Choose what Live Well may use. Change it any time.",
@@ -653,5 +651,42 @@
   },
   "learnLessonsEmptyTitle": "Lessons are on their way",
   "learnLessonsEmptyBody": "Short lessons from Dr. Gokula's book will show up here once they are reviewed.",
-  "learnLibraryTitle": "Library"
+  "learnLibraryTitle": "Library",
+  "careEyebrow": "Direct support",
+  "careTitle": "Talk to your coach",
+  "careStatusSoon": "Coming soon",
+  "careStatusAiVoice": "AI voice",
+  "careStatusAiVoiceLabel": "Your coach speaks with an AI voice",
+  "careHelpNow": "Get help now",
+  "careSoonTitle": "Your coach is coming soon",
+  "careSoonBody": "Soon you can talk or type to your coach here, any time of day. If you need help right now, tap \"Get help now\".",
+  "careNotSent": "Your coach isn’t available yet, so this message wasn’t sent. It stays on this screen only.",
+  "careSources": "Sources: {sources}",
+  "@careSources": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "careSourcesTitle": "Where this comes from",
+  "careYou": "You",
+  "careCoachSaid": "{coach} said",
+  "@careCoachSaid": {
+    "placeholders": {
+      "coach": {
+        "type": "String"
+      }
+    }
+  },
+  "careDisclaimer": "Educational companion · Does not prescribe or change medication",
+  "careTypeHint": "Type a message",
+  "careSend": "Send",
+  "careHoldToTalk": "Hold to talk",
+  "careListening": "Listening… let go to stop",
+  "careTalkHint": "Or tap once to start and again to stop",
+  "helpNowTitle": "Get help now",
+  "helpNowBody": "If you or someone else is in danger, call emergency services now. If you are struggling with how you feel, you can call or text a support line any time.",
+  "helpNowEmergency": "Emergency",
+  "helpNowSupport": "Talk to someone"
 }

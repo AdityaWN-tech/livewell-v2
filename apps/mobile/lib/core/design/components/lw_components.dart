@@ -19,12 +19,16 @@ class LwScreen extends StatelessWidget {
     required this.children,
     this.actions = const [],
     this.eyebrow,
+    this.bottom,
   });
 
   final String title;
   final List<Widget> children;
   final List<Widget> actions;
   final String? eyebrow;
+
+  /// Fixed below the scrolling content (for example a message composer).
+  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
@@ -38,32 +42,45 @@ class LwScreen extends StatelessWidget {
         child: Scaffold(
           body: SafeArea(
             bottom: false,
-            child: ListView(
-              padding: const EdgeInsets.all(LwSpacing.screenGutter),
+            child: Column(
               children: [
-                // Title left, actions right; with large text the actions
-                // move to their own line instead of squeezing the title.
-                Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  runSpacing: LwSpacing.xs,
-                  children: [
-                    Semantics(
-                      header: true,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(LwSpacing.screenGutter),
+                    children: [
+                      // Title left, actions right; with large text the actions
+                      // move to their own line instead of squeezing the title.
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        runSpacing: LwSpacing.xs,
                         children: [
-                          Text(eyebrow!.toUpperCase(), style: t.labelSmall),
-                          Text(title, style: t.headlineSmall),
+                          Semantics(
+                            header: true,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  eyebrow!.toUpperCase(),
+                                  style: t.labelSmall,
+                                ),
+                                Text(title, style: t.headlineSmall),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: actions,
+                          ),
                         ],
                       ),
-                    ),
-                    Row(mainAxisSize: MainAxisSize.min, children: actions),
-                  ],
+                      const SizedBox(height: LwSpacing.md),
+                      ...children,
+                    ],
+                  ),
                 ),
-                const SizedBox(height: LwSpacing.md),
-                ...children,
+                ?bottom,
               ],
             ),
           ),

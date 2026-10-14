@@ -27,6 +27,7 @@ class Harness {
     FakeConsentRepository? consents,
     FakeDictation? dictation,
     FakePhoneLauncher? phone,
+    this.flavor = Flavor.prod,
   }) : dictation = dictation ?? FakeDictation(),
        phone = phone ?? FakePhoneLauncher(),
        store = store ?? FakeOnboardingStore(),
@@ -41,6 +42,9 @@ class Harness {
   final FakeDictation dictation;
   final FakePhoneLauncher phone;
 
+  /// Build flavour to simulate (dev shows developer tools).
+  final Flavor flavor;
+
   /// Cold start the real app: signed out resumes at the saved onboarding
   /// step; signed in goes by the profile's step.
   Future<void> boot(WidgetTester tester) async {
@@ -50,7 +54,7 @@ class Harness {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          flavorProvider.overrideWithValue(Flavor.prod),
+          flavorProvider.overrideWithValue(flavor),
           splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
           onboardingStoreProvider.overrideWithValue(store),
           authServiceProvider.overrideWithValue(auth),

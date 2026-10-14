@@ -1149,6 +1149,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t start the call. Please dial {number}.'**
   String safetyCallFailed(String number);
+
+  /// No description provided for @settingsDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer'**
+  String get settingsDeveloper;
+
+  /// No description provided for @settingsDeveloperBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools for building the app. Only in the dev build.'**
+  String get settingsDeveloperBody;
 }
 
 class _AppLocalizationsDelegate

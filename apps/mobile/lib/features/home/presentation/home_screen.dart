@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../core/config/flavor.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../account/data/profile_repository.dart';
@@ -18,7 +16,6 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final isDev = ref.watch(flavorProvider) == Flavor.dev;
     final why = ref.watch(currentProfileProvider).value?.whyStatement;
     return LwScreen(
       actions: const [SettingsAction()],
@@ -34,11 +31,6 @@ class HomeScreen extends ConsumerWidget {
           title: l10n.homeEmptyTitle,
           body: l10n.homeEmptyBody,
         ),
-        if (isDev)
-          OutlinedButton(
-            onPressed: () => context.push('/dev/tokens'),
-            child: Text(l10n.devDesignTokens),
-          ),
       ],
     );
   }

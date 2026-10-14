@@ -40,6 +40,15 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
+        <!-- One-tap emergency and crisis calls / texts (FR-SAF-01/02). -->
+        <intent>
+            <action android:name="android.intent.action.DIAL"/>
+            <data android:scheme="tel"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="sms"/>
+        </intent>
         <!-- Lets voice typing find the phone's speech recognizer. -->
         <intent>
             <action android:name="android.speech.RecognitionService"/>

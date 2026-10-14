@@ -72,5 +72,10 @@
 	<string>Live Well uses the microphone only when you choose to speak, for example to say your Why or talk to your coach.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Live Well turns what you say into text so you don't have to type.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>sms</string>
+	</array>
 </dict>
 </plist>

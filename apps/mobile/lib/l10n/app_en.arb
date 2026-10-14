@@ -139,7 +139,7 @@
   "phoneTitle": "Continue with phone",
   "phoneCountryLabel": "Country",
   "countryIndia": "India (+91)",
-  "countryUs": "United States (+1)",
+  "countryUs": "the US",
   "phoneNumberLabel": "Mobile number",
   "phoneInvalidMsg": "Enter a valid mobile number for this country.",
   "phoneSendCode": "Send code",
@@ -199,5 +199,66 @@
   "whyMicNotNow": "Not now",
   "whyDictationUnavailable": "Voice typing isn't available on this phone. You can type instead.",
   "whySaveError": "We couldn't save your Why. Please try again.",
-  "homeWhyEyebrow": "Your Why"
+  "homeWhyEyebrow": "Your Why",
+  "safetyEmergencyTitle": "This could be an emergency",
+  "safetyEmergencyBody": "Please call for emergency help now. If you can, unlock your door and ask someone to stay with you.",
+  "safetyCallNumber": "Call {number}",
+  "@safetyCallNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyCallNumberIn": "Call {number} in {country}",
+  "@safetyCallNumberIn": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyCrisisTitle": "You don't have to face this alone",
+  "safetyCrisisBody": "If you're thinking about suicide or hurting yourself, please reach out to someone right now. It's free and confidential, and they're there day and night.",
+  "safetyCrisisCall": "Call {name}: {number}",
+  "@safetyCrisisCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyCrisisText": "Text {number}",
+  "@safetyCrisisText": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyCrisisDanger": "If you're in danger right now, call emergency services.",
+  "safetyEdTitle": "Let's take care of you first",
+  "safetyEdBody": "It sounds like food or your body may feel hard right now. Live Well won't help with very low-calorie or fast weight-loss plans. A doctor or an eating-disorder specialist can support you, and you deserve that support.",
+  "safetyMedTitle": "Medicine changes are for you and your prescriber",
+  "safetyMedBody": "Please don't start, stop or change any medicine or supplement without talking to the doctor who prescribed it. Live Well can help with daily habits alongside your treatment.",
+  "safetyComplexTitle": "Check with your clinician first",
+  "safetyComplexBody": "Pregnancy and some health conditions change what's safe for you. Please talk to your doctor or midwife before changing how you eat or move.",
+  "safetyBack": "Go back",
+  "safetyChangeIt": "Change it",
+  "safetySaveAnyway": "Save my Why",
+  "countryIndiaName": "India",
+  "safetyCallFailed": "We couldn't start the call. Please dial {number}.",
+  "@safetyCallFailed": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  }
 }

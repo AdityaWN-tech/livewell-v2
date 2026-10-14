@@ -751,7 +751,7 @@ abstract class AppLocalizations {
   /// No description provided for @countryUs.
   ///
   /// In en, this message translates to:
-  /// **'United States (+1)'**
+  /// **'the US'**
   String get countryUs;
 
   /// No description provided for @phoneNumberLabel.
@@ -1029,6 +1029,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Why'**
   String get homeWhyEyebrow;
+
+  /// No description provided for @safetyEmergencyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This could be an emergency'**
+  String get safetyEmergencyTitle;
+
+  /// No description provided for @safetyEmergencyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please call for emergency help now. If you can, unlock your door and ask someone to stay with you.'**
+  String get safetyEmergencyBody;
+
+  /// No description provided for @safetyCallNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Call {number}'**
+  String safetyCallNumber(String number);
+
+  /// No description provided for @safetyCallNumberIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Call {number} in {country}'**
+  String safetyCallNumberIn(String number, String country);
+
+  /// No description provided for @safetyCrisisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have to face this alone'**
+  String get safetyCrisisTitle;
+
+  /// No description provided for @safetyCrisisBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re thinking about suicide or hurting yourself, please reach out to someone right now. It\'s free and confidential, and they\'re there day and night.'**
+  String get safetyCrisisBody;
+
+  /// No description provided for @safetyCrisisCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call {name}: {number}'**
+  String safetyCrisisCall(String name, String number);
+
+  /// No description provided for @safetyCrisisText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text {number}'**
+  String safetyCrisisText(String number);
+
+  /// No description provided for @safetyCrisisDanger.
+  ///
+  /// In en, this message translates to:
+  /// **'If you\'re in danger right now, call emergency services.'**
+  String get safetyCrisisDanger;
+
+  /// No description provided for @safetyEdTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s take care of you first'**
+  String get safetyEdTitle;
+
+  /// No description provided for @safetyEdBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It sounds like food or your body may feel hard right now. Live Well won\'t help with very low-calorie or fast weight-loss plans. A doctor or an eating-disorder specialist can support you, and you deserve that support.'**
+  String get safetyEdBody;
+
+  /// No description provided for @safetyMedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicine changes are for you and your prescriber'**
+  String get safetyMedTitle;
+
+  /// No description provided for @safetyMedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please don\'t start, stop or change any medicine or supplement without talking to the doctor who prescribed it. Live Well can help with daily habits alongside your treatment.'**
+  String get safetyMedBody;
+
+  /// No description provided for @safetyComplexTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check with your clinician first'**
+  String get safetyComplexTitle;
+
+  /// No description provided for @safetyComplexBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pregnancy and some health conditions change what\'s safe for you. Please talk to your doctor or midwife before changing how you eat or move.'**
+  String get safetyComplexBody;
+
+  /// No description provided for @safetyBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get safetyBack;
+
+  /// No description provided for @safetyChangeIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Change it'**
+  String get safetyChangeIt;
+
+  /// No description provided for @safetySaveAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Save my Why'**
+  String get safetySaveAnyway;
+
+  /// No description provided for @countryIndiaName.
+  ///
+  /// In en, this message translates to:
+  /// **'India'**
+  String get countryIndiaName;
+
+  /// No description provided for @safetyCallFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t start the call. Please dial {number}.'**
+  String safetyCallFailed(String number);
 }
 
 class _AppLocalizationsDelegate

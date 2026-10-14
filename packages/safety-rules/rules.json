@@ -1,0 +1,227 @@
+{
+  "version": "0.1-draft",
+  "status": "DRAFT: needs review by the Clinical Content and Safety Committee before launch",
+  "matching": "Text is lowercased, curly quotes straightened, characters other than a-z, 0-9, apostrophe and space become spaces, spaces collapsed. Patterns are regular expressions searched in that text. The highest-priority matching category wins; every matching rule id is logged.",
+  "categories": [
+    {
+      "id": "emergency",
+      "priority": 1,
+      "interrupts": true
+    },
+    {
+      "id": "crisis",
+      "priority": 2,
+      "interrupts": true
+    },
+    {
+      "id": "disordered_eating",
+      "priority": 3,
+      "interrupts": false
+    },
+    {
+      "id": "medication",
+      "priority": 4,
+      "interrupts": false
+    },
+    {
+      "id": "pregnancy_complex",
+      "priority": 5,
+      "interrupts": false
+    }
+  ],
+  "contacts": {
+    "US": {
+      "emergency": "911",
+      "crisis_call": "988",
+      "crisis_text": "988",
+      "crisis_name": "988 Suicide & Crisis Lifeline"
+    },
+    "IN": {
+      "emergency": "112",
+      "crisis_call": "14416",
+      "crisis_text": null,
+      "crisis_name": "Tele-MANAS"
+    }
+  },
+  "rules": [
+    {
+      "id": "EM-CHEST",
+      "category": "emergency",
+      "spec": "FR-SAF-01",
+      "patterns": [
+        "\\bchest (?:pain|pains|pressure|tightness|is tight|feels tight|hurts|is hurting|squeezing|crushing)\\b",
+        "\\b(?:crushing|squeezing|severe|sharp|bad) chest\\b",
+        "\\b(?:pain|pressure|tightness) in (?:my|the) chest\\b",
+        "\\b(?:having|have) a heart attack\\b",
+        "\\b(?:think|thinks|might be|could be|is this) (?:it'?s |i'?m having )?a heart attack\\b"
+      ]
+    },
+    {
+      "id": "EM-STROKE",
+      "category": "emergency",
+      "spec": "FR-SAF-01",
+      "patterns": [
+        "\\b(?:having|have) a stroke\\b",
+        "\\bsigns? of (?:a )?stroke\\b",
+        "\\b(?:face|mouth) (?:is )?(?:drooping|droopy|droops)\\b",
+        "\\bdrooping (?:face|mouth)\\b",
+        "\\bslurr(?:ed|ing) (?:speech|words)\\b",
+        "\\bsudden(?:ly)? (?:i )?(?:ca(?:n ?'?t|not)|unable to) (?:speak|talk)\\b",
+        "\\b(?:ca(?:n ?'?t|not)|unable to) (?:speak|talk) (?:properly|clearly|normally)\\b",
+        "\\b(?:trouble|difficulty|problems?) (?:speaking|talking)\\b",
+        "\\b(?:ca(?:n ?'?t|not)|unable to) (?:lift|move) my (?:arm|leg)\\b",
+        "\\bsudden(?:ly)? (?:numb|numbness|weak|weakness|confused|confusion|blind)\\b",
+        "\\b(?:left|right) (?:arm|side|leg) (?:is |went |has gone |feels )?(?:numb|weak|dead)\\b"
+      ]
+    },
+    {
+      "id": "EM-BREATH",
+      "category": "emergency",
+      "spec": "FR-SAF-01",
+      "patterns": [
+        "\\b(?:ca(?:n ?'?t|not)|unable to|struggling to|hard to|barely) breathe?\\b",
+        "\\b(?:severe|extreme|really bad) (?:shortness of breath|breathlessness)\\b",
+        "\\bgasping (?:for )?(?:air|breath)\\b",
+        "\\bchoking\\b"
+      ]
+    },
+    {
+      "id": "EM-BLEED",
+      "category": "emergency",
+      "spec": "FR-SAF-01",
+      "patterns": [
+        "\\b(?:bleeding|blood) (?:wo(?:n ?'?t|not)|will not|does(?:n ?'?t|not)|is(?:n ?'?t|not)) stop",
+        "\\b(?:heavy|severe|a lot of|lots of|uncontrolled) bleeding\\b",
+        "\\b(?:coughing|vomiting|throwing|spitting) (?:up )?blood\\b"
+      ]
+    },
+    {
+      "id": "EM-FAINT",
+      "category": "emergency",
+      "spec": "FR-SAF-01",
+      "patterns": [
+        "\\bfaint(?:ed|ing)\\b",
+        "\\b(?:feel|feeling|felt|going to|about to|might) faint\\b",
+        "\\bpass(?:ed|ing)? out\\b",
+        "\\b(?:lost|losing) consciousness\\b",
+        "\\b(?:collapsed|blacked out)\\b",
+        "\\bunconscious\\b"
+      ]
+    },
+    {
+      "id": "EM-OVERDOSE",
+      "category": "emergency",
+      "spec": "FR-SAF-01/02",
+      "patterns": [
+        "\\boverdos(?:e|ed|ing)\\b",
+        "\\btook (?:too many|a lot of|all (?:my|of my|the)|a whole (?:bottle|pack|strip) of) (?:pills|tablets|meds|medicines?|medication|insulin|sleeping pills)\\b"
+      ]
+    },
+    {
+      "id": "CR-SUICIDE",
+      "category": "crisis",
+      "spec": "FR-SAF-02",
+      "patterns": [
+        "\\bsuicid(?:e|al)\\b",
+        "\\bkill(?:ing)? my ?self\\b",
+        "\\bend (?:my life|it all)\\b",
+        "\\b(?:do(?:n ?'?t|not)|dont) want to (?:live|be alive|be here|exist|wake up)\\b",
+        "\\bwant to die\\b",
+        "\\bwish (?:i|i ?'?d) (?:was|were|had) (?:dead|never been born)\\b",
+        "\\bbetter off (?:dead|without me)\\b",
+        "\\bno (?:reason|point) (?:to|in) (?:live|living|going on)\\b",
+        "\\btake my (?:own )?life\\b",
+        "\\b(?:hurt|hurting|harm|harming|cut|cutting) my ?self\\b",
+        "\\bself ?harm\\b"
+      ]
+    },
+    {
+      "id": "CR-HINGLISH",
+      "category": "crisis",
+      "spec": "FR-SAF-02, D-03",
+      "note": "Common romanised Hindi phrases. DRAFT: needs review by a clinician fluent in Hindi.",
+      "patterns": [
+        "\\bmar(?:na|ne|jaana|jana) (?:chahta|chahti|chahte)\\b",
+        "\\bkhud ?kushi\\b",
+        "\\bjeena nahi? (?:chahta|chahti|hai)\\b",
+        "\\bzinda nahi? (?:rehna|rahna)\\b"
+      ]
+    },
+    {
+      "id": "ED-RESTRICT",
+      "category": "disordered_eating",
+      "spec": "FR-SAF-04",
+      "patterns": [
+        "\\b[1-9][0-9]{1,2} (?:calories|cals|kcal|kcals) (?:a|per|each|every) day\\b",
+        "\\b(?:eat|eating|have|having) only [1-9][0-9]{1,2} (?:calories|cals|kcal)\\b",
+        "\\b(?:starve|starving) my ?self\\b",
+        "\\b(?:stop|stopped|quit) eating (?:completely|entirely|altogether|for days)\\b"
+      ]
+    },
+    {
+      "id": "ED-PURGE",
+      "category": "disordered_eating",
+      "spec": "FR-SAF-04",
+      "patterns": [
+        "\\b(?:make|making|force|forcing) my ?self (?:throw up|vomit|sick)\\b",
+        "\\bpurg(?:ed|ing) (?:after|my|food|meals)\\b",
+        "\\b(?:binge|binging|bingeing) (?:and|then) (?:purge|purging|throw up|vomit)\\b",
+        "\\blaxatives? (?:to|for) (?:lose|losing|weight)\\b"
+      ]
+    },
+    {
+      "id": "ED-CRASH",
+      "category": "disordered_eating",
+      "spec": "FR-SAF-04",
+      "patterns": [
+        "\\blose weight (?:really |super |very |so )?fast\\b",
+        "\\b(?:lose|drop) [0-9]+ ?(?:kg|kgs|kilos|kilograms|pounds|lbs) (?:in|by) (?:a|one|two|three|[0-9]+) (?:day|days|week|weeks)\\b",
+        "\\b(?:hate|disgusted by|disgusted with) my (?:body|self)\\b"
+      ]
+    },
+    {
+      "id": "MED-CHANGE",
+      "category": "medication",
+      "spec": "FR-SAF-03",
+      "patterns": [
+        "\\b(?:stop|stopping|quit|quitting|skip|skipping|halve|double|increase|decrease|lower|lowering|reduce|reducing|cut down|cut back|come off|coming off|get off|getting off|taper|tapering|less|more|swap|replace|instead of)\\b.*\\b(?:medicines?|medications?|meds|pills?|tablets?|doses?|dosage|insulin|metformin|glipizide|glimepiride|gliclazide|sitagliptin|januvia|semaglutide|ozempic|wegovy|rybelsus|tirzepatide|mounjaro|jardiance|empagliflozin|dapagliflozin|farxiga|statins?|atorvastatin|rosuvastatin|lipitor|crestor|lisinopril|amlodipine|losartan|telmisartan|metoprolol|warfarin|aspirin|blood thinners?|thyroxine|levothyroxine|thyronorm|antidepressants?|sertraline|prednisone|bp pills?)\\b",
+        "\\b(?:medicines?|medications?|meds|pills?|tablets?|doses?|dosage|insulin|metformin|glipizide|glimepiride|gliclazide|sitagliptin|januvia|semaglutide|ozempic|wegovy|rybelsus|tirzepatide|mounjaro|jardiance|empagliflozin|dapagliflozin|farxiga|statins?|atorvastatin|rosuvastatin|lipitor|crestor|lisinopril|amlodipine|losartan|telmisartan|metoprolol|warfarin|aspirin|blood thinners?|thyroxine|levothyroxine|thyronorm|antidepressants?|sertraline|prednisone|bp pills?)\\b.*\\b(?:stop|stopping|quit|quitting|skip|skipping|halve|double|increase|decrease|lower|lowering|reduce|reducing|cut down|cut back|come off|coming off|get off|getting off|taper|tapering|less|more|swap|replace|instead of)\\b",
+        "\\b(?:how much|how many|what dose|which dose|right dose|dosage of)\\b.*\\b(?:medicines?|medications?|meds|pills?|tablets?|doses?|dosage|insulin|metformin|glipizide|glimepiride|gliclazide|sitagliptin|januvia|semaglutide|ozempic|wegovy|rybelsus|tirzepatide|mounjaro|jardiance|empagliflozin|dapagliflozin|farxiga|statins?|atorvastatin|rosuvastatin|lipitor|crestor|lisinopril|amlodipine|losartan|telmisartan|metoprolol|warfarin|aspirin|blood thinners?|thyroxine|levothyroxine|thyronorm|antidepressants?|sertraline|prednisone|bp pills?)\\b"
+      ]
+    },
+    {
+      "id": "MED-SUPPLEMENT",
+      "category": "medication",
+      "spec": "FR-SAF-03, 15.3",
+      "patterns": [
+        "\\bsupplement (?:stack|protocol|regimen|plan)\\b",
+        "\\b(?:how much|how many mg|what dose|which dose|dosage of)\\b.*\\b(?:supplements?|vitamins?|magnesium|berberine|fish oil|omega 3|turmeric|curcumin|zinc|ashwagandha|chromium|cinnamon pills?)\\b",
+        "\\b(?:supplements?|vitamins?|magnesium|berberine|fish oil|omega 3|turmeric|curcumin|zinc|ashwagandha|chromium|cinnamon pills?)\\b.*\\b(?:how much|dose|dosage|mg a day|mg per day)\\b"
+      ]
+    },
+    {
+      "id": "PREG",
+      "category": "pregnancy_complex",
+      "spec": "FR-SAF-05",
+      "patterns": [
+        "\\bpregnan(?:t|cy)\\b",
+        "\\bexpecting (?:a|our) baby\\b",
+        "\\bbreast ?feeding\\b",
+        "\\btrying to (?:conceive|get pregnant)\\b"
+      ]
+    },
+    {
+      "id": "COMPLEX",
+      "category": "pregnancy_complex",
+      "spec": "FR-SAF-05",
+      "patterns": [
+        "\\bdialysis\\b",
+        "\\bchemo(?:therapy)?\\b",
+        "\\b(?:kidney|liver|heart) (?:failure|disease|transplant)\\b",
+        "\\btype 1 diabetes\\b",
+        "\\bhad a (?:stroke|heart attack)\\b",
+        "\\b(?:history of|since my|after my) (?:a )?(?:stroke|heart attack)\\b"
+      ]
+    }
+  ]
+}

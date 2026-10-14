@@ -1,6 +1,7 @@
 import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
+import 'package:livewell/features/safety/presentation/safety_screens.dart';
 
 /// In-memory sign-in for widget tests.
 class FakeAuthService implements AuthService {
@@ -92,6 +93,9 @@ class FakeProfileRepository extends ProfileRepository {
   /// Profiles that already existed, by uid -> onboarding step.
   final existing = <String, String>{};
   final whys = <String, String>{};
+
+  /// Region for profiles in [existing] ('US' / 'IN').
+  final regions = <String, String>{};
   final log = <String>[];
 
   String? _step(String uid) => existing[uid] ?? created[uid]?.onboardingStep;
@@ -104,7 +108,7 @@ class FakeProfileRepository extends ProfileRepository {
       uid: uid,
       onboardingStep: step,
       whyStatement: whys[uid],
-      region: created[uid]?.region,
+      region: regions[uid] ?? created[uid]?.region,
     );
   }
 
@@ -164,4 +168,22 @@ class FakeDictation implements Dictation {
 
   @override
   Future<void> stop() async => listening = false;
+}
+
+/// Records the numbers the app tried to call or text.
+class FakePhoneLauncher implements PhoneLauncher {
+  final calls = <String>[];
+  final texts = <String>[];
+
+  @override
+  Future<bool> call(String number) async {
+    calls.add(number);
+    return true;
+  }
+
+  @override
+  Future<bool> text(String number) async {
+    texts.add(number);
+    return true;
+  }
 }

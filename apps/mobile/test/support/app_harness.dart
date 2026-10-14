@@ -10,6 +10,7 @@ import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/data/firebase_auth_service.dart';
 import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
+import 'package:livewell/features/safety/presentation/safety_screens.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
@@ -25,7 +26,9 @@ class Harness {
     FakeProfileRepository? profiles,
     FakeConsentRepository? consents,
     FakeDictation? dictation,
+    FakePhoneLauncher? phone,
   }) : dictation = dictation ?? FakeDictation(),
+       phone = phone ?? FakePhoneLauncher(),
        store = store ?? FakeOnboardingStore(),
        auth = auth ?? FakeAuthService(),
        profiles = profiles ?? FakeProfileRepository(),
@@ -36,6 +39,7 @@ class Harness {
   final FakeProfileRepository profiles;
   final FakeConsentRepository consents;
   final FakeDictation dictation;
+  final FakePhoneLauncher phone;
 
   /// Cold start the real app: signed out resumes at the saved onboarding
   /// step; signed in goes by the profile's step.
@@ -53,6 +57,7 @@ class Harness {
           profileRepositoryProvider.overrideWithValue(profiles),
           consentRepositoryProvider.overrideWithValue(consents),
           dictationProvider.overrideWithValue(dictation),
+          phoneLauncherProvider.overrideWithValue(phone),
           // Same decisions as the real startup, minus Firebase.
           appStartupProvider.overrideWith((ref) async {
             final user = auth.currentUser;

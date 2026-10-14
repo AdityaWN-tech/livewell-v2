@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/app.dart';
+import 'package:livewell/core/config/feature_flags.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/core/speech/dictation.dart';
@@ -35,6 +36,7 @@ class Harness {
     FakeCheckInRepository? checkIns,
     FakeCheckInPromptStore? checkInPrompt,
     FakeAnalytics? analytics,
+    this.flags = const FeatureFlags(),
   }) : now = now ?? defaultNow,
        checkIns = checkIns ?? FakeCheckInRepository(),
        // Default: already asked today, so tests that aren't about the
@@ -54,6 +56,9 @@ class Harness {
   final FakeConsentRepository consents;
   final FakeDictation dictation;
   final FakePhoneLauncher phone;
+
+  /// Feature flags (Remote Config later).
+  final FeatureFlags flags;
 
   /// Build flavour to simulate (dev shows developer tools).
   final Flavor flavor;
@@ -75,6 +80,7 @@ class Harness {
       ProviderScope(
         overrides: [
           flavorProvider.overrideWithValue(flavor),
+          featureFlagsProvider.overrideWithValue(flags),
           splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
           onboardingStoreProvider.overrideWithValue(store),
           authServiceProvider.overrideWithValue(auth),

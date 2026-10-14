@@ -61,13 +61,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabCare => 'Care';
 
   @override
-  String get homeEmptyTitle => 'Your day starts here';
-
-  @override
-  String get homeEmptyBody =>
-      'Your morning briefing, one next step and a quick check-in will show up here.';
-
-  @override
   String get planEmptyTitle => 'Your plan';
 
   @override
@@ -749,14 +742,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkinContinue => 'Continue';
 
   @override
-  String get homeCheckInTitle => 'Check in';
-
-  @override
-  String get homeCheckInBody =>
-      'Tell your coach how you\'re doing. It takes about 30 seconds.';
-
-  @override
-  String get homeTodayStepEyebrow => 'Today\'s step';
+  String get homeTodayStepEyebrow => 'Today\'s one step';
 
   @override
   String homeTodayStepTimed(int minutes) {
@@ -773,4 +759,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countryUsName => 'the US';
+
+  @override
+  String get homeEyebrow => 'Live Well';
+
+  @override
+  String homeDay(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String homeDayLabel(int day) {
+    return 'Day $day of your journey';
+  }
+
+  @override
+  String get homeCoachDefaultName => 'Coach';
+
+  @override
+  String homeGreetingNamed(String name) {
+    return 'Hi, $name';
+  }
+
+  @override
+  String get homeGreeting => 'Hi there';
+
+  @override
+  String get homeBriefingSoon => 'Briefing coming soon';
+
+  @override
+  String get homeTodayStepBeforeCheckIn =>
+      'Check in first. Then a small step picked for you will appear here.';
+
+  @override
+  String get homeStepDone => 'Done';
+
+  @override
+  String homeStepSmaller(int minutes) {
+    return 'Make it $minutes min';
+  }
+
+  @override
+  String homeStepSmallerLabel(int minutes) {
+    return 'Make it a $minutes-minute step';
+  }
+
+  @override
+  String get homeStepDoneMessage => 'Done for today. Nice work.';
+
+  @override
+  String homeStepMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get homeStepGentleReason => 'A gentle day. Go easy on yourself.';
+
+  @override
+  String get homeQuickCheckIn => 'Quick check-in';
+
+  @override
+  String get homeQuickCheckInTime => 'Takes 30s';
+
+  @override
+  String get homeQuickCheckInLabel => 'Quick check-in. Takes about 30 seconds.';
+
+  @override
+  String homeCheckedIn(String mood) {
+    return 'Checked in today · Mood: $mood';
+  }
+
+  @override
+  String get homeMilestoneTitle => 'Companion milestone';
+
+  @override
+  String homeMilestonePhase(int phase, int total) {
+    return 'Phase $phase of $total';
+  }
+
+  @override
+  String homeMilestoneHabits(int kept, int planned) {
+    return '$kept / $planned habits kept';
+  }
+
+  @override
+  String homeMilestoneHabitsLabel(int kept, int planned) {
+    return '$kept of $planned habits kept';
+  }
+
+  @override
+  String get homeMilestoneEmpty =>
+      'Your progress will show here once you start your first habit.';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../tokens.dart';
 
@@ -7,20 +8,64 @@ import '../tokens.dart';
 
 /// Standard screen: bold left-aligned title (as in the reference screens),
 /// 16 dp gutters, scrolling body.
+///
+/// With an [eyebrow] it uses the T-UI-01 header instead of an app bar: a
+/// small label above a large title, scrolling with the content so it grows
+/// with large text.
 class LwScreen extends StatelessWidget {
   const LwScreen({
     super.key,
     required this.title,
     required this.children,
     this.actions = const [],
+    this.eyebrow,
   });
 
   final String title;
   final List<Widget> children;
   final List<Widget> actions;
+  final String? eyebrow;
 
   @override
   Widget build(BuildContext context) {
+    if (eyebrow != null) {
+      final t = Theme.of(context).textTheme;
+      // No app bar here, so set the status bar icons ourselves: dark icons
+      // on the light background, light icons in dark mode.
+      final dark = Theme.of(context).brightness == Brightness.dark;
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        child: Scaffold(
+          body: SafeArea(
+            bottom: false,
+            child: ListView(
+              padding: const EdgeInsets.all(LwSpacing.screenGutter),
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Semantics(
+                        header: true,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(eyebrow!.toUpperCase(), style: t.labelSmall),
+                            Text(title, style: t.headlineSmall),
+                          ],
+                        ),
+                      ),
+                    ),
+                    ...actions,
+                  ],
+                ),
+                const SizedBox(height: LwSpacing.md),
+                ...children,
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(title: Text(title), actions: actions),
       body: ListView(

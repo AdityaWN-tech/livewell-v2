@@ -196,18 +196,6 @@ abstract class AppLocalizations {
   /// **'Care'**
   String get tabCare;
 
-  /// No description provided for @homeEmptyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your day starts here'**
-  String get homeEmptyTitle;
-
-  /// No description provided for @homeEmptyBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Your morning briefing, one next step and a quick check-in will show up here.'**
-  String get homeEmptyBody;
-
   /// No description provided for @planEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -1402,22 +1390,10 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get checkinContinue;
 
-  /// No description provided for @homeCheckInTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Check in'**
-  String get homeCheckInTitle;
-
-  /// No description provided for @homeCheckInBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Tell your coach how you\'re doing. It takes about 30 seconds.'**
-  String get homeCheckInBody;
-
   /// No description provided for @homeTodayStepEyebrow.
   ///
   /// In en, this message translates to:
-  /// **'Today\'s step'**
+  /// **'Today\'s one step'**
   String get homeTodayStepEyebrow;
 
   /// No description provided for @homeTodayStepTimed.
@@ -1443,6 +1419,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'the US'**
   String get countryUsName;
+
+  /// No description provided for @homeEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well'**
+  String get homeEyebrow;
+
+  /// No description provided for @homeDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String homeDay(int day);
+
+  /// No description provided for @homeDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of your journey'**
+  String homeDayLabel(int day);
+
+  /// No description provided for @homeCoachDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach'**
+  String get homeCoachDefaultName;
+
+  /// No description provided for @homeGreetingNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, {name}'**
+  String homeGreetingNamed(String name);
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi there'**
+  String get homeGreeting;
+
+  /// No description provided for @homeBriefingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Briefing coming soon'**
+  String get homeBriefingSoon;
+
+  /// No description provided for @homeTodayStepBeforeCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in first. Then a small step picked for you will appear here.'**
+  String get homeTodayStepBeforeCheckIn;
+
+  /// No description provided for @homeStepDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get homeStepDone;
+
+  /// No description provided for @homeStepSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it {minutes} min'**
+  String homeStepSmaller(int minutes);
+
+  /// No description provided for @homeStepSmallerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it a {minutes}-minute step'**
+  String homeStepSmallerLabel(int minutes);
+
+  /// No description provided for @homeStepDoneMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Done for today. Nice work.'**
+  String get homeStepDoneMessage;
+
+  /// No description provided for @homeStepMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String homeStepMinutes(int minutes);
+
+  /// No description provided for @homeStepGentleReason.
+  ///
+  /// In en, this message translates to:
+  /// **'A gentle day. Go easy on yourself.'**
+  String get homeStepGentleReason;
+
+  /// No description provided for @homeQuickCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick check-in'**
+  String get homeQuickCheckIn;
+
+  /// No description provided for @homeQuickCheckInTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Takes 30s'**
+  String get homeQuickCheckInTime;
+
+  /// No description provided for @homeQuickCheckInLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick check-in. Takes about 30 seconds.'**
+  String get homeQuickCheckInLabel;
+
+  /// No description provided for @homeCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in today · Mood: {mood}'**
+  String homeCheckedIn(String mood);
+
+  /// No description provided for @homeMilestoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Companion milestone'**
+  String get homeMilestoneTitle;
+
+  /// No description provided for @homeMilestonePhase.
+  ///
+  /// In en, this message translates to:
+  /// **'Phase {phase} of {total}'**
+  String homeMilestonePhase(int phase, int total);
+
+  /// No description provided for @homeMilestoneHabits.
+  ///
+  /// In en, this message translates to:
+  /// **'{kept} / {planned} habits kept'**
+  String homeMilestoneHabits(int kept, int planned);
+
+  /// No description provided for @homeMilestoneHabitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{kept} of {planned} habits kept'**
+  String homeMilestoneHabitsLabel(int kept, int planned);
+
+  /// No description provided for @homeMilestoneEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress will show here once you start your first habit.'**
+  String get homeMilestoneEmpty;
 }
 
 class _AppLocalizationsDelegate

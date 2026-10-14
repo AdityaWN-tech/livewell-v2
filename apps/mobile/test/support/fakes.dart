@@ -101,6 +101,10 @@ class FakeProfileRepository extends ProfileRepository {
 
   /// Region for profiles in [existing] ('US' / 'IN').
   final regions = <String, String>{};
+
+  /// Display name and account creation time for profiles in [existing].
+  final names = <String, String>{};
+  final createdAts = <String, DateTime>{};
   final log = <String>[];
 
   String? _step(String uid) => existing[uid] ?? created[uid]?.onboardingStep;
@@ -114,7 +118,8 @@ class FakeProfileRepository extends ProfileRepository {
       onboardingStep: step,
       whyStatement: whys[uid],
       region: regions[uid] ?? created[uid]?.region,
-      displayName: created[uid]?.displayName,
+      displayName: names[uid] ?? created[uid]?.displayName,
+      createdAt: createdAts[uid],
     );
   }
 

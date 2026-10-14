@@ -22,6 +22,7 @@ class Profile {
     this.region,
     this.whyStatement,
     this.onboardingStep,
+    this.createdAt,
   });
 
   final String uid;
@@ -30,12 +31,16 @@ class Profile {
   final String? whyStatement;
   final String? onboardingStep;
 
+  /// When the account was created (for "Day N" on Home).
+  final DateTime? createdAt;
+
   static Profile fromData(String uid, Map<String, dynamic> d) => Profile(
     uid: uid,
     displayName: d['display_name'] as String?,
     region: d['region'] as String?,
     whyStatement: d['why_statement'] as String?,
     onboardingStep: d['onboarding_step'] as String?,
+    createdAt: (d['created_at'] as Timestamp?)?.toDate(),
   );
 }
 

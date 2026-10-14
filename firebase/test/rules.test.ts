@@ -353,6 +353,51 @@ describe('checkins (T-DLY-02: mood first, one per local date)', () => {
   });
 });
 
+describe('reflections (FR-DLY-05, T-UI-01d: one per local date)', () => {
+  const reflection = (o: Record<string, unknown> = {}) => ({
+    text: 'Walked after lunch', prompt: 'went_well', source: 'app', ...meta(), ...o,
+  });
+  const ref = () => doc(as(ALICE), 'users/alice/reflections/2026-10-14');
+
+  it('owner saves and edits the same day; nobody else can read or write', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), reflection()));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), reflection({ text: 'Walked and slept well', created_at: saved.created_at, updated_at: meta().updated_at })),
+    );
+    await assertFails(deleteDoc(ref()));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/reflections/2026-10-14')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/reflections/2026-10-15'), reflection()));
+  });
+  it('text is 1 to 500 characters; prompt and source are fixed values', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), reflection({ text: '' })));
+    await assertFails(setDoc(ref(), reflection({ text: 'x'.repeat(501) })));
+    await assertFails(setDoc(ref(), reflection({ text: 42 })));
+    await assertFails(setDoc(ref(), reflection({ prompt: 'anything' })));
+    await assertFails(setDoc(ref(), reflection({ source: 'web' })));
+    await assertSucceeds(setDoc(ref(), reflection({ text: 'x'.repeat(500) })));
+  });
+  it('rejects bad date ids, unknown fields and missing meta', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/reflections/today'), reflection()));
+    await assertFails(setDoc(ref(), reflection({ mood: 3 })));
+    const { schema_version: _, ...noMeta } = reflection();
+    await assertFails(setDoc(ref(), noMeta));
+  });
+  it('created_at never changes on update', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/reflections/2026-10-14': reflection() });
+    await assertFails(
+      setDoc(ref(), reflection({ created_at: meta().created_at, updated_at: meta().updated_at })),
+    );
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), reflection()));
+  });
+});
+
 describe('memory_facts (user approves or deletes, FR-CNV-05)', () => {
   beforeEach(async () => {
     await seedAdult(env);

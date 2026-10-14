@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show TimeOfDay;
 
 import '../../home/domain/home_models.dart';
 import '../../plan/domain/plan_models.dart';
+import '../../track/domain/track_models.dart';
 
 /// Sample data shown only in the dev preview (dev flavour only; AGENTS.md:
 /// no fake data in staging or prod). Lets the design be reviewed before the
@@ -60,4 +61,19 @@ abstract final class PreviewSamples {
       minutes: 10,
     ),
   ];
+
+  /// 14 days, a rest day used this week (the weekly grace, FR-DLY-07).
+  static const streak = StreakSummary(
+    length: 14,
+    best: 14,
+    week: [
+      StreakDay.done,
+      StreakDay.done,
+      StreakDay.rest,
+      StreakDay.done,
+      StreakDay.today,
+      StreakDay.upcoming,
+      StreakDay.upcoming,
+    ],
+  );
 }

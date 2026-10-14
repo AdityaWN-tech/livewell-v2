@@ -61,13 +61,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabCare => 'Care';
 
   @override
-  String get trackEmptyTitle => 'Your progress';
-
-  @override
-  String get trackEmptyBody =>
-      'Your check-ins, habits and the numbers you log will show here as simple charts.';
-
-  @override
   String get learnEmptyTitle => 'Learn something small';
 
   @override
@@ -1022,4 +1015,144 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get frameworkTrackingBody =>
       'Check-ins, habits and how you feel over time.';
+
+  @override
+  String get trackEyebrow => 'Progression';
+
+  @override
+  String get trackWeeklyWins => 'Weekly wins';
+
+  @override
+  String get trackWeeklyWinsSoonTitle => 'Weekly wins are coming soon';
+
+  @override
+  String get trackWeeklyWinsSoonBody =>
+      'Every Sunday your coach will sum up your week: what went well, your check-ins and one small change for next week.';
+
+  @override
+  String get trackGotIt => 'Got it';
+
+  @override
+  String get trackStreakEyebrow => 'Consistency';
+
+  @override
+  String trackStreakDays(int days) {
+    return '$days-day streak';
+  }
+
+  @override
+  String get trackPersonalBest => 'Personal best';
+
+  @override
+  String get trackStreakEmpty =>
+      'Your streak starts with your first habit. A missed day never resets it straight away: you get one rest day each week.';
+
+  @override
+  String get trackDayMon => 'M';
+
+  @override
+  String get trackDayTue => 'T';
+
+  @override
+  String get trackDayWed => 'W';
+
+  @override
+  String get trackDayThu => 'T';
+
+  @override
+  String get trackDayFri => 'F';
+
+  @override
+  String get trackDaySat => 'S';
+
+  @override
+  String get trackDaySun => 'S';
+
+  @override
+  String trackDayDone(String day) {
+    return '$day: done';
+  }
+
+  @override
+  String trackDayRest(String day) {
+    return '$day: rest day';
+  }
+
+  @override
+  String trackDayRestart(String day) {
+    return '$day: restart';
+  }
+
+  @override
+  String trackDayToday(String day) {
+    return '$day: today';
+  }
+
+  @override
+  String trackDayUpcoming(String day) {
+    return '$day: coming up';
+  }
+
+  @override
+  String get trackStreakLegend =>
+      'Rest days are part of the plan. One each week keeps your streak going.';
+
+  @override
+  String get trackCheckInTitle => '30-second daily check-in';
+
+  @override
+  String get trackCheckInTap => 'Tap to log';
+
+  @override
+  String get trackEnergy => 'Energy';
+
+  @override
+  String get trackSleep => 'Sleep';
+
+  @override
+  String get trackStress => 'Stress';
+
+  @override
+  String get trackMood => 'Mood';
+
+  @override
+  String get trackNotLogged => 'Not logged';
+
+  @override
+  String trackTileLabel(String name, String value) {
+    return '$name: $value. Tap to update your check-in.';
+  }
+
+  @override
+  String trackTileEmptyLabel(String name) {
+    return '$name: not logged yet. Tap to check in.';
+  }
+
+  @override
+  String get trackReflectionTitle => 'Evening reflection';
+
+  @override
+  String get trackReflectionQuestion => 'What went well today?';
+
+  @override
+  String get trackReflectionHint => 'Speak or type your reflection…';
+
+  @override
+  String get trackReflectionSave => 'Save';
+
+  @override
+  String get trackReflectionSaved => 'Saved. Thanks for taking a moment.';
+
+  @override
+  String get trackReflectionSpeak => 'Speak instead';
+
+  @override
+  String get trackReflectionStop => 'Stop listening';
+
+  @override
+  String get trackReflectionError =>
+      'We couldn\'t save your reflection. Please try again.';
+
+  @override
+  String get trackReflectionNotSaved => 'This was not saved.';
 }

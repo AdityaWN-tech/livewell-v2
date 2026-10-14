@@ -26,8 +26,6 @@
   "@tabHome": {
     "description": "Bottom navigation tabs (spec 14.2)."
   },
-  "trackEmptyTitle": "Your progress",
-  "trackEmptyBody": "Your check-ins, habits and the numbers you log will show here as simple charts.",
   "learnEmptyTitle": "Learn something small",
   "learnEmptyBody": "Short lessons from the Live Well book, audio and breathing sessions will be here.",
   "careEmptyTitle": "Care and support",
@@ -531,5 +529,104 @@
   "frameworkImplementation": "Implementation",
   "frameworkImplementationBody": "One tap to start, timers and breathing.",
   "frameworkTracking": "Tracking",
-  "frameworkTrackingBody": "Check-ins, habits and how you feel over time."
+  "frameworkTrackingBody": "Check-ins, habits and how you feel over time.",
+  "trackEyebrow": "Progression",
+  "trackWeeklyWins": "Weekly wins",
+  "trackWeeklyWinsSoonTitle": "Weekly wins are coming soon",
+  "trackWeeklyWinsSoonBody": "Every Sunday your coach will sum up your week: what went well, your check-ins and one small change for next week.",
+  "trackGotIt": "Got it",
+  "trackStreakEyebrow": "Consistency",
+  "trackStreakDays": "{days}-day streak",
+  "@trackStreakDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "trackPersonalBest": "Personal best",
+  "trackStreakEmpty": "Your streak starts with your first habit. A missed day never resets it straight away: you get one rest day each week.",
+  "trackDayMon": "M",
+  "trackDayTue": "T",
+  "trackDayWed": "W",
+  "trackDayThu": "T",
+  "trackDayFri": "F",
+  "trackDaySat": "S",
+  "trackDaySun": "S",
+  "trackDayDone": "{day}: done",
+  "@trackDayDone": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDayRest": "{day}: rest day",
+  "@trackDayRest": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDayRestart": "{day}: restart",
+  "@trackDayRestart": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDayToday": "{day}: today",
+  "@trackDayToday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDayUpcoming": "{day}: coming up",
+  "@trackDayUpcoming": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "trackStreakLegend": "Rest days are part of the plan. One each week keeps your streak going.",
+  "trackCheckInTitle": "30-second daily check-in",
+  "trackCheckInTap": "Tap to log",
+  "trackEnergy": "Energy",
+  "trackSleep": "Sleep",
+  "trackStress": "Stress",
+  "trackMood": "Mood",
+  "trackNotLogged": "Not logged",
+  "trackTileLabel": "{name}: {value}. Tap to update your check-in.",
+  "@trackTileLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackTileEmptyLabel": "{name}: not logged yet. Tap to check in.",
+  "@trackTileEmptyLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackReflectionTitle": "Evening reflection",
+  "trackReflectionQuestion": "What went well today?",
+  "trackReflectionHint": "Speak or type your reflection…",
+  "trackReflectionSave": "Save",
+  "trackReflectionSaved": "Saved. Thanks for taking a moment.",
+  "trackReflectionSpeak": "Speak instead",
+  "trackReflectionStop": "Stop listening",
+  "trackReflectionError": "We couldn't save your reflection. Please try again.",
+  "trackReflectionNotSaved": "This was not saved."
 }

@@ -16,6 +16,7 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `users/{uid}/habits/{id}` | goal_id, title, anchor, window, size_variants, active | Owner read/create/update; no delete | — |
 | `users/{uid}/habit_logs/{date_habitId}` | date, habit_id, status, source, size_done | Owner read/create/update; id must equal `date_habitId`; date and habit fixed | — |
 | `users/{uid}/checkins/{date}` | mood (1–5, required), energy, sleep, stress (1–5, optional), time_available (2/5/10/30, optional), barrier_text (≤ 140, optional), source, gentle_day (bool) | Owner read/create/update; id `YYYY-MM-DD` (local date); created_at never changes; **mood ≤ 2 or stress ≥ 4 must have gentle_day = true** (T-DLY-02) | — |
+| `users/{uid}/reflections/{date}` | text (1–500), prompt (`went_well`), source (`app`) | Owner read/create/update; id `YYYY-MM-DD` (local date); created_at never changes; no delete. Not in spec section 11 (added for FR-DLY-05 / T-UI-01d). Red-flag text is checked in the app and not saved | — |
 | `users/{uid}/daily_plans/{date}` | next_step, alternatives, briefing ids/urls, mode | Owner read only | nightly job |
 | `users/{uid}/messages/{id}` | CoachMessage (spec 9.5) | Owner read only | orchestrator |
 | `users/{uid}/memory_facts/{id}` | fact, category, confidence, source_message_id, status | Owner read; change status to saved/deleted only; deleted is final | Memory Agent proposals |

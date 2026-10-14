@@ -196,18 +196,6 @@ abstract class AppLocalizations {
   /// **'Care'**
   String get tabCare;
 
-  /// No description provided for @trackEmptyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your progress'**
-  String get trackEmptyTitle;
-
-  /// No description provided for @trackEmptyBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Your check-ins, habits and the numbers you log will show here as simple charts.'**
-  String get trackEmptyBody;
-
   /// No description provided for @learnEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -1863,6 +1851,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check-ins, habits and how you feel over time.'**
   String get frameworkTrackingBody;
+
+  /// No description provided for @trackEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Progression'**
+  String get trackEyebrow;
+
+  /// No description provided for @trackWeeklyWins.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly wins'**
+  String get trackWeeklyWins;
+
+  /// No description provided for @trackWeeklyWinsSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly wins are coming soon'**
+  String get trackWeeklyWinsSoonTitle;
+
+  /// No description provided for @trackWeeklyWinsSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every Sunday your coach will sum up your week: what went well, your check-ins and one small change for next week.'**
+  String get trackWeeklyWinsSoonBody;
+
+  /// No description provided for @trackGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get trackGotIt;
+
+  /// No description provided for @trackStreakEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistency'**
+  String get trackStreakEyebrow;
+
+  /// No description provided for @trackStreakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}-day streak'**
+  String trackStreakDays(int days);
+
+  /// No description provided for @trackPersonalBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal best'**
+  String get trackPersonalBest;
+
+  /// No description provided for @trackStreakEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your streak starts with your first habit. A missed day never resets it straight away: you get one rest day each week.'**
+  String get trackStreakEmpty;
+
+  /// No description provided for @trackDayMon.
+  ///
+  /// In en, this message translates to:
+  /// **'M'**
+  String get trackDayMon;
+
+  /// No description provided for @trackDayTue.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get trackDayTue;
+
+  /// No description provided for @trackDayWed.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get trackDayWed;
+
+  /// No description provided for @trackDayThu.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get trackDayThu;
+
+  /// No description provided for @trackDayFri.
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get trackDayFri;
+
+  /// No description provided for @trackDaySat.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get trackDaySat;
+
+  /// No description provided for @trackDaySun.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get trackDaySun;
+
+  /// No description provided for @trackDayDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: done'**
+  String trackDayDone(String day);
+
+  /// No description provided for @trackDayRest.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: rest day'**
+  String trackDayRest(String day);
+
+  /// No description provided for @trackDayRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: restart'**
+  String trackDayRestart(String day);
+
+  /// No description provided for @trackDayToday.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: today'**
+  String trackDayToday(String day);
+
+  /// No description provided for @trackDayUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: coming up'**
+  String trackDayUpcoming(String day);
+
+  /// No description provided for @trackStreakLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest days are part of the plan. One each week keeps your streak going.'**
+  String get trackStreakLegend;
+
+  /// No description provided for @trackCheckInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'30-second daily check-in'**
+  String get trackCheckInTitle;
+
+  /// No description provided for @trackCheckInTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to log'**
+  String get trackCheckInTap;
+
+  /// No description provided for @trackEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get trackEnergy;
+
+  /// No description provided for @trackSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get trackSleep;
+
+  /// No description provided for @trackStress.
+  ///
+  /// In en, this message translates to:
+  /// **'Stress'**
+  String get trackStress;
+
+  /// No description provided for @trackMood.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood'**
+  String get trackMood;
+
+  /// No description provided for @trackNotLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Not logged'**
+  String get trackNotLogged;
+
+  /// No description provided for @trackTileLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {value}. Tap to update your check-in.'**
+  String trackTileLabel(String name, String value);
+
+  /// No description provided for @trackTileEmptyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: not logged yet. Tap to check in.'**
+  String trackTileEmptyLabel(String name);
+
+  /// No description provided for @trackReflectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening reflection'**
+  String get trackReflectionTitle;
+
+  /// No description provided for @trackReflectionQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What went well today?'**
+  String get trackReflectionQuestion;
+
+  /// No description provided for @trackReflectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak or type your reflection…'**
+  String get trackReflectionHint;
+
+  /// No description provided for @trackReflectionSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get trackReflectionSave;
+
+  /// No description provided for @trackReflectionSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Thanks for taking a moment.'**
+  String get trackReflectionSaved;
+
+  /// No description provided for @trackReflectionSpeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak instead'**
+  String get trackReflectionSpeak;
+
+  /// No description provided for @trackReflectionStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop listening'**
+  String get trackReflectionStop;
+
+  /// No description provided for @trackReflectionError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save your reflection. Please try again.'**
+  String get trackReflectionError;
+
+  /// No description provided for @trackReflectionNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'This was not saved.'**
+  String get trackReflectionNotSaved;
 }
 
 class _AppLocalizationsDelegate

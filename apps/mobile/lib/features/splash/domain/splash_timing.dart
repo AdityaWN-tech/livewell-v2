@@ -37,8 +37,7 @@ class SplashTiming {
   final Duration holdHome;
   final Duration holdWelcome;
 
-  Duration hold(StartDestination d) =>
-      d == StartDestination.home ? holdHome : holdWelcome;
+  Duration hold(StartDestination d) => d.signedIn ? holdHome : holdWelcome;
 
   /// Splash on screen until the next screen is fully visible, if startup is
   /// ready by the end of the reveal.

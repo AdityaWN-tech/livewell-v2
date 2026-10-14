@@ -459,6 +459,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Preview mode: changes here are not saved.'**
   String get devPreviewNotSaved;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What Live Well does'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutDoesHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well helps you'**
+  String get aboutDoesHeader;
+
+  /// No description provided for @aboutDoes1.
+  ///
+  /// In en, this message translates to:
+  /// **'Build small daily habits with Dr. Gokula\'s MY GOAL DO IT approach and the 8 drivers of health.'**
+  String get aboutDoes1;
+
+  /// No description provided for @aboutDoes2.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk with a personal coach that speaks, listens and remembers only what you allow.'**
+  String get aboutDoes2;
+
+  /// No description provided for @aboutDoes3.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn from the Live Well book and reviewed lessons.'**
+  String get aboutDoes3;
+
+  /// No description provided for @aboutDoes4.
+  ///
+  /// In en, this message translates to:
+  /// **'Go deeper on the Live Well portal when you want to.'**
+  String get aboutDoes4;
+
+  /// No description provided for @aboutDoesNotHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well does not'**
+  String get aboutDoesNotHeader;
+
+  /// No description provided for @aboutDoesNot1.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnose illness or replace your doctor.'**
+  String get aboutDoesNot1;
+
+  /// No description provided for @aboutDoesNot2.
+  ///
+  /// In en, this message translates to:
+  /// **'Give medication, dose or supplement advice.'**
+  String get aboutDoesNot2;
+
+  /// No description provided for @aboutDoesNot3.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your medical records.'**
+  String get aboutDoesNot3;
+
+  /// No description provided for @aboutDoesNot4.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell your data or show ads from other companies.'**
+  String get aboutDoesNot4;
+
+  /// No description provided for @aboutEmergency.
+  ///
+  /// In en, this message translates to:
+  /// **'In an emergency, call your local emergency number.'**
+  String get aboutEmergency;
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get commonContinue;
+
+  /// No description provided for @ageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you 18 or older?'**
+  String get ageTitle;
+
+  /// No description provided for @ageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well is for adults. We ask before you create an account, so nothing is saved for anyone under 18.'**
+  String get ageBody;
+
+  /// No description provided for @ageYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, I\'m 18 or older'**
+  String get ageYes;
+
+  /// No description provided for @ageNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No, I\'m under 18'**
+  String get ageNo;
+
+  /// No description provided for @under18Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well is for adults'**
+  String get under18Title;
+
+  /// No description provided for @under18Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your interest. Live Well is made for people 18 and older, so we haven\'t saved anything. If you\'d like support with your health, a parent, school nurse or doctor is a great place to start.'**
+  String get under18Body;
+
+  /// No description provided for @under18Back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to start'**
+  String get under18Back;
+
+  /// No description provided for @legalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you start'**
+  String get legalTitle;
+
+  /// No description provided for @legalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please read and accept each of these. Your acceptance is saved with the version and the date.'**
+  String get legalBody;
+
+  /// No description provided for @legalRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get legalRead;
+
+  /// No description provided for @legalAcceptAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept and continue'**
+  String get legalAcceptAll;
+
+  /// No description provided for @legalAcceptHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tick all four to continue.'**
+  String get legalAcceptHint;
+
+  /// No description provided for @legalVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String legalVersion(String version);
+
+  /// No description provided for @legalLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t open this document. Please try again.'**
+  String get legalLoadError;
+
+  /// No description provided for @signInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account'**
+  String get signInTitle;
+
+  /// No description provided for @signInComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in options are being added next.'**
+  String get signInComingSoon;
 }
 
 class _AppLocalizationsDelegate

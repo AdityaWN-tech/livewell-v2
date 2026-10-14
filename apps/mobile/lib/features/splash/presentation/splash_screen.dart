@@ -78,14 +78,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       final results = await Future.wait<Object?>([reveal, startup]);
       if (!mounted) return;
       final destination = results[1]! as StartDestination;
-      StartupTrace.mark('reveal_done_and_startup_ready ${destination.name}');
+      StartupTrace.mark('reveal_done_and_startup_ready ${destination.path}');
       _hold = Timer(timing.hold(destination), () {
         if (mounted) {
-          context.go(
-            destination == StartDestination.home ? '/home' : '/welcome',
-          );
+          context.go(destination.path);
           WidgetsBinding.instance.addPostFrameCallback(
-            (_) => StartupTrace.mark('first_screen_shown ${destination.name}'),
+            (_) => StartupTrace.mark('first_screen_shown ${destination.path}'),
           );
         }
       });

@@ -212,4 +212,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get devPreviewNotSaved => 'Preview mode: changes here are not saved.';
+
+  @override
+  String get aboutTitle => 'What Live Well does';
+
+  @override
+  String get aboutDoesHeader => 'Live Well helps you';
+
+  @override
+  String get aboutDoes1 =>
+      'Build small daily habits with Dr. Gokula\'s MY GOAL DO IT approach and the 8 drivers of health.';
+
+  @override
+  String get aboutDoes2 =>
+      'Talk with a personal coach that speaks, listens and remembers only what you allow.';
+
+  @override
+  String get aboutDoes3 =>
+      'Learn from the Live Well book and reviewed lessons.';
+
+  @override
+  String get aboutDoes4 =>
+      'Go deeper on the Live Well portal when you want to.';
+
+  @override
+  String get aboutDoesNotHeader => 'Live Well does not';
+
+  @override
+  String get aboutDoesNot1 => 'Diagnose illness or replace your doctor.';
+
+  @override
+  String get aboutDoesNot2 => 'Give medication, dose or supplement advice.';
+
+  @override
+  String get aboutDoesNot3 => 'Keep your medical records.';
+
+  @override
+  String get aboutDoesNot4 =>
+      'Sell your data or show ads from other companies.';
+
+  @override
+  String get aboutEmergency =>
+      'In an emergency, call your local emergency number.';
+
+  @override
+  String get commonContinue => 'Continue';
+
+  @override
+  String get ageTitle => 'Are you 18 or older?';
+
+  @override
+  String get ageBody =>
+      'Live Well is for adults. We ask before you create an account, so nothing is saved for anyone under 18.';
+
+  @override
+  String get ageYes => 'Yes, I\'m 18 or older';
+
+  @override
+  String get ageNo => 'No, I\'m under 18';
+
+  @override
+  String get under18Title => 'Live Well is for adults';
+
+  @override
+  String get under18Body =>
+      'Thank you for your interest. Live Well is made for people 18 and older, so we haven\'t saved anything. If you\'d like support with your health, a parent, school nurse or doctor is a great place to start.';
+
+  @override
+  String get under18Back => 'Back to start';
+
+  @override
+  String get legalTitle => 'Before you start';
+
+  @override
+  String get legalBody =>
+      'Please read and accept each of these. Your acceptance is saved with the version and the date.';
+
+  @override
+  String get legalRead => 'Read';
+
+  @override
+  String get legalAcceptAll => 'Accept and continue';
+
+  @override
+  String get legalAcceptHint => 'Tick all four to continue.';
+
+  @override
+  String legalVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get legalLoadError =>
+      'We couldn\'t open this document. Please try again.';
+
+  @override
+  String get signInTitle => 'Create your account';
+
+  @override
+  String get signInComingSoon => 'Sign-in options are being added next.';
 }

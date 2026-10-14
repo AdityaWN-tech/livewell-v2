@@ -6,10 +6,12 @@ import 'package:go_router/go_router.dart';
 import '../../../core/config/flavor.dart';
 import '../../../core/design/tokens.dart';
 import '../../dev/application/preview_mode.dart';
+import '../../onboarding/data/onboarding_store.dart';
+import '../../onboarding/domain/onboarding_progress.dart';
 import '../../../l10n/app_localizations.dart';
 
-/// First screen for new users (spec 5.2 step 1). The onboarding flow behind
-/// "Get started" comes in T-ONB-01; the buttons are placeholders until then.
+/// First screen for new users (spec 5.2 step 1). "Get started" begins
+/// onboarding; "I already have an account" goes straight to sign-in.
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
 
@@ -49,12 +51,19 @@ class WelcomeScreen extends ConsumerWidget {
                 ),
                 const Spacer(),
                 FilledButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await ref
+                        .read(onboardingProvider.notifier)
+                        .goTo(OnboardingStep.about);
+                    if (context.mounted) {
+                      context.push(OnboardingStep.about.path);
+                    }
+                  },
                   child: Text(l10n.welcomeGetStarted),
                 ),
                 const SizedBox(height: LwSpacing.xs),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => context.push(OnboardingStep.signIn.path),
                   child: Text(l10n.welcomeHaveAccount),
                 ),
                 if (isDev)

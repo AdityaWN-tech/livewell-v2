@@ -3,11 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/config/flavor.dart';
-import '../../../core/design/tokens.dart';
+import '../../../core/design/components/lw_components.dart';
 import '../../../l10n/app_localizations.dart';
 
-/// Placeholder Home. The real Home (briefing, next step, check-in, streak)
-/// arrives with the 5-tab shell (T-FND-04) and T-DLY-01.
+/// Home tab. Will hold: avatar (tap to talk), morning briefing player, today's
+/// next step, quick check-in, streak, at most one secondary card (spec 14.2,
+/// T-DLY-01).
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -15,21 +16,20 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final isDev = ref.watch(flavorProvider) == Flavor.dev;
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.homeTitle)),
-      body: Padding(
-        padding: const EdgeInsets.all(LwSpacing.screenGutter),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (isDev)
-              OutlinedButton(
-                onPressed: () => context.push('/dev/tokens'),
-                child: Text(l10n.devDesignTokens),
-              ),
-          ],
+    return LwScreen(
+      title: l10n.tabHome,
+      children: [
+        LwEmptyState(
+          icon: Icons.wb_sunny_outlined,
+          title: l10n.homeEmptyTitle,
+          body: l10n.homeEmptyBody,
         ),
-      ),
+        if (isDev)
+          OutlinedButton(
+            onPressed: () => context.push('/dev/tokens'),
+            child: Text(l10n.devDesignTokens),
+          ),
+      ],
     );
   }
 }

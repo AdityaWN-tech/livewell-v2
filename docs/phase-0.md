@@ -16,7 +16,7 @@ Greenfield adjustments are in `decisions.md` (D-01).
 | T-FND-01 | Requirements check (greenfield form, D-01) | `docs/audit.md`: every 10.4 "keep/refactor" item mapped to a v2 task | To do |
 | T-FND-02 | CI (GitHub Actions: lint + tests), staging + prod Firebase projects, Terraform skeleton | CI green on an empty PR; dev, staging, prod deployable | To do |
 | T-FND-03 | Vendor + framework spike (LangGraph vs ADK, TTS/clone, avatar, STT, LLM), ADRs | ADRs with 8.3 scorecards; morning-briefing prototype end to end | To do (needs vendor keys) |
-| T-FND-04 | go_router 5-tab shell (Home, Plan, Track, Learn, Care), Riverpod, design system components | All screens reachable; golden tests for core components | To do |
+| T-FND-04 | go_router 5-tab shell (Home, Plan, Track, Learn, Care), Riverpod, design system components | All screens reachable; golden tests for core components | Done 2026-10-13: 5-tab shell (StatefulShellRoute), core components (LwScreen, LwSectionHeader, LwCard, LwTag, LwEmptyState), tab placeholders, goldens light + dark. Greenfield form of "prototype screens" = the 5 spec 14.2 tabs (D-01) |
 | T-FND-05 | Consent service (append-only) + Settings UI | Grant/revoke every consent type; emulator tests; audit entries | To do (human review) |
 | T-FND-06 | Firestore security rules + emulator tests (all Section 11 collections) | 100% rule coverage | To do (human review) |
 | T-FND-07 | Migration of old prototype data | Dropped (D-01) | N/A |

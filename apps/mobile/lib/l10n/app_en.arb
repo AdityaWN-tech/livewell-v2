@@ -5,14 +5,35 @@
   "taglineHabit": "Habit.",
   "taglineHappiness": "Happiness.",
   "splashSemanticLabel": "Live Well. Health. Habit. Happiness.",
-  "@splashSemanticLabel": {"description": "Read once by screen readers while the logo reveal plays."},
+  "@splashSemanticLabel": {
+    "description": "Read once by screen readers while the logo reveal plays."
+  },
   "welcomeTitle": "Your daily companion for health and happiness.",
-  "@welcomeTitle": {"description": "Welcome screen headline (spec 5.2 step 1)."},
+  "@welcomeTitle": {
+    "description": "Welcome screen headline (spec 5.2 step 1)."
+  },
   "welcomeGetStarted": "Get started",
   "welcomeHaveAccount": "I already have an account",
-  "homeTitle": "Home",
   "startupErrorTitle": "We couldn't start Live Well",
   "startupErrorBody": "Please check your connection and try again.",
   "startupErrorRetry": "Try again",
-  "devDesignTokens": "Design tokens"
+  "devDesignTokens": "Design tokens",
+  "tabHome": "Home",
+  "tabPlan": "Plan",
+  "tabTrack": "Track",
+  "tabLearn": "Learn",
+  "tabCare": "Care",
+  "@tabHome": {
+    "description": "Bottom navigation tabs (spec 14.2)."
+  },
+  "homeEmptyTitle": "Your day starts here",
+  "homeEmptyBody": "Your morning briefing, one next step and a quick check-in will show up here.",
+  "planEmptyTitle": "Your plan",
+  "planEmptyBody": "Your Live Well Map, your 30-day goal and your daily habits will live here.",
+  "trackEmptyTitle": "Your progress",
+  "trackEmptyBody": "Your check-ins, habits and the numbers you log will show here as simple charts.",
+  "learnEmptyTitle": "Learn something small",
+  "learnEmptyBody": "Short lessons from the Live Well book, audio and breathing sessions will be here.",
+  "careEmptyTitle": "Care and support",
+  "careEmptyBody": "Talk with your coach, see what it remembers, and find safety and clinician help here."
 }

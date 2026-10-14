@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/app.dart';
+import 'package:livewell/core/config/flavor.dart';
+import 'package:livewell/core/startup/app_startup.dart';
+import 'package:livewell/features/care/presentation/care_screen.dart';
+import 'package:livewell/features/home/presentation/home_screen.dart';
+import 'package:livewell/features/learn/presentation/learn_screen.dart';
+import 'package:livewell/features/plan/presentation/plan_screen.dart';
+import 'package:livewell/features/splash/application/splash_handoff.dart';
+import 'package:livewell/features/track/presentation/track_screen.dart';
+
+import '../support/frames.dart';
+
+Future<void> bootToShell(
+  WidgetTester tester, {
+  Flavor flavor = Flavor.prod,
+}) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        flavorProvider.overrideWithValue(flavor),
+        splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
+        appStartupProvider.overrideWith((ref) async => StartDestination.home),
+      ],
+      child: const LiveWellApp(),
+    ),
+  );
+  await pumpFrames(tester, const Duration(seconds: 2));
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('shell has exactly the 5 spec tabs in order (14.2)', (
+    tester,
+  ) async {
+    await bootToShell(tester);
+    final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+    expect(bar.destinations.map((d) => (d as NavigationDestination).label), [
+      'Home',
+      'Plan',
+      'Track',
+      'Learn',
+      'Care',
+    ]);
+    expect(find.byType(HomeScreen), findsOneWidget);
+  });
+
+  testWidgets('every tab screen is reachable', (tester) async {
+    await bootToShell(tester);
+    final screens = {
+      'Plan': PlanScreen,
+      'Track': TrackScreen,
+      'Learn': LearnScreen,
+      'Care': CareScreen,
+      'Home': HomeScreen,
+    };
+    for (final MapEntry(key: label, value: type) in screens.entries) {
+      await tester.tap(
+        find.descendant(
+          of: find.byType(NavigationBar),
+          matching: find.text(label),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(type), findsOneWidget, reason: '$label tab');
+    }
+  });
+
+  testWidgets('tab targets meet the 48 dp minimum (NFR-06)', (tester) async {
+    await bootToShell(tester);
+    final tabs = find.byType(NavigationDestination);
+    expect(tabs, findsNWidgets(5));
+    for (var i = 0; i < 5; i++) {
+      final size = tester.getSize(tabs.at(i));
+      expect(size.height, greaterThanOrEqualTo(48), reason: 'tab $i height');
+      expect(size.width, greaterThanOrEqualTo(48), reason: 'tab $i width');
+    }
+  });
+
+  for (final dark in [false, true]) {
+    testWidgets('shell golden at phone size (${dark ? 'dark' : 'light'})', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.625; // Pixel-class phone, 411 x 914 dp
+      tester.platformDispatcher.platformBrightnessTestValue = dark
+          ? Brightness.dark
+          : Brightness.light;
+      addTearDown(tester.view.reset);
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      await bootToShell(tester);
+      await expectLater(
+        find.byType(MaterialApp),
+        matchesGoldenFile('goldens/shell_home_${dark ? 'dark' : 'light'}.png'),
+      );
+    });
+  }
+}

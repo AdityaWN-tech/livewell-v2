@@ -167,6 +167,11 @@ abstract final class LwSize {
   static const double iconSm = 20;
   static const double iconMd = 24;
   static const double avatarSm = 40;
+
+  /// Logo mark on the splash. Must equal the native splash image
+  /// (640 px at 4x in assets/brand/splash/), so the hand-off doesn't jump.
+  static const double splashMark = 160;
+  static const double splashWordmarkWidth = 200;
 }
 
 /// Motion. Calm, never bouncy. Use [LwMotion.duration] so reduce-motion is respected.

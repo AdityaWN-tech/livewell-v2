@@ -6,9 +6,11 @@ Redrawn in code from the logo in `apps/mobile/assets/design-reference/portal-log
 
 | File | Use |
 |---|---|
-| `logo.png` | Full lockup, 1024 px: teal rounded square, lime mark, "LIVE WELL", "Health. Habit. Happiness." |
-| `logo-mark.png` | Lime circle mark only, 1024 px, transparent corners (splash, app icon) |
-| `logo-mark.svg` | Same mark as a vector |
+| `master/logo.png` | Full lockup, 1024 px (not bundled): teal rounded square, lime mark, "LIVE WELL", "Health. Habit. Happiness." |
+| `master/logo-mark.png`, `master/logo-mark.svg` | Lime circle mark, 1024 px and vector (not bundled; app icon source) |
+| `master/wordmark.png` | "LIVE WELL" lettering, full size (not bundled) |
+| `logo.png`, `logo-mark.png`, `wordmark.png` + `2.0x/ 3.0x/ 4.0x/` | Bundled, sized for how the app shows them (160 dp, 160 dp, 200 dp wide), so phones decode only what they need |
+| `splash/` | Native splash images for flutter_native_splash (not bundled) |
 
 Fonts in the redraw: Times New Roman (title) and Arial Bold (tagline), the closest fonts on this PC to the reference.
 When the client's original artwork and font names arrive, replace these files and keep the same names.
@@ -44,3 +46,13 @@ and checks every text/background pair for WCAG 2.2 AA in light and dark.
 Semantic light palette: background `#F4F6F5`, surface `#FFFFFF`, textPrimary `#14232B`, textSecondary `#55646B`,
 primaryTint `#E2EDF0`, accentTint `#EEF9E2`, outlineSoft `#E3E8E7`, outlineStrong `#8A979C`, success `#2F6B12`,
 caution `#9A5B00`, emergency `#B3261E`. Dark palette: lime becomes primary on `#0A1A22` / `#12262F`.
+
+## Launch sequence (S-7, D-13)
+1. **Native splash** (flutter_native_splash, config in `pubspec.yaml`): teal `#0B3A4E` + the mark at 160 dp, Android (incl. 12+) and iOS. No white flash.
+2. It stays up until the logo images are decoded (`NativeSplashGate`), so the first Flutter frame shows the same mark in the same place. On Android 12+ the system splash is removed instantly (`MainActivity.kt`) instead of fading.
+3. **Reveal** starts once that frame is really on screen: mark rises and shrinks, "LIVE WELL" fades in, then "Health." "Habit." "Happiness." one after another (750 ms).
+4. Meanwhile Firebase and the sign-in check load (`appStartupProvider`).
+5. Hold: 200 ms → **Home** (signed in, about 1.2 s total) or 950 ms → **Welcome** (new user, about 2 s). Then a 250 ms fade.
+6. Reduce motion: still logo, longer hold, fade only.
+7. Startup failure: calm "Try again" on teal, never a crash.
+Timing markers `LW_STARTUP …` print in debug/profile builds (logcat) for measuring NFR-01.

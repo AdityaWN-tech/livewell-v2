@@ -12,7 +12,7 @@ Greenfield adjustments are in `decisions.md` (D-01).
 | S-4 | FlutterFire configure dev, Firebase init in `bootstrap.dart`, fingerprints, sign-in methods enabled | Dev app starts with Firebase on an Android device | Partly done 2026-10-13: configure, init and fingerprints done, verified on emulator. Left: sign-in methods + Firestore nam5 (console), iOS plist (Mac) |
 | S-5 | New private GitHub repo + first push | `git remote -v` shows the new repo | Done 2026-10-12: AdityaWN-tech/livewell-v2 (private) |
 | S-6 | Brand: original logo, design tokens (colors, text, spacing, radius) | Logo in `assets/brand/`, `docs/brand.md`, tokens used everywhere | Done 2026-10-13: logo (D-15), tokens + theme, AA contrast tests, dev gallery |
-| S-7 | Splash: flutter_native_splash + logo reveal (≤ budget in NFR-01) | Cold start to Home < 2.0 s on a mid-range device | Chosen: "Three words" (D-13); ready to build |
+| S-7 | Splash: flutter_native_splash + logo reveal (≤ budget in NFR-01) | Cold start to Home < 2.0 s on a mid-range device | Built 2026-10-13 (branch task/S-7-splash): native splash, reveal, Welcome/Home routing, tests. **Not yet verified:** look and NFR-01 timing on a real mid-range phone (the emulator is too slow to show or time it) |
 | T-FND-01 | Requirements check (greenfield form, D-01) | `docs/audit.md`: every 10.4 "keep/refactor" item mapped to a v2 task | To do |
 | T-FND-02 | CI (GitHub Actions: lint + tests), staging + prod Firebase projects, Terraform skeleton | CI green on an empty PR; dev, staging, prod deployable | To do |
 | T-FND-03 | Vendor + framework spike (LangGraph vs ADK, TTS/clone, avatar, STT, LLM), ADRs | ADRs with 8.3 scorecards; morning-briefing prototype end to end | To do (needs vendor keys) |

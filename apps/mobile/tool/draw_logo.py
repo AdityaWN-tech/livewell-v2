@@ -2,8 +2,10 @@
 
 Provisional (docs/decisions.md D-15): replace with the client's original artwork when it arrives.
 Usage (from apps/mobile):  python tool/draw_logo.py
-Writes assets/brand/logo.png (full lockup), logo-mark.png (circle mark, transparent),
-logo-mark.svg (vector mark).
+Writes full-size masters to assets/brand/master/ (logo.png lockup, logo-mark.png,
+logo-mark.svg, wordmark.png; not bundled), sized 1x-4x copies of logo, logo-mark and
+wordmark for the app, and assets/brand/splash/ images for flutter_native_splash. The mark is 160 dp wide on every splash (native and Flutter),
+so the hand-off between them doesn't jump.
 """
 import math
 from pathlib import Path
@@ -113,6 +115,26 @@ def mark(size=1024):
     return img.resize((size, size), Image.LANCZOS)
 
 
+def padded_mark(canvas, mark_px):
+    """Mark of mark_px diameter centred on a transparent canvas (splash images are 4x)."""
+    img = Image.new("RGBA", (canvas, canvas), (0, 0, 0, 0))
+    m = mark(mark_px * 2).resize((mark_px, mark_px), Image.LANCZOS)
+    off = (canvas - mark_px) // 2
+    img.alpha_composite(m, (off, off))
+    return img
+
+
+def wordmark(width=1280):
+    """"LIVE WELL" in the logo's serif, transparent background."""
+    S = width * SS
+    probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    f = fit_text(probe, "LIVE WELL", ["times.ttf", "DejaVuSerif.ttf"], S * 0.98, int(S * 0.2))
+    left, top, right, bottom = probe.textbbox((0, 0), "LIVE WELL", font=f)
+    img = Image.new("RGBA", (right - left + 2 * SS, bottom - top + 2 * SS), (0, 0, 0, 0))
+    ImageDraw.Draw(img).text((SS - left, SS - top), "LIVE WELL", font=f, fill=TEXT)
+    return img.resize((img.width // SS, img.height // SS), Image.LANCZOS)
+
+
 def mark_svg():
     def pt(p):
         return f"{50 + p[0] * 50:.2f} {50 + p[1] * 50:.2f}"
@@ -127,9 +149,34 @@ def mark_svg():
             f'<polygon points="{leaf}" fill="{hexc(LEAF_FILL)}"/></svg>\n')
 
 
+def save_scaled(img, name, base_px):
+    """Resolution-aware variants (Flutter picks the one for the phone's density):
+    assets/brand/<name> at 1x plus 2.0x/, 3.0x/, 4.0x/. base_px is the 1x width."""
+    for scale in (1, 2, 3, 4):
+        folder = OUT if scale == 1 else OUT / f"{scale}.0x"
+        folder.mkdir(parents=True, exist_ok=True)
+        w = base_px * scale
+        h = round(img.height * w / img.width)
+        img.resize((w, h), Image.LANCZOS).save(folder / name)
+
+
 if __name__ == "__main__":
-    OUT.mkdir(parents=True, exist_ok=True)
-    lockup().save(OUT / "logo.png")
-    mark().save(OUT / "logo-mark.png")
-    (OUT / "logo-mark.svg").write_text(mark_svg(), encoding="utf-8")
-    print("wrote", *(p.name for p in sorted(OUT.glob("logo*"))))
+    master = OUT / "master"  # full-size sources, not bundled in the app
+    master.mkdir(parents=True, exist_ok=True)
+    full, mark_full, word_full = lockup(), mark(), wordmark()
+    full.save(master / "logo.png")
+    mark_full.save(master / "logo-mark.png")
+    word_full.save(master / "wordmark.png")
+    (master / "logo-mark.svg").write_text(mark_svg(), encoding="utf-8")
+    # Bundled, sized for how the app shows them (dp at 1x): splash mark 160,
+    # wordmark 200, Welcome logo 160.
+    save_scaled(full, "logo.png", 160)
+    save_scaled(mark_full, "logo-mark.png", 160)
+    save_scaled(word_full, "wordmark.png", 200)
+    splash = OUT / "splash"
+    splash.mkdir(exist_ok=True)
+    # Native splash. Pre-Android-12 and iOS: 4x image, 640 px = 160 dp.
+    padded_mark(640, 640).save(splash / "splash-mark.png")
+    # Android 12+: 960 px canvas (240 dp), icon must fit a 640 px (160 dp) circle.
+    padded_mark(960, 640).save(splash / "splash-mark-android12.png")
+    print("wrote", *(p.relative_to(OUT).as_posix() for p in sorted(OUT.rglob("*.*"))))

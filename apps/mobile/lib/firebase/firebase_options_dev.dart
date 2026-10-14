@@ -56,13 +56,14 @@ class DefaultFirebaseOptions {
     projectId: 'my-livewell',
     storageBucket: 'my-livewell.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCgKYzgKsc-I8tesCD8kJT6qf9ffS8vt4Y',
     appId: '1:623153208660:ios:ccdfebe26e2d05ac7ffcc1',
     messagingSenderId: '623153208660',
     projectId: 'my-livewell',
     storageBucket: 'my-livewell.firebasestorage.app',
+    androidClientId: '623153208660-2t2vg5sh0l3vfsvb4kceg1qrkmgc6fcf.apps.googleusercontent.com',
+    iosClientId: '623153208660-soat1bkodfkq1bouudc2k37kescf9rlc.apps.googleusercontent.com',
     iosBundleId: 'net.conciergeconnectedcare.livewell.dev',
   );
 }

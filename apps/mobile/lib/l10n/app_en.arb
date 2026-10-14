@@ -26,8 +26,6 @@
   "@tabHome": {
     "description": "Bottom navigation tabs (spec 14.2)."
   },
-  "learnEmptyTitle": "Learn something small",
-  "learnEmptyBody": "Short lessons from the Live Well book, audio and breathing sessions will be here.",
   "careEmptyTitle": "Care and support",
   "careEmptyBody": "Talk with your coach, see what it remembers, and find safety and clinician help here.",
   "settingsTitle": "Settings",
@@ -628,5 +626,32 @@
   "trackReflectionSpeak": "Speak instead",
   "trackReflectionStop": "Stop listening",
   "trackReflectionError": "We couldn't save your reflection. Please try again.",
-  "trackReflectionNotSaved": "This was not saved."
+  "trackReflectionNotSaved": "This was not saved.",
+  "learnEyebrow": "Approved knowledge",
+  "learnPortalEyebrow": "From the Live Well Portal",
+  "learnPaidCourse": "Paid course",
+  "learnFreeLesson": "Free lesson",
+  "learnViewCourse": "View course",
+  "learnNotNow": "Not now",
+  "learnPortalOpenError": "We couldn't open the portal. Please try again.",
+  "learnLibrary": "Curated library",
+  "learnViewAll": "View all {count}",
+  "@learnViewAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "learnReadTime": "{minutes}-min read",
+  "@learnReadTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "learnLessonsEmptyTitle": "Lessons are on their way",
+  "learnLessonsEmptyBody": "Short lessons from Dr. Gokula's book will show up here once they are reviewed.",
+  "learnLibraryTitle": "Library"
 }

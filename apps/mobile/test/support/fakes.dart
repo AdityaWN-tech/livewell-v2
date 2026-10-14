@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:livewell/core/analytics/analytics.dart';
+import 'package:livewell/features/learn/data/learn_repository.dart';
+import 'package:livewell/features/learn/domain/lesson.dart';
+import 'package:livewell/features/learn/domain/portal.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
 import 'package:livewell/features/track/domain/track_models.dart';
 import 'package:livewell/core/speech/dictation.dart';
@@ -273,5 +276,48 @@ class FakeReflectionRepository implements ReflectionRepository {
     saves++;
     days[reflection.date] = reflection;
     _changes.add(reflection.date);
+  }
+}
+
+/// Lessons, offers and portal events in memory, for tests.
+class FakeLearnRepository implements LearnRepository {
+  FakeLearnRepository({DateTime Function()? now}) : _now = now ?? DateTime.now;
+
+  final DateTime Function() _now;
+  List<Lesson> lessons = [];
+  List<PortalOffer> offers = [];
+  final events = <PortalEventRecord>[];
+  final clickIds = <String>[];
+  final _changes = StreamController<void>.broadcast();
+
+  @override
+  Stream<List<Lesson>> watchLessons() => Stream.value(lessons);
+
+  @override
+  Stream<List<PortalOffer>> watchOffers() => Stream.value(offers);
+
+  @override
+  Stream<List<PortalEventRecord>> watchEvents({int days = 14}) async* {
+    yield List.of(events);
+    yield* _changes.stream.map((_) => List.of(events));
+  }
+
+  @override
+  Future<void> logEvent(String event, String offerId, {String? clickId}) async {
+    if (clickId != null) clickIds.add(clickId);
+    events.add(PortalEventRecord(event: event, offerId: offerId, at: _now()));
+    _changes.add(null);
+  }
+}
+
+/// Records the portal links the app tried to open.
+class FakePortalBrowser implements PortalBrowser {
+  final opened = <Uri>[];
+  bool works = true;
+
+  @override
+  Future<bool> open(Uri url) async {
+    opened.add(url);
+    return works;
   }
 }

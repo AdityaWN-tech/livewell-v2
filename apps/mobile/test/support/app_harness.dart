@@ -16,6 +16,8 @@ import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
+import 'package:livewell/features/dev/application/preview_mode.dart';
+import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
@@ -39,7 +41,10 @@ class Harness {
     FakeAnalytics? analytics,
     this.flags = const FeatureFlags(),
     FakeReflectionRepository? reflections,
+    FakeLearnRepository? learn,
   }) : reflections = reflections ?? FakeReflectionRepository(),
+       browser = FakePortalBrowser(),
+       learn = learn ?? FakeLearnRepository(now: () => defaultNow),
        now = now ?? defaultNow,
        checkIns = checkIns ?? FakeCheckInRepository(),
        // Default: already asked today, so tests that aren't about the
@@ -61,6 +66,8 @@ class Harness {
   final FakePhoneLauncher phone;
 
   final FakeReflectionRepository reflections;
+  final FakeLearnRepository learn;
+  final FakePortalBrowser browser;
 
   /// Feature flags (Remote Config later).
   final FeatureFlags flags;
@@ -96,6 +103,13 @@ class Harness {
           clockProvider.overrideWithValue(() => now),
           checkInRepositoryProvider.overrideWithValue(checkIns),
           reflectionRepositoryProvider.overrideWithValue(reflections),
+          portalBrowserProvider.overrideWithValue(browser),
+          // The dev preview keeps its sample lessons and offer.
+          learnRepositoryProvider.overrideWith(
+            (ref) => ref.watch(previewModeProvider)
+                ? PreviewLearnRepository()
+                : learn,
+          ),
           checkInPromptStoreProvider.overrideWithValue(checkInPrompt),
           analyticsProvider.overrideWithValue(analytics),
           // Same decisions as the real startup, minus Firebase.

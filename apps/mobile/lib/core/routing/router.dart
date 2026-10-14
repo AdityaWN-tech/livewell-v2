@@ -15,6 +15,7 @@ import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
 import '../../features/account/application/account_setup.dart' show whyPath;
+import '../../features/learn/presentation/library_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
@@ -100,6 +101,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'framework',
                         builder: (context, state) => const FrameworkScreen(),
+                      ),
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'library',
+                        builder: (context, state) => const LibraryScreen(),
                       ),
                   ],
                 ),

@@ -61,13 +61,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabCare => 'Care';
 
   @override
-  String get learnEmptyTitle => 'Learn something small';
-
-  @override
-  String get learnEmptyBody =>
-      'Short lessons from the Live Well book, audio and breathing sessions will be here.';
-
-  @override
   String get careEmptyTitle => 'Care and support';
 
   @override
@@ -1155,4 +1148,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trackReflectionNotSaved => 'This was not saved.';
+
+  @override
+  String get learnEyebrow => 'Approved knowledge';
+
+  @override
+  String get learnPortalEyebrow => 'From the Live Well Portal';
+
+  @override
+  String get learnPaidCourse => 'Paid course';
+
+  @override
+  String get learnFreeLesson => 'Free lesson';
+
+  @override
+  String get learnViewCourse => 'View course';
+
+  @override
+  String get learnNotNow => 'Not now';
+
+  @override
+  String get learnPortalOpenError =>
+      'We couldn\'t open the portal. Please try again.';
+
+  @override
+  String get learnLibrary => 'Curated library';
+
+  @override
+  String learnViewAll(int count) {
+    return 'View all $count';
+  }
+
+  @override
+  String learnReadTime(int minutes) {
+    return '$minutes-min read';
+  }
+
+  @override
+  String get learnLessonsEmptyTitle => 'Lessons are on their way';
+
+  @override
+  String get learnLessonsEmptyBody =>
+      'Short lessons from Dr. Gokula\'s book will show up here once they are reviewed.';
+
+  @override
+  String get learnLibraryTitle => 'Library';
 }

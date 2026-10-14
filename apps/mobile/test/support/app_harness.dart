@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/app.dart';
 import 'package:livewell/core/config/flavor.dart';
+import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/core/speech/dictation.dart';
+import 'package:livewell/core/time/clock.dart';
 import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
+import 'package:livewell/features/checkin/data/checkin_repository.dart';
 import 'package:livewell/features/auth/data/firebase_auth_service.dart';
 import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
@@ -28,7 +31,17 @@ class Harness {
     FakeDictation? dictation,
     FakePhoneLauncher? phone,
     this.flavor = Flavor.prod,
-  }) : dictation = dictation ?? FakeDictation(),
+    DateTime? now,
+    FakeCheckInRepository? checkIns,
+    FakeCheckInPromptStore? checkInPrompt,
+    FakeAnalytics? analytics,
+  }) : now = now ?? defaultNow,
+       checkIns = checkIns ?? FakeCheckInRepository(),
+       // Default: already asked today, so tests that aren't about the
+       // check-in aren't interrupted by its sheet.
+       checkInPrompt = checkInPrompt ?? FakeCheckInPromptStore('2026-10-14'),
+       analytics = analytics ?? FakeAnalytics(),
+       dictation = dictation ?? FakeDictation(),
        phone = phone ?? FakePhoneLauncher(),
        store = store ?? FakeOnboardingStore(),
        auth = auth ?? FakeAuthService(),
@@ -44,6 +57,13 @@ class Harness {
 
   /// Build flavour to simulate (dev shows developer tools).
   final Flavor flavor;
+
+  /// Local "now" for the app (fixed so dates are predictable).
+  static final defaultNow = DateTime(2026, 10, 14, 8, 30);
+  DateTime now;
+  final FakeCheckInRepository checkIns;
+  final FakeCheckInPromptStore checkInPrompt;
+  final FakeAnalytics analytics;
 
   /// Cold start the real app: signed out resumes at the saved onboarding
   /// step; signed in goes by the profile's step.
@@ -62,6 +82,10 @@ class Harness {
           consentRepositoryProvider.overrideWithValue(consents),
           dictationProvider.overrideWithValue(dictation),
           phoneLauncherProvider.overrideWithValue(phone),
+          clockProvider.overrideWithValue(() => now),
+          checkInRepositoryProvider.overrideWithValue(checkIns),
+          checkInPromptStoreProvider.overrideWithValue(checkInPrompt),
+          analyticsProvider.overrideWithValue(analytics),
           // Same decisions as the real startup, minus Firebase.
           appStartupProvider.overrideWith((ref) async {
             final user = auth.currentUser;

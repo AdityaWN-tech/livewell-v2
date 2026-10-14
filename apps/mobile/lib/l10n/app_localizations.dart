@@ -751,7 +751,7 @@ abstract class AppLocalizations {
   /// No description provided for @countryUs.
   ///
   /// In en, this message translates to:
-  /// **'the US'**
+  /// **'United States (+1)'**
   String get countryUs;
 
   /// No description provided for @phoneNumberLabel.
@@ -1161,6 +1161,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tools for building the app. Only in the dev build.'**
   String get settingsDeveloperBody;
+
+  /// No description provided for @checkinResponseHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Love that energy. Let\'s use it well today.'**
+  String get checkinResponseHigh;
+
+  /// No description provided for @checkinResponseSteady.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for checking in. One small step is plenty today.'**
+  String get checkinResponseSteady;
+
+  /// No description provided for @checkinResponseGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for telling me. Let\'s keep today gentle.'**
+  String get checkinResponseGentle;
+
+  /// No description provided for @checkinMoodQuestionNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi {name}, how are you feeling today?'**
+  String checkinMoodQuestionNamed(String name);
+
+  /// No description provided for @checkinMoodQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, how are you feeling today?'**
+  String get checkinMoodQuestion;
+
+  /// No description provided for @checkinMood1.
+  ///
+  /// In en, this message translates to:
+  /// **'Very low'**
+  String get checkinMood1;
+
+  /// No description provided for @checkinMood2.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get checkinMood2;
+
+  /// No description provided for @checkinMood3.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay'**
+  String get checkinMood3;
+
+  /// No description provided for @checkinMood4.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get checkinMood4;
+
+  /// No description provided for @checkinMood5.
+  ///
+  /// In en, this message translates to:
+  /// **'Great'**
+  String get checkinMood5;
+
+  /// No description provided for @checkinEnergyQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How is your energy?'**
+  String get checkinEnergyQuestion;
+
+  /// No description provided for @checkinEnergy1.
+  ///
+  /// In en, this message translates to:
+  /// **'Very low'**
+  String get checkinEnergy1;
+
+  /// No description provided for @checkinEnergy2.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get checkinEnergy2;
+
+  /// No description provided for @checkinEnergy3.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay'**
+  String get checkinEnergy3;
+
+  /// No description provided for @checkinEnergy4.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get checkinEnergy4;
+
+  /// No description provided for @checkinEnergy5.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get checkinEnergy5;
+
+  /// No description provided for @checkinSleepQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How did you sleep last night?'**
+  String get checkinSleepQuestion;
+
+  /// No description provided for @checkinSleep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Very badly'**
+  String get checkinSleep1;
+
+  /// No description provided for @checkinSleep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Badly'**
+  String get checkinSleep2;
+
+  /// No description provided for @checkinSleep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay'**
+  String get checkinSleep3;
+
+  /// No description provided for @checkinSleep4.
+  ///
+  /// In en, this message translates to:
+  /// **'Well'**
+  String get checkinSleep4;
+
+  /// No description provided for @checkinSleep5.
+  ///
+  /// In en, this message translates to:
+  /// **'Very well'**
+  String get checkinSleep5;
+
+  /// No description provided for @checkinStressQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How stressed do you feel?'**
+  String get checkinStressQuestion;
+
+  /// No description provided for @checkinStress1.
+  ///
+  /// In en, this message translates to:
+  /// **'Not at all'**
+  String get checkinStress1;
+
+  /// No description provided for @checkinStress2.
+  ///
+  /// In en, this message translates to:
+  /// **'A little'**
+  String get checkinStress2;
+
+  /// No description provided for @checkinStress3.
+  ///
+  /// In en, this message translates to:
+  /// **'Some'**
+  String get checkinStress3;
+
+  /// No description provided for @checkinStress4.
+  ///
+  /// In en, this message translates to:
+  /// **'A lot'**
+  String get checkinStress4;
+
+  /// No description provided for @checkinStress5.
+  ///
+  /// In en, this message translates to:
+  /// **'Very'**
+  String get checkinStress5;
+
+  /// No description provided for @checkinTimeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How much time do you have today?'**
+  String get checkinTimeQuestion;
+
+  /// No description provided for @checkinMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String checkinMinutes(int minutes);
+
+  /// No description provided for @checkinMinutesLong.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} minutes'**
+  String checkinMinutesLong(int minutes);
+
+  /// No description provided for @checkinBarrierQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything that could make today hard?'**
+  String get checkinBarrierQuestion;
+
+  /// No description provided for @checkinBarrierHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. A few words is plenty.'**
+  String get checkinBarrierHint;
+
+  /// No description provided for @checkinSkipQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip question'**
+  String get checkinSkipQuestion;
+
+  /// No description provided for @checkinSkipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get checkinSkipForNow;
+
+  /// No description provided for @checkinDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get checkinDone;
+
+  /// No description provided for @checkinSpeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak instead'**
+  String get checkinSpeak;
+
+  /// No description provided for @checkinStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {step} of {total}'**
+  String checkinStepOf(int step, int total);
+
+  /// No description provided for @checkinSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save your check-in. Please try again.'**
+  String get checkinSaveError;
+
+  /// No description provided for @checkinContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get checkinContinue;
+
+  /// No description provided for @homeCheckInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in'**
+  String get homeCheckInTitle;
+
+  /// No description provided for @homeCheckInBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell your coach how you\'re doing. It takes about 30 seconds.'**
+  String get homeCheckInBody;
+
+  /// No description provided for @homeTodayStepEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s step'**
+  String get homeTodayStepEyebrow;
+
+  /// No description provided for @homeTodayStepTimed.
+  ///
+  /// In en, this message translates to:
+  /// **'A step that fits in {minutes} minutes will appear here.'**
+  String homeTodayStepTimed(int minutes);
+
+  /// No description provided for @homeTodayStepUntimed.
+  ///
+  /// In en, this message translates to:
+  /// **'A small step picked for you will appear here.'**
+  String get homeTodayStepUntimed;
+
+  /// No description provided for @homeTodayStepGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'A small, gentle step will appear here. Go easy on yourself today.'**
+  String get homeTodayStepGentle;
+
+  /// No description provided for @countryUsName.
+  ///
+  /// In en, this message translates to:
+  /// **'the US'**
+  String get countryUsName;
 }
 
 class _AppLocalizationsDelegate

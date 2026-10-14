@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/flavor.dart';
+import '../../checkin/data/checkin_repository.dart';
+import '../../checkin/domain/checkin.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
 
@@ -54,3 +56,26 @@ class InMemoryConsentRepository implements ConsentRepository {
     _changes.add(List.of(_records));
   }
 }
+
+/// Keeps check-ins in memory only, for preview mode (nothing is saved).
+class InMemoryCheckInRepository implements CheckInRepository {
+  final _days = <String, CheckIn>{};
+  final _changes = StreamController<String>.broadcast();
+
+  @override
+  Stream<CheckIn?> watchDay(String date) async* {
+    yield _days[date];
+    yield* _changes.stream.where((d) => d == date).map((d) => _days[d]);
+  }
+
+  @override
+  Future<void> save(CheckIn checkIn) async {
+    _days[checkIn.date] = checkIn;
+    _changes.add(checkIn.date);
+  }
+}
+
+/// One in-memory store per app run, so preview check-ins survive tab changes.
+final previewCheckInRepositoryProvider = Provider<CheckInRepository>(
+  (ref) => InMemoryCheckInRepository(),
+);

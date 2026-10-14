@@ -191,4 +191,14 @@ void main() {
     expect(h.profiles.created, isEmpty);
     expect(h.store.saved, isNull);
   });
+
+  testWidgets('phone screen labels both countries with their codes', (
+    tester,
+  ) async {
+    await Harness(store: readyStore()).boot(tester);
+    await tapText(tester, 'Continue with phone');
+    expect(find.text('India (+91)'), findsOneWidget);
+    // Regression: PR #13 had overwritten this label with "the US".
+    expect(find.text('United States (+1)'), findsOneWidget);
+  });
 }

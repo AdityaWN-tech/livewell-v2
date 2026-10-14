@@ -373,7 +373,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countryIndia => 'India (+91)';
 
   @override
-  String get countryUs => 'the US';
+  String get countryUs => 'United States (+1)';
 
   @override
   String get phoneNumberLabel => 'Mobile number';
@@ -615,4 +615,162 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsDeveloperBody =>
       'Tools for building the app. Only in the dev build.';
+
+  @override
+  String get checkinResponseHigh =>
+      'Love that energy. Let\'s use it well today.';
+
+  @override
+  String get checkinResponseSteady =>
+      'Thanks for checking in. One small step is plenty today.';
+
+  @override
+  String get checkinResponseGentle =>
+      'Thanks for telling me. Let\'s keep today gentle.';
+
+  @override
+  String checkinMoodQuestionNamed(String name) {
+    return 'Hi $name, how are you feeling today?';
+  }
+
+  @override
+  String get checkinMoodQuestion => 'Hi, how are you feeling today?';
+
+  @override
+  String get checkinMood1 => 'Very low';
+
+  @override
+  String get checkinMood2 => 'Low';
+
+  @override
+  String get checkinMood3 => 'Okay';
+
+  @override
+  String get checkinMood4 => 'Good';
+
+  @override
+  String get checkinMood5 => 'Great';
+
+  @override
+  String get checkinEnergyQuestion => 'How is your energy?';
+
+  @override
+  String get checkinEnergy1 => 'Very low';
+
+  @override
+  String get checkinEnergy2 => 'Low';
+
+  @override
+  String get checkinEnergy3 => 'Okay';
+
+  @override
+  String get checkinEnergy4 => 'Good';
+
+  @override
+  String get checkinEnergy5 => 'High';
+
+  @override
+  String get checkinSleepQuestion => 'How did you sleep last night?';
+
+  @override
+  String get checkinSleep1 => 'Very badly';
+
+  @override
+  String get checkinSleep2 => 'Badly';
+
+  @override
+  String get checkinSleep3 => 'Okay';
+
+  @override
+  String get checkinSleep4 => 'Well';
+
+  @override
+  String get checkinSleep5 => 'Very well';
+
+  @override
+  String get checkinStressQuestion => 'How stressed do you feel?';
+
+  @override
+  String get checkinStress1 => 'Not at all';
+
+  @override
+  String get checkinStress2 => 'A little';
+
+  @override
+  String get checkinStress3 => 'Some';
+
+  @override
+  String get checkinStress4 => 'A lot';
+
+  @override
+  String get checkinStress5 => 'Very';
+
+  @override
+  String get checkinTimeQuestion => 'How much time do you have today?';
+
+  @override
+  String checkinMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String checkinMinutesLong(int minutes) {
+    return '$minutes minutes';
+  }
+
+  @override
+  String get checkinBarrierQuestion => 'Anything that could make today hard?';
+
+  @override
+  String get checkinBarrierHint => 'Optional. A few words is plenty.';
+
+  @override
+  String get checkinSkipQuestion => 'Skip question';
+
+  @override
+  String get checkinSkipForNow => 'Skip for now';
+
+  @override
+  String get checkinDone => 'Done';
+
+  @override
+  String get checkinSpeak => 'Speak instead';
+
+  @override
+  String checkinStepOf(int step, int total) {
+    return 'Step $step of $total';
+  }
+
+  @override
+  String get checkinSaveError =>
+      'We couldn\'t save your check-in. Please try again.';
+
+  @override
+  String get checkinContinue => 'Continue';
+
+  @override
+  String get homeCheckInTitle => 'Check in';
+
+  @override
+  String get homeCheckInBody =>
+      'Tell your coach how you\'re doing. It takes about 30 seconds.';
+
+  @override
+  String get homeTodayStepEyebrow => 'Today\'s step';
+
+  @override
+  String homeTodayStepTimed(int minutes) {
+    return 'A step that fits in $minutes minutes will appear here.';
+  }
+
+  @override
+  String get homeTodayStepUntimed =>
+      'A small step picked for you will appear here.';
+
+  @override
+  String get homeTodayStepGentle =>
+      'A small, gentle step will appear here. Go easy on yourself today.';
+
+  @override
+  String get countryUsName => 'the US';
 }

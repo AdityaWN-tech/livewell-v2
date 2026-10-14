@@ -1,4 +1,9 @@
+import 'dart:async';
+
+import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/core/speech/dictation.dart';
+import 'package:livewell/features/checkin/data/checkin_repository.dart';
+import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
@@ -109,6 +114,7 @@ class FakeProfileRepository extends ProfileRepository {
       onboardingStep: step,
       whyStatement: whys[uid],
       region: regions[uid] ?? created[uid]?.region,
+      displayName: created[uid]?.displayName,
     );
   }
 
@@ -186,4 +192,53 @@ class FakePhoneLauncher implements PhoneLauncher {
     texts.add(number);
     return true;
   }
+}
+
+/// In-memory check-ins; [saves] counts writes (one per day expected).
+class FakeCheckInRepository implements CheckInRepository {
+  final days = <String, CheckIn>{};
+  int saves = 0;
+  final _changes = StreamController<String>.broadcast();
+
+  @override
+  Stream<CheckIn?> watchDay(String date) async* {
+    yield days[date];
+    yield* _changes.stream.where((d) => d == date).map((d) => days[d]);
+  }
+
+  @override
+  Future<void> save(CheckIn checkIn) async {
+    saves++;
+    days[checkIn.date] = checkIn;
+    _changes.add(checkIn.date);
+  }
+}
+
+/// Remembers the last day the check-in was offered.
+class FakeCheckInPromptStore implements CheckInPromptStore {
+  FakeCheckInPromptStore([this.lastAsked]);
+
+  String? lastAsked;
+
+  @override
+  Future<String?> lastAskedDay() async => lastAsked;
+
+  @override
+  Future<void> markAsked(String day) async => lastAsked = day;
+}
+
+/// Records analytics calls exactly as the app made them.
+class FakeAnalytics implements Analytics {
+  final events = <Map<String, Object>>[];
+
+  @override
+  Future<void> checkinCompleted({
+    required int durationSeconds,
+    required int stepsAnswered,
+  }) async => events.add({
+    'name': 'checkin_completed',
+    'surface': 'app',
+    'duration_s': durationSeconds,
+    'steps_answered': stepsAnswered,
+  });
 }

@@ -178,19 +178,39 @@ service cloud.firestore {
       }
 
       // ---------- check-ins: one per date (FR-DLY-02) ----------
+      // Mood first (T-DLY-02): mood required, the rest optional.
       match /checkins/{date} {
+        function optionalScore(d, key) {
+          return !(key in d) || isScore(d[key]);
+        }
         function validCheckin(d) {
-          return isScore(d.energy) && isScore(d.sleep)
-            && isScore(d.stress) && isScore(d.mood)
-            && d.time_available in [2, 5, 10, 30]
-            && d.source in ['app', 'widget', 'watch'];
+          return d.keys().hasOnly(['mood', 'energy', 'sleep', 'stress',
+                   'time_available', 'barrier_text', 'source', 'gentle_day',
+                   'created_at', 'updated_at', 'schema_version'])
+            && isScore(d.mood)
+            && optionalScore(d, 'energy')
+            && optionalScore(d, 'sleep')
+            && optionalScore(d, 'stress')
+            && (!('time_available' in d) || d.time_available in [2, 5, 10, 30])
+            && (!('barrier_text' in d)
+                || (d.barrier_text is string && d.barrier_text.size() <= 140))
+            && d.source in ['app', 'widget', 'watch']
+            && d.gentle_day is bool
+            // Safety floor (spec 15.3): low mood or high stress is always a
+            // gentle day, so no portal card can appear that day.
+            && (d.gentle_day == true
+                || (d.mood > 2 && (!('stress' in d) || d.stress < 4)));
         }
         allow read: if isOwner(uid);
         allow create: if isAdultOwner(uid)
           && date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
           && validCheckin(request.resource.data)
           && hasMeta(request.resource.data);
-        allow update: if isAdultOwner(uid) && validCheckin(request.resource.data);
+        // Same-day re-submit updates the record; created_at never changes.
+        allow update: if isAdultOwner(uid)
+          && validCheckin(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
         allow delete: if false;
       }
 

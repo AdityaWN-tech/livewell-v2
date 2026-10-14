@@ -196,8 +196,10 @@ class _Reveal extends StatelessWidget {
             Center(
               child: Transform.translate(
                 offset: const Offset(0, _wordsOffset),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                // Wrap, not Row: with very large text the three words go
+                // onto a second line instead of overflowing (NFR-06).
+                child: Wrap(
+                  alignment: WrapAlignment.center,
                   children: [
                     for (var i = 0; i < words.length; i++)
                       Builder(

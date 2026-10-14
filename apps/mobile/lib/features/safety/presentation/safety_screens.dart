@@ -33,8 +33,9 @@ final phoneLauncherProvider = Provider<PhoneLauncher>(
 Future<bool> showSafetyResponse(
   BuildContext context,
   SafetyResult result,
-  List<SafetyContacts> contacts,
-) async {
+  List<SafetyContacts> contacts, {
+  String? continueLabel,
+}) async {
   final category = result.category;
   if (category == null) return true;
   if (category.interrupts) {
@@ -51,7 +52,8 @@ Future<bool> showSafetyResponse(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => SafetyNoticeSheet(category: category),
+    builder: (_) =>
+        SafetyNoticeSheet(category: category, continueLabel: continueLabel),
   );
   return proceed ?? false;
 }
@@ -78,7 +80,7 @@ class SafetyInterruptScreen extends ConsumerWidget {
     final emergency = category == SafetyCategory.emergency;
     final both = contacts.length > 1;
     String country(SafetyContacts c) =>
-        c.region == 'IN' ? l.countryIndiaName : l.countryUs;
+        c.region == 'IN' ? l.countryIndiaName : l.countryUsName;
 
     Future<void> dial(String number, {bool sms = false}) async {
       final launcher = ref.read(phoneLauncherProvider);
@@ -177,9 +179,16 @@ class SafetyInterruptScreen extends ConsumerWidget {
 /// Gentle, non-blocking note for disordered eating, medication and
 /// pregnancy / medically complex topics (FR-SAF-03..05).
 class SafetyNoticeSheet extends StatelessWidget {
-  const SafetyNoticeSheet({super.key, required this.category});
+  const SafetyNoticeSheet({
+    super.key,
+    required this.category,
+    this.continueLabel,
+  });
 
   final SafetyCategory category;
+
+  /// Label of the "carry on" button; defaults to the Why screen's wording.
+  final String? continueLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +221,7 @@ class SafetyNoticeSheet extends StatelessWidget {
             if (canContinue)
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: Text(l.safetySaveAnyway),
+                child: Text(continueLabel ?? l.safetySaveAnyway),
               ),
             if (canContinue) const SizedBox(height: LwSpacing.xs),
             OutlinedButton(

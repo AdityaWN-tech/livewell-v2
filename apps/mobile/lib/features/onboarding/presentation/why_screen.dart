@@ -7,8 +7,7 @@ import '../../../core/speech/dictation.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
-import '../../consent/data/consent_repository.dart';
-import '../../consent/domain/consent.dart';
+import '../../consent/presentation/microphone_consent.dart';
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/presentation/safety_screens.dart';
 import 'about_screen.dart' show OnboardingScaffold;
@@ -69,7 +68,7 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
       setState(() => _listening = false);
       return;
     }
-    if (!await _ensureMicConsent() || !mounted) return;
+    if (!await ensureMicrophoneConsent(context, ref) || !mounted) return;
     _beforeDictation = _text.text.trim();
     final started = await dictation.start((words, isFinal) {
       if (!mounted) return;
@@ -86,43 +85,6 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
       return;
     }
     setState(() => _listening = true);
-  }
-
-  /// The microphone is a separate, revocable consent (FR-ONB-03): ask in the
-  /// app before the OS permission prompt, and record the answer.
-  Future<bool> _ensureMicConsent() async {
-    // One read straight from the store (an unwatched provider would pause).
-    final records = await ref
-        .read(consentRepositoryProvider)
-        .watchRecords()
-        .first;
-    if (isGranted(currentConsents(records), ConsentType.microphone)) {
-      return true;
-    }
-    if (!mounted) return false;
-    final l = AppLocalizations.of(context);
-    final allow = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l.whyMicTitle),
-        content: Text(l.whyMicBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l.whyMicNotNow),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l.whyMicAllow),
-          ),
-        ],
-      ),
-    );
-    if (allow != true) return false;
-    await ref
-        .read(consentRepositoryProvider)
-        .record(ConsentType.microphone, granted: true);
-    return true;
   }
 
   Future<void> _save() async {

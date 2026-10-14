@@ -283,26 +283,73 @@ describe('habit_logs (idempotent date_habitId)', () => {
   });
 });
 
-describe('checkins (one per date, 1-5 scales)', () => {
+describe('checkins (T-DLY-02: mood first, one per local date)', () => {
   const checkin = (o: Record<string, unknown> = {}) => ({
-    energy: 3, sleep: 4, stress: 2, mood: 4, time_available: 10, source: 'app', ...meta(), ...o,
+    mood: 4, energy: 3, sleep: 4, stress: 2, time_available: 10,
+    barrier_text: 'Long meeting day', source: 'app', gentle_day: false,
+    ...meta(), ...o,
   });
-  it('owner checks in and can correct it the same day', async () => {
+  const ref = () => doc(as(ALICE), 'users/alice/checkins/2026-10-13');
+
+  it('owner checks in; a same-day re-submit updates it (idempotent by date)', async () => {
     await seedAdult(env);
-    const ref = doc(as(ALICE), 'users/alice/checkins/2026-10-13');
-    await assertSucceeds(setDoc(ref, checkin()));
-    await assertSucceeds(updateDoc(ref, { mood: 5 }));
-    await assertSucceeds(getDoc(ref));
-    await assertFails(deleteDoc(ref));
+    await assertSucceeds(setDoc(ref(), checkin()));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), checkin({ mood: 5, created_at: saved.created_at, updated_at: meta().updated_at })),
+    );
+    await assertSucceeds(getDoc(ref()));
+    await assertFails(deleteDoc(ref()));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/checkins/2026-10-13')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/checkins/2026-10-14'), checkin()));
   });
-  it('rejects out-of-range values, odd time options and bad ids', async () => {
+  it('mood alone is enough; the other answers are optional', async () => {
     await seedAdult(env);
-    const ref = doc(as(ALICE), 'users/alice/checkins/2026-10-13');
-    await assertFails(setDoc(ref, checkin({ energy: 6 })));
-    await assertFails(setDoc(ref, checkin({ time_available: 15 })));
+    await assertSucceeds(
+      setDoc(ref(), { mood: 3, source: 'app', gentle_day: false, ...meta() }),
+    );
+  });
+  it('mood is required and every answer must be in range', async () => {
+    await seedAdult(env);
+    const { mood: _, ...noMood } = checkin();
+    await assertFails(setDoc(ref(), noMood));
+    await assertFails(setDoc(ref(), checkin({ mood: 0 })));
+    await assertFails(setDoc(ref(), checkin({ energy: 6 })));
+    await assertFails(setDoc(ref(), checkin({ sleep: 2.5 })));
+    await assertFails(setDoc(ref(), checkin({ time_available: 15 })));
+    await assertFails(setDoc(ref(), checkin({ source: 'web' })));
+    await assertFails(setDoc(ref(), checkin({ barrier_text: 'x'.repeat(141) })));
+    await assertSucceeds(setDoc(ref(), checkin({ barrier_text: 'x'.repeat(140) })));
+  });
+  it('rejects bad date ids and unknown fields', async () => {
+    await seedAdult(env);
     await assertFails(setDoc(doc(as(ALICE), 'users/alice/checkins/today'), checkin()));
+    await assertFails(setDoc(ref(), checkin({ notes_for_coach: 'hi' })));
+  });
+  it('safety floor: low mood or high stress must be a gentle day (spec 15.3)', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), checkin({ mood: 2, gentle_day: false })));
+    await assertFails(setDoc(ref(), checkin({ mood: 4, stress: 4, gentle_day: false })));
+    const day = (d: string) => doc(as(ALICE), `users/alice/checkins/2026-10-${d}`);
+    await assertSucceeds(setDoc(day('13'), checkin({ mood: 2, gentle_day: true })));
+    await assertSucceeds(setDoc(day('14'), checkin({ mood: 5, stress: 5, gentle_day: true })));
+    // A gentle day may also be set for other reasons (a red flag in the text).
+    await assertSucceeds(setDoc(day('15'), checkin({ mood: 5, stress: 1, gentle_day: true })));
+  });
+  it('gentle_day must be present as true or false', async () => {
+    await seedAdult(env);
+    const { gentle_day: _, ...noFlag } = checkin();
+    await assertFails(setDoc(ref(), noFlag));
+  });
+  it('created_at never changes on update', async () => {
+    await seedAdult(env);
     await seed(env, { 'users/alice/checkins/2026-10-13': checkin() });
-    await assertFails(updateDoc(ref, { stress: 0 }));
+    await assertFails(
+      setDoc(ref(), checkin({ created_at: meta().created_at, updated_at: meta().updated_at, mood: 5 })),
+    );
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), checkin()));
   });
 });
 

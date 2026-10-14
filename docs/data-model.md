@@ -15,7 +15,7 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `users/{uid}/goals/{id}` | SMART fields, FITT, status, driver | Owner read/create/update; no delete (pause) | — |
 | `users/{uid}/habits/{id}` | goal_id, title, anchor, window, size_variants, active | Owner read/create/update; no delete | — |
 | `users/{uid}/habit_logs/{date_habitId}` | date, habit_id, status, source, size_done | Owner read/create/update; id must equal `date_habitId`; date and habit fixed | — |
-| `users/{uid}/checkins/{date}` | energy, sleep, stress, mood (1–5), time_available (2/5/10/30), barrier_text, source | Owner read/create/update; id `YYYY-MM-DD` | — |
+| `users/{uid}/checkins/{date}` | mood (1–5, required), energy, sleep, stress (1–5, optional), time_available (2/5/10/30, optional), barrier_text (≤ 140, optional), source, gentle_day (bool) | Owner read/create/update; id `YYYY-MM-DD` (local date); created_at never changes; **mood ≤ 2 or stress ≥ 4 must have gentle_day = true** (T-DLY-02) | — |
 | `users/{uid}/daily_plans/{date}` | next_step, alternatives, briefing ids/urls, mode | Owner read only | nightly job |
 | `users/{uid}/messages/{id}` | CoachMessage (spec 9.5) | Owner read only | orchestrator |
 | `users/{uid}/memory_facts/{id}` | fact, category, confidence, source_message_id, status | Owner read; change status to saved/deleted only; deleted is final | Memory Agent proposals |

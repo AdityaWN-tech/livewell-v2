@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/config/flavor.dart';
-import 'core/design/tokens.dart';
+import 'core/design/theme.dart';
 import 'core/routing/router.dart';
 
 class LiveWellApp extends ConsumerWidget {
@@ -14,14 +14,9 @@ class LiveWellApp extends ConsumerWidget {
     final app = MaterialApp.router(
       title: 'Live Well',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: LwColors.deepTeal,
-          primary: LwColors.deepTeal,
-          secondary: LwColors.lime,
-        ),
-        scaffoldBackgroundColor: LwColors.background,
-      ),
+      theme: LwTheme.light(),
+      darkTheme: LwTheme.dark(),
+      themeMode: ThemeMode.system,
       routerConfig: ref.watch(routerProvider),
     );
     final label = flavor.label;

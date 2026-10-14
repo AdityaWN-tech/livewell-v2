@@ -15,7 +15,14 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.textContaining('Live Well'), findsOneWidget);
+      expect(
+        find.text(
+          flavor == Flavor.dev
+              ? 'Design tokens'
+              : 'Live Well\nHealth. Habit. Happiness.',
+        ),
+        findsOneWidget,
+      );
       final banner = find.byWidgetPredicate(
         (w) => w is Banner && w.message == flavor.label,
       );

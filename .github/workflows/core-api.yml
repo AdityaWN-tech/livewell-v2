@@ -1,0 +1,37 @@
+# Core API / Cloud Functions tests (T-FND-05 audit trigger). Runs the real
+# functions against the Firestore + Functions emulators.
+name: core-api
+
+on:
+  pull_request:
+    paths: ["services/core-api/**", "firebase.json", ".github/workflows/core-api.yml"]
+  push:
+    branches: [main]
+    paths: ["services/core-api/**", "firebase.json", ".github/workflows/core-api.yml"]
+
+concurrency:
+  group: core-api-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: services/core-api
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: services/core-api/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test

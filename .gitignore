@@ -22,3 +22,11 @@ __pycache__/
 Thumbs.db
 .idea/
 *.log
+
+# Firebase emulator logs
+firebase-debug.log
+firestore-debug.log
+*-debug.log
+
+# Golden-test failure images
+apps/mobile/test/**/failures/

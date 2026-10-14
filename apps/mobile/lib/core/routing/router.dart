@@ -2,11 +2,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
 import '../../features/care/presentation/care_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/learn/presentation/learn_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
+import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/track/presentation/track_screen.dart';
@@ -40,6 +42,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                 GoRoute(path: path, builder: (context, state) => screen),
               ],
             ),
+        ],
+      ),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: 'consents',
+            builder: (context, state) => const ConsentsScreen(),
+          ),
         ],
       ),
       if (flavor == Flavor.dev)

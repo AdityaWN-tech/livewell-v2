@@ -94,4 +94,116 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get careEmptyBody =>
       'Talk with your coach, see what it remembers, and find safety and clinician help here.';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsPrivacy => 'Privacy and consents';
+
+  @override
+  String get settingsPrivacyBody =>
+      'Choose what Live Well may use. Change it any time.';
+
+  @override
+  String get consentsIntro =>
+      'Each switch is your choice, and you can change it any time. Every change is saved with the date and the wording you saw.';
+
+  @override
+  String get consentsDraftNote =>
+      'Draft wording. The final text comes after legal review.';
+
+  @override
+  String get consentsOptionalHeader => 'Your choices';
+
+  @override
+  String get consentsLegalHeader => 'Accepted to use Live Well';
+
+  @override
+  String consentLegalAccepted(String version) {
+    return 'Accepted · version $version';
+  }
+
+  @override
+  String get consentLegalNotAccepted => 'Not accepted yet';
+
+  @override
+  String get consentLegalWithdrawNote =>
+      'These are needed to use Live Well. To withdraw, close your account from My data.';
+
+  @override
+  String get consentSaveError =>
+      'We couldn\'t save that change. Please try again.';
+
+  @override
+  String get consentLoadError =>
+      'We couldn\'t load your choices. Please try again.';
+
+  @override
+  String get consentNotificationsTitle => 'Reminders and nudges';
+
+  @override
+  String get consentNotificationsBody =>
+      'Lets Live Well send your briefing, check-in and habit reminders. You choose the times and quiet hours.';
+
+  @override
+  String get consentHealthDataTitle => 'Health data';
+
+  @override
+  String get consentHealthDataBody =>
+      'Lets Live Well read steps, sleep and activity from Apple Health or Health Connect for your tracking.';
+
+  @override
+  String get consentCameraTitle => 'Camera';
+
+  @override
+  String get consentCameraBody =>
+      'Used only if you make an avatar from a selfie.';
+
+  @override
+  String get consentMicrophoneTitle => 'Microphone';
+
+  @override
+  String get consentMicrophoneBody =>
+      'Used when you talk to your coach or answer a reflection by voice.';
+
+  @override
+  String get consentBiometricTitle => 'Face and voice models';
+
+  @override
+  String get consentBiometricBody =>
+      'Needed to make an avatar from your face or a copy of a voice. You can delete them any time.';
+
+  @override
+  String get consentPortalLinkingTitle => 'Link to the Live Well portal';
+
+  @override
+  String get consentPortalLinkingBody =>
+      'Connects your portal account so your coach can suggest courses that fit. Your health data is never shared with the portal.';
+
+  @override
+  String get consentMarketingTitle => 'News and offers';
+
+  @override
+  String get consentMarketingBody =>
+      'Occasional emails about new Live Well courses and programs.';
+
+  @override
+  String get consentAnalyticsTitle => 'Help improve the app';
+
+  @override
+  String get consentAnalyticsBody =>
+      'Shares anonymous usage counts, never your health details.';
+
+  @override
+  String get consentTermsTitle => 'Terms of use';
+
+  @override
+  String get consentPrivacyTitle => 'Privacy policy';
+
+  @override
+  String get consentMedicalDisclaimerTitle => 'Medical disclaimer';
+
+  @override
+  String get consentAiDisclosureTitle => 'AI disclosure';
 }

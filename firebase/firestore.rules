@@ -214,6 +214,30 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // ---------- evening reflection, one per local date (FR-DLY-05, T-UI-01d) ----------
+      // The app runs the text through the red-flag rules before saving;
+      // emergency, crisis and disordered-eating text is never sent.
+      match /reflections/{date} {
+        function validReflection(d) {
+          return d.keys().hasOnly(['text', 'prompt', 'source', 'created_at',
+                   'updated_at', 'schema_version'])
+            && d.text is string && d.text.size() > 0 && d.text.size() <= 500
+            && d.prompt in ['went_well']
+            && d.source in ['app'];
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && validReflection(request.resource.data)
+          && hasMeta(request.resource.data);
+        // Same-day edit; created_at never changes.
+        allow update: if isAdultOwner(uid)
+          && validReflection(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
       // ---------- memory facts: user approves or deletes (FR-CNV-05) ----------
       match /memory_facts/{factId} {
         allow read: if isOwner(uid);

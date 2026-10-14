@@ -16,6 +16,7 @@ import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
+import 'package:livewell/features/track/data/reflection_repository.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
 import 'fake_onboarding_store.dart';
@@ -37,7 +38,9 @@ class Harness {
     FakeCheckInPromptStore? checkInPrompt,
     FakeAnalytics? analytics,
     this.flags = const FeatureFlags(),
-  }) : now = now ?? defaultNow,
+    FakeReflectionRepository? reflections,
+  }) : reflections = reflections ?? FakeReflectionRepository(),
+       now = now ?? defaultNow,
        checkIns = checkIns ?? FakeCheckInRepository(),
        // Default: already asked today, so tests that aren't about the
        // check-in aren't interrupted by its sheet.
@@ -56,6 +59,8 @@ class Harness {
   final FakeConsentRepository consents;
   final FakeDictation dictation;
   final FakePhoneLauncher phone;
+
+  final FakeReflectionRepository reflections;
 
   /// Feature flags (Remote Config later).
   final FeatureFlags flags;
@@ -90,6 +95,7 @@ class Harness {
           phoneLauncherProvider.overrideWithValue(phone),
           clockProvider.overrideWithValue(() => now),
           checkInRepositoryProvider.overrideWithValue(checkIns),
+          reflectionRepositoryProvider.overrideWithValue(reflections),
           checkInPromptStoreProvider.overrideWithValue(checkInPrompt),
           analyticsProvider.overrideWithValue(analytics),
           // Same decisions as the real startup, minus Firebase.

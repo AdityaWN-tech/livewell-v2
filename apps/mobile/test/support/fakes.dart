@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:livewell/core/analytics/analytics.dart';
+import 'package:livewell/features/track/data/reflection_repository.dart';
+import 'package:livewell/features/track/domain/track_models.dart';
 import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/features/checkin/data/checkin_repository.dart';
 import 'package:livewell/features/checkin/domain/checkin.dart';
@@ -246,4 +248,30 @@ class FakeAnalytics implements Analytics {
     'duration_s': durationSeconds,
     'steps_answered': stepsAnswered,
   });
+
+  @override
+  Future<void> reflectionSubmitted({required bool voice}) async => events.add({
+    'name': 'reflection_submitted',
+    'mode': voice ? 'voice' : 'text',
+  });
+}
+
+/// Reflections in memory, for tests.
+class FakeReflectionRepository implements ReflectionRepository {
+  final days = <String, Reflection>{};
+  final _changes = StreamController<String>.broadcast();
+  int saves = 0;
+
+  @override
+  Stream<Reflection?> watchDay(String date) async* {
+    yield days[date];
+    yield* _changes.stream.where((d) => d == date).map((d) => days[d]);
+  }
+
+  @override
+  Future<void> save(Reflection reflection) async {
+    saves++;
+    days[reflection.date] = reflection;
+    _changes.add(reflection.date);
+  }
 }

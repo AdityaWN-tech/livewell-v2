@@ -14,6 +14,9 @@ abstract class Analytics {
     required int durationSeconds,
     required int stepsAnswered,
   });
+
+  /// `reflection_submitted {mode}`, mode "text" or "voice". Never the text.
+  Future<void> reflectionSubmitted({required bool voice});
 }
 
 /// Firebase Analytics, only with the analytics consent (FR-ONB-03).
@@ -49,6 +52,19 @@ class ConsentedFirebaseAnalytics implements Analytics {
           'duration_s': durationSeconds,
           'steps_answered': stepsAnswered,
         },
+      );
+    } catch (_) {
+      // Analytics must never break the app.
+    }
+  }
+
+  @override
+  Future<void> reflectionSubmitted({required bool voice}) async {
+    try {
+      final analytics = await _allowed();
+      await analytics?.logEvent(
+        name: 'reflection_submitted',
+        parameters: {'mode': voice ? 'voice' : 'text'},
       );
     } catch (_) {
       // Analytics must never break the app.

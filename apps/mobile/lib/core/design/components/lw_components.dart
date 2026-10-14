@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../tokens.dart';
 
@@ -29,32 +30,38 @@ class LwScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     if (eyebrow != null) {
       final t = Theme.of(context).textTheme;
-      return Scaffold(
-        body: SafeArea(
-          bottom: false,
-          child: ListView(
-            padding: const EdgeInsets.all(LwSpacing.screenGutter),
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Semantics(
-                      header: true,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(eyebrow!.toUpperCase(), style: t.labelSmall),
-                          Text(title, style: t.headlineSmall),
-                        ],
+      // No app bar here, so set the status bar icons ourselves: dark icons
+      // on the light background, light icons in dark mode.
+      final dark = Theme.of(context).brightness == Brightness.dark;
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        child: Scaffold(
+          body: SafeArea(
+            bottom: false,
+            child: ListView(
+              padding: const EdgeInsets.all(LwSpacing.screenGutter),
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Semantics(
+                        header: true,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(eyebrow!.toUpperCase(), style: t.labelSmall),
+                            Text(title, style: t.headlineSmall),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  ...actions,
-                ],
-              ),
-              const SizedBox(height: LwSpacing.md),
-              ...children,
-            ],
+                    ...actions,
+                  ],
+                ),
+                const SizedBox(height: LwSpacing.md),
+                ...children,
+              ],
+            ),
           ),
         ),
       );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/config/feature_flags.dart';
 import 'package:livewell/core/config/flavor.dart';
@@ -259,6 +260,33 @@ void main() {
             findsOneWidget,
           );
           handle.dispose();
+        },
+      );
+    }
+
+    for (final dark in [false, true]) {
+      testWidgets(
+        'status bar icons are readable (${dark ? 'dark' : 'light'})',
+        (tester) async {
+          tester.platformDispatcher.platformBrightnessTestValue = dark
+              ? Brightness.dark
+              : Brightness.light;
+          addTearDown(
+            tester.platformDispatcher.clearPlatformBrightnessTestValue,
+          );
+          await signedIn().boot(tester);
+          final region = tester.widget<AnnotatedRegion<SystemUiOverlayStyle>>(
+            find
+                .descendant(
+                  of: find.byType(HomeScreen),
+                  matching: find.byType(AnnotatedRegion<SystemUiOverlayStyle>),
+                )
+                .first,
+          );
+          expect(
+            region.value.statusBarIconBrightness,
+            dark ? Brightness.light : Brightness.dark,
+          );
         },
       );
     }

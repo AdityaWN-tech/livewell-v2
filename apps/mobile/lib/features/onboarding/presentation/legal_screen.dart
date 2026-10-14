@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../auth/data/firebase_auth_service.dart';
+import '../../auth/presentation/auth_copy.dart';
 import '../../consent/domain/consent.dart';
 import '../../consent/presentation/consent_copy.dart';
 import '../data/onboarding_store.dart';
@@ -36,6 +38,13 @@ class LegalScreen extends ConsumerWidget {
             ),
       onPrimary: allAccepted
           ? () async {
+              // Already signed in (came via "I already have an account"):
+              // create the account now. Otherwise sign in next.
+              final user = ref.read(authServiceProvider).currentUser;
+              if (user != null) {
+                await runSignIn(context, ref, () async => user);
+                return;
+              }
               await ref
                   .read(onboardingProvider.notifier)
                   .goTo(OnboardingStep.signIn);

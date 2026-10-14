@@ -111,6 +111,71 @@
     }
   },
   "legalLoadError": "We couldn't open this document. Please try again.",
-  "signInTitle": "Create your account",
-  "signInComingSoon": "Sign-in options are being added next."
+  "signInTitle": "Sign in or create an account",
+  "signInBody": "Use your phone number, email or Google. If you already use the Live Well portal, use the same phone number or email.",
+  "signInPhone": "Continue with phone",
+  "signInEmail": "Continue with email",
+  "signInGoogle": "Continue with Google",
+  "signInApple": "Continue with Apple",
+  "emailTitle": "Continue with email",
+  "emailModeSignIn": "Sign in",
+  "emailModeCreate": "Create account",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "passwordHint": "At least 8 characters",
+  "passwordShow": "Show password",
+  "passwordHide": "Hide password",
+  "forgotPassword": "Forgot password?",
+  "resetSent": "We sent a reset link to {email}.",
+  "@resetSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailInvalidMsg": "Enter a valid email address.",
+  "passwordShortMsg": "Use at least 8 characters.",
+  "phoneTitle": "Continue with phone",
+  "phoneCountryLabel": "Country",
+  "countryIndia": "India (+91)",
+  "countryUs": "United States (+1)",
+  "phoneNumberLabel": "Mobile number",
+  "phoneInvalidMsg": "Enter a valid mobile number for this country.",
+  "phoneSendCode": "Send code",
+  "phoneSmsNote": "We'll text you a 6-digit code. Message rates may apply.",
+  "codeTitle": "Enter the code",
+  "codeBody": "We sent a 6-digit code to {phone}.",
+  "@codeBody": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "codeLabel": "6-digit code",
+  "codeVerify": "Verify",
+  "codeResendIn": "Resend code in {seconds} s",
+  "@codeResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "codeResend": "Resend code",
+  "codeChangeNumber": "Change number",
+  "codeInvalidMsg": "Enter the 6 digits from the text message.",
+  "authErrorInvalidEmail": "That email address doesn't look right.",
+  "authErrorWrongCredentials": "That email and password don't match. Try again or reset your password.",
+  "authErrorEmailInUse": "There's already an account with this email. Sign in instead.",
+  "authErrorWeakPassword": "Choose a stronger password with at least 8 characters.",
+  "authErrorInvalidPhone": "That phone number doesn't look right.",
+  "authErrorWrongCode": "That code isn't right. Check the text message and try again.",
+  "authErrorCodeExpired": "That code has expired. Send a new one.",
+  "authErrorTooMany": "Too many tries. Please wait a few minutes and try again.",
+  "authErrorNetwork": "No connection. Check your internet and try again.",
+  "authErrorMethodDisabled": "This sign-in option isn't available yet.",
+  "authErrorUnknown": "Something went wrong. Please try again.",
+  "accountSetupError": "We couldn't finish setting up your account. Please try again."
 }

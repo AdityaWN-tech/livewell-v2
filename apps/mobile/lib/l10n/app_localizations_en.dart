@@ -307,8 +307,156 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t open this document. Please try again.';
 
   @override
-  String get signInTitle => 'Create your account';
+  String get signInTitle => 'Sign in or create an account';
 
   @override
-  String get signInComingSoon => 'Sign-in options are being added next.';
+  String get signInBody =>
+      'Use your phone number, email or Google. If you already use the Live Well portal, use the same phone number or email.';
+
+  @override
+  String get signInPhone => 'Continue with phone';
+
+  @override
+  String get signInEmail => 'Continue with email';
+
+  @override
+  String get signInGoogle => 'Continue with Google';
+
+  @override
+  String get signInApple => 'Continue with Apple';
+
+  @override
+  String get emailTitle => 'Continue with email';
+
+  @override
+  String get emailModeSignIn => 'Sign in';
+
+  @override
+  String get emailModeCreate => 'Create account';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get passwordHint => 'At least 8 characters';
+
+  @override
+  String get passwordShow => 'Show password';
+
+  @override
+  String get passwordHide => 'Hide password';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String resetSent(String email) {
+    return 'We sent a reset link to $email.';
+  }
+
+  @override
+  String get emailInvalidMsg => 'Enter a valid email address.';
+
+  @override
+  String get passwordShortMsg => 'Use at least 8 characters.';
+
+  @override
+  String get phoneTitle => 'Continue with phone';
+
+  @override
+  String get phoneCountryLabel => 'Country';
+
+  @override
+  String get countryIndia => 'India (+91)';
+
+  @override
+  String get countryUs => 'United States (+1)';
+
+  @override
+  String get phoneNumberLabel => 'Mobile number';
+
+  @override
+  String get phoneInvalidMsg => 'Enter a valid mobile number for this country.';
+
+  @override
+  String get phoneSendCode => 'Send code';
+
+  @override
+  String get phoneSmsNote =>
+      'We\'ll text you a 6-digit code. Message rates may apply.';
+
+  @override
+  String get codeTitle => 'Enter the code';
+
+  @override
+  String codeBody(String phone) {
+    return 'We sent a 6-digit code to $phone.';
+  }
+
+  @override
+  String get codeLabel => '6-digit code';
+
+  @override
+  String get codeVerify => 'Verify';
+
+  @override
+  String codeResendIn(int seconds) {
+    return 'Resend code in $seconds s';
+  }
+
+  @override
+  String get codeResend => 'Resend code';
+
+  @override
+  String get codeChangeNumber => 'Change number';
+
+  @override
+  String get codeInvalidMsg => 'Enter the 6 digits from the text message.';
+
+  @override
+  String get authErrorInvalidEmail => 'That email address doesn\'t look right.';
+
+  @override
+  String get authErrorWrongCredentials =>
+      'That email and password don\'t match. Try again or reset your password.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'There\'s already an account with this email. Sign in instead.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Choose a stronger password with at least 8 characters.';
+
+  @override
+  String get authErrorInvalidPhone => 'That phone number doesn\'t look right.';
+
+  @override
+  String get authErrorWrongCode =>
+      'That code isn\'t right. Check the text message and try again.';
+
+  @override
+  String get authErrorCodeExpired => 'That code has expired. Send a new one.';
+
+  @override
+  String get authErrorTooMany =>
+      'Too many tries. Please wait a few minutes and try again.';
+
+  @override
+  String get authErrorNetwork =>
+      'No connection. Check your internet and try again.';
+
+  @override
+  String get authErrorMethodDisabled =>
+      'This sign-in option isn\'t available yet.';
+
+  @override
+  String get authErrorUnknown => 'Something went wrong. Please try again.';
+
+  @override
+  String get accountSetupError =>
+      'We couldn\'t finish setting up your account. Please try again.';
 }

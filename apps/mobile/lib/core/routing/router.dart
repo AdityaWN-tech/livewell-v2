@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
+import '../../features/auth/presentation/email_sign_in_screen.dart';
+import '../../features/auth/presentation/phone_sign_in_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/care/presentation/care_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
@@ -67,6 +69,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/sign-in',
         builder: (context, state) => const SignInScreen(),
+        routes: [
+          GoRoute(
+            path: 'phone',
+            builder: (context, state) => const PhoneSignInScreen(),
+          ),
+          GoRoute(
+            path: 'email',
+            builder: (context, state) => const EmailSignInScreen(),
+          ),
+        ],
       ),
       StatefulShellRoute.indexedStack(
         pageBuilder: (context, state, shell) =>

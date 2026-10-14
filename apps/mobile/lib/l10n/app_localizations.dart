@@ -625,14 +625,278 @@ abstract class AppLocalizations {
   /// No description provided for @signInTitle.
   ///
   /// In en, this message translates to:
-  /// **'Create your account'**
+  /// **'Sign in or create an account'**
   String get signInTitle;
 
-  /// No description provided for @signInComingSoon.
+  /// No description provided for @signInBody.
   ///
   /// In en, this message translates to:
-  /// **'Sign-in options are being added next.'**
-  String get signInComingSoon;
+  /// **'Use your phone number, email or Google. If you already use the Live Well portal, use the same phone number or email.'**
+  String get signInBody;
+
+  /// No description provided for @signInPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with phone'**
+  String get signInPhone;
+
+  /// No description provided for @signInEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with email'**
+  String get signInEmail;
+
+  /// No description provided for @signInGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get signInGoogle;
+
+  /// No description provided for @signInApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get signInApple;
+
+  /// No description provided for @emailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with email'**
+  String get emailTitle;
+
+  /// No description provided for @emailModeSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get emailModeSignIn;
+
+  /// No description provided for @emailModeCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get emailModeCreate;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters'**
+  String get passwordHint;
+
+  /// No description provided for @passwordShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get passwordShow;
+
+  /// No description provided for @passwordHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get passwordHide;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @resetSent.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a reset link to {email}.'**
+  String resetSent(String email);
+
+  /// No description provided for @emailInvalidMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get emailInvalidMsg;
+
+  /// No description provided for @passwordShortMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least 8 characters.'**
+  String get passwordShortMsg;
+
+  /// No description provided for @phoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with phone'**
+  String get phoneTitle;
+
+  /// No description provided for @phoneCountryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get phoneCountryLabel;
+
+  /// No description provided for @countryIndia.
+  ///
+  /// In en, this message translates to:
+  /// **'India (+91)'**
+  String get countryIndia;
+
+  /// No description provided for @countryUs.
+  ///
+  /// In en, this message translates to:
+  /// **'United States (+1)'**
+  String get countryUs;
+
+  /// No description provided for @phoneNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile number'**
+  String get phoneNumberLabel;
+
+  /// No description provided for @phoneInvalidMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid mobile number for this country.'**
+  String get phoneInvalidMsg;
+
+  /// No description provided for @phoneSendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code'**
+  String get phoneSendCode;
+
+  /// No description provided for @phoneSmsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll text you a 6-digit code. Message rates may apply.'**
+  String get phoneSmsNote;
+
+  /// No description provided for @codeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code'**
+  String get codeTitle;
+
+  /// No description provided for @codeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to {phone}.'**
+  String codeBody(String phone);
+
+  /// No description provided for @codeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'6-digit code'**
+  String get codeLabel;
+
+  /// No description provided for @codeVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get codeVerify;
+
+  /// No description provided for @codeResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds} s'**
+  String codeResendIn(int seconds);
+
+  /// No description provided for @codeResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get codeResend;
+
+  /// No description provided for @codeChangeNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Change number'**
+  String get codeChangeNumber;
+
+  /// No description provided for @codeInvalidMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6 digits from the text message.'**
+  String get codeInvalidMsg;
+
+  /// No description provided for @authErrorInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'That email address doesn\'t look right.'**
+  String get authErrorInvalidEmail;
+
+  /// No description provided for @authErrorWrongCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'That email and password don\'t match. Try again or reset your password.'**
+  String get authErrorWrongCredentials;
+
+  /// No description provided for @authErrorEmailInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s already an account with this email. Sign in instead.'**
+  String get authErrorEmailInUse;
+
+  /// No description provided for @authErrorWeakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a stronger password with at least 8 characters.'**
+  String get authErrorWeakPassword;
+
+  /// No description provided for @authErrorInvalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'That phone number doesn\'t look right.'**
+  String get authErrorInvalidPhone;
+
+  /// No description provided for @authErrorWrongCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That code isn\'t right. Check the text message and try again.'**
+  String get authErrorWrongCode;
+
+  /// No description provided for @authErrorCodeExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'That code has expired. Send a new one.'**
+  String get authErrorCodeExpired;
+
+  /// No description provided for @authErrorTooMany.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many tries. Please wait a few minutes and try again.'**
+  String get authErrorTooMany;
+
+  /// No description provided for @authErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check your internet and try again.'**
+  String get authErrorNetwork;
+
+  /// No description provided for @authErrorMethodDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This sign-in option isn\'t available yet.'**
+  String get authErrorMethodDisabled;
+
+  /// No description provided for @authErrorUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get authErrorUnknown;
+
+  /// No description provided for @accountSetupError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t finish setting up your account. Please try again.'**
+  String get accountSetupError;
 }
 
 class _AppLocalizationsDelegate

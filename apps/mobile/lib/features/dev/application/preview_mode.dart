@@ -32,7 +32,11 @@ class InMemoryConsentRepository implements ConsentRepository {
   }
 
   @override
-  Future<void> record(ConsentType type, {required bool granted}) async {
+  Future<void> record(
+    ConsentType type, {
+    required bool granted,
+    DateTime? grantedAt,
+  }) async {
     _records.add(
       ConsentRecord(
         type: type,

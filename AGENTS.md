@@ -38,6 +38,9 @@ If a request conflicts with the spec, say so and stop before writing code.
 - Feel (spec 14.1): warm, hopeful, calm, premium, inclusive. Never fear-based or overly clinical.
 - One primary action per screen (spec 4.1).
 
+## Data rules (mobile)
+- Get Firestore only from `firestoreProvider` (`lib/core/data/firestore.dart`), never `FirebaseFirestore.instance` (D-16; a test enforces this).
+
 ## Safety rules that can never be removed
 - Markets are India and US (D-03). Emergency (IN 112 / US 911) and crisis (IN Tele-MANAS 14416 / US 988) routing is plain code, runs before any AI, uses fixed templates and the neutral voice.
 - Never guess a user's region silently: a wrong guess shows the wrong emergency number.

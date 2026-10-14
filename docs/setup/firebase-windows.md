@@ -70,7 +70,9 @@ After turning on Google sign-in (step 7), re-run step 5 so `google-services.json
 - Apple: needs an Apple Developer account (Services ID + key). Can wait until the iOS work.
 
 ## 8. Create the Firestore database
-Firebase console → Firestore Database → Create database → location **nam5 (United States)** (D-14; this can't be changed later) → start in **production mode** (locked rules; our own rules come in T-FND-06).
+Edition **Standard** (not Enterprise), database ID **`(default)`** exactly (with brackets), location **nam5 (United States)** (D-14, permanent), **production mode** (locked rules; our own rules come in T-FND-06).
+CLI equivalent: `firebase firestore:databases:create "(default)" --location nam5 --edition standard --delete-protection ENABLED --project <id>` (works on the free plan only when no other database holds the project's free tier).
+Check from a device: `flutter test integration_test/firestore_smoke_test.dart --flavor dev -d <device>` must print `FIRESTORE_SMOKE permission-denied` (connected, rules locked). See D-16.
 
 ## When to create staging and prod
 Spec T-FND-02 expects dev, staging and prod deployable by the end of Phase 0. Create them **after** the dev flavor works end to end (sign-in on a device) and **before** T-FND-02 is closed. Create them in the client organisation's Google account if possible (moving projects later is painful). Then repeat step 5 with `staging` / `.stg` and `prod` / no suffix, and fill in `firebaseProjectId` in `lib/core/config/flavor.dart`.

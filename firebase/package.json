@@ -1,0 +1,19 @@
+{
+  "name": "livewell-firebase",
+  "private": true,
+  "type": "module",
+  "description": "Firestore security rules and their emulator tests (T-FND-06)",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-livewell \"vitest run && node scripts/check-coverage.mjs\"",
+    "test:watch": "vitest",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "@types/node": "^26.6.5",
+    "firebase": "^13.0.0",
+    "firebase-tools": "^15.33.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4"
+  }
+}

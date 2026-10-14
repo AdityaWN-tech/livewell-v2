@@ -67,6 +67,9 @@ docs/                   Spec, decisions, setup guides, API, data model, ADRs
 | What | Command |
 |---|---|
 | Mobile analyze + tests | `cd "D:\Adii voult\Adii\LiveWell\apps\mobile"; flutter analyze; flutter test` |
+| Golden images only / update them | `flutter test --tags golden` / `flutter test --update-goldens --tags golden` |
+| Firestore smoke test on a device | `flutter test integration_test/firestore_smoke_test.dart --flavor dev -d DEVICE` |
+| CI (GitHub Actions) | `.github/workflows/mobile.yml`: Linux runs everything except goldens; Windows runs goldens |
 | Run dev flavor | `flutter run --flavor dev -t lib/main_dev.dart` |
 | Build dev APK | `flutter build apk --debug --flavor dev -t lib/main_dev.dart` |
 | Staging / prod | same with `staging` / `prod` and `lib/main_staging.dart` / `lib/main_prod.dart` |

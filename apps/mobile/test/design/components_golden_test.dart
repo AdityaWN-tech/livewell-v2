@@ -1,3 +1,6 @@
+@Tags(['golden'])
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/design/components/lw_components.dart';
@@ -5,8 +8,8 @@ import 'package:livewell/core/design/theme.dart';
 
 /// Golden images of the core components in light and dark (T-FND-04).
 /// Regenerate after an intended visual change:
-///   flutter test --update-goldens test/design/components_golden_test.dart
-/// Goldens are rendered on Windows; CI must use the same OS or keep its own set.
+///   flutter test --update-goldens --tags golden
+/// Goldens are rendered on Windows; CI runs them on a Windows runner.
 void main() {
   Widget gallery() => const SingleChildScrollView(
     padding: EdgeInsets.all(16),

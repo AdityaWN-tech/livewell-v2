@@ -139,7 +139,7 @@
   "phoneTitle": "Continue with phone",
   "phoneCountryLabel": "Country",
   "countryIndia": "India (+91)",
-  "countryUs": "the US",
+  "countryUs": "United States (+1)",
   "phoneNumberLabel": "Mobile number",
   "phoneInvalidMsg": "Enter a valid mobile number for this country.",
   "phoneSendCode": "Send code",
@@ -262,5 +262,90 @@
     }
   },
   "settingsDeveloper": "Developer",
-  "settingsDeveloperBody": "Tools for building the app. Only in the dev build."
+  "settingsDeveloperBody": "Tools for building the app. Only in the dev build.",
+  "checkinResponseHigh": "Love that energy. Let's use it well today.",
+  "checkinResponseSteady": "Thanks for checking in. One small step is plenty today.",
+  "checkinResponseGentle": "Thanks for telling me. Let's keep today gentle.",
+  "checkinMoodQuestionNamed": "Hi {name}, how are you feeling today?",
+  "@checkinMoodQuestionNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "checkinMoodQuestion": "Hi, how are you feeling today?",
+  "checkinMood1": "Very low",
+  "checkinMood2": "Low",
+  "checkinMood3": "Okay",
+  "checkinMood4": "Good",
+  "checkinMood5": "Great",
+  "checkinEnergyQuestion": "How is your energy?",
+  "checkinEnergy1": "Very low",
+  "checkinEnergy2": "Low",
+  "checkinEnergy3": "Okay",
+  "checkinEnergy4": "Good",
+  "checkinEnergy5": "High",
+  "checkinSleepQuestion": "How did you sleep last night?",
+  "checkinSleep1": "Very badly",
+  "checkinSleep2": "Badly",
+  "checkinSleep3": "Okay",
+  "checkinSleep4": "Well",
+  "checkinSleep5": "Very well",
+  "checkinStressQuestion": "How stressed do you feel?",
+  "checkinStress1": "Not at all",
+  "checkinStress2": "A little",
+  "checkinStress3": "Some",
+  "checkinStress4": "A lot",
+  "checkinStress5": "Very",
+  "checkinTimeQuestion": "How much time do you have today?",
+  "checkinMinutes": "{minutes} min",
+  "@checkinMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "checkinMinutesLong": "{minutes} minutes",
+  "@checkinMinutesLong": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "checkinBarrierQuestion": "Anything that could make today hard?",
+  "checkinBarrierHint": "Optional. A few words is plenty.",
+  "checkinSkipQuestion": "Skip question",
+  "checkinSkipForNow": "Skip for now",
+  "checkinDone": "Done",
+  "checkinSpeak": "Speak instead",
+  "checkinStepOf": "Step {step} of {total}",
+  "@checkinStepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "checkinSaveError": "We couldn't save your check-in. Please try again.",
+  "checkinContinue": "Continue",
+  "homeCheckInTitle": "Check in",
+  "homeCheckInBody": "Tell your coach how you're doing. It takes about 30 seconds.",
+  "homeTodayStepEyebrow": "Today's step",
+  "homeTodayStepTimed": "A step that fits in {minutes} minutes will appear here.",
+  "@homeTodayStepTimed": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTodayStepUntimed": "A small step picked for you will appear here.",
+  "homeTodayStepGentle": "A small, gentle step will appear here. Go easy on yourself today.",
+  "countryUsName": "the US"
 }

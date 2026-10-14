@@ -28,19 +28,22 @@ class DesignGallery extends StatelessWidget {
           ),
           const SizedBox(height: LwSpacing.sectionGap),
           _Section('Colours', [
-            Wrap(
-              spacing: LwSpacing.xs,
-              runSpacing: LwSpacing.xs,
+            Column(
               children: [
-                _Swatch('primary', p.primary, p.onPrimary),
-                _Swatch('primaryTint', p.primaryTint, p.onPrimaryTint),
-                _Swatch('accent', p.accent, p.onAccent),
-                _Swatch('accentTint', p.accentTint, p.textPrimary),
-                _Swatch('background', p.background, p.textPrimary),
-                _Swatch('surface', p.surface, p.textPrimary),
-                _Swatch('success', p.success, p.surface),
-                _Swatch('caution', p.caution, p.surface),
-                _Swatch('emergency', p.emergency, p.onEmergency),
+                _Swatch('primary', p.primary),
+                _Swatch('primaryTint', p.primaryTint),
+                _Swatch('accent', p.accent),
+                _Swatch('accentStrong', p.accentStrong),
+                _Swatch('accentTint', p.accentTint),
+                _Swatch('heroSurface', p.heroSurface),
+                _Swatch('background', p.background),
+                _Swatch('surface', p.surface),
+                _Swatch('textPrimary', p.textPrimary),
+                _Swatch('textSecondary', p.textSecondary),
+                _Swatch('outlineStrong', p.outlineStrong),
+                _Swatch('success', p.success),
+                _Swatch('caution', p.caution),
+                _Swatch('emergency', p.emergency),
               ],
             ),
           ]),
@@ -107,6 +110,44 @@ class DesignGallery extends StatelessWidget {
                     Text('Dr Murthy Gokula', style: t.bodySmall),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: LwSpacing.sm),
+            Container(
+              padding: const EdgeInsets.all(LwSpacing.cardPadding),
+              decoration: BoxDecoration(
+                color: p.heroSurface,
+                borderRadius: LwRadius.lgAll,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "TODAY'S ONE STEP",
+                    style: t.labelSmall?.copyWith(
+                      color: p.onHeroSurfaceSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: LwSpacing.xxs),
+                  Text(
+                    '10-min walk after lunch',
+                    style: t.titleLarge?.copyWith(color: p.onHeroSurface),
+                  ),
+                  const SizedBox(height: LwSpacing.sm),
+                  FilledButton(onPressed: () {}, child: const Text('Done')),
+                ],
+              ),
+            ),
+            const SizedBox(height: LwSpacing.sm),
+            Container(
+              padding: const EdgeInsets.all(LwSpacing.cardPadding),
+              decoration: BoxDecoration(
+                color: p.emergency,
+                borderRadius: LwRadius.mdAll,
+              ),
+              child: Text(
+                'Emergency card (safety only)',
+                style: t.titleMedium?.copyWith(color: p.onEmergency),
               ),
             ),
           ]),
@@ -183,24 +224,31 @@ class _Section extends StatelessWidget {
 }
 
 class _Swatch extends StatelessWidget {
-  const _Swatch(this.name, this.color, this.onColor);
+  const _Swatch(this.name, this.color);
   final String name;
   final Color color;
-  final Color onColor;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 104,
-    height: 56,
-    padding: const EdgeInsets.all(LwSpacing.xs),
-    decoration: BoxDecoration(
-      color: color,
-      borderRadius: LwRadius.smAll,
-      border: Border.all(color: LwPalette.of(context).outlineSoft),
-    ),
-    child: Text(
-      name,
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: onColor),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final hex = color.toARGB32().toRadixString(16).substring(2).toUpperCase();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: LwSpacing.xs),
+      child: Row(
+        children: [
+          Container(
+            width: LwSize.minTapTarget * 2,
+            height: LwSize.minTapTarget,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: LwRadius.smAll,
+              border: Border.all(color: LwPalette.of(context).outlineStrong),
+            ),
+          ),
+          const SizedBox(width: LwSpacing.sm),
+          Expanded(child: Text('$name · #$hex', style: t.bodySmall)),
+        ],
+      ),
+    );
+  }
 }

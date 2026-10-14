@@ -17,10 +17,14 @@ abstract final class LwTheme {
       onPrimary: p.onPrimary,
       primaryContainer: p.primaryTint,
       onPrimaryContainer: p.onPrimaryTint,
-      secondary: p.accent,
-      onSecondary: p.onAccent,
+      secondary: p.accentStrong,
+      onSecondary: p.onAccentStrong,
       secondaryContainer: p.accentTint,
-      onSecondaryContainer: p.textPrimary,
+      onSecondaryContainer: p.onAccentTint,
+      tertiary: p.accent,
+      onTertiary: p.textPrimary,
+      inverseSurface: p.heroSurface,
+      onInverseSurface: p.onHeroSurface,
       error: p.emergency,
       onError: p.onEmergency,
       surface: p.surface,
@@ -50,10 +54,12 @@ abstract final class LwTheme {
         centerTitle: false,
         titleTextStyle: text.headlineSmall,
       ),
+      // Primary action: strong terracotta (T-UI-01). Plain terracotta fails
+      // AA with a label on it.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: p.primary,
-          foregroundColor: p.onPrimary,
+          backgroundColor: p.accentStrong,
+          foregroundColor: p.onAccentStrong,
           disabledBackgroundColor: p.outlineSoft,
           disabledForegroundColor: p.textDisabled,
           minimumSize: buttonSize,
@@ -74,7 +80,7 @@ abstract final class LwTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: p.primary,
+          foregroundColor: p.accentStrong,
           minimumSize: const Size(LwSize.minTapTarget, LwSize.minTapTarget),
           textStyle: text.labelLarge,
         ),
@@ -104,6 +110,7 @@ abstract final class LwTheme {
       chipTheme: ChipThemeData(
         backgroundColor: p.surface,
         selectedColor: p.primaryTint,
+        secondarySelectedColor: p.primaryTint,
         labelStyle: text.labelMedium,
         side: BorderSide(color: p.outlineStrong),
         shape: const StadiumBorder(),

@@ -15,6 +15,7 @@ import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
 import '../../features/account/application/account_setup.dart' show whyPath;
+import '../../features/plan/presentation/framework_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
@@ -90,7 +91,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           for (final (path, screen) in _tabs)
             StatefulShellBranch(
               routes: [
-                GoRoute(path: path, builder: (context, state) => screen),
+                GoRoute(
+                  path: path,
+                  builder: (context, state) => screen,
+                  routes: [
+                    // MY GOAL DO IT under Plan (FR-GOL-06).
+                    if (path == '/plan')
+                      GoRoute(
+                        path: 'framework',
+                        builder: (context, state) => const FrameworkScreen(),
+                      ),
+                  ],
+                ),
               ],
             ),
         ],

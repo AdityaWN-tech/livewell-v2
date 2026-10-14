@@ -196,18 +196,6 @@ abstract class AppLocalizations {
   /// **'Care'**
   String get tabCare;
 
-  /// No description provided for @planEmptyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your plan'**
-  String get planEmptyTitle;
-
-  /// No description provided for @planEmptyBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Your Live Well Map, your 30-day goal and your daily habits will live here.'**
-  String get planEmptyBody;
-
   /// No description provided for @trackEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -1557,6 +1545,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your progress will show here once you start your first habit.'**
   String get homeMilestoneEmpty;
+
+  /// No description provided for @planEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get planEyebrow;
+
+  /// No description provided for @planNewHabit.
+  ///
+  /// In en, this message translates to:
+  /// **'New habit'**
+  String get planNewHabit;
+
+  /// No description provided for @planFrameworkChip.
+  ///
+  /// In en, this message translates to:
+  /// **'MY GOAL DO IT Framework · 8 Drivers'**
+  String get planFrameworkChip;
+
+  /// No description provided for @planFrameworkChipLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the MY GOAL DO IT framework'**
+  String get planFrameworkChipLabel;
+
+  /// No description provided for @planEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No habits yet'**
+  String get planEmptyTitle;
+
+  /// No description provided for @planEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first small habit will show up here once your plan is ready.'**
+  String get planEmptyBody;
+
+  /// No description provided for @planStatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get planStatusDone;
+
+  /// No description provided for @planStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get planStatusInProgress;
+
+  /// No description provided for @planStatusScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get planStatusScheduled;
+
+  /// No description provided for @planCompletedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed at {time}'**
+  String planCompletedAt(String time);
+
+  /// No description provided for @planTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target: {time}'**
+  String planTarget(String time);
+
+  /// No description provided for @planMicrostep.
+  ///
+  /// In en, this message translates to:
+  /// **'Microstep: {step}'**
+  String planMicrostep(String step);
+
+  /// No description provided for @planMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String planMinutes(int minutes);
+
+  /// No description provided for @planRoleMicrohabit.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily habit'**
+  String get planRoleMicrohabit;
+
+  /// No description provided for @planRoleSupporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Supporting habit'**
+  String get planRoleSupporting;
+
+  /// No description provided for @planMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark \"{title}\" done'**
+  String planMarkDone(String title);
+
+  /// No description provided for @planFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan is full'**
+  String get planFullTitle;
+
+  /// No description provided for @planFullBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have 1 daily habit and 2 supporting habits. That is plenty, so each one gets your attention. When one feels easy and automatic, you can swap it for something new.'**
+  String get planFullBody;
+
+  /// No description provided for @planAddSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding habits is coming soon'**
+  String get planAddSoonTitle;
+
+  /// No description provided for @planAddSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can add your own habits here. You can have 1 daily habit and up to 2 supporting habits.'**
+  String get planAddSoonBody;
+
+  /// No description provided for @planGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get planGotIt;
+
+  /// No description provided for @planAffirmation1.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on one small action today.'**
+  String get planAffirmation1;
+
+  /// No description provided for @planAffirmation2.
+  ///
+  /// In en, this message translates to:
+  /// **'Small steps still count.'**
+  String get planAffirmation2;
+
+  /// No description provided for @planAffirmation3.
+  ///
+  /// In en, this message translates to:
+  /// **'I don’t need perfect. I need my next step.'**
+  String get planAffirmation3;
+
+  /// No description provided for @planAffirmation4.
+  ///
+  /// In en, this message translates to:
+  /// **'Every restart is progress.'**
+  String get planAffirmation4;
+
+  /// No description provided for @planAffirmation5.
+  ///
+  /// In en, this message translates to:
+  /// **'Today, I choose one thing that helps me feel well.'**
+  String get planAffirmation5;
+
+  /// No description provided for @planAffirmationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today’s thought'**
+  String get planAffirmationLabel;
+
+  /// No description provided for @frameworkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MY GOAL DO IT'**
+  String get frameworkTitle;
+
+  /// No description provided for @frameworkEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Framework'**
+  String get frameworkEyebrow;
+
+  /// No description provided for @frameworkIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Dr. Gokula’s way of building habits that last. Each letter is one part of your plan.'**
+  String get frameworkIntro;
+
+  /// No description provided for @frameworkSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get frameworkSoon;
+
+  /// No description provided for @frameworkOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get frameworkOpen;
+
+  /// No description provided for @frameworkMindset.
+  ///
+  /// In en, this message translates to:
+  /// **'Mindset'**
+  String get frameworkMindset;
+
+  /// No description provided for @frameworkMindsetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A daily thought about who you are becoming.'**
+  String get frameworkMindsetBody;
+
+  /// No description provided for @frameworkWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Why'**
+  String get frameworkWhy;
+
+  /// No description provided for @frameworkWhyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The reason that keeps you going.'**
+  String get frameworkWhyBody;
+
+  /// No description provided for @frameworkWhyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven’t written your Why yet.'**
+  String get frameworkWhyEmpty;
+
+  /// No description provided for @frameworkGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Goals'**
+  String get frameworkGoals;
+
+  /// No description provided for @frameworkGoalsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 30-day goal and how it is going.'**
+  String get frameworkGoalsBody;
+
+  /// No description provided for @frameworkOrganization.
+  ///
+  /// In en, this message translates to:
+  /// **'Organization'**
+  String get frameworkOrganization;
+
+  /// No description provided for @frameworkOrganizationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'When and where your habits happen.'**
+  String get frameworkOrganizationBody;
+
+  /// No description provided for @frameworkAccountability.
+  ///
+  /// In en, this message translates to:
+  /// **'Accountability'**
+  String get frameworkAccountability;
+
+  /// No description provided for @frameworkAccountabilityBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach checks in with you.'**
+  String get frameworkAccountabilityBody;
+
+  /// No description provided for @frameworkLifestyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifestyle'**
+  String get frameworkLifestyle;
+
+  /// No description provided for @frameworkLifestyleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Food, movement, sleep, stress and connection.'**
+  String get frameworkLifestyleBody;
+
+  /// No description provided for @frameworkDiscipline.
+  ///
+  /// In en, this message translates to:
+  /// **'Discipline'**
+  String get frameworkDiscipline;
+
+  /// No description provided for @frameworkDisciplineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Habits so small you can always do them.'**
+  String get frameworkDisciplineBody;
+
+  /// No description provided for @frameworkOptimism.
+  ///
+  /// In en, this message translates to:
+  /// **'Optimism'**
+  String get frameworkOptimism;
+
+  /// No description provided for @frameworkOptimismBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Celebrating wins and kind restarts.'**
+  String get frameworkOptimismBody;
+
+  /// No description provided for @frameworkImplementation.
+  ///
+  /// In en, this message translates to:
+  /// **'Implementation'**
+  String get frameworkImplementation;
+
+  /// No description provided for @frameworkImplementationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One tap to start, timers and breathing.'**
+  String get frameworkImplementationBody;
+
+  /// No description provided for @frameworkTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking'**
+  String get frameworkTracking;
+
+  /// No description provided for @frameworkTrackingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-ins, habits and how you feel over time.'**
+  String get frameworkTrackingBody;
 }
 
 class _AppLocalizationsDelegate

@@ -41,21 +41,25 @@ class LwScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(LwSpacing.screenGutter),
               children: [
-                Row(
+                // Title left, actions right; with large text the actions
+                // move to their own line instead of squeezing the title.
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  runSpacing: LwSpacing.xs,
                   children: [
-                    Expanded(
-                      child: Semantics(
-                        header: true,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(eyebrow!.toUpperCase(), style: t.labelSmall),
-                            Text(title, style: t.headlineSmall),
-                          ],
-                        ),
+                    Semantics(
+                      header: true,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(eyebrow!.toUpperCase(), style: t.labelSmall),
+                          Text(title, style: t.headlineSmall),
+                        ],
                       ),
                     ),
-                    ...actions,
+                    Row(mainAxisSize: MainAxisSize.min, children: actions),
                   ],
                 ),
                 const SizedBox(height: LwSpacing.md),

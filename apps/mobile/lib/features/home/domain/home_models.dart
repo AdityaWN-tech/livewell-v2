@@ -10,7 +10,7 @@ class TodayStep {
     required this.smallerMinutes,
   });
 
-  /// Driver label, for example "Driver 3 · Movement".
+  /// Driver label, for example "Driver 3".
   final String driver;
   final String title;
   final String reason;

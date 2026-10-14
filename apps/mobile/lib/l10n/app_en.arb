@@ -26,8 +26,6 @@
   "@tabHome": {
     "description": "Bottom navigation tabs (spec 14.2)."
   },
-  "planEmptyTitle": "Your plan",
-  "planEmptyBody": "Your Live Well Map, your 30-day goal and your daily habits will live here.",
   "trackEmptyTitle": "Your progress",
   "trackEmptyBody": "Your check-ins, habits and the numbers you log will show here as simple charts.",
   "learnEmptyTitle": "Learn something small",
@@ -445,5 +443,93 @@
       }
     }
   },
-  "homeMilestoneEmpty": "Your progress will show here once you start your first habit."
+  "homeMilestoneEmpty": "Your progress will show here once you start your first habit.",
+  "planEyebrow": "Schedule",
+  "planNewHabit": "New habit",
+  "planFrameworkChip": "MY GOAL DO IT Framework · 8 Drivers",
+  "planFrameworkChipLabel": "Open the MY GOAL DO IT framework",
+  "planEmptyTitle": "No habits yet",
+  "planEmptyBody": "Your first small habit will show up here once your plan is ready.",
+  "planStatusDone": "Done",
+  "planStatusInProgress": "In progress",
+  "planStatusScheduled": "Scheduled",
+  "planCompletedAt": "Completed at {time}",
+  "@planCompletedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planTarget": "Target: {time}",
+  "@planTarget": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planMicrostep": "Microstep: {step}",
+  "@planMicrostep": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "planMinutes": "{minutes} min",
+  "@planMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "planRoleMicrohabit": "Daily habit",
+  "planRoleSupporting": "Supporting habit",
+  "planMarkDone": "Mark \"{title}\" done",
+  "@planMarkDone": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "planFullTitle": "Your plan is full",
+  "planFullBody": "You have 1 daily habit and 2 supporting habits. That is plenty, so each one gets your attention. When one feels easy and automatic, you can swap it for something new.",
+  "planAddSoonTitle": "Adding habits is coming soon",
+  "planAddSoonBody": "Soon you can add your own habits here. You can have 1 daily habit and up to 2 supporting habits.",
+  "planGotIt": "Got it",
+  "planAffirmation1": "Focus on one small action today.",
+  "planAffirmation2": "Small steps still count.",
+  "planAffirmation3": "I don’t need perfect. I need my next step.",
+  "planAffirmation4": "Every restart is progress.",
+  "planAffirmation5": "Today, I choose one thing that helps me feel well.",
+  "planAffirmationLabel": "Today’s thought",
+  "frameworkTitle": "MY GOAL DO IT",
+  "frameworkEyebrow": "Framework",
+  "frameworkIntro": "Dr. Gokula’s way of building habits that last. Each letter is one part of your plan.",
+  "frameworkSoon": "Coming soon",
+  "frameworkOpen": "Open",
+  "frameworkMindset": "Mindset",
+  "frameworkMindsetBody": "A daily thought about who you are becoming.",
+  "frameworkWhy": "Your Why",
+  "frameworkWhyBody": "The reason that keeps you going.",
+  "frameworkWhyEmpty": "You haven’t written your Why yet.",
+  "frameworkGoals": "Goals",
+  "frameworkGoalsBody": "Your 30-day goal and how it is going.",
+  "frameworkOrganization": "Organization",
+  "frameworkOrganizationBody": "When and where your habits happen.",
+  "frameworkAccountability": "Accountability",
+  "frameworkAccountabilityBody": "Your coach checks in with you.",
+  "frameworkLifestyle": "Lifestyle",
+  "frameworkLifestyleBody": "Food, movement, sleep, stress and connection.",
+  "frameworkDiscipline": "Discipline",
+  "frameworkDisciplineBody": "Habits so small you can always do them.",
+  "frameworkOptimism": "Optimism",
+  "frameworkOptimismBody": "Celebrating wins and kind restarts.",
+  "frameworkImplementation": "Implementation",
+  "frameworkImplementationBody": "One tap to start, timers and breathing.",
+  "frameworkTracking": "Tracking",
+  "frameworkTrackingBody": "Check-ins, habits and how you feel over time."
 }

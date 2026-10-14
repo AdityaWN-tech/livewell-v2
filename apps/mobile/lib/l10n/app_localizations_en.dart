@@ -61,13 +61,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabCare => 'Care';
 
   @override
-  String get planEmptyTitle => 'Your plan';
-
-  @override
-  String get planEmptyBody =>
-      'Your Live Well Map, your 30-day goal and your daily habits will live here.';
-
-  @override
   String get trackEmptyTitle => 'Your progress';
 
   @override
@@ -850,4 +843,183 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeMilestoneEmpty =>
       'Your progress will show here once you start your first habit.';
+
+  @override
+  String get planEyebrow => 'Schedule';
+
+  @override
+  String get planNewHabit => 'New habit';
+
+  @override
+  String get planFrameworkChip => 'MY GOAL DO IT Framework · 8 Drivers';
+
+  @override
+  String get planFrameworkChipLabel => 'Open the MY GOAL DO IT framework';
+
+  @override
+  String get planEmptyTitle => 'No habits yet';
+
+  @override
+  String get planEmptyBody =>
+      'Your first small habit will show up here once your plan is ready.';
+
+  @override
+  String get planStatusDone => 'Done';
+
+  @override
+  String get planStatusInProgress => 'In progress';
+
+  @override
+  String get planStatusScheduled => 'Scheduled';
+
+  @override
+  String planCompletedAt(String time) {
+    return 'Completed at $time';
+  }
+
+  @override
+  String planTarget(String time) {
+    return 'Target: $time';
+  }
+
+  @override
+  String planMicrostep(String step) {
+    return 'Microstep: $step';
+  }
+
+  @override
+  String planMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get planRoleMicrohabit => 'Daily habit';
+
+  @override
+  String get planRoleSupporting => 'Supporting habit';
+
+  @override
+  String planMarkDone(String title) {
+    return 'Mark \"$title\" done';
+  }
+
+  @override
+  String get planFullTitle => 'Your plan is full';
+
+  @override
+  String get planFullBody =>
+      'You have 1 daily habit and 2 supporting habits. That is plenty, so each one gets your attention. When one feels easy and automatic, you can swap it for something new.';
+
+  @override
+  String get planAddSoonTitle => 'Adding habits is coming soon';
+
+  @override
+  String get planAddSoonBody =>
+      'Soon you can add your own habits here. You can have 1 daily habit and up to 2 supporting habits.';
+
+  @override
+  String get planGotIt => 'Got it';
+
+  @override
+  String get planAffirmation1 => 'Focus on one small action today.';
+
+  @override
+  String get planAffirmation2 => 'Small steps still count.';
+
+  @override
+  String get planAffirmation3 => 'I don’t need perfect. I need my next step.';
+
+  @override
+  String get planAffirmation4 => 'Every restart is progress.';
+
+  @override
+  String get planAffirmation5 =>
+      'Today, I choose one thing that helps me feel well.';
+
+  @override
+  String get planAffirmationLabel => 'Today’s thought';
+
+  @override
+  String get frameworkTitle => 'MY GOAL DO IT';
+
+  @override
+  String get frameworkEyebrow => 'Framework';
+
+  @override
+  String get frameworkIntro =>
+      'Dr. Gokula’s way of building habits that last. Each letter is one part of your plan.';
+
+  @override
+  String get frameworkSoon => 'Coming soon';
+
+  @override
+  String get frameworkOpen => 'Open';
+
+  @override
+  String get frameworkMindset => 'Mindset';
+
+  @override
+  String get frameworkMindsetBody =>
+      'A daily thought about who you are becoming.';
+
+  @override
+  String get frameworkWhy => 'Your Why';
+
+  @override
+  String get frameworkWhyBody => 'The reason that keeps you going.';
+
+  @override
+  String get frameworkWhyEmpty => 'You haven’t written your Why yet.';
+
+  @override
+  String get frameworkGoals => 'Goals';
+
+  @override
+  String get frameworkGoalsBody => 'Your 30-day goal and how it is going.';
+
+  @override
+  String get frameworkOrganization => 'Organization';
+
+  @override
+  String get frameworkOrganizationBody => 'When and where your habits happen.';
+
+  @override
+  String get frameworkAccountability => 'Accountability';
+
+  @override
+  String get frameworkAccountabilityBody => 'Your coach checks in with you.';
+
+  @override
+  String get frameworkLifestyle => 'Lifestyle';
+
+  @override
+  String get frameworkLifestyleBody =>
+      'Food, movement, sleep, stress and connection.';
+
+  @override
+  String get frameworkDiscipline => 'Discipline';
+
+  @override
+  String get frameworkDisciplineBody =>
+      'Habits so small you can always do them.';
+
+  @override
+  String get frameworkOptimism => 'Optimism';
+
+  @override
+  String get frameworkOptimismBody => 'Celebrating wins and kind restarts.';
+
+  @override
+  String get frameworkImplementation => 'Implementation';
+
+  @override
+  String get frameworkImplementationBody =>
+      'One tap to start, timers and breathing.';
+
+  @override
+  String get frameworkTracking => 'Tracking';
+
+  @override
+  String get frameworkTrackingBody =>
+      'Check-ins, habits and how you feel over time.';
 }

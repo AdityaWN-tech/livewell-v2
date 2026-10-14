@@ -195,7 +195,7 @@ void main() {
       expect(find.text('Day 9'), findsOneWidget);
       expect(find.text('Hi, Priya'), findsOneWidget);
       expect(find.text('10-min walk after lunch'), findsOneWidget);
-      expect(find.text('Driver 3 · Movement'), findsOneWidget);
+      expect(find.text('Driver 3'), findsOneWidget);
       expect(find.byKey(const Key('step-done')), findsOneWidget);
       expect(find.text('Make it 5 min'), findsOneWidget);
       expect(find.text('Phase 1 of 3'), findsOneWidget);

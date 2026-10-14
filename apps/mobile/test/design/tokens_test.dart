@@ -18,6 +18,79 @@ double contrast(Color a, Color b) {
   return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
 }
 
+typedef _Lab = (double, double, double);
+
+_Lab _lab(Color c) {
+  double lin(double v) =>
+      v <= 0.04045 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+  final r = lin(c.r), g = lin(c.g), b = lin(c.b);
+  final x = (0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047;
+  final y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  final z = (0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883;
+  double f(double t) =>
+      t > 0.008856 ? math.pow(t, 1 / 3).toDouble() : 7.787 * t + 16 / 116;
+  return (116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z)));
+}
+
+/// CIEDE2000 colour difference. About 10 or more reads as a different colour.
+double deltaE2000(Color a, Color b) => _de2000Lab(_lab(a), _lab(b));
+
+double _de2000Lab(_Lab p1, _Lab p2) {
+  double rad(double d) => d * math.pi / 180;
+  double deg(double r) => r * 180 / math.pi;
+  final (l1, a1, b1) = p1;
+  final (l2, a2, b2) = p2;
+  final cBar =
+      (math.sqrt(a1 * a1 + b1 * b1) + math.sqrt(a2 * a2 + b2 * b2)) / 2;
+  final c7 = math.pow(cBar, 7);
+  final g = 0.5 * (1 - math.sqrt(c7 / (c7 + math.pow(25, 7))));
+  final a1p = (1 + g) * a1, a2p = (1 + g) * a2;
+  final c1p = math.sqrt(a1p * a1p + b1 * b1);
+  final c2p = math.sqrt(a2p * a2p + b2 * b2);
+  double hue(double b, double a) =>
+      (b == 0 && a == 0) ? 0 : (deg(math.atan2(b, a)) + 360) % 360;
+  final h1p = hue(b1, a1p), h2p = hue(b2, a2p);
+  final dLp = l2 - l1, dCp = c2p - c1p;
+  var dh = h2p - h1p;
+  if (c1p * c2p == 0) {
+    dh = 0;
+  } else if (dh > 180) {
+    dh -= 360;
+  } else if (dh < -180) {
+    dh += 360;
+  }
+  final dHp = 2 * math.sqrt(c1p * c2p) * math.sin(rad(dh / 2));
+  final lBar = (l1 + l2) / 2, cBarP = (c1p + c2p) / 2;
+  double hBar;
+  if (c1p * c2p == 0) {
+    hBar = h1p + h2p;
+  } else if ((h1p - h2p).abs() > 180) {
+    hBar = (h1p + h2p + (h1p + h2p < 360 ? 360 : -360)) / 2;
+  } else {
+    hBar = (h1p + h2p) / 2;
+  }
+  final t =
+      1 -
+      0.17 * math.cos(rad(hBar - 30)) +
+      0.24 * math.cos(rad(2 * hBar)) +
+      0.32 * math.cos(rad(3 * hBar + 6)) -
+      0.20 * math.cos(rad(4 * hBar - 63));
+  final dTheta = 30 * math.exp(-math.pow((hBar - 275) / 25, 2));
+  final cp7 = math.pow(cBarP, 7);
+  final rc = 2 * math.sqrt(cp7 / (cp7 + math.pow(25, 7)));
+  final sl =
+      1 +
+      0.015 * math.pow(lBar - 50, 2) / math.sqrt(20 + math.pow(lBar - 50, 2));
+  final sc = 1 + 0.045 * cBarP, sh = 1 + 0.015 * cBarP * t;
+  final rt = -math.sin(rad(2 * dTheta)) * rc;
+  return math.sqrt(
+    math.pow(dLp / sl, 2) +
+        math.pow(dCp / sc, 2) +
+        math.pow(dHp / sh, 2) +
+        rt * (dCp / sc) * (dHp / sh),
+  );
+}
+
 void main() {
   for (final (name, p) in [
     ('light', LwPalette.light),
@@ -29,11 +102,22 @@ void main() {
         'textPrimary on surface': (p.textPrimary, p.surface),
         'textSecondary on background': (p.textSecondary, p.background),
         'textSecondary on surface': (p.textSecondary, p.surface),
+        'textSecondary on primaryTint': (p.textSecondary, p.primaryTint),
         'onPrimary on primary': (p.onPrimary, p.primary),
         'onPrimaryTint on primaryTint': (p.onPrimaryTint, p.primaryTint),
-        'onAccent on accent': (p.onAccent, p.accent),
-        'textPrimary on accentTint': (p.textPrimary, p.accentTint),
-        'primary on surface (links)': (p.primary, p.surface),
+        'onAccentStrong on accentStrong (buttons)': (
+          p.onAccentStrong,
+          p.accentStrong,
+        ),
+        'accentStrong on surface (links)': (p.accentStrong, p.surface),
+        'accentStrong on background (links)': (p.accentStrong, p.background),
+        'onAccentTint on accentTint': (p.onAccentTint, p.accentTint),
+        'onHeroSurface on heroSurface': (p.onHeroSurface, p.heroSurface),
+        'onHeroSurfaceSecondary on heroSurface': (
+          p.onHeroSurfaceSecondary,
+          p.heroSurface,
+        ),
+        'primary on surface': (p.primary, p.surface),
         'success on surface': (p.success, p.surface),
         'caution on surface': (p.caution, p.surface),
         'onEmergency on emergency': (p.onEmergency, p.emergency),
@@ -43,11 +127,51 @@ void main() {
           expect(contrast(pair.$1, pair.$2), greaterThanOrEqualTo(4.5));
         });
       });
-      test('outlineStrong on surface is 3:1 or more (input borders)', () {
-        expect(contrast(p.outlineStrong, p.surface), greaterThanOrEqualTo(3));
+      // WCAG 1.4.11: icons, dots, progress bars and input borders.
+      final nonText = {
+        'outlineStrong on surface (input borders)': (
+          p.outlineStrong,
+          p.surface,
+        ),
+        'accent on surface (icons, dots)': (p.accent, p.surface),
+        'accent on background': (p.accent, p.background),
+        'accent on heroSurface': (p.accent, p.heroSurface),
+      };
+      nonText.forEach((label, pair) {
+        test('$label is 3:1 or more', () {
+          expect(contrast(pair.$1, pair.$2), greaterThanOrEqualTo(3));
+        });
       });
+      test(
+        'emergency is clearly different from terracotta (CIEDE2000 >= 15)',
+        () {
+          for (final c in [p.accent, p.accentStrong, LwBrand.terracotta]) {
+            expect(deltaE2000(p.emergency, c), greaterThanOrEqualTo(15));
+          }
+        },
+      );
     });
   }
+
+  test('CIEDE2000 matches published reference pairs', () {
+    // Sharma, Wu, Dalal (2005) test data, pairs 1 and 17, in Lab.
+    expect(
+      _de2000Lab((50, 2.6772, -79.7751), (50, 0, -82.7485)),
+      closeTo(2.0425, 1e-3),
+    );
+    expect(_de2000Lab((50, 2.5, 0), (73, 25, -18)), closeTo(27.1492, 1e-3));
+  });
+
+  test('filled buttons use the strong terracotta, not plain terracotta', () {
+    for (final (theme, p) in [
+      (LwTheme.light(), LwPalette.light),
+      (LwTheme.dark(), LwPalette.dark),
+    ]) {
+      final style = theme.filledButtonTheme.style!;
+      expect(style.backgroundColor?.resolve({}), p.accentStrong);
+      expect(style.foregroundColor?.resolve({}), p.onAccentStrong);
+    }
+  });
 
   test('no raw colours outside lib/core/design (use tokens)', () {
     final offenders = <String>[];

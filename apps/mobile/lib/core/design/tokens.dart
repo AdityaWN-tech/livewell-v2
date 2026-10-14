@@ -4,21 +4,33 @@ import 'package:flutter/material.dart';
 /// `Theme.of(context).textTheme`, [LwSpacing], [LwRadius], [LwSize], [LwMotion]);
 /// raw colours and magic numbers are not allowed outside lib/core/design/.
 ///
-/// Sources: brand colours from the Live Well logo (docs/brand.md); layout,
+/// Sources: app colours from the T-UI-01 mockup (docs/design/screen.png, D-25),
+/// logo colours from docs/brand.md; layout,
 /// type scale and component style measured from the portal reference screens
 /// (assets/design-reference/); feel per spec 14.1 (warm, hopeful, calm, premium).
 
 /// Raw brand colours. Use [LwPalette] in widgets; these feed the palettes.
 abstract final class LwBrand {
+  // Logo colours. The logo, splash and launcher icon keep these until the
+  // client approves a new logo (T-UI-01, needs-product).
   static const deepTeal = Color(0xFF0B3A4E);
   static const lime = Color(0xFF8BE03E);
   static const cream = Color(0xFFF0F8DC);
   static const leaf = Color(0xFFFAFDF0);
   static const onTealText = Color(0xFFECF1F6);
+
+  // "Live Well Companion" app palette (T-UI-01, D-25; replaces D-04 in the app).
+  static const terracotta = Color(0xFFD97457);
+  static const forestSlate = Color(0xFF1E3834);
+  static const sageMint = Color(0xFFE1ECEB);
+
+  /// Darker terracotta for button fills and text: white on it is 4.8:1
+  /// (white on [terracotta] is only 3.2:1).
+  static const terracottaStrong = Color(0xFFB05A3B);
 }
 
 /// Semantic colours for one brightness. Contrast is checked in
-/// test/design/contrast_test.dart (WCAG 2.2 AA, NFR-06).
+/// test/design/tokens_test.dart (WCAG 2.2 AA, NFR-06).
 @immutable
 class LwPalette extends ThemeExtension<LwPalette> {
   const LwPalette({
@@ -27,8 +39,13 @@ class LwPalette extends ThemeExtension<LwPalette> {
     required this.primaryTint,
     required this.onPrimaryTint,
     required this.accent,
-    required this.onAccent,
+    required this.accentStrong,
+    required this.onAccentStrong,
     required this.accentTint,
+    required this.onAccentTint,
+    required this.heroSurface,
+    required this.onHeroSurface,
+    required this.onHeroSurfaceSecondary,
     required this.background,
     required this.surface,
     required this.textPrimary,
@@ -42,18 +59,31 @@ class LwPalette extends ThemeExtension<LwPalette> {
     required this.onEmergency,
   });
 
-  /// Brand teal: primary buttons, links, selected icons.
+  /// Forest Slate: headings, selected icons, focus rings, outlined buttons.
   final Color primary;
   final Color onPrimary;
 
-  /// Soft selected state (chips, tabs), like the reference's tinted "Upcoming" tab.
+  /// Sage-Mint: soft selected state (nav indicator, chips, quiet cards).
   final Color primaryTint;
   final Color onPrimaryTint;
 
-  /// Lime: celebrations, progress, streaks. Never used as text on light surfaces.
+  /// Terracotta as in the mockup. Decorative only (dots, icons, progress,
+  /// large shapes): it reaches 3:1, not 4.5:1, so never put text on it or
+  /// use it as text. Use [accentStrong] for that.
   final Color accent;
-  final Color onAccent;
+
+  /// The primary action colour: filled buttons, text links.
+  final Color accentStrong;
+  final Color onAccentStrong;
+
+  /// Pale terracotta background for highlights.
   final Color accentTint;
+  final Color onAccentTint;
+
+  /// The dark forest "hero" card (Today's one step, coach bubble, portal card).
+  final Color heroSurface;
+  final Color onHeroSurface;
+  final Color onHeroSurfaceSecondary;
 
   final Color background;
   final Color surface;
@@ -67,55 +97,67 @@ class LwPalette extends ThemeExtension<LwPalette> {
   /// Input borders and other UI boundaries that must reach 3:1.
   final Color outlineStrong;
 
-  /// Positive text and icons (lime is too light for text).
+  /// Positive text and icons.
   final Color success;
 
   /// Gentle notices. Kindness rule (spec 4.1): no red for everyday things.
   final Color caution;
 
-  /// Reserved for emergency and crisis cards only (FR-SAF-01/02).
+  /// Reserved for emergency and crisis cards only (FR-SAF-01/02). A true
+  /// crimson, kept far from terracotta (CIEDE2000 15 or more, tested) so a
+  /// safety card never looks like a normal button.
   final Color emergency;
   final Color onEmergency;
 
   static const light = LwPalette(
-    primary: LwBrand.deepTeal,
+    primary: LwBrand.forestSlate,
     onPrimary: Color(0xFFFFFFFF),
-    primaryTint: Color(0xFFE2EDF0),
-    onPrimaryTint: LwBrand.deepTeal,
-    accent: LwBrand.lime,
-    onAccent: LwBrand.deepTeal,
-    accentTint: Color(0xFFEEF9E2),
-    background: Color(0xFFF4F6F5),
+    primaryTint: LwBrand.sageMint,
+    onPrimaryTint: LwBrand.forestSlate,
+    accent: LwBrand.terracotta,
+    accentStrong: LwBrand.terracottaStrong,
+    onAccentStrong: Color(0xFFFFFFFF),
+    accentTint: Color(0xFFFCEFEA),
+    onAccentTint: LwBrand.forestSlate,
+    heroSurface: LwBrand.forestSlate,
+    onHeroSurface: Color(0xFFFFFFFF),
+    onHeroSurfaceSecondary: Color(0xFFC9D8D4),
+    background: Color(0xFFF8FAF9),
     surface: Color(0xFFFFFFFF),
-    textPrimary: Color(0xFF14232B),
-    textSecondary: Color(0xFF55646B),
-    textDisabled: Color(0xFF8A979C),
-    outlineSoft: Color(0xFFE3E8E7),
-    outlineStrong: Color(0xFF8A979C),
-    success: Color(0xFF2F6B12),
-    caution: Color(0xFF9A5B00),
-    emergency: Color(0xFFB3261E),
+    textPrimary: LwBrand.forestSlate,
+    textSecondary: Color(0xFF566864),
+    textDisabled: Color(0xFF8A9A96),
+    outlineSoft: Color(0xFFE3EAE8),
+    outlineStrong: Color(0xFF83918C),
+    success: Color(0xFF2B734E),
+    caution: Color(0xFF835A00),
+    emergency: Color(0xFFA50E1E),
     onEmergency: Color(0xFFFFFFFF),
   );
 
   static const dark = LwPalette(
-    primary: LwBrand.lime,
-    onPrimary: LwBrand.deepTeal,
-    primaryTint: Color(0xFF1C3A2A),
-    onPrimaryTint: LwBrand.lime,
-    accent: LwBrand.lime,
-    onAccent: LwBrand.deepTeal,
-    accentTint: Color(0xFF1C3A2A),
-    background: Color(0xFF0A1A22),
-    surface: Color(0xFF12262F),
-    textPrimary: Color(0xFFEAF0F2),
-    textSecondary: Color(0xFFA9B8BE),
-    textDisabled: Color(0xFF6F8189),
-    outlineSoft: Color(0xFF243B45),
-    outlineStrong: Color(0xFF7D9099),
-    success: Color(0xFF9FE36A),
-    caution: Color(0xFFF2B866),
-    emergency: Color(0xFFB3261E),
+    primary: Color(0xFFA9D3C9),
+    onPrimary: LwBrand.forestSlate,
+    primaryTint: Color(0xFF24403B),
+    onPrimaryTint: LwBrand.sageMint,
+    accent: LwBrand.terracotta,
+    accentStrong: Color(0xFFE58C70),
+    onAccentStrong: Color(0xFF13201E),
+    accentTint: Color(0xFF3A2620),
+    onAccentTint: Color(0xFFE8EFED),
+    heroSurface: LwBrand.forestSlate,
+    onHeroSurface: Color(0xFFFFFFFF),
+    onHeroSurfaceSecondary: Color(0xFFC9D8D4),
+    background: Color(0xFF0E1B19),
+    surface: Color(0xFF162724),
+    textPrimary: Color(0xFFE8EFED),
+    textSecondary: Color(0xFFA7B7B3),
+    textDisabled: Color(0xFF6E827D),
+    outlineSoft: Color(0xFF263B37),
+    outlineStrong: Color(0xFF74877F),
+    success: Color(0xFF7FD1A4),
+    caution: Color(0xFFE9B85C),
+    emergency: Color(0xFFB3131F),
     onEmergency: Color(0xFFFFFFFF),
   );
 

@@ -21,7 +21,7 @@ and checks every text/background pair for WCAG 2.2 AA in light and dark.
 
 | File | Contents |
 |---|---|
-| `tokens.dart` | `LwBrand` (logo colours), `LwPalette` light/dark (semantic colours, via `LwPalette.of(context)`), `LwSpacing`, `LwRadius`, `LwSize`, `LwMotion` |
+| `tokens.dart` | `LwBrand` (logo + app colours), `LwPalette` light/dark (semantic colours, via `LwPalette.of(context)`), `LwSpacing`, `LwRadius`, `LwSize`, `LwMotion` |
 | `typography.dart` | `LwType`: Poppins type scale |
 | `theme.dart` | `LwTheme.light()` / `.dark()`: Material theme built from the tokens (buttons, inputs, chips, cards, sheets, nav bar) |
 
@@ -34,18 +34,35 @@ and checks every text/background pair for WCAG 2.2 AA in light and dark.
 - **Motion:** 150 / 250 / 400 ms, ease-out; `LwMotion.duration()` returns zero when reduce-motion is on.
 - **Review on a phone:** the dev flavor opens a "Design tokens" gallery (`lib/features/dev/`).
 
-## Colours (from the logo)
+## App colours (T-UI-01, D-25)
+From the "Live Well Companion" mockup (`docs/design/screen.png`). Exact values and every contrast pair: `tokens.dart` and `test/design/tokens_test.dart`.
+
+| Token | Light | Dark | Where |
+|---|---|---|---|
+| primary | `#1E3834` Forest Slate | `#A9D3C9` | Headings, selected icons, focus ring, outlined buttons |
+| primaryTint | `#E1ECEB` Sage-Mint | `#24403B` | Nav indicator, selected chips, quiet cards |
+| accent | `#D97457` Terracotta | `#D97457` | **Decorative only**: dots, icons, progress (3:1, not 4.5:1) |
+| accentStrong | `#B05A3B` | `#E58C70` | Filled buttons (white / dark label), text links |
+| accentTint | `#FCEFEA` | `#3A2620` | Soft highlight backgrounds |
+| heroSurface | `#1E3834` | `#1E3834` | Dark hero cards (today's step, coach bubble, portal card) |
+| background / surface | `#F8FAF9` / `#FFFFFF` | `#0E1B19` / `#162724` | Screens / cards |
+| textPrimary / textSecondary | `#1E3834` / `#566864` | `#E8EFED` / `#A7B7B3` | Text |
+| success / caution | `#2B734E` / `#835A00` | `#7FD1A4` / `#E9B85C` | Positive / gentle notices |
+| emergency | `#A50E1E` | `#B3131F` | Emergency and crisis cards **only** |
+
+- Plain terracotta with white text is 3.2:1 and fails AA, so buttons use `accentStrong`.
+- Emergency is a true crimson, kept at CIEDE2000 15 or more from both terracottas (tested), so a safety card never looks like a normal button.
+
+## Logo colours (D-04, logo, splash and icon only)
 | Token | Hex | Where |
 |---|---|---|
-| deepTeal | `#0B3A4E` | Logo background, primary |
-| lime | `#8BE03E` | Logo circle, accent |
+| deepTeal | `#0B3A4E` | Logo background, native splash |
+| lime | `#8BE03E` | Logo circle |
 | cream | `#F0F8DC` | Line in the mark |
 | leaf | `#FAFDF0` | Leaf in the mark |
-| text on teal | `#ECF1F6` | Logo lettering |
+| text on teal | `#ECF1F6` | Logo lettering, splash text |
 
-Semantic light palette: background `#F4F6F5`, surface `#FFFFFF`, textPrimary `#14232B`, textSecondary `#55646B`,
-primaryTint `#E2EDF0`, accentTint `#EEF9E2`, outlineSoft `#E3E8E7`, outlineStrong `#8A979C`, success `#2F6B12`,
-caution `#9A5B00`, emergency `#B3261E`. Dark palette: lime becomes primary on `#0A1A22` / `#12262F`.
+These stay until the client approves a new logo (needs-product, D-25).
 
 ## Launch sequence (S-7, D-13)
 1. **Native splash** (flutter_native_splash, config in `pubspec.yaml`): teal `#0B3A4E` + the mark at 160 dp, Android (incl. 12+) and iOS. No white flash.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' show TimeOfDay;
 
+import '../../care/domain/chat.dart';
 import '../../home/domain/home_models.dart';
 import '../../learn/domain/lesson.dart';
 import '../../learn/domain/portal.dart';
@@ -117,6 +118,22 @@ abstract final class PreviewSamples {
       title: 'Your Why, every day',
       summary: 'Keeping your reason close when motivation dips.',
       readMinutes: 2,
+    ),
+  ];
+
+  /// A sample exchange (spec Appendix C wording). The coach isn't built;
+  /// staging and prod never show made-up answers.
+  static const chat = [
+    ChatMessage(
+      author: ChatAuthor.user,
+      text: 'Is walking after meals really useful?',
+    ),
+    ChatMessage(
+      author: ChatAuthor.coach,
+      text:
+          'Yes. A short walk after a meal helps your body handle that meal '
+          'more steadily.',
+      sources: ['Book, chapter 2'],
     ),
   ];
 }

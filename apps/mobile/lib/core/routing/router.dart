@@ -16,6 +16,7 @@ import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
 import '../../features/account/application/account_setup.dart' show whyPath;
 import '../../features/learn/presentation/library_screen.dart';
+import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
@@ -112,6 +113,11 @@ final routerProvider = Provider<GoRouter>((ref) {
               ],
             ),
         ],
+      ),
+      // Safety resources, always reachable from Care (spec 14.2).
+      GoRoute(
+        path: '/help',
+        builder: (context, state) => const HelpNowScreen(),
       ),
       GoRoute(
         path: '/settings',

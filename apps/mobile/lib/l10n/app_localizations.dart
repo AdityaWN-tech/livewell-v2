@@ -196,18 +196,6 @@ abstract class AppLocalizations {
   /// **'Care'**
   String get tabCare;
 
-  /// No description provided for @careEmptyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Care and support'**
-  String get careEmptyTitle;
-
-  /// No description provided for @careEmptyBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Talk with your coach, see what it remembers, and find safety and clinician help here.'**
-  String get careEmptyBody;
-
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
@@ -2157,6 +2145,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Library'**
   String get learnLibraryTitle;
+
+  /// No description provided for @careEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct support'**
+  String get careEyebrow;
+
+  /// No description provided for @careTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to your coach'**
+  String get careTitle;
+
+  /// No description provided for @careStatusSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get careStatusSoon;
+
+  /// No description provided for @careStatusAiVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'AI voice'**
+  String get careStatusAiVoice;
+
+  /// No description provided for @careStatusAiVoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach speaks with an AI voice'**
+  String get careStatusAiVoiceLabel;
+
+  /// No description provided for @careHelpNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Get help now'**
+  String get careHelpNow;
+
+  /// No description provided for @careSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach is coming soon'**
+  String get careSoonTitle;
+
+  /// No description provided for @careSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can talk or type to your coach here, any time of day. If you need help right now, tap \"Get help now\".'**
+  String get careSoonBody;
+
+  /// No description provided for @careNotSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach isn’t available yet, so this message wasn’t sent. It stays on this screen only.'**
+  String get careNotSent;
+
+  /// No description provided for @careSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources: {sources}'**
+  String careSources(String sources);
+
+  /// No description provided for @careSourcesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where this comes from'**
+  String get careSourcesTitle;
+
+  /// No description provided for @careYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get careYou;
+
+  /// No description provided for @careCoachSaid.
+  ///
+  /// In en, this message translates to:
+  /// **'{coach} said'**
+  String careCoachSaid(String coach);
+
+  /// No description provided for @careDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Educational companion · Does not prescribe or change medication'**
+  String get careDisclaimer;
+
+  /// No description provided for @careTypeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get careTypeHint;
+
+  /// No description provided for @careSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get careSend;
+
+  /// No description provided for @careHoldToTalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to talk'**
+  String get careHoldToTalk;
+
+  /// No description provided for @careListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening… let go to stop'**
+  String get careListening;
+
+  /// No description provided for @careTalkHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Or tap once to start and again to stop'**
+  String get careTalkHint;
+
+  /// No description provided for @helpNowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get help now'**
+  String get helpNowTitle;
+
+  /// No description provided for @helpNowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If you or someone else is in danger, call emergency services now. If you are struggling with how you feel, you can call or text a support line any time.'**
+  String get helpNowBody;
+
+  /// No description provided for @helpNowEmergency.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency'**
+  String get helpNowEmergency;
+
+  /// No description provided for @helpNowSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to someone'**
+  String get helpNowSupport;
 }
 
 class _AppLocalizationsDelegate

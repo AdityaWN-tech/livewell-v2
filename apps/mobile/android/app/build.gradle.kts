@@ -1,5 +1,8 @@
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -71,4 +74,10 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+// staging/prod have no google-services.json until their Firebase projects exist (D-05).
+// Warn instead of failing so those flavors still compile; bootstrap() stops them at launch.
+googleServices {
+    missingGoogleServicesStrategy = com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy.WARN
 }

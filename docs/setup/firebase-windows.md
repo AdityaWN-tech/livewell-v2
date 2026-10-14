@@ -50,12 +50,18 @@ flutterfire configure `
 ```
 This registers the Android and iOS dev apps in Firebase and writes the Dart options plus the Android file. The iOS `GoogleService-Info.plist` placement step edits the Xcode project, which needs a Mac (see `ios-without-mac.md`); on Windows it can be skipped or may fail without harm.
 
+**Done for dev (2026-10-13):** Android app `1:623153208660:android:40b0bdefc8ad3a227ffcc1`, iOS app `1:623153208660:ios:ccdfebe26e2d05ac7ffcc1`. The iOS plist was not written (needs a Mac).
+
+**Windows build note:** the pub cache (C:) and the project (D:) are on different drives, which corrupts Kotlin incremental caches ("Storage … is already registered"). `android/gradle.properties` therefore sets `kotlin.incremental=false`.
+
 ## 6. Android fingerprints (needed for Google sign-in and phone OTP)
 ```powershell
 cd "D:\Adii voult\Adii\LiveWell\apps\mobile\android"
 .\gradlew signingReport
 ```
 Copy the **SHA-1** and **SHA-256** of the `devDebug` variant into Firebase console → Project settings → the `.dev` Android app → Add fingerprint. Release keys are added later.
+Done for dev with the CLI: `firebase apps:android:sha:create <appId> <sha> --project my-livewell` (debug SHA-1 and SHA-256).
+After turning on Google sign-in (step 7), re-run step 5 so `google-services.json` picks up the OAuth client.
 
 ## 7. Turn on sign-in methods (Firebase console → Authentication → Sign-in method)
 - Email/Password: on.

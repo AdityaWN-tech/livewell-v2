@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/app.dart';
 import 'package:livewell/core/config/flavor.dart';
+import 'package:livewell/firebase/firebase_options.dart';
 
 void main() {
   for (final flavor in Flavor.values) {
@@ -26,5 +27,11 @@ void main() {
     expect(Flavor.dev.firebaseProjectId, 'my-livewell');
     expect(Flavor.staging.firebaseProjectId, isNull);
     expect(Flavor.prod.firebaseProjectId, isNull);
+  });
+
+  test('Firebase options exist for dev only', () {
+    expect(firebaseOptionsFor(Flavor.dev)?.projectId, 'my-livewell');
+    expect(firebaseOptionsFor(Flavor.staging), isNull);
+    expect(firebaseOptionsFor(Flavor.prod), isNull);
   });
 }

@@ -26,8 +26,6 @@
   "@tabHome": {
     "description": "Bottom navigation tabs (spec 14.2)."
   },
-  "homeEmptyTitle": "Your day starts here",
-  "homeEmptyBody": "Your morning briefing, one next step and a quick check-in will show up here.",
   "planEmptyTitle": "Your plan",
   "planEmptyBody": "Your Live Well Map, your 30-day goal and your daily habits will live here.",
   "trackEmptyTitle": "Your progress",
@@ -334,9 +332,7 @@
   },
   "checkinSaveError": "We couldn't save your check-in. Please try again.",
   "checkinContinue": "Continue",
-  "homeCheckInTitle": "Check in",
-  "homeCheckInBody": "Tell your coach how you're doing. It takes about 30 seconds.",
-  "homeTodayStepEyebrow": "Today's step",
+  "homeTodayStepEyebrow": "Today's one step",
   "homeTodayStepTimed": "A step that fits in {minutes} minutes will appear here.",
   "@homeTodayStepTimed": {
     "placeholders": {
@@ -347,5 +343,107 @@
   },
   "homeTodayStepUntimed": "A small step picked for you will appear here.",
   "homeTodayStepGentle": "A small, gentle step will appear here. Go easy on yourself today.",
-  "countryUsName": "the US"
+  "countryUsName": "the US",
+  "homeEyebrow": "Live Well",
+  "homeDay": "Day {day}",
+  "@homeDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDayLabel": "Day {day} of your journey",
+  "@homeDayLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "homeCoachDefaultName": "Coach",
+  "homeGreetingNamed": "Hi, {name}",
+  "@homeGreetingNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreeting": "Hi there",
+  "homeBriefingSoon": "Briefing coming soon",
+  "homeTodayStepBeforeCheckIn": "Check in first. Then a small step picked for you will appear here.",
+  "homeStepDone": "Done",
+  "homeStepSmaller": "Make it {minutes} min",
+  "@homeStepSmaller": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStepSmallerLabel": "Make it a {minutes}-minute step",
+  "@homeStepSmallerLabel": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStepDoneMessage": "Done for today. Nice work.",
+  "homeStepMinutes": "{minutes} min",
+  "@homeStepMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStepGentleReason": "A gentle day. Go easy on yourself.",
+  "homeQuickCheckIn": "Quick check-in",
+  "homeQuickCheckInTime": "Takes 30s",
+  "homeQuickCheckInLabel": "Quick check-in. Takes about 30 seconds.",
+  "homeCheckedIn": "Checked in today · Mood: {mood}",
+  "@homeCheckedIn": {
+    "placeholders": {
+      "mood": {
+        "type": "String"
+      }
+    }
+  },
+  "homeMilestoneTitle": "Companion milestone",
+  "homeMilestonePhase": "Phase {phase} of {total}",
+  "@homeMilestonePhase": {
+    "placeholders": {
+      "phase": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "homeMilestoneHabits": "{kept} / {planned} habits kept",
+  "@homeMilestoneHabits": {
+    "placeholders": {
+      "kept": {
+        "type": "int"
+      },
+      "planned": {
+        "type": "int"
+      }
+    }
+  },
+  "homeMilestoneHabitsLabel": "{kept} of {planned} habits kept",
+  "@homeMilestoneHabitsLabel": {
+    "placeholders": {
+      "kept": {
+        "type": "int"
+      },
+      "planned": {
+        "type": "int"
+      }
+    }
+  },
+  "homeMilestoneEmpty": "Your progress will show here once you start your first habit."
 }

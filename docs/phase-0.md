@@ -32,4 +32,5 @@ Apple Developer (organisation), Google Play Console, Anthropic API, a TTS vendor
 ## Started early from Phase 1
 | Task | Status |
 |---|---|
+| T-ONB-02 Personal Why (FR-ONB-05) | Built 2026-10-13: typed, suggestions, voice typing behind the microphone consent (on-device recognizer), saved to the profile (rules: string, max 280), shown on Home; reopening at this step resumes there. Free text not yet safety-screened (D-21) |
 | T-ONB-01 Onboarding + sign-in (FR-ONB-01..06) | Built 2026-10-13 (**awaiting human review**: legal copy, consent). Part 1: about, 18+ gate before sign-in (D-19), legal acceptance, resume at step. Part 2: phone OTP (+91/+1), email (sign in, create, reset), Google (Firebase provider flow), Apple (iPhone only, needs Apple Developer account); profile + 4 legal consents created after sign-in; under-18 after sign-in deletes the account. Tests: 101 app tests, device end to end on emulators (email, wrong password, +91 OTP). **Not yet:** biometric unlock toggle (FR-ONB-01), real-project use needs the T-FND-06 rules deployed |

@@ -85,7 +85,10 @@ class SignInCompletion {
     switch (status) {
       case AccountStatus.ready:
         await _ref.read(onboardingProvider.notifier).finish();
-        return '/home';
+        final profile = await _ref
+            .read(profileRepositoryProvider)
+            .get(user.uid);
+        return routeForProfileStep(profile?.onboardingStep);
       case AccountStatus.needsOnboarding:
         final next = progress.isAdult
             ? OnboardingStep.legal
@@ -95,6 +98,15 @@ class SignInCompletion {
     }
   }
 }
+
+/// Where a signed-in person with a profile goes, by their onboarding step
+/// (FR-ONB-06). Steps without a screen yet (the assessment) go to Home.
+String routeForProfileStep(String? step) => switch (step) {
+  ProfileStep.why => whyPath,
+  _ => '/home',
+};
+
+const whyPath = '/onboarding/why';
 
 final signInCompletionProvider = Provider<SignInCompletion>(
   SignInCompletion.new,

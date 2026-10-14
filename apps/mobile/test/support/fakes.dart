@@ -1,3 +1,4 @@
+import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 
@@ -85,18 +86,82 @@ class FakeAuthService implements AuthService {
 }
 
 /// In-memory profiles.
-class FakeProfileRepository implements ProfileRepository {
+class FakeProfileRepository extends ProfileRepository {
   final created = <String, NewProfile>{};
-  final existing = <String>{};
+
+  /// Profiles that already existed, by uid -> onboarding step.
+  final existing = <String, String>{};
+  final whys = <String, String>{};
   final log = <String>[];
 
+  String? _step(String uid) => existing[uid] ?? created[uid]?.onboardingStep;
+
   @override
-  Future<bool> exists(String uid) async =>
-      existing.contains(uid) || created.containsKey(uid);
+  Future<Profile?> get(String uid) async {
+    final step = _step(uid);
+    if (step == null) return null;
+    return Profile(
+      uid: uid,
+      onboardingStep: step,
+      whyStatement: whys[uid],
+      region: created[uid]?.region,
+    );
+  }
+
+  @override
+  Stream<Profile?> watch(String uid) async* {
+    yield await get(uid);
+  }
 
   @override
   Future<void> create(String uid, NewProfile profile) async {
     log.add('profile:$uid');
     created[uid] = profile;
   }
+
+  @override
+  Future<void> saveWhy(
+    String uid,
+    String why, {
+    required String nextStep,
+  }) async {
+    log.add('why:$uid');
+    whys[uid] = why.trim();
+    if (existing.containsKey(uid)) {
+      existing[uid] = nextStep;
+    } else {
+      final p = created[uid]!;
+      created[uid] = NewProfile(
+        displayName: p.displayName,
+        email: p.email,
+        locale: p.locale,
+        region: p.region,
+        onboardingStep: nextStep,
+      );
+    }
+  }
+}
+
+/// Voice typing stand-in: [available] decides whether it starts; [say]
+/// delivers words as if spoken.
+class FakeDictation implements Dictation {
+  bool available = true;
+  bool listening = false;
+  void Function(String, bool)? _onText;
+
+  @override
+  Future<bool> start(void Function(String text, bool isFinal) onText) async {
+    if (!available) return false;
+    listening = true;
+    _onText = onText;
+    return true;
+  }
+
+  void say(String words, {bool isFinal = true}) {
+    _onText?.call(words, isFinal);
+    if (isFinal) listening = false;
+  }
+
+  @override
+  Future<void> stop() async => listening = false;
 }

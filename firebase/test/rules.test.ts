@@ -68,6 +68,17 @@ describe('users/{uid} profile', () => {
       }),
     );
   });
+  it('the Why is short text: up to 280 characters (FR-ONB-05)', async () => {
+    await seedAdult(env);
+    const ref = doc(as(ALICE), 'users/alice');
+    const now = meta().updated_at;
+    await assertSucceeds(
+      updateDoc(ref, { why_statement: 'x'.repeat(280), onboarding_step: 'assessment', updated_at: now }),
+    );
+    await assertFails(updateDoc(ref, { why_statement: 'x'.repeat(281), updated_at: now }));
+    await assertFails(updateDoc(ref, { why_statement: 42, updated_at: now }));
+    await assertFails(updateDoc(doc(as(BOB), 'users/alice'), { why_statement: 'hi', updated_at: now }));
+  });
   it('cannot switch age_confirmed off', async () => {
     await seedAdult(env);
     await assertFails(updateDoc(doc(as(ALICE), 'users/alice'), { age_confirmed: false }));

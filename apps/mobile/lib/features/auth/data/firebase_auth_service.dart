@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:firebase_core/firebase_core.dart' as fb show Firebase;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/auth.dart';
@@ -9,9 +10,12 @@ import '../domain/auth.dart';
 /// Firebase's built-in provider flow (no extra SDK); Apple is offered on iOS
 /// only (needs the Apple Developer account, see docs/setup).
 class FirebaseAuthService implements AuthService {
-  FirebaseAuthService(this._auth);
+  FirebaseAuthService([fb.FirebaseAuth? auth]) : _injected = auth;
 
-  final fb.FirebaseAuth _auth;
+  final fb.FirebaseAuth? _injected;
+
+  /// Looked up on first use, so creating the service never needs Firebase.
+  fb.FirebaseAuth get _auth => _injected ?? fb.FirebaseAuth.instance;
 
   static AuthUser toAuthUser(fb.User u) => _user(u);
 
@@ -33,6 +37,8 @@ class FirebaseAuthService implements AuthService {
 
   @override
   AuthUser? get currentUser {
+    // No Firebase app yet (widget tests, a failed startup): nobody signed in.
+    if (fb.Firebase.apps.isEmpty && _injected == null) return null;
     final u = _auth.currentUser;
     return u == null ? null : _user(u);
   }
@@ -150,5 +156,5 @@ class FirebaseAuthService implements AuthService {
 }
 
 final authServiceProvider = Provider<AuthService>(
-  (ref) => FirebaseAuthService(fb.FirebaseAuth.instance),
+  (ref) => FirebaseAuthService(),
 );

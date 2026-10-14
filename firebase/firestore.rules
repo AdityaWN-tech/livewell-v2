@@ -63,14 +63,22 @@ service cloud.firestore {
                 'why_statement', 'created_at', 'updated_at', 'schema_version'];
       }
 
+      // The personal Why (FR-ONB-05) is short free text.
+      function validWhy(d) {
+        return !('why_statement' in d)
+          || (d.why_statement is string && d.why_statement.size() <= 280);
+      }
+
       allow read: if isOwner(uid);
       allow create: if isOwner(uid)
         && request.resource.data.keys().hasOnly(clientProfileKeys())
         && request.resource.data.age_confirmed == true
+        && validWhy(request.resource.data)
         && hasMeta(request.resource.data);
       allow update: if isOwner(uid)
         && onlyChanges(clientProfileKeys())
         && request.resource.data.age_confirmed == true
+        && validWhy(request.resource.data)
         && request.resource.data.updated_at is timestamp;
       // Account deletion runs on the server (FR-SET-02).
       allow delete: if false;

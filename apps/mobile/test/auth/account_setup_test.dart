@@ -34,7 +34,7 @@ void main() {
   });
 
   test('existing account: straight to the app, nothing written', () async {
-    profiles.existing.add('u1');
+    profiles.existing['u1'] = 'assessment';
     expect(await setup.afterSignIn(phoneUser, ready), AccountStatus.ready);
     expect(profiles.created, isEmpty);
     expect(consents.records, isEmpty);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart' show TimeOfDay;
 
 import '../../home/domain/home_models.dart';
+import '../../learn/domain/lesson.dart';
+import '../../learn/domain/portal.dart';
 import '../../plan/domain/plan_models.dart';
 import '../../track/domain/track_models.dart';
 
@@ -76,4 +78,45 @@ abstract final class PreviewSamples {
       StreakDay.upcoming,
     ],
   );
+
+  /// A made-up offer; the real catalog is portal_offers (spec 13.2).
+  static const offer = PortalOffer(
+    id: 'sample-offer',
+    title: 'Everyday Movement course',
+    description: 'Short video lessons on fitting movement into a busy day.',
+    url: 'https://example.com/everyday-movement',
+    offerType: 'course',
+    topicTags: ['movement'],
+  );
+
+  static const lessons = [
+    Lesson(
+      id: 'sample-1',
+      category: 'Driver 1',
+      title: 'Microhabits vs. willpower',
+      summary: 'Why starting with 2 minutes helps a habit stick.',
+      readMinutes: 3,
+    ),
+    Lesson(
+      id: 'sample-2',
+      category: 'Driver 3',
+      title: 'Moving after meals',
+      summary: 'Simple ways to add a short walk to your day.',
+      readMinutes: 4,
+    ),
+    Lesson(
+      id: 'sample-3',
+      category: 'Driver 5',
+      title: 'Winding down for sleep',
+      summary: 'A calm routine for the last hour of your day.',
+      readMinutes: 5,
+    ),
+    Lesson(
+      id: 'sample-4',
+      category: 'Driver 2',
+      title: 'Your Why, every day',
+      summary: 'Keeping your reason close when motivation dips.',
+      readMinutes: 2,
+    ),
+  ];
 }

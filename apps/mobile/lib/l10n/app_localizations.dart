@@ -196,18 +196,6 @@ abstract class AppLocalizations {
   /// **'Care'**
   String get tabCare;
 
-  /// No description provided for @learnEmptyTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Learn something small'**
-  String get learnEmptyTitle;
-
-  /// No description provided for @learnEmptyBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Short lessons from the Live Well book, audio and breathing sessions will be here.'**
-  String get learnEmptyBody;
-
   /// No description provided for @careEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -2091,6 +2079,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This was not saved.'**
   String get trackReflectionNotSaved;
+
+  /// No description provided for @learnEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved knowledge'**
+  String get learnEyebrow;
+
+  /// No description provided for @learnPortalEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'From the Live Well Portal'**
+  String get learnPortalEyebrow;
+
+  /// No description provided for @learnPaidCourse.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid course'**
+  String get learnPaidCourse;
+
+  /// No description provided for @learnFreeLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Free lesson'**
+  String get learnFreeLesson;
+
+  /// No description provided for @learnViewCourse.
+  ///
+  /// In en, this message translates to:
+  /// **'View course'**
+  String get learnViewCourse;
+
+  /// No description provided for @learnNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get learnNotNow;
+
+  /// No description provided for @learnPortalOpenError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t open the portal. Please try again.'**
+  String get learnPortalOpenError;
+
+  /// No description provided for @learnLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Curated library'**
+  String get learnLibrary;
+
+  /// No description provided for @learnViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all {count}'**
+  String learnViewAll(int count);
+
+  /// No description provided for @learnReadTime.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}-min read'**
+  String learnReadTime(int minutes);
+
+  /// No description provided for @learnLessonsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons are on their way'**
+  String get learnLessonsEmptyTitle;
+
+  /// No description provided for @learnLessonsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Short lessons from Dr. Gokula\'s book will show up here once they are reviewed.'**
+  String get learnLessonsEmptyBody;
+
+  /// No description provided for @learnLibraryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get learnLibraryTitle;
 }
 
 class _AppLocalizationsDelegate

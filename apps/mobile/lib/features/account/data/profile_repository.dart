@@ -23,6 +23,7 @@ class Profile {
     this.whyStatement,
     this.onboardingStep,
     this.createdAt,
+    this.edSafeMode = false,
   });
 
   final String uid;
@@ -34,6 +35,10 @@ class Profile {
   /// When the account was created (for "Day N" on Home).
   final DateTime? createdAt;
 
+  /// Server-set after a disordered-eating flag (FR-SAF-04); blocks portal
+  /// cards and diet content.
+  final bool edSafeMode;
+
   static Profile fromData(String uid, Map<String, dynamic> d) => Profile(
     uid: uid,
     displayName: d['display_name'] as String?,
@@ -41,6 +46,7 @@ class Profile {
     whyStatement: d['why_statement'] as String?,
     onboardingStep: d['onboarding_step'] as String?,
     createdAt: (d['created_at'] as Timestamp?)?.toDate(),
+    edSafeMode: d['ed_safe_mode'] as bool? ?? false,
   );
 }
 

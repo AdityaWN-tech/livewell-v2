@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
+import 'package:livewell/features/avatar/presentation/avatar_screen.dart';
 import 'package:livewell/features/auth/presentation/phone_sign_in_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/onboarding/domain/onboarding_progress.dart';
 import 'package:livewell/features/onboarding/presentation/about_screen.dart';
-import 'package:livewell/features/onboarding/presentation/why_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fake_onboarding_store.dart';
@@ -67,7 +67,7 @@ void main() {
 
     await tester.enterText(find.byKey(const Key('code')), '123456');
     await tapText(tester, 'Verify');
-    expect(find.byType(WhyScreen), findsOneWidget);
+    expect(find.byType(AvatarScreen), findsOneWidget);
 
     const uid = 'phone:+919876543210';
     expect(h.profiles.created[uid]!.region, 'IN');
@@ -108,7 +108,7 @@ void main() {
     );
     await tester.tap(find.widgetWithText(FilledButton, 'Create account'));
     await tester.pumpAndSettle();
-    expect(find.byType(WhyScreen), findsOneWidget);
+    expect(find.byType(AvatarScreen), findsOneWidget);
     expect(
       h.profiles.created['email:priya@example.com']!.email,
       'priya@example.com',
@@ -171,7 +171,7 @@ void main() {
       await tester.pumpAndSettle();
     }
     await tapText(tester, 'Accept and continue');
-    expect(find.byType(WhyScreen), findsOneWidget);
+    expect(find.byType(AvatarScreen), findsOneWidget);
     expect(h.profiles.created.keys, ['google:1']);
     expect(h.consents.records, hasLength(4));
   });

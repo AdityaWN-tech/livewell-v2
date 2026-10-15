@@ -6,9 +6,9 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 
 | Path | Key fields | App (client) access | Written by server |
 |---|---|---|---|
-| `users/{uid}` | display_name, email, tz, locale, region, age_confirmed, onboarding_step, focus_driver, why_statement | Owner read; create only with `age_confirmed == true`; update listed fields only; no delete | plan_tier, ed_safe_mode, safety state; account deletion |
+| `users/{uid}` | display_name, email, tz, locale, region, age_confirmed, onboarding_step (`avatar` → `why` → `assessment`), focus_driver, why_statement | Owner read; create only with `age_confirmed == true`; update listed fields only; no delete | plan_tier, ed_safe_mode, safety state; account deletion |
 | `users/{uid}/consents/{id}` | type, doc_version, granted, granted_at, revoked_at, app_version, evidence_ref | Owner read; **append-only** create (created_at = server time); no update/delete | — |
-| `users/{uid}/avatar/current` | type (stylized \| photoreal), style_config, raw_media_retained | Owner read; create/update those fields; no delete | vendor, vendor_avatar_id, thumbnail_urls; deletion |
+| `users/{uid}/avatar/current` | type (stylized \| photoreal), style_config, raw_media_retained | Owner read; create/update those fields; no delete. **style_config v1** (T-ONB-03b): `version`, `skin` (0–9, Monk scale), `hair` (none/short/long/curly/coily/wavy/bun/buzz), `hair_colour` (0–6), `eyes` (round/almond/smiling), `glasses` (none/round/square), `head_covering` (none/hijab/turban/kippah), `clothing` (crew/collar/cardigan), `clothing_colour` (0–5), `background` (0–5), `look` (woman/man/neutral, only if chosen). The app always writes `type: stylized`, `raw_media_retained: false` | vendor, vendor_avatar_id, thumbnail_urls; deletion |
 | `users/{uid}/voices/{voice_id}` | kind, vendor_voice_id, consent_id, status, speed, style | Owner read; update speed (0.8–1.2) and style only | everything else (create, status, revoke) |
 | `voice_consents/{id}` | consent record (spec 11 example) | **None** | all |
 | `users/{uid}/assessments/{id}` | bank_version, answers[], driver_scores, red_flags, map_result, completed_at | Owner read; create; update until completed; bank_version fixed | — |

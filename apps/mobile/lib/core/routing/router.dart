@@ -14,7 +14,9 @@ import '../../features/onboarding/presentation/about_screen.dart';
 import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
-import '../../features/account/application/account_setup.dart' show whyPath;
+import '../../features/account/application/account_setup.dart'
+    show avatarPath, whyPath;
+import '../../features/avatar/presentation/avatar_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
@@ -70,6 +72,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      // After sign-up: create your coach (T-ONB-03b), then the Why.
+      GoRoute(
+        path: avatarPath,
+        builder: (context, state) => const AvatarScreen(),
       ),
       GoRoute(path: whyPath, builder: (context, state) => const WhyScreen()),
       GoRoute(

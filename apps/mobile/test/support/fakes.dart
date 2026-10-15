@@ -171,6 +171,22 @@ class FakeProfileRepository extends ProfileRepository {
     created[uid] = profile;
   }
 
+  /// Saved focus answers, by uid.
+  final focus =
+      <String, ({List<String> choices, String driver, bool? limited})>{};
+
+  @override
+  Future<void> saveFocus(
+    String uid, {
+    required List<String> choices,
+    required String driver,
+    required bool? activityLimited,
+    required String nextStep,
+  }) async {
+    focus[uid] = (choices: choices, driver: driver, limited: activityLimited);
+    existing[uid] = nextStep;
+  }
+
   @override
   Future<void> setStep(String uid, String step) async {
     log.add('step:$uid:$step');

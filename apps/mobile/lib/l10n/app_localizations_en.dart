@@ -1612,4 +1612,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceNameClear => 'Clear';
+
+  @override
+  String get onbCheckinTitle => 'First, a quick check-in';
+
+  @override
+  String get onbCheckinBody =>
+      'How are you feeling today? It takes about 30 seconds and helps your coach plan a kind first week.';
+
+  @override
+  String get onbCheckinStart => 'Start check-in';
+
+  @override
+  String get onbCheckinSkip => 'Skip the check-in';
+
+  @override
+  String get focusTitle => 'What would you like to work on this week?';
+
+  @override
+  String get focusBody => 'Pick one. You can add a second if you like.';
+
+  @override
+  String get focusMoveMore => 'Move more';
+
+  @override
+  String get focusSleepBetter => 'Sleep better';
+
+  @override
+  String get focusEatBetter => 'Eat better';
+
+  @override
+  String get focusLessStress => 'Feel less stressed';
+
+  @override
+  String get focusMoreEnergy => 'More energy';
+
+  @override
+  String get focusHealthyRoutine => 'Build a healthy routine';
+
+  @override
+  String get focusFirst => '1st';
+
+  @override
+  String get focusSecond => '2nd';
+
+  @override
+  String focusFirstLabel(String name) {
+    return '$name, first choice';
+  }
+
+  @override
+  String focusSecondLabel(String name) {
+    return '$name, second choice';
+  }
+
+  @override
+  String get focusFull => 'You’ve picked two. Tap one to remove it first.';
+
+  @override
+  String get focusContinue => 'Continue';
+
+  @override
+  String get focusSaveError =>
+      'We couldn’t save your choice. Please try again.';
+
+  @override
+  String get activityTitle => 'Before we plan any movement';
+
+  @override
+  String get activityQuestion =>
+      'Do you have chest pain, fainting or severe breathlessness, or has a doctor or nurse told you to limit your activity?';
+
+  @override
+  String get activityYes => 'Yes';
+
+  @override
+  String get activityNo => 'No';
+
+  @override
+  String get activityLimitedTitle => 'Talk to your clinician first';
+
+  @override
+  String get activityLimitedBody =>
+      'Please check with your doctor or nurse before starting new exercise. For now, your plan will focus on sleep, stress, food and routine, with no exercise. You can change this later in Settings.';
+
+  @override
+  String get activityLimitedNow =>
+      'If you have chest pain, fainting or trouble breathing right now, get help now.';
+
+  @override
+  String get activityContinue => 'Continue';
 }

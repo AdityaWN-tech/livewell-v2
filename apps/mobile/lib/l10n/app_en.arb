@@ -852,5 +852,46 @@
   "voiceNameSteady": "Steady",
   "voiceNameDeep": "Deep",
   "voiceNameGentle": "Gentle",
-  "voiceNameClear": "Clear"
+  "voiceNameClear": "Clear",
+  "onbCheckinTitle": "First, a quick check-in",
+  "onbCheckinBody": "How are you feeling today? It takes about 30 seconds and helps your coach plan a kind first week.",
+  "onbCheckinStart": "Start check-in",
+  "onbCheckinSkip": "Skip the check-in",
+  "focusTitle": "What would you like to work on this week?",
+  "focusBody": "Pick one. You can add a second if you like.",
+  "focusMoveMore": "Move more",
+  "focusSleepBetter": "Sleep better",
+  "focusEatBetter": "Eat better",
+  "focusLessStress": "Feel less stressed",
+  "focusMoreEnergy": "More energy",
+  "focusHealthyRoutine": "Build a healthy routine",
+  "focusFirst": "1st",
+  "focusSecond": "2nd",
+  "focusFirstLabel": "{name}, first choice",
+  "@focusFirstLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "focusSecondLabel": "{name}, second choice",
+  "@focusSecondLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "focusFull": "You’ve picked two. Tap one to remove it first.",
+  "focusContinue": "Continue",
+  "focusSaveError": "We couldn’t save your choice. Please try again.",
+  "activityTitle": "Before we plan any movement",
+  "activityQuestion": "Do you have chest pain, fainting or severe breathlessness, or has a doctor or nurse told you to limit your activity?",
+  "activityYes": "Yes",
+  "activityNo": "No",
+  "activityLimitedTitle": "Talk to your clinician first",
+  "activityLimitedBody": "Please check with your doctor or nurse before starting new exercise. For now, your plan will focus on sleep, stress, food and routine, with no exercise. You can change this later in Settings.",
+  "activityLimitedNow": "If you have chest pain, fainting or trouble breathing right now, get help now.",
+  "activityContinue": "Continue"
 }

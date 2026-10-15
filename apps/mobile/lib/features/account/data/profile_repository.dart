@@ -12,6 +12,11 @@ abstract final class ProfileStep {
 
   /// Choose your coach's voice (T-ONB-03c), after the avatar.
   static const voice = 'voice';
+
+  /// First check-in, then "What would you like to work on?" (T-ONB-03d),
+  /// after the Why.
+  static const checkin = 'checkin';
+  static const focus = 'focus';
   static const why = 'why';
 
   /// The 8-driver assessment (T-ASM-01..03, not built yet). Until it exists,
@@ -29,6 +34,8 @@ class Profile {
     this.onboardingStep,
     this.createdAt,
     this.edSafeMode = false,
+    this.focusChoices = const [],
+    this.activityLimited,
   });
 
   final String uid;
@@ -44,6 +51,12 @@ class Profile {
   /// cards and diet content.
   final bool edSafeMode;
 
+  /// "What would you like to work on" ids, main focus first (T-ONB-03d).
+  final List<String> focusChoices;
+
+  /// FR-GOL-03: a clinician limit or warning signs; then no movement plans.
+  final bool? activityLimited;
+
   static Profile fromData(String uid, Map<String, dynamic> d) => Profile(
     uid: uid,
     displayName: d['display_name'] as String?,
@@ -52,6 +65,8 @@ class Profile {
     onboardingStep: d['onboarding_step'] as String?,
     createdAt: (d['created_at'] as Timestamp?)?.toDate(),
     edSafeMode: d['ed_safe_mode'] as bool? ?? false,
+    focusChoices: [...?(d['focus_choices'] as List?)?.cast<String>()],
+    activityLimited: d['activity_limited'] as bool?,
   );
 }
 
@@ -73,6 +88,17 @@ abstract class ProfileRepository {
 
   /// Moves onboarding to [step] (FR-ONB-06: resumes there).
   Future<void> setStep(String uid, String step);
+
+  /// Saves the focus choices (1 or 2 ids), the main driver and the FR-GOL-03
+  /// answer (null when not asked: no movement focus), then moves onboarding
+  /// to [nextStep].
+  Future<void> saveFocus(
+    String uid, {
+    required List<String> choices,
+    required String driver,
+    required bool? activityLimited,
+    required String nextStep,
+  });
 }
 
 class NewProfile {
@@ -130,6 +156,21 @@ class FirestoreProfileRepository extends ProfileRepository {
       'schema_version': 1,
     });
   }
+
+  @override
+  Future<void> saveFocus(
+    String uid, {
+    required List<String> choices,
+    required String driver,
+    required bool? activityLimited,
+    required String nextStep,
+  }) => _doc(uid).update({
+    'focus_choices': choices,
+    'focus_driver': driver,
+    'activity_limited': ?activityLimited,
+    'onboarding_step': nextStep,
+    'updated_at': FieldValue.serverTimestamp(),
+  });
 
   @override
   Future<void> setStep(String uid, String step) => _doc(uid).update({

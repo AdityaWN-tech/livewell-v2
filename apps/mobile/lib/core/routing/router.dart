@@ -15,9 +15,11 @@ import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
 import '../../features/account/application/account_setup.dart'
-    show avatarPath, voicePath, whyPath;
+    show avatarPath, checkinPath, focusPath, voicePath, whyPath;
 import '../../features/avatar/presentation/avatar_screen.dart';
 import '../../features/voice/presentation/voice_screen.dart';
+import '../../features/focus/presentation/focus_screen.dart';
+import '../../features/focus/presentation/onboarding_checkin_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
@@ -84,6 +86,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const VoiceScreen(),
       ),
       GoRoute(path: whyPath, builder: (context, state) => const WhyScreen()),
+      // After the Why: first check-in, then the focus (T-ONB-03d).
+      GoRoute(
+        path: checkinPath,
+        builder: (context, state) => const OnboardingCheckInScreen(),
+      ),
+      GoRoute(
+        path: focusPath,
+        builder: (context, state) => const FocusScreen(),
+      ),
       GoRoute(
         path: '/sign-in',
         builder: (context, state) => const SignInScreen(),

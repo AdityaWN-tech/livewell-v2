@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/speech/dictation.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../account/application/account_setup.dart' show checkinPath;
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../consent/presentation/microphone_consent.dart';
@@ -115,8 +116,9 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
 
       await ref
           .read(profileRepositoryProvider)
-          .saveWhy(uid, _text.text, nextStep: ProfileStep.assessment);
-      if (mounted) context.go('/home');
+          .saveWhy(uid, _text.text, nextStep: ProfileStep.checkin);
+      // Next: the first check-in, then the focus (T-ONB-03d).
+      if (mounted) context.go(checkinPath);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

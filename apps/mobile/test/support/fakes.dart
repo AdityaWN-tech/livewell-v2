@@ -23,6 +23,12 @@ class FakeAuthService implements AuthService {
   int codesSent = 0;
   bool deleted = false;
   AuthFailure? googleFailure;
+  AuthFailure? appleFailure;
+
+  /// What Google finds when [googleFailure] is accountExists.
+  String? existingEmail;
+  PendingLink? pending;
+  final linked = <SocialProvider>[];
 
   @override
   AuthUser? get currentUser => signedIn;
@@ -72,6 +78,12 @@ class FakeAuthService implements AuthService {
 
   @override
   Future<AuthUser> signInWithGoogle() async {
+    if (googleFailure == AuthFailure.accountExists) {
+      pending = PendingLink(
+        provider: SocialProvider.google,
+        email: existingEmail,
+      );
+    }
     if (googleFailure != null) throw AuthException(googleFailure!);
     return _signIn(
       const AuthUser(
@@ -83,8 +95,23 @@ class FakeAuthService implements AuthService {
   }
 
   @override
-  Future<AuthUser> signInWithApple() async =>
-      _signIn(const AuthUser(uid: 'apple:1'));
+  Future<AuthUser> signInWithApple() async {
+    if (appleFailure != null) throw AuthException(appleFailure!);
+    // Apple may hide the email (private relay).
+    return _signIn(const AuthUser(uid: 'apple:1'));
+  }
+
+  @override
+  PendingLink? get pendingLink => pending;
+
+  @override
+  void clearPendingLink() => pending = null;
+
+  @override
+  Future<void> linkPending() async {
+    if (pending != null) linked.add(pending!.provider);
+    pending = null;
+  }
 
   @override
   Future<void> signOut() async => signedIn = null;

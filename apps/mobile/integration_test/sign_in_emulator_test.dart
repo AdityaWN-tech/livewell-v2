@@ -177,4 +177,86 @@ void main() {
     );
     await expectAccountCreated(user.uid, region: 'IN');
   });
+
+  // T-ONB-03a: Google one tap. The Auth emulator accepts an unsigned Google
+  // ID token, so the provider's browser step is replaced by that credential.
+  FirebaseAuthService googleAs(String sub, String email) => FirebaseAuthService(
+    fb.FirebaseAuth.instance,
+    (_) => fb.FirebaseAuth.instance.signInWithCredential(
+      fb.GoogleAuthProvider.credential(
+        idToken: jsonEncode({
+          'sub': sub,
+          'email': email,
+          'email_verified': true,
+          'name': 'Priya Test',
+        }),
+      ),
+    ),
+  );
+
+  testWidgets('Google, new person: one tap signs up and sets up the account', (
+    _,
+  ) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final auth = googleAs('g-$id', 'g-$id@example.com');
+    final user = await auth.signInWithGoogle();
+    expect(user.email, 'g-$id@example.com');
+    expect(
+      await container.read(signInCompletionProvider).complete(user),
+      whyPath,
+    );
+    await expectAccountCreated(user.uid);
+  });
+
+  testWidgets('Google, existing person: one tap signs in, nothing redone', (
+    _,
+  ) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final auth = googleAs('g-$id', 'g-$id@example.com');
+    final first = await auth.signInWithGoogle();
+    await container.read(signInCompletionProvider).complete(first);
+    await container
+        .read(profileRepositoryProvider)
+        .saveWhy(
+          first.uid,
+          'Energy to travel with my family.',
+          nextStep: ProfileStep.assessment,
+        );
+    final created = (await db.doc('users/${first.uid}').get())['created_at'];
+    final consents =
+        (await db.collection('users/${first.uid}/consents').get()).size;
+
+    await auth.signOut();
+    final again = await auth.signInWithGoogle();
+    expect(again.uid, first.uid, reason: 'same account, not a new one');
+    expect(
+      await container.read(signInCompletionProvider).complete(again),
+      '/home',
+    );
+    final profile = await db.doc('users/${first.uid}').get();
+    expect(profile['created_at'], created);
+    expect(
+      (await db.collection('users/${first.uid}/consents').get()).size,
+      consents,
+      reason: 'no duplicate consent records',
+    );
+  });
+
+  testWidgets('cancelled Google sign-in is reported as cancelled', (_) async {
+    final auth = FirebaseAuthService(
+      fb.FirebaseAuth.instance,
+      (_) => throw fb.FirebaseAuthException(code: 'web-context-canceled'),
+    );
+    await expectLater(
+      auth.signInWithGoogle(),
+      throwsA(
+        isA<AuthException>().having(
+          (e) => e.failure,
+          'failure',
+          AuthFailure.cancelled,
+        ),
+      ),
+    );
+    expect(fb.FirebaseAuth.instance.currentUser, isNull);
+  });
 }

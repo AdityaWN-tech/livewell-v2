@@ -24,14 +24,14 @@ FakeOnboardingStore readyStore() {
 }
 
 void main() {
-  testWidgets('sign-in offers phone, email and Google (Apple only on iPhone)', (
+  testWidgets('sign-in offers phone, email, and Google and Apple icons', (
     tester,
   ) async {
     await Harness(store: readyStore()).boot(tester);
     expect(find.text('Continue with phone'), findsOneWidget);
     expect(find.text('Continue with email'), findsOneWidget);
-    expect(find.text('Continue with Google'), findsOneWidget);
-    expect(find.text('Continue with Apple'), findsNothing); // Android test host
+    expect(find.byKey(const Key('sign-in-google')), findsOneWidget);
+    expect(find.byKey(const Key('sign-in-apple')), findsOneWidget);
   });
 
   testWidgets('phone: India number, code, then the account is set up', (
@@ -137,9 +137,9 @@ void main() {
     final h = Harness(store: readyStore());
     h.auth.googleFailure = AuthFailure.cancelled;
     await h.boot(tester);
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     expect(find.byType(SnackBar), findsNothing);
-    expect(find.text('Continue with Google'), findsOneWidget);
+    expect(find.byKey(const Key('sign-in-google')), findsOneWidget);
   });
 
   testWidgets('returning member with an account goes straight to Home', (
@@ -149,7 +149,7 @@ void main() {
     h.profiles.existing['google:1'] = 'assessment';
     await h.boot(tester);
     await tapText(tester, 'I already have an account');
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(h.profiles.created, isEmpty);
   });
@@ -160,7 +160,7 @@ void main() {
     final h = Harness();
     await h.boot(tester);
     await tapText(tester, 'I already have an account');
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     expect(find.byType(AboutScreen), findsOneWidget);
     expect(h.profiles.created, isEmpty, reason: 'no 18+ check or legal yet');
 
@@ -182,7 +182,7 @@ void main() {
     final h = Harness();
     await h.boot(tester);
     await tapText(tester, 'I already have an account');
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     await tapText(tester, 'Continue');
     await tapText(tester, "No, I'm under 18");
     expect(find.text('Live Well is for adults'), findsOneWidget);
@@ -201,4 +201,10 @@ void main() {
     // Regression: PR #13 had overwritten this label with "the US".
     expect(find.text('United States (+1)'), findsOneWidget);
   });
+}
+
+Future<void> tapKey(WidgetTester tester, String key) async {
+  await tester.ensureVisible(find.byKey(Key(key)));
+  await tester.tap(find.byKey(Key(key)));
+  await tester.pumpAndSettle();
 }

@@ -571,7 +571,7 @@ abstract class AppLocalizations {
   /// No description provided for @signInBody.
   ///
   /// In en, this message translates to:
-  /// **'Use your phone number, email or Google. If you already use the Live Well portal, use the same phone number or email.'**
+  /// **'Use your phone number, email, Google or Apple. If you already use the Live Well portal, use the same phone number or email.'**
   String get signInBody;
 
   /// No description provided for @signInPhone.
@@ -2283,6 +2283,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Talk to someone'**
   String get helpNowSupport;
+
+  /// No description provided for @signInOrContinueWith.
+  ///
+  /// In en, this message translates to:
+  /// **'or continue with'**
+  String get signInOrContinueWith;
+
+  /// No description provided for @authErrorAccountExists.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have a Live Well account with this email. Sign in the way you did before (phone or email). Then we’ll offer to add this option to it.'**
+  String get authErrorAccountExists;
+
+  /// No description provided for @authLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {provider} to your account?'**
+  String authLinkTitle(String provider);
+
+  /// No description provided for @authLinkBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Next time you can sign in with {provider} or the way you just did. It’s the same account.'**
+  String authLinkBody(String provider);
+
+  /// No description provided for @authLinkAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {provider}'**
+  String authLinkAdd(String provider);
+
+  /// No description provided for @authLinkNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get authLinkNotNow;
+
+  /// No description provided for @authLinkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{provider} is now added to your account.'**
+  String authLinkDone(String provider);
 }
 
 class _AppLocalizationsDelegate

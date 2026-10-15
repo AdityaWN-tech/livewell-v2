@@ -276,7 +276,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signInBody =>
-      'Use your phone number, email or Google. If you already use the Live Well portal, use the same phone number or email.';
+      'Use your phone number, email, Google or Apple. If you already use the Live Well portal, use the same phone number or email.';
 
   @override
   String get signInPhone => 'Continue with phone';
@@ -1263,4 +1263,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpNowSupport => 'Talk to someone';
+
+  @override
+  String get signInOrContinueWith => 'or continue with';
+
+  @override
+  String get authErrorAccountExists =>
+      'You already have a Live Well account with this email. Sign in the way you did before (phone or email). Then we’ll offer to add this option to it.';
+
+  @override
+  String authLinkTitle(String provider) {
+    return 'Add $provider to your account?';
+  }
+
+  @override
+  String authLinkBody(String provider) {
+    return 'Next time you can sign in with $provider or the way you just did. It’s the same account.';
+  }
+
+  @override
+  String authLinkAdd(String provider) {
+    return 'Add $provider';
+  }
+
+  @override
+  String get authLinkNotNow => 'Not now';
+
+  @override
+  String authLinkDone(String provider) {
+    return '$provider is now added to your account.';
+  }
 }

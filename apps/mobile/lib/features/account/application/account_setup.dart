@@ -103,12 +103,14 @@ class SignInCompletion {
 /// (FR-ONB-06). Steps without a screen yet (the assessment) go to Home.
 String routeForProfileStep(String? step) => switch (step) {
   ProfileStep.avatar => avatarPath,
+  ProfileStep.voice => voicePath,
   ProfileStep.why => whyPath,
   _ => '/home',
 };
 
 const whyPath = '/onboarding/why';
 const avatarPath = '/onboarding/avatar';
+const voicePath = '/onboarding/voice';
 
 final signInCompletionProvider = Provider<SignInCompletion>(
   SignInCompletion.new,

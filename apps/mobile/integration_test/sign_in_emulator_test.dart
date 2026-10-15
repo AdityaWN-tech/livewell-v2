@@ -14,6 +14,8 @@ import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/data/firebase_auth_service.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/domain/avatar_config.dart';
+import 'package:livewell/features/voice/data/voice_repository.dart';
+import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
 import 'package:livewell/features/onboarding/domain/onboarding_progress.dart';
@@ -286,5 +288,47 @@ void main() {
     expect(second['style_config']['head_covering'], 'hijab');
     expect(second['created_at'], first['created_at']);
     expect((await avatars.load())!.skin, 9);
+  });
+
+  testWidgets('library voice: chosen, then switched, one active (rules)', (
+    _,
+  ) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final user = await googleAs(
+      'v-$id',
+      'v-$id@example.com',
+    ).signInWithGoogle();
+    await container.read(signInCompletionProvider).complete(user);
+    final voices = container.read(voiceRepositoryProvider);
+
+    await voices.choose(VoiceChoice.fallback);
+    await voices.choose(
+      const VoiceChoice(
+        voiceId: 'lw-clear',
+        speed: 1.2,
+        style: VoiceStyle.energetic,
+      ),
+    );
+    final all = await db.collection('users/${user.uid}/voices').get();
+    final byId = {for (final d in all.docs) d.id: d.data()};
+    expect(byId['lw-warm']!['status'], 'inactive');
+    expect(byId['lw-clear']!['status'], 'active');
+    expect(byId['lw-clear']!['kind'], 'library');
+    expect(byId['lw-clear']!['speed'], 1.2);
+    expect(byId['lw-clear']!['style'], 'energetic');
+    // A cloned voice can't be created from the app.
+    await expectLater(
+      db.doc('users/${user.uid}/voices/lw-mine').set({
+        'kind': 'self_clone',
+        'vendor_voice_id': 'x',
+        'status': 'active',
+        'speed': 1,
+        'style': 'calm',
+        'created_at': FieldValue.serverTimestamp(),
+        'updated_at': FieldValue.serverTimestamp(),
+        'schema_version': 1,
+      }),
+      throwsA(isA<FirebaseException>()),
+    );
   });
 }

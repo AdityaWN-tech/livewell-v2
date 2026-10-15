@@ -120,14 +120,37 @@ service cloud.firestore {
 
       // ---------- voices: status and vendor ids are server-only (16.2) ----------
       match /voices/{voiceId} {
+        function validSpeed(d) {
+          return d.speed is number && d.speed >= 0.8 && d.speed <= 1.2;
+        }
+        // A library voice (T-ONB-03c): no personal data, chosen in the app.
+        // Id = the app's catalogue id; only fixed fields.
+        function validLibraryVoice(d) {
+          return d.keys().hasOnly(['kind', 'vendor_voice_id', 'status',
+                   'speed', 'style', 'created_at', 'updated_at',
+                   'schema_version'])
+            && d.kind == 'library'
+            && voiceId.matches('^lw-[a-z0-9-]{1,30}$')
+            && d.vendor_voice_id is string
+            && d.status in ['active', 'inactive']
+            && validSpeed(d)
+            && d.style in ['calm', 'energetic'];
+        }
         allow read: if isOwner(uid);
-        // The app may only change playback preferences on an existing voice.
+        // Cloned voices (self, loved one, Dr. Gokula) are created only by
+        // the server after the consent flow (spec 7.4, 16.2).
+        allow create: if isAdultOwner(uid)
+          && validLibraryVoice(request.resource.data)
+          && hasMeta(request.resource.data);
+        // Any voice: playback preferences. Library voices: also switching
+        // which one is active. Status of cloned voices stays server-only.
         allow update: if isAdultOwner(uid)
-          && onlyChanges(['speed', 'style', 'updated_at'])
-          && request.resource.data.speed is number
-          && request.resource.data.speed >= 0.8
-          && request.resource.data.speed <= 1.2;
-        allow create, delete: if false;
+          && validSpeed(request.resource.data)
+          && (onlyChanges(['speed', 'style', 'updated_at'])
+              || (resource.data.kind == 'library'
+                  && onlyChanges(['status', 'speed', 'style', 'updated_at'])
+                  && request.resource.data.status in ['active', 'inactive']));
+        allow delete: if false;
       }
 
       // ---------- assessments: saveable until completed (FR-ONB-06) ----------

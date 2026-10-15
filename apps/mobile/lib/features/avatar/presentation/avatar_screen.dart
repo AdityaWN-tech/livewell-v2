@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../account/application/account_setup.dart' show whyPath;
+import '../../account/application/account_setup.dart' show voicePath;
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../data/avatar_repository.dart';
@@ -49,10 +49,9 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
     try {
       await ref.read(avatarRepositoryProvider).save(config);
       final uid = ref.read(authServiceProvider).currentUser!.uid;
-      // TODO(T-ONB-03c): the voice step comes next.
-      await ref.read(profileRepositoryProvider).setStep(uid, ProfileStep.why);
+      await ref.read(profileRepositoryProvider).setStep(uid, ProfileStep.voice);
       await ref.read(avatarDraftStoreProvider).clear();
-      if (mounted) context.go(whyPath);
+      if (mounted) context.go(voicePath);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)

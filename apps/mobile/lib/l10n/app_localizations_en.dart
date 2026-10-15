@@ -1514,4 +1514,102 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avatarBgSunshine => 'Sunshine';
+
+  @override
+  String get voiceTitle => 'Choose your coach’s voice';
+
+  @override
+  String get voiceAiLabel => 'AI voice';
+
+  @override
+  String get voiceAiLabelLong => 'This is an AI voice';
+
+  @override
+  String voiceGreetingNamed(String name) {
+    return 'Hi $name, I’m your Live Well coach.';
+  }
+
+  @override
+  String get voiceGreeting => 'Hi, I’m your Live Well coach.';
+
+  @override
+  String get voicePlayAgain => 'Play again';
+
+  @override
+  String get voiceSoundsGood => 'Sounds good';
+
+  @override
+  String get voiceChooseAnother => 'Choose another voice';
+
+  @override
+  String get voiceSkip => 'Skip, use default';
+
+  @override
+  String get voiceOwnTitle => 'Use my own voice';
+
+  @override
+  String get voiceOwnSoon => 'Coming soon';
+
+  @override
+  String get voiceOwnBody =>
+      'Recording your own voice will need your consent, a short live recording in the app and a check that it’s really you. It isn’t available yet.';
+
+  @override
+  String get voiceGotIt => 'Got it';
+
+  @override
+  String get voiceLibraryTitle => 'Voice library';
+
+  @override
+  String get voiceStyle => 'Style';
+
+  @override
+  String get voiceStyleCalm => 'Calm';
+
+  @override
+  String get voiceStyleEnergetic => 'Energetic';
+
+  @override
+  String get voiceSpeed => 'Speed';
+
+  @override
+  String voiceSpeedValue(String speed) {
+    return '${speed}x';
+  }
+
+  @override
+  String voicePreview(String name) {
+    return 'Play $name';
+  }
+
+  @override
+  String get voiceUseThis => 'Use this voice';
+
+  @override
+  String get voiceAccentUs => 'US English';
+
+  @override
+  String get voiceAccentUk => 'UK English';
+
+  @override
+  String get voiceSaveError =>
+      'We couldn’t save your coach’s voice. Please try again.';
+
+  @override
+  String get voiceNameWarm => 'Warm';
+
+  @override
+  String get voiceNameBright => 'Bright';
+
+  @override
+  String get voiceNameSteady => 'Steady';
+
+  @override
+  String get voiceNameDeep => 'Deep';
+
+  @override
+  String get voiceNameGentle => 'Gentle';
+
+  @override
+  String get voiceNameClear => 'Clear';
 }

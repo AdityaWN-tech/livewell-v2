@@ -5,6 +5,8 @@ import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/data/selfie_service.dart';
 import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
+import 'package:livewell/features/voice/data/voice_repository.dart';
+import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 import 'package:livewell/features/learn/domain/portal.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
@@ -400,4 +402,42 @@ class FakePhotoSource implements PhotoSource {
     taken++;
     return path;
   }
+}
+
+/// The chosen voice, in memory.
+class FakeVoiceRepository implements VoiceRepository {
+  VoiceChoice? chosen;
+  bool fail = false;
+
+  @override
+  Future<void> choose(VoiceChoice choice) async {
+    if (fail) throw Exception('offline');
+    chosen = choice;
+  }
+}
+
+class FakeVoiceDraftStore implements VoiceDraftStore {
+  VoiceDraft? draft;
+
+  @override
+  Future<VoiceDraft?> load() async => draft;
+
+  @override
+  Future<void> save(VoiceDraft d) async => draft = d;
+
+  @override
+  Future<void> clear() async => draft = null;
+}
+
+/// Records what would have played (asset and speed).
+class FakeVoicePreviewPlayer implements VoicePreviewPlayer {
+  final played = <(String, double)>[];
+  int stops = 0;
+
+  @override
+  Future<void> play(String asset, {double speed = 1.0}) async =>
+      played.add((asset, speed));
+
+  @override
+  Future<void> stop() async => stops++;
 }

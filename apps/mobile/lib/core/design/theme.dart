@@ -117,6 +117,24 @@ abstract final class LwTheme {
         padding: const EdgeInsets.symmetric(horizontal: LwSpacing.xs),
         showCheckmark: false,
       ),
+      // Selected segment matches selected chips (sage tint).
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected) ? p.primaryTint : null,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.selected)
+                ? p.onPrimaryTint
+                : p.textPrimary,
+          ),
+          side: WidgetStatePropertyAll(BorderSide(color: p.outlineStrong)),
+          minimumSize: const WidgetStatePropertyAll(
+            Size(LwSize.minTapTarget, LwSize.minTapTarget),
+          ),
+          textStyle: WidgetStatePropertyAll(text.labelLarge),
+        ),
+      ),
       cardTheme: CardThemeData(
         color: p.surface,
         elevation: 0,

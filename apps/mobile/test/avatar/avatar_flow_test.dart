@@ -14,7 +14,7 @@ import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/avatar/presentation/avatar_creator_screen.dart';
 import 'package:livewell/features/avatar/presentation/avatar_screen.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
-import 'package:livewell/features/onboarding/presentation/why_screen.dart';
+import 'package:livewell/features/voice/presentation/voice_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
@@ -168,7 +168,7 @@ void main() {
     });
 
     for (final look in AvatarLook.values) {
-      testWidgets('pick "${look.name}", Use this: saved, then the Why', (
+      testWidgets('pick "${look.name}", Use this: saved, then the voice step', (
         tester,
       ) async {
         final h = atAvatar();
@@ -176,9 +176,9 @@ void main() {
         await tapKey(tester, 'avatar-look-${look.name}');
         await tapKey(tester, 'avatar-use');
         expect(h.avatars.saved, AvatarConfig.forLook(look));
-        expect(h.profiles.existing[uid], ProfileStep.why);
+        expect(h.profiles.existing[uid], ProfileStep.voice);
         expect(h.avatarDrafts.draft, isNull);
-        expect(find.byType(WhyScreen), findsOneWidget);
+        expect(find.byType(VoiceScreen), findsOneWidget);
       });
     }
 
@@ -187,7 +187,7 @@ void main() {
       await h.boot(tester);
       await tapKey(tester, 'avatar-skip');
       expect(h.avatars.saved, AvatarConfig.fallback);
-      expect(find.byType(WhyScreen), findsOneWidget);
+      expect(find.byType(VoiceScreen), findsOneWidget);
     });
 
     testWidgets('a save error says so and stays', (tester) async {
@@ -226,7 +226,7 @@ void main() {
       expect(h.avatars.saved!.headCovering, HeadCovering.hijab);
       expect(h.avatars.saved!.glasses, Glasses.round);
       expect(h.avatars.saved!.background, 3);
-      expect(find.byType(WhyScreen), findsOneWidget);
+      expect(find.byType(VoiceScreen), findsOneWidget);
     });
 
     testWidgets('closing the app mid-creator: it reopens with the choices', (

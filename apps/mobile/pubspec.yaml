@@ -77,6 +77,8 @@ flutter:
     - assets/brand/social/
     # Coach voice previews, fixed approved text (docs/voices.md).
     - assets/voices/
+    # Focus -> driver map (copy of content/plan, checked by a test).
+    - assets/plan/
     # Legal texts users accept (copies of content/legal, checked by a test).
     - assets/legal/
     # Red-flag rules (copy of packages/safety-rules/rules.json, checked by a test).

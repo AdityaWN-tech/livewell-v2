@@ -219,6 +219,26 @@ describe('voices (status and vendor ids server-only)', () => {
   });
 });
 
+describe('focus choices (T-ONB-03d)', () => {
+  const ref = () => doc(as(ALICE), 'users/alice');
+  const upd = (o: Record<string, unknown>) =>
+    updateDoc(ref(), { ...o, updated_at: meta().updated_at });
+
+  it('owner saves 1 or 2 known focus choices, the driver and the activity answer', async () => {
+    await seedAdult(env);
+    await assertSucceeds(upd({ focus_choices: ['move_more'], focus_driver: 'movement', activity_limited: false }));
+    await assertSucceeds(upd({ focus_choices: ['sleep_better', 'less_stress'], activity_limited: true }));
+  });
+  it('rejects none, more than 2, unknown choices and a non-bool activity answer', async () => {
+    await seedAdult(env);
+    await assertFails(upd({ focus_choices: [] }));
+    await assertFails(upd({ focus_choices: ['move_more', 'sleep_better', 'eat_better'] }));
+    await assertFails(upd({ focus_choices: ['lose_10kg'] }));
+    await assertFails(upd({ activity_limited: 'yes' }));
+    await assertFails(upd({ focus_driver: 'x'.repeat(41) }));
+  });
+});
+
 describe('library voices (T-ONB-03c: chosen in the app)', () => {
   const lib = (o: Record<string, unknown> = {}) => ({
     kind: 'library', vendor_voice_id: 'kokoro:af_heart', status: 'active', speed: 1, style: 'calm', ...meta(), ...o,

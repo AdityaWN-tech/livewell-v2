@@ -2931,6 +2931,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get voiceNameClear;
+
+  /// No description provided for @onbCheckinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First, a quick check-in'**
+  String get onbCheckinTitle;
+
+  /// No description provided for @onbCheckinBody.
+  ///
+  /// In en, this message translates to:
+  /// **'How are you feeling today? It takes about 30 seconds and helps your coach plan a kind first week.'**
+  String get onbCheckinBody;
+
+  /// No description provided for @onbCheckinStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start check-in'**
+  String get onbCheckinStart;
+
+  /// No description provided for @onbCheckinSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip the check-in'**
+  String get onbCheckinSkip;
+
+  /// No description provided for @focusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to work on this week?'**
+  String get focusTitle;
+
+  /// No description provided for @focusBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick one. You can add a second if you like.'**
+  String get focusBody;
+
+  /// No description provided for @focusMoveMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Move more'**
+  String get focusMoveMore;
+
+  /// No description provided for @focusSleepBetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep better'**
+  String get focusSleepBetter;
+
+  /// No description provided for @focusEatBetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Eat better'**
+  String get focusEatBetter;
+
+  /// No description provided for @focusLessStress.
+  ///
+  /// In en, this message translates to:
+  /// **'Feel less stressed'**
+  String get focusLessStress;
+
+  /// No description provided for @focusMoreEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'More energy'**
+  String get focusMoreEnergy;
+
+  /// No description provided for @focusHealthyRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a healthy routine'**
+  String get focusHealthyRoutine;
+
+  /// No description provided for @focusFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'1st'**
+  String get focusFirst;
+
+  /// No description provided for @focusSecond.
+  ///
+  /// In en, this message translates to:
+  /// **'2nd'**
+  String get focusSecond;
+
+  /// No description provided for @focusFirstLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, first choice'**
+  String focusFirstLabel(String name);
+
+  /// No description provided for @focusSecondLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, second choice'**
+  String focusSecondLabel(String name);
+
+  /// No description provided for @focusFull.
+  ///
+  /// In en, this message translates to:
+  /// **'You’ve picked two. Tap one to remove it first.'**
+  String get focusFull;
+
+  /// No description provided for @focusContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get focusContinue;
+
+  /// No description provided for @focusSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t save your choice. Please try again.'**
+  String get focusSaveError;
+
+  /// No description provided for @activityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Before we plan any movement'**
+  String get activityTitle;
+
+  /// No description provided for @activityQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you have chest pain, fainting or severe breathlessness, or has a doctor or nurse told you to limit your activity?'**
+  String get activityQuestion;
+
+  /// No description provided for @activityYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get activityYes;
+
+  /// No description provided for @activityNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get activityNo;
+
+  /// No description provided for @activityLimitedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to your clinician first'**
+  String get activityLimitedTitle;
+
+  /// No description provided for @activityLimitedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check with your doctor or nurse before starting new exercise. For now, your plan will focus on sleep, stress, food and routine, with no exercise. You can change this later in Settings.'**
+  String get activityLimitedBody;
+
+  /// No description provided for @activityLimitedNow.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have chest pain, fainting or trouble breathing right now, get help now.'**
+  String get activityLimitedNow;
+
+  /// No description provided for @activityContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get activityContinue;
 }
 
 class _AppLocalizationsDelegate

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/checkin/presentation/checkin_sheet.dart';
+import 'package:livewell/features/focus/presentation/focus_screen.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
@@ -40,7 +42,7 @@ void main() {
     expect(find.byType(WhyScreen), findsOneWidget);
   });
 
-  testWidgets('type a Why, save it, and see it on Home (FR-ONB-05)', (
+  testWidgets('type a Why, save it, check in, pick a focus, see it on Home', (
     tester,
   ) async {
     final h = atWhy();
@@ -59,7 +61,16 @@ void main() {
     await tapText(tester, 'Save my Why');
 
     expect(h.profiles.whys[uid], 'Energy to play cricket with my son.');
-    expect(h.profiles.existing[uid], ProfileStep.assessment);
+    expect(h.profiles.existing[uid], ProfileStep.checkin);
+    // T-ONB-03d: the first check-in opens; closing it moves on to the focus.
+    expect(find.byType(CheckInSheet), findsOneWidget);
+    await tester.tapAt(const Offset(20, 20));
+    await tester.pumpAndSettle();
+    expect(find.byType(FocusScreen), findsOneWidget);
+    await tester.tap(find.byKey(const Key('focus-sleep_better')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('focus-continue')));
+    await tester.pumpAndSettle();
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.text('YOUR WHY'), findsOneWidget);
     expect(find.text('Energy to play cricket with my son.'), findsOneWidget);

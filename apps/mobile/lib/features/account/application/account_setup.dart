@@ -104,6 +104,8 @@ class SignInCompletion {
 String routeForProfileStep(String? step) => switch (step) {
   ProfileStep.avatar => avatarPath,
   ProfileStep.voice => voicePath,
+  ProfileStep.checkin => checkinPath,
+  ProfileStep.focus => focusPath,
   ProfileStep.why => whyPath,
   _ => '/home',
 };
@@ -111,6 +113,8 @@ String routeForProfileStep(String? step) => switch (step) {
 const whyPath = '/onboarding/why';
 const avatarPath = '/onboarding/avatar';
 const voicePath = '/onboarding/voice';
+const checkinPath = '/onboarding/checkin';
+const focusPath = '/onboarding/focus';
 
 final signInCompletionProvider = Provider<SignInCompletion>(
   SignInCompletion.new,

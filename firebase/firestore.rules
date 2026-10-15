@@ -60,7 +60,23 @@ service cloud.firestore {
       function clientProfileKeys() {
         return ['display_name', 'email', 'tz', 'locale', 'region',
                 'age_confirmed', 'onboarding_step', 'focus_driver',
+                'focus_choices', 'activity_limited',
                 'why_statement', 'created_at', 'updated_at', 'schema_version'];
+      }
+
+      // "What would you like to work on this week?" (T-ONB-03d): 1 or 2 of
+      // the fixed choices; activity_limited from the FR-GOL-03 check.
+      function validFocus(d) {
+        return (!('focus_choices' in d)
+                || (d.focus_choices is list
+                    && d.focus_choices.size() >= 1
+                    && d.focus_choices.size() <= 2
+                    && d.focus_choices.hasOnly(['move_more', 'sleep_better',
+                         'eat_better', 'less_stress', 'more_energy',
+                         'healthy_routine'])))
+          && (!('focus_driver' in d)
+              || (d.focus_driver is string && d.focus_driver.size() <= 40))
+          && (!('activity_limited' in d) || d.activity_limited is bool);
       }
 
       // The personal Why (FR-ONB-05) is short free text.
@@ -74,11 +90,13 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(clientProfileKeys())
         && request.resource.data.age_confirmed == true
         && validWhy(request.resource.data)
+        && validFocus(request.resource.data)
         && hasMeta(request.resource.data);
       allow update: if isOwner(uid)
         && onlyChanges(clientProfileKeys())
         && request.resource.data.age_confirmed == true
         && validWhy(request.resource.data)
+        && validFocus(request.resource.data)
         && request.resource.data.updated_at is timestamp;
       // Account deletion runs on the server (FR-SET-02).
       allow delete: if false;

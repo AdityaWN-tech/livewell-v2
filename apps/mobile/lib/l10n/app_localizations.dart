@@ -2751,6 +2751,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sunshine'**
   String get avatarBgSunshine;
+
+  /// No description provided for @voiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your coach’s voice'**
+  String get voiceTitle;
+
+  /// No description provided for @voiceAiLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AI voice'**
+  String get voiceAiLabel;
+
+  /// No description provided for @voiceAiLabelLong.
+  ///
+  /// In en, this message translates to:
+  /// **'This is an AI voice'**
+  String get voiceAiLabelLong;
+
+  /// No description provided for @voiceGreetingNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi {name}, I’m your Live Well coach.'**
+  String voiceGreetingNamed(String name);
+
+  /// No description provided for @voiceGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, I’m your Live Well coach.'**
+  String get voiceGreeting;
+
+  /// No description provided for @voicePlayAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Play again'**
+  String get voicePlayAgain;
+
+  /// No description provided for @voiceSoundsGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds good'**
+  String get voiceSoundsGood;
+
+  /// No description provided for @voiceChooseAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another voice'**
+  String get voiceChooseAnother;
+
+  /// No description provided for @voiceSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip, use default'**
+  String get voiceSkip;
+
+  /// No description provided for @voiceOwnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my own voice'**
+  String get voiceOwnTitle;
+
+  /// No description provided for @voiceOwnSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get voiceOwnSoon;
+
+  /// No description provided for @voiceOwnBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording your own voice will need your consent, a short live recording in the app and a check that it’s really you. It isn’t available yet.'**
+  String get voiceOwnBody;
+
+  /// No description provided for @voiceGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get voiceGotIt;
+
+  /// No description provided for @voiceLibraryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice library'**
+  String get voiceLibraryTitle;
+
+  /// No description provided for @voiceStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Style'**
+  String get voiceStyle;
+
+  /// No description provided for @voiceStyleCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get voiceStyleCalm;
+
+  /// No description provided for @voiceStyleEnergetic.
+  ///
+  /// In en, this message translates to:
+  /// **'Energetic'**
+  String get voiceStyleEnergetic;
+
+  /// No description provided for @voiceSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get voiceSpeed;
+
+  /// No description provided for @voiceSpeedValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{speed}x'**
+  String voiceSpeedValue(String speed);
+
+  /// No description provided for @voicePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Play {name}'**
+  String voicePreview(String name);
+
+  /// No description provided for @voiceUseThis.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this voice'**
+  String get voiceUseThis;
+
+  /// No description provided for @voiceAccentUs.
+  ///
+  /// In en, this message translates to:
+  /// **'US English'**
+  String get voiceAccentUs;
+
+  /// No description provided for @voiceAccentUk.
+  ///
+  /// In en, this message translates to:
+  /// **'UK English'**
+  String get voiceAccentUk;
+
+  /// No description provided for @voiceSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t save your coach’s voice. Please try again.'**
+  String get voiceSaveError;
+
+  /// No description provided for @voiceNameWarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm'**
+  String get voiceNameWarm;
+
+  /// No description provided for @voiceNameBright.
+  ///
+  /// In en, this message translates to:
+  /// **'Bright'**
+  String get voiceNameBright;
+
+  /// No description provided for @voiceNameSteady.
+  ///
+  /// In en, this message translates to:
+  /// **'Steady'**
+  String get voiceNameSteady;
+
+  /// No description provided for @voiceNameDeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep'**
+  String get voiceNameDeep;
+
+  /// No description provided for @voiceNameGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle'**
+  String get voiceNameGentle;
+
+  /// No description provided for @voiceNameClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get voiceNameClear;
 }
 
 class _AppLocalizationsDelegate

@@ -801,5 +801,56 @@
   "avatarBgCream": "Cream",
   "avatarBgSky": "Sky",
   "avatarBgLavender": "Lavender",
-  "avatarBgSunshine": "Sunshine"
+  "avatarBgSunshine": "Sunshine",
+  "voiceTitle": "Choose your coach’s voice",
+  "voiceAiLabel": "AI voice",
+  "voiceAiLabelLong": "This is an AI voice",
+  "voiceGreetingNamed": "Hi {name}, I’m your Live Well coach.",
+  "@voiceGreetingNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceGreeting": "Hi, I’m your Live Well coach.",
+  "voicePlayAgain": "Play again",
+  "voiceSoundsGood": "Sounds good",
+  "voiceChooseAnother": "Choose another voice",
+  "voiceSkip": "Skip, use default",
+  "voiceOwnTitle": "Use my own voice",
+  "voiceOwnSoon": "Coming soon",
+  "voiceOwnBody": "Recording your own voice will need your consent, a short live recording in the app and a check that it’s really you. It isn’t available yet.",
+  "voiceGotIt": "Got it",
+  "voiceLibraryTitle": "Voice library",
+  "voiceStyle": "Style",
+  "voiceStyleCalm": "Calm",
+  "voiceStyleEnergetic": "Energetic",
+  "voiceSpeed": "Speed",
+  "voiceSpeedValue": "{speed}x",
+  "@voiceSpeedValue": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "voicePreview": "Play {name}",
+  "@voicePreview": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceUseThis": "Use this voice",
+  "voiceAccentUs": "US English",
+  "voiceAccentUk": "UK English",
+  "voiceSaveError": "We couldn’t save your coach’s voice. Please try again.",
+  "voiceNameWarm": "Warm",
+  "voiceNameBright": "Bright",
+  "voiceNameSteady": "Steady",
+  "voiceNameDeep": "Deep",
+  "voiceNameGentle": "Gentle",
+  "voiceNameClear": "Clear"
 }

@@ -20,6 +20,7 @@ import 'package:livewell/features/dev/application/preview_mode.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/data/selfie_service.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
+import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
@@ -73,6 +74,9 @@ class Harness {
   final avatars = FakeAvatarRepository();
   final avatarDrafts = FakeAvatarDraftStore();
   final photos = FakePhotoSource();
+  final voices = FakeVoiceRepository();
+  final voiceDrafts = FakeVoiceDraftStore();
+  final player = FakeVoicePreviewPlayer();
 
   /// A selfie analyzer to use instead of the real one over [photos].
   final SelfieAnalyzer? selfie;
@@ -116,6 +120,9 @@ class Harness {
           avatarRepositoryProvider.overrideWithValue(avatars),
           avatarDraftStoreProvider.overrideWithValue(avatarDrafts),
           photoSourceProvider.overrideWithValue(photos),
+          voiceRepositoryProvider.overrideWithValue(voices),
+          voiceDraftStoreProvider.overrideWithValue(voiceDrafts),
+          voicePreviewPlayerProvider.overrideWithValue(player),
           if (selfie != null) selfieAnalyzerProvider.overrideWithValue(selfie!),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(

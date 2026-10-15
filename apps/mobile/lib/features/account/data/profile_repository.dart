@@ -9,6 +9,9 @@ import '../../dev/application/preview_mode.dart';
 abstract final class ProfileStep {
   /// Create your coach (T-ONB-03b), the first step after sign-up.
   static const avatar = 'avatar';
+
+  /// Choose your coach's voice (T-ONB-03c), after the avatar.
+  static const voice = 'voice';
   static const why = 'why';
 
   /// The 8-driver assessment (T-ASM-01..03, not built yet). Until it exists,

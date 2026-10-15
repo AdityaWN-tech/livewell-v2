@@ -15,8 +15,9 @@ import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
 import '../../features/account/application/account_setup.dart'
-    show avatarPath, whyPath;
+    show avatarPath, voicePath, whyPath;
 import '../../features/avatar/presentation/avatar_screen.dart';
+import '../../features/voice/presentation/voice_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
@@ -77,6 +78,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: avatarPath,
         builder: (context, state) => const AvatarScreen(),
+      ),
+      GoRoute(
+        path: voicePath,
+        builder: (context, state) => const VoiceScreen(),
       ),
       GoRoute(path: whyPath, builder: (context, state) => const WhyScreen()),
       GoRoute(

@@ -205,14 +205,48 @@ describe('voices (status and vendor ids server-only)', () => {
     await assertSucceeds(updateDoc(doc(as(ALICE), 'users/alice/voices/v1'), { speed: 1.2, style: 'warm' }));
     await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/v1'), { speed: 2 }));
   });
-  it('cannot change status, vendor id, create or delete', async () => {
-    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/v1'), { status: 'revoked' }));
+  it('cannot change status of a cloned voice, vendor id, create clones or delete', async () => {
+    await seed(env, {
+      'users/alice/voices/c1': { kind: 'self_clone', vendor_voice_id: 'v-c1', status: 'active', speed: 1, style: 'calm', ...meta() },
+    });
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/c1'), { status: 'revoked' }));
     await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/v1'), { vendor_voice_id: 'clone' }));
     await assertFails(
       setDoc(doc(as(ALICE), 'users/alice/voices/v2'), { kind: 'self_clone', status: 'active', ...meta() }),
     );
     await assertFails(deleteDoc(doc(as(ALICE), 'users/alice/voices/v1')));
     await assertFails(getDoc(doc(as(BOB), 'users/alice/voices/v1')));
+  });
+});
+
+describe('library voices (T-ONB-03c: chosen in the app)', () => {
+  const lib = (o: Record<string, unknown> = {}) => ({
+    kind: 'library', vendor_voice_id: 'kokoro:af_heart', status: 'active', speed: 1, style: 'calm', ...meta(), ...o,
+  });
+  const ref = (id = 'lw-warm', who = ALICE) => doc(as(who), `users/alice/voices/${id}`);
+
+  it('adult owner picks a library voice, then switches the active one', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), lib()));
+    await assertSucceeds(setDoc(ref('lw-clear'), lib({ vendor_voice_id: 'kokoro:bm_george' })));
+    await assertSucceeds(updateDoc(ref(), { status: 'inactive', updated_at: meta().updated_at }));
+    await assertSucceeds(updateDoc(ref('lw-clear'), { speed: 1.2, style: 'energetic' }));
+    await assertFails(setDoc(ref('lw-gentle', BOB), lib()));
+  });
+  it('only fixed fields, catalogue ids, and speed 0.8-1.2', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref('my-voice'), lib()));
+    await assertFails(setDoc(ref(), lib({ kind: 'self_clone' })));
+    await assertFails(setDoc(ref(), lib({ consent_id: 'c1' })));
+    await assertFails(setDoc(ref(), lib({ speed: 1.5 })));
+    await assertFails(setDoc(ref(), lib({ style: 'whisper' })));
+    await assertFails(setDoc(ref(), lib({ status: 'revoked' })));
+    await assertSucceeds(setDoc(ref(), lib({ speed: 0.8 })));
+    await assertFails(updateDoc(ref(), { vendor_voice_id: 'elevenlabs:x' }));
+    await assertFails(updateDoc(ref(), { status: 'revoked' }));
+  });
+  it('nothing before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), lib()));
   });
 });
 

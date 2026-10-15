@@ -1,15 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/design/components/social_sign_in.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/firebase_auth_service.dart';
 import 'auth_copy.dart';
 
 /// Choose how to sign in (FR-ONB-01, D-02). Phone first: most current
-/// portal members use +91 phone numbers.
+/// portal members use +91 phone numbers. Google and Apple are one-tap logo
+/// buttons (T-ONB-03a): one tap signs in, or signs up if there's no account.
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
@@ -35,8 +36,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
-    // Apple sign-in is offered on iPhone (App Store rule when Google is offered).
-    final showApple = defaultTargetPlatform == TargetPlatform.iOS;
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
@@ -61,20 +60,38 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 onPressed: () => context.push('/sign-in/email'),
                 label: Text(l.signInEmail),
               ),
-              const SizedBox(height: LwSpacing.sm),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.account_circle_outlined),
-                onPressed: () => _provider(false),
-                label: Text(l.signInGoogle),
+              const SizedBox(height: LwSpacing.xl),
+              Row(
+                children: [
+                  const Expanded(child: Divider()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: LwSpacing.sm,
+                    ),
+                    child: Text(l.signInOrContinueWith, style: t.bodySmall),
+                  ),
+                  const Expanded(child: Divider()),
+                ],
               ),
-              if (showApple) ...[
-                const SizedBox(height: LwSpacing.sm),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.apple),
-                  onPressed: () => _provider(true),
-                  label: Text(l.signInApple),
-                ),
-              ],
+              const SizedBox(height: LwSpacing.md),
+              // Apple is offered wherever Google is (App Store rule 4.8):
+              // native on iOS, Firebase's web flow on Android.
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SocialSignInButton.google(
+                    key: const Key('sign-in-google'),
+                    label: l.signInGoogle,
+                    onPressed: _busy ? null : () => _provider(false),
+                  ),
+                  const SizedBox(width: LwSpacing.lg),
+                  SocialSignInButton.apple(
+                    key: const Key('sign-in-apple'),
+                    label: l.signInApple,
+                    onPressed: _busy ? null : () => _provider(true),
+                  ),
+                ],
+              ),
               if (_busy) ...[
                 const SizedBox(height: LwSpacing.lg),
                 const Center(child: CircularProgressIndicator()),

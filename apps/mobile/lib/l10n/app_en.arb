@@ -102,7 +102,7 @@
   },
   "legalLoadError": "We couldn't open this document. Please try again.",
   "signInTitle": "Sign in or create an account",
-  "signInBody": "Use your phone number, email or Google. If you already use the Live Well portal, use the same phone number or email.",
+  "signInBody": "Use your phone number, email, Google or Apple. If you already use the Live Well portal, use the same phone number or email.",
   "signInPhone": "Continue with phone",
   "signInEmail": "Continue with email",
   "signInGoogle": "Continue with Google",
@@ -688,5 +688,40 @@
   "helpNowTitle": "Get help now",
   "helpNowBody": "If you or someone else is in danger, call emergency services now. If you are struggling with how you feel, you can call or text a support line any time.",
   "helpNowEmergency": "Emergency",
-  "helpNowSupport": "Talk to someone"
+  "helpNowSupport": "Talk to someone",
+  "signInOrContinueWith": "or continue with",
+  "authErrorAccountExists": "You already have a Live Well account with this email. Sign in the way you did before (phone or email). Then we’ll offer to add this option to it.",
+  "authLinkTitle": "Add {provider} to your account?",
+  "@authLinkTitle": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "authLinkBody": "Next time you can sign in with {provider} or the way you just did. It’s the same account.",
+  "@authLinkBody": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "authLinkAdd": "Add {provider}",
+  "@authLinkAdd": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "authLinkNotNow": "Not now",
+  "authLinkDone": "{provider} is now added to your account.",
+  "@authLinkDone": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -71,6 +71,8 @@ flutter:
 
   assets:
     - assets/brand/
+    # Official Google and Apple sign-in logos (docs/brand/social/README.md).
+    - assets/brand/social/
     # Legal texts users accept (copies of content/legal, checked by a test).
     - assets/legal/
     # Red-flag rules (copy of packages/safety-rules/rules.json, checked by a test).

@@ -30,6 +30,10 @@ enum AuthFailure {
   tooManyRequests,
   network,
   methodDisabled,
+
+  /// Google or Apple found a Live Well account with the same email that
+  /// was made another way (Firebase account-exists-with-different-credential).
+  accountExists,
   cancelled,
   unknown,
 }
@@ -51,8 +55,8 @@ AuthFailure authFailureFromCode(String code) => switch (code) {
   'wrong-password' ||
   'invalid-credential' ||
   'INVALID_LOGIN_CREDENTIALS' => AuthFailure.wrongCredentials,
-  'email-already-in-use' ||
-  'account-exists-with-different-credential' => AuthFailure.emailInUse,
+  'email-already-in-use' => AuthFailure.emailInUse,
+  'account-exists-with-different-credential' => AuthFailure.accountExists,
   'weak-password' => AuthFailure.weakPassword,
   'invalid-phone-number' || 'missing-phone-number' => AuthFailure.invalidPhone,
   'invalid-verification-code' ||
@@ -140,6 +144,32 @@ String? inferRegion({String? phoneE164, String? deviceCountry}) {
   };
 }
 
+/// One-tap sign-in providers.
+enum SocialProvider {
+  google('Google'),
+  apple('Apple');
+
+  const SocialProvider(this.brandName);
+
+  /// Brand name, never translated.
+  final String brandName;
+}
+
+/// A Google or Apple sign-in that hit an existing account with the same
+/// email. Offered for linking once the person signs in the original way.
+class PendingLink {
+  const PendingLink({required this.provider, this.email});
+
+  final SocialProvider provider;
+  final String? email;
+
+  /// Only link into the account that owns the same email, never another.
+  bool matches(AuthUser user) =>
+      email != null &&
+      user.email != null &&
+      user.email!.trim().toLowerCase() == email!.trim().toLowerCase();
+}
+
 /// Sign-in operations. Firebase implementation in data/; fakes in tests.
 abstract class AuthService {
   AuthUser? get currentUser;
@@ -158,8 +188,17 @@ abstract class AuthService {
     String code,
   );
 
+  /// One tap signs in, or signs up when no account exists yet.
   Future<AuthUser> signInWithGoogle();
   Future<AuthUser> signInWithApple();
+
+  /// Set when the last Google/Apple attempt failed with
+  /// [AuthFailure.accountExists]; cleared by [clearPendingLink].
+  PendingLink? get pendingLink;
+
+  /// Adds the pending Google/Apple sign-in to the signed-in account.
+  Future<void> linkPending();
+  void clearPendingLink();
 
   Future<void> signOut();
 

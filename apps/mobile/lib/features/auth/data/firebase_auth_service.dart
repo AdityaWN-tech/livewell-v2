@@ -6,13 +6,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/auth.dart';
 
+/// Opens a provider's sign-in. Replaced in Auth-emulator tests, which can't
+/// drive a browser.
+typedef ProviderSignIn = Future<fb.UserCredential> Function(
+  fb.AuthProvider provider,
+);
+
 /// Firebase Auth implementation of [AuthService]. Google and Apple use
-/// Firebase's built-in provider flow (no extra SDK); Apple is offered on iOS
-/// only (needs the Apple Developer account, see docs/setup).
+/// Firebase's built-in provider flow (no extra SDK): native Sign in with
+/// Apple on iOS, Firebase's web OAuth flow on Android.
 class FirebaseAuthService implements AuthService {
-  FirebaseAuthService([fb.FirebaseAuth? auth]) : _injected = auth;
+  FirebaseAuthService([fb.FirebaseAuth? auth, this._providerSignIn])
+    : _injected = auth;
 
   final fb.FirebaseAuth? _injected;
+  final ProviderSignIn? _providerSignIn;
+
+  PendingLink? _pending;
+  fb.AuthCredential? _pendingCredential;
 
   /// Looked up on first use, so creating the service never needs Firebase.
   fb.FirebaseAuth get _auth => _injected ?? fb.FirebaseAuth.instance;
@@ -132,18 +143,63 @@ class FirebaseAuthService implements AuthService {
     );
   }
 
-  @override
-  Future<AuthUser> signInWithGoogle() =>
-      _guard(() => _auth.signInWithProvider(fb.GoogleAuthProvider()));
-
-  @override
-  Future<AuthUser> signInWithApple() => _guard(
-    () => _auth.signInWithProvider(
+  static fb.AuthProvider _provider(SocialProvider p) => switch (p) {
+    SocialProvider.google => fb.GoogleAuthProvider(),
+    // Apple may hide the email (private relay); that is accepted.
+    SocialProvider.apple =>
       fb.AppleAuthProvider()
         ..addScope('email')
         ..addScope('name'),
-    ),
-  );
+  };
+
+  Future<AuthUser> _social(SocialProvider p) async {
+    try {
+      final signIn = _providerSignIn ?? _auth.signInWithProvider;
+      final cred = await signIn(_provider(p));
+      return _user(cred.user!);
+    } on fb.FirebaseAuthException catch (e) {
+      if (e.code == 'account-exists-with-different-credential') {
+        _pending = PendingLink(provider: p, email: e.email);
+        _pendingCredential = e.credential;
+      }
+      throw AuthException(authFailureFromCode(e.code), e.message);
+    }
+  }
+
+  @override
+  Future<AuthUser> signInWithGoogle() => _social(SocialProvider.google);
+
+  @override
+  Future<AuthUser> signInWithApple() => _social(SocialProvider.apple);
+
+  @override
+  PendingLink? get pendingLink => _pending;
+
+  @override
+  void clearPendingLink() {
+    _pending = null;
+    _pendingCredential = null;
+  }
+
+  @override
+  Future<void> linkPending() async {
+    final pending = _pending;
+    final user = _auth.currentUser;
+    if (pending == null || user == null) return;
+    try {
+      final credential = _pendingCredential;
+      if (credential != null) {
+        await user.linkWithCredential(credential);
+      } else {
+        // Some platforms don't return the credential: ask the provider again.
+        await user.linkWithProvider(_provider(pending.provider));
+      }
+    } on fb.FirebaseAuthException catch (e) {
+      throw AuthException(authFailureFromCode(e.code), e.message);
+    } finally {
+      clearPendingLink();
+    }
+  }
 
   @override
   Future<void> signOut() => _auth.signOut();

@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:livewell/core/analytics/analytics.dart';
+import 'package:livewell/features/avatar/data/avatar_repository.dart';
+import 'package:livewell/features/avatar/data/selfie_service.dart';
+import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 import 'package:livewell/features/learn/domain/portal.dart';
@@ -164,6 +167,16 @@ class FakeProfileRepository extends ProfileRepository {
   Future<void> create(String uid, NewProfile profile) async {
     log.add('profile:$uid');
     created[uid] = profile;
+  }
+
+  @override
+  Future<void> setStep(String uid, String step) async {
+    log.add('step:$uid:$step');
+    if (existing.containsKey(uid)) {
+      existing[uid] = step;
+    } else if (created[uid] != null) {
+      existing[uid] = step;
+    }
   }
 
   @override
@@ -346,5 +359,45 @@ class FakePortalBrowser implements PortalBrowser {
   Future<bool> open(Uri url) async {
     opened.add(url);
     return works;
+  }
+}
+
+/// The saved avatar, in memory.
+class FakeAvatarRepository implements AvatarRepository {
+  AvatarConfig? saved;
+  bool fail = false;
+
+  @override
+  Future<AvatarConfig?> load() async => saved;
+
+  @override
+  Future<void> save(AvatarConfig config) async {
+    if (fail) throw Exception('offline');
+    saved = config;
+  }
+}
+
+class FakeAvatarDraftStore implements AvatarDraftStore {
+  AvatarDraft? draft;
+
+  @override
+  Future<AvatarDraft?> load() async => draft;
+
+  @override
+  Future<void> save(AvatarDraft d) async => draft = d;
+
+  @override
+  Future<void> clear() async => draft = null;
+}
+
+/// Hands back a photo file prepared by the test (or null = cancelled).
+class FakePhotoSource implements PhotoSource {
+  String? path;
+  int taken = 0;
+
+  @override
+  Future<String?> takeSelfie() async {
+    taken++;
+    return path;
   }
 }

@@ -12,6 +12,8 @@ import 'package:livewell/core/data/firestore.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/data/firebase_auth_service.dart';
+import 'package:livewell/features/avatar/data/avatar_repository.dart';
+import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
 import 'package:livewell/features/onboarding/domain/onboarding_progress.dart';
@@ -93,7 +95,7 @@ void main() {
     final profile = await db.doc('users/$uid').get();
     expect(profile.exists, isTrue);
     expect(profile['age_confirmed'], isTrue);
-    expect(profile['onboarding_step'], 'why');
+    expect(profile['onboarding_step'], 'avatar');
     if (region != null) expect(profile['region'], region);
 
     final consents = await db.collection('users/$uid/consents').get();
@@ -114,7 +116,7 @@ void main() {
     final user = await auth.createAccountWithEmail(email, 'walk-after-lunch');
 
     final next = await container.read(signInCompletionProvider).complete(user);
-    expect(next, whyPath, reason: 'new accounts write their Why next');
+    expect(next, avatarPath, reason: 'new accounts create their coach next');
     await expectAccountCreated(user.uid);
 
     // Save the Why through the real rules (FR-ONB-05); the account is then
@@ -173,7 +175,7 @@ void main() {
 
     expect(
       await container.read(signInCompletionProvider).complete(user),
-      whyPath,
+      avatarPath,
     );
     await expectAccountCreated(user.uid, region: 'IN');
   });
@@ -203,7 +205,7 @@ void main() {
     expect(user.email, 'g-$id@example.com');
     expect(
       await container.read(signInCompletionProvider).complete(user),
-      whyPath,
+      avatarPath,
     );
     await expectAccountCreated(user.uid);
   });
@@ -258,5 +260,31 @@ void main() {
       ),
     );
     expect(fb.FirebaseAuth.instance.currentUser, isNull);
+  });
+
+  testWidgets('avatar saves through the real rules, then restyles', (_) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final user = await googleAs(
+      'a-$id',
+      'a-$id@example.com',
+    ).signInWithGoogle();
+    await container.read(signInCompletionProvider).complete(user);
+    final avatars = container.read(avatarRepositoryProvider);
+
+    await avatars.save(AvatarConfig.forLook(AvatarLook.woman));
+    final first = await db.doc('users/${user.uid}/avatar/current').get();
+    expect(first['type'], 'stylized');
+    expect(first['raw_media_retained'], isFalse);
+    expect(first['style_config']['look'], 'woman');
+
+    // A second save is an update the rules allow (created_at untouched).
+    await avatars.save(
+      AvatarConfig.fallback.copyWith(skin: 9, headCovering: HeadCovering.hijab),
+    );
+    final second = await db.doc('users/${user.uid}/avatar/current').get();
+    expect(second['style_config']['skin'], 9);
+    expect(second['style_config']['head_covering'], 'hijab');
+    expect(second['created_at'], first['created_at']);
+    expect((await avatars.load())!.skin, 9);
   });
 }

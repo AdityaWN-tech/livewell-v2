@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/design/components/social_sign_in.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
+import 'package:livewell/features/avatar/presentation/avatar_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
-import 'package:livewell/features/onboarding/presentation/why_screen.dart';
 
 import '../support/app_harness.dart';
 import 'sign_in_flow_test.dart' show readyStore, tapKey;
@@ -64,13 +64,13 @@ void main() {
   });
 
   group('one tap signs in or signs up', () {
-    testWidgets('Google, new person: account created, then the Why', (
+    testWidgets('Google, new person: account created, then Create your coach', (
       tester,
     ) async {
       final h = Harness(store: readyStore());
       await h.boot(tester);
       await tapKey(tester, 'sign-in-google');
-      expect(find.byType(WhyScreen), findsOneWidget);
+      expect(find.byType(AvatarScreen), findsOneWidget);
       expect(h.profiles.created.keys, ['google:1']);
       expect(h.consents.records, hasLength(4));
     });
@@ -93,7 +93,7 @@ void main() {
       final h = Harness(store: readyStore());
       await h.boot(tester);
       await tapKey(tester, 'sign-in-apple');
-      expect(find.byType(WhyScreen), findsOneWidget);
+      expect(find.byType(AvatarScreen), findsOneWidget);
       expect(h.profiles.created['apple:1']!.email, isNull);
     });
 

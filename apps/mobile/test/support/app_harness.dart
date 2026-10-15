@@ -17,6 +17,8 @@ import 'package:livewell/features/onboarding/data/onboarding_store.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
 import 'package:livewell/features/dev/application/preview_mode.dart';
+import 'package:livewell/features/avatar/data/avatar_repository.dart';
+import 'package:livewell/features/avatar/data/selfie_service.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
 
@@ -42,6 +44,7 @@ class Harness {
     this.flags = const FeatureFlags(),
     FakeReflectionRepository? reflections,
     FakeLearnRepository? learn,
+    this.selfie,
   }) : reflections = reflections ?? FakeReflectionRepository(),
        browser = FakePortalBrowser(),
        learn = learn ?? FakeLearnRepository(now: () => defaultNow),
@@ -67,6 +70,12 @@ class Harness {
 
   final FakeReflectionRepository reflections;
   final FakeLearnRepository learn;
+  final avatars = FakeAvatarRepository();
+  final avatarDrafts = FakeAvatarDraftStore();
+  final photos = FakePhotoSource();
+
+  /// A selfie analyzer to use instead of the real one over [photos].
+  final SelfieAnalyzer? selfie;
   final FakePortalBrowser browser;
 
   /// Feature flags (Remote Config later).
@@ -104,6 +113,10 @@ class Harness {
           checkInRepositoryProvider.overrideWithValue(checkIns),
           reflectionRepositoryProvider.overrideWithValue(reflections),
           portalBrowserProvider.overrideWithValue(browser),
+          avatarRepositoryProvider.overrideWithValue(avatars),
+          avatarDraftStoreProvider.overrideWithValue(avatarDrafts),
+          photoSourceProvider.overrideWithValue(photos),
+          if (selfie != null) selfieAnalyzerProvider.overrideWithValue(selfie!),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(
             (ref) => ref.watch(previewModeProvider)

@@ -7,6 +7,8 @@ import '../../dev/application/preview_mode.dart';
 
 /// Onboarding steps after the account exists (users/{uid}.onboarding_step).
 abstract final class ProfileStep {
+  /// Create your coach (T-ONB-03b), the first step after sign-up.
+  static const avatar = 'avatar';
   static const why = 'why';
 
   /// The 8-driver assessment (T-ASM-01..03, not built yet). Until it exists,
@@ -65,6 +67,9 @@ abstract class ProfileRepository {
 
   /// Saves the personal Why and moves onboarding to [nextStep] (FR-ONB-05).
   Future<void> saveWhy(String uid, String why, {required String nextStep});
+
+  /// Moves onboarding to [step] (FR-ONB-06: resumes there).
+  Future<void> setStep(String uid, String step);
 }
 
 class NewProfile {
@@ -73,7 +78,7 @@ class NewProfile {
     this.email,
     this.locale,
     this.region,
-    this.onboardingStep = ProfileStep.why,
+    this.onboardingStep = ProfileStep.avatar,
   });
 
   final String? displayName;
@@ -122,6 +127,12 @@ class FirestoreProfileRepository extends ProfileRepository {
       'schema_version': 1,
     });
   }
+
+  @override
+  Future<void> setStep(String uid, String step) => _doc(uid).update({
+    'onboarding_step': step,
+    'updated_at': FieldValue.serverTimestamp(),
+  });
 
   @override
   Future<void> saveWhy(String uid, String why, {required String nextStep}) =>

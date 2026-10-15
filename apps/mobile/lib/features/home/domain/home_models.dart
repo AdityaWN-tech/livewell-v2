@@ -6,8 +6,8 @@ class TodayStep {
     required this.title,
     required this.reason,
     required this.minutes,
-    required this.smallerTitle,
-    required this.smallerMinutes,
+    this.smallerTitle,
+    this.smallerMinutes,
   });
 
   /// Driver label, for example "Driver 3".
@@ -15,8 +15,10 @@ class TodayStep {
   final String title;
   final String reason;
   final int minutes;
-  final String smallerTitle;
-  final int smallerMinutes;
+
+  /// Null when the step is already the smallest size.
+  final String? smallerTitle;
+  final int? smallerMinutes;
 }
 
 /// Progress for the companion milestone card.

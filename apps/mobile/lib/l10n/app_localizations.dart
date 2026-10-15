@@ -3093,6 +3093,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get activityContinue;
+
+  /// No description provided for @planPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 7 days'**
+  String get planPreviewTitle;
+
+  /// No description provided for @planPreviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One small step a day, sized to the time you have. You can change the times.'**
+  String get planPreviewBody;
+
+  /// No description provided for @planTouchpoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 3 daily moments'**
+  String get planTouchpoints;
+
+  /// No description provided for @planMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning greeting'**
+  String get planMorning;
+
+  /// No description provided for @planMidday.
+  ///
+  /// In en, this message translates to:
+  /// **'Midday nudge'**
+  String get planMidday;
+
+  /// No description provided for @planEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening reflection'**
+  String get planEvening;
+
+  /// No description provided for @planTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} at {time}. Tap to change.'**
+  String planTimeLabel(String name, String time);
+
+  /// No description provided for @planQuietHours.
+  ///
+  /// In en, this message translates to:
+  /// **'That’s during quiet hours ({start} to {end}). Please pick another time.'**
+  String planQuietHours(String start, String end);
+
+  /// No description provided for @planAlsoThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Also this week'**
+  String get planAlsoThisWeek;
+
+  /// No description provided for @planDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {n}'**
+  String planDay(int n);
+
+  /// No description provided for @planSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Short on time? {step}'**
+  String planSmaller(String step);
+
+  /// No description provided for @planGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'A gentle start today.'**
+  String get planGentle;
+
+  /// No description provided for @planStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start my plan'**
+  String get planStart;
+
+  /// No description provided for @planNotReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Your starter plan is being reviewed by our care team. Your coach will set it up soon.'**
+  String get planNotReady;
+
+  /// No description provided for @planNotReadyContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get planNotReadyContinue;
+
+  /// No description provided for @planReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get gentle reminders?'**
+  String get planReminderTitle;
+
+  /// No description provided for @planReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well can remind you three times a day: a morning hello, a midday nudge for your step and an evening check-in. Reminders never show health details, and you can turn them off any time. Your plan works without them.'**
+  String get planReminderBody;
+
+  /// No description provided for @planReminderAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow reminders'**
+  String get planReminderAllow;
+
+  /// No description provided for @planReminderNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get planReminderNotNow;
+
+  /// No description provided for @planSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t save your plan. Please try again.'**
+  String get planSaveError;
+
+  /// No description provided for @reminderChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily plan'**
+  String get reminderChannel;
+
+  /// No description provided for @reminderGreetingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get reminderGreetingTitle;
+
+  /// No description provided for @reminderGreetingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach has a hello and today’s small step for you.'**
+  String get reminderGreetingBody;
+
+  /// No description provided for @reminderNudgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for your small step'**
+  String get reminderNudgeTitle;
+
+  /// No description provided for @reminderNudgeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Live Well when you’re ready.'**
+  String get reminderNudgeBody;
+
+  /// No description provided for @reminderReflectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A moment to look back'**
+  String get reminderReflectionTitle;
+
+  /// No description provided for @reminderReflectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'What went well today?'**
+  String get reminderReflectionBody;
 }
 
 class _AppLocalizationsDelegate

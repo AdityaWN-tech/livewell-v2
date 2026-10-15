@@ -17,6 +17,9 @@ abstract final class ProfileStep {
   /// after the Why.
   static const checkin = 'checkin';
   static const focus = 'focus';
+
+  /// "Your 7 days" starter plan (T-ONB-03e), the last onboarding step.
+  static const plan = 'plan';
   static const why = 'why';
 
   /// The 8-driver assessment (T-ASM-01..03, not built yet). Until it exists,

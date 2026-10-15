@@ -13,6 +13,9 @@ import '../../checkin/domain/checkin.dart';
 import '../../checkin/presentation/checkin_sheet.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../settings/presentation/settings_screen.dart';
+import '../../starter_plan/application/plan_scheduler.dart';
+import '../../starter_plan/presentation/plan_preview_screen.dart'
+    show reminderTexts;
 import '../application/home_data.dart';
 import '../domain/home_models.dart';
 
@@ -55,6 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       onResume: () {
         ref.invalidate(todayCheckInProvider);
         _maybeAsk();
+        _followTimeZone();
       },
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeAsk());
@@ -67,6 +71,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   String get _today => localDateKey(ref.read(clockProvider)());
+
+  /// After travel, move the plan's reminders to the new time zone.
+  Future<void> _followTimeZone() async {
+    if (ref.read(authServiceProvider).currentUser == null) return;
+    try {
+      await ref
+          .read(planSchedulerProvider)
+          .rescheduleIfZoneChanged(reminderTexts(AppLocalizations.of(context)));
+    } catch (_) {
+      // Reminders are a nice-to-have; never break Home over them.
+    }
+  }
 
   /// First open of the day: ask how they feel before anything else. Once per
   /// day only; closing the sheet counts as asked.
@@ -323,7 +339,7 @@ class _StepCardState extends State<_StepCard> {
     final checkIn = widget.checkIn;
     final gentle = checkIn?.gentleDay ?? false;
     // A gentle day always gets the smaller step (FR-DLY-02, T-DLY-02).
-    final small = _smaller || gentle;
+    final small = _smaller || gentle || step?.smallerTitle == null;
 
     final String title;
     String? reason;
@@ -336,7 +352,7 @@ class _StepCardState extends State<_StepCard> {
           ? l.homeTodayStepTimed(checkIn.timeAvailable!)
           : l.homeTodayStepUntimed;
     } else {
-      title = small ? step.smallerTitle : step.title;
+      title = small ? (step.smallerTitle ?? step.title) : step.title;
       reason = gentle ? l.homeStepGentleReason : step.reason;
     }
     final onHero = t.titleLarge?.copyWith(color: p.onHeroSurface);
@@ -409,9 +425,9 @@ class _StepCardState extends State<_StepCard> {
                     icon: const Icon(Icons.check),
                     label: Text(l.homeStepDone),
                   ),
-                  if (!small)
+                  if (!small && step.smallerMinutes != null)
                     Semantics(
-                      label: l.homeStepSmallerLabel(step.smallerMinutes),
+                      label: l.homeStepSmallerLabel(step.smallerMinutes!),
                       container: true,
                       excludeSemantics: true,
                       button: true,
@@ -422,7 +438,7 @@ class _StepCardState extends State<_StepCard> {
                         ),
                         onPressed: () => setState(() => _smaller = true),
                         child: Text(
-                          l.homeStepSmaller(step.smallerMinutes),
+                          l.homeStepSmaller(step.smallerMinutes!),
                           style: const TextStyle(
                             decoration: TextDecoration.underline,
                           ),

@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/time/clock.dart';
+import '../../auth/data/firebase_auth_service.dart';
+import '../../checkin/domain/checkin.dart';
+import '../../starter_plan/data/plan_repository.dart';
+import '../../starter_plan/domain/starter_plan.dart';
 import '../../account/data/profile_repository.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
@@ -26,11 +30,32 @@ final dayNumberProvider = Provider<int?>((ref) {
 /// TODO(T-AVT-01): read the name chosen in Avatar Studio.
 final coachNameProvider = Provider<String?>((ref) => null);
 
-/// Today's next step. Null until the planner exists.
-/// TODO(T-DLY-03): read users/{uid}/daily_plans/{date}.next_step.
-final todayStepProvider = Provider<TodayStep?>(
-  (ref) => ref.watch(previewModeProvider) ? PreviewSamples.step : null,
-);
+/// Today's planned day: the starter plan (T-ONB-03e) or, later, the
+/// nightly plan, from users/{uid}/daily_plans/{date}.
+final todayPlanProvider = StreamProvider<PlanDay?>((ref) {
+  if (ref.watch(previewModeProvider) ||
+      ref.watch(authServiceProvider).currentUser == null) {
+    return Stream.value(null);
+  }
+  final today = localDateKey(ref.watch(clockProvider)());
+  return ref.watch(planRepositoryProvider).watchDay(today);
+});
+
+/// Today's next step: the plan's step; sample data in the dev preview.
+/// TODO(T-DLY-03): save Done to users/{uid}/habit_logs.
+final todayStepProvider = Provider<TodayStep?>((ref) {
+  if (ref.watch(previewModeProvider)) return PreviewSamples.step;
+  final day = ref.watch(todayPlanProvider).value;
+  if (day == null) return null;
+  return TodayStep(
+    driver: day.anchor,
+    title: day.title,
+    reason: day.reason,
+    minutes: day.minutes,
+    smallerTitle: day.smallerTitle,
+    smallerMinutes: day.smallerMinutes,
+  );
+});
 
 /// Phase progress and habits kept. Null until habits and streaks exist.
 /// TODO(T-GOL-01): compute from habits and habit_logs.

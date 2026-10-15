@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "focus": "more_energy",
+  "supporting": [
+    {
+      "id": "water_morning",
+      "title": "A glass of water when you wake up",
+      "anchor": "After you wake up",
+      "movement": false
+    },
+    {
+      "id": "daylight",
+      "title": "Step outside for some daylight",
+      "anchor": "In the morning",
+      "movement": false
+    }
+  ],
+  "days": [
+    {
+      "title": "Take a {minutes}-minute walk in daylight",
+      "reason": "Light and movement can help you feel more awake.",
+      "anchor": "In the morning",
+      "movement": true
+    },
+    {
+      "title": "Drink a glass of water and stretch gently for {minutes} minutes",
+      "reason": "Water and a gentle stretch can wake your body up.",
+      "anchor": "After you wake up",
+      "movement": true
+    },
+    {
+      "title": "Wind down for {minutes} minutes so you sleep a little earlier",
+      "reason": "Good sleep is one of the best sources of energy.",
+      "anchor": "Before bed",
+      "movement": false
+    },
+    {
+      "title": "Take a {minutes}-minute walk after lunch",
+      "reason": "A walk after a meal can help with the afternoon dip.",
+      "anchor": "After lunch",
+      "movement": true
+    },
+    {
+      "title": "Step outside for {minutes} minutes of fresh air",
+      "reason": "Fresh air can help you feel refreshed.",
+      "anchor": "In the afternoon",
+      "movement": false
+    },
+    {
+      "title": "Eat a balanced breakfast and take {minutes} minutes to enjoy it",
+      "reason": "A good breakfast can help you feel steady in the morning.",
+      "anchor": "At breakfast",
+      "movement": false
+    },
+    {
+      "title": "Take a {minutes}-minute walk and notice your energy after",
+      "reason": "Noticing what gives you energy helps you do more of it.",
+      "anchor": "After lunch",
+      "movement": true
+    }
+  ]
+}

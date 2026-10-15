@@ -60,7 +60,7 @@ service cloud.firestore {
       function clientProfileKeys() {
         return ['display_name', 'email', 'tz', 'locale', 'region',
                 'age_confirmed', 'onboarding_step', 'focus_driver',
-                'focus_choices', 'activity_limited',
+                'focus_choices', 'activity_limited', 'touchpoints',
                 'why_statement', 'created_at', 'updated_at', 'schema_version'];
       }
 
@@ -76,7 +76,17 @@ service cloud.firestore {
                          'healthy_routine'])))
           && (!('focus_driver' in d)
               || (d.focus_driver is string && d.focus_driver.size() <= 40))
-          && (!('activity_limited' in d) || d.activity_limited is bool);
+          && (!('activity_limited' in d) || d.activity_limited is bool)
+          && (!('touchpoints' in d) || validTouchpoints(d.touchpoints));
+      }
+
+      // Morning / midday / evening touchpoint times, "HH:MM" (T-ONB-03e).
+      function validTouchpoints(t) {
+        return t is map
+          && t.keys().hasOnly(['morning', 'midday', 'evening'])
+          && t.morning.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+          && t.midday.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+          && t.evening.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$');
       }
 
       // The personal Why (FR-ONB-05) is short free text.
@@ -303,9 +313,38 @@ service cloud.firestore {
       }
 
       // ---------- server-written, read-only for the app ----------
+      // Daily plans are written by the nightly job, except the rule-based
+      // 7-day starter plan (T-ONB-03e), which the app writes itself. The app
+      // can never overwrite a plan the server wrote.
       match /daily_plans/{date} {
+        function validStep(s) {
+          return s is map
+            && s.keys().hasOnly(['title', 'reason', 'anchor', 'minutes',
+                 'smaller_title', 'smaller_minutes', 'focus'])
+            && s.title is string && s.title.size() <= 160
+            && s.minutes in [2, 5, 10, 30];
+        }
+        function validStarterDay(d) {
+          return d.keys().hasOnly(['next_step', 'alternatives', 'supporting',
+                   'mode', 'day_number', 'source', 'template_version',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.source == 'starter_v1'
+            && validStep(d.next_step)
+            && d.alternatives is list && d.alternatives.size() <= 2
+            && d.supporting is list && d.supporting.size() <= 2
+            && d.mode in ['normal', 'gentle']
+            && d.day_number is int && d.day_number >= 1 && d.day_number <= 7;
+        }
         allow read: if isOwner(uid);
-        allow write: if false;
+        allow create: if isAdultOwner(uid)
+          && date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && validStarterDay(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && resource.data.source == 'starter_v1'
+          && validStarterDay(request.resource.data)
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
       }
       match /messages/{messageId} {
         allow read: if isOwner(uid);

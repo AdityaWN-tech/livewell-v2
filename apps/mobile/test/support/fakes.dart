@@ -6,6 +6,10 @@ import 'package:livewell/features/avatar/data/selfie_service.dart';
 import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
+import 'package:livewell/features/starter_plan/data/plan_repository.dart';
+import 'package:livewell/features/starter_plan/data/reminders.dart';
+import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
+import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 import 'package:livewell/features/learn/domain/portal.dart';
@@ -157,6 +161,8 @@ class FakeProfileRepository extends ProfileRepository {
       region: regions[uid] ?? created[uid]?.region,
       displayName: names[uid] ?? created[uid]?.displayName,
       createdAt: createdAts[uid],
+      focusChoices: focus[uid]?.choices ?? const [],
+      activityLimited: focus[uid]?.limited,
     );
   }
 
@@ -456,4 +462,81 @@ class FakeVoicePreviewPlayer implements VoicePreviewPlayer {
 
   @override
   Future<void> stop() async => stops++;
+}
+
+/// Plan days and touchpoint times in memory.
+class FakePlanRepository implements PlanRepository {
+  final days = <String, PlanDay>{};
+  List<SupportingHabit> supporting = [];
+  TouchpointTimes times = const TouchpointTimes();
+  int saves = 0;
+  bool fail = false;
+
+  @override
+  Future<void> save(StarterPlan plan, TouchpointTimes t) async {
+    if (fail) throw Exception('offline');
+    saves++;
+    for (final d in plan.days) {
+      days[d.date] = d;
+    }
+    supporting = plan.supporting;
+    times = t;
+  }
+
+  @override
+  Future<void> saveTimes(TouchpointTimes t) async => times = t;
+
+  @override
+  Future<TouchpointTimes> loadTimes() async => times;
+
+  @override
+  Stream<PlanDay?> watchDay(String date) => Stream.value(days[date]);
+
+  @override
+  Future<List<String>> datesFrom(String from) async =>
+      (days.keys.where((d) => d.compareTo(from) >= 0).toList()..sort());
+}
+
+/// Records what would have been scheduled.
+class FakeReminders implements Reminders {
+  bool allow = true;
+  int permissionAsks = 0;
+  List<ScheduledTouchpoint> scheduled = [];
+  ReminderTexts? texts;
+  int cancels = 0;
+  String zone = 'Asia/Kolkata';
+
+  @override
+  Future<bool> requestPermission() async {
+    permissionAsks++;
+    return allow;
+  }
+
+  @override
+  Future<void> replaceAll(
+    List<ScheduledTouchpoint> items,
+    ReminderTexts t,
+  ) async {
+    scheduled = items;
+    texts = t;
+  }
+
+  @override
+  Future<void> cancelAll() async {
+    cancels++;
+    scheduled = [];
+  }
+
+  @override
+  Future<String> timeZone() async => zone;
+}
+
+class FakeReminderZoneStore implements ReminderZoneStore {
+  String? zone;
+
+  @override
+  Future<String?> load() async => zone;
+
+  @override
+  Future<void> save(String z) async => zone = z;
 }

@@ -15,6 +15,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications (scheduled reminders, T-ONB-03e).
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -80,4 +82,8 @@ flutter {
 // Warn instead of failing so those flavors still compile; bootstrap() stops them at launch.
 googleServices {
     missingGoogleServicesStrategy = com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy.WARN
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

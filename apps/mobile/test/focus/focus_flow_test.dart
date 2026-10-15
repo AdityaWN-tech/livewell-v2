@@ -11,7 +11,7 @@ import 'package:livewell/features/checkin/presentation/checkin_sheet.dart';
 import 'package:livewell/features/focus/domain/focus.dart';
 import 'package:livewell/features/focus/presentation/activity_check_screen.dart';
 import 'package:livewell/features/focus/presentation/focus_screen.dart';
-import 'package:livewell/features/home/presentation/home_screen.dart';
+import 'package:livewell/features/starter_plan/presentation/plan_preview_screen.dart';
 import 'package:livewell/features/safety/presentation/help_now_screen.dart';
 
 import '../support/app_harness.dart';
@@ -107,26 +107,30 @@ void main() {
   });
 
   group('what would you like to work on', () {
-    testWidgets('pick one (no movement): saved, no activity check, Home', (
-      tester,
-    ) async {
-      final h = at(ProfileStep.focus);
-      await h.boot(tester);
-      expect(find.text('What would you like to work on this week?'), findsOne);
-      final cont = tester.widget<FilledButton>(
-        find.byKey(const Key('focus-continue')),
-      );
-      expect(cont.onPressed, isNull, reason: 'pick at least one');
-      await tapKey(tester, 'focus-sleep_better');
-      await tapKey(tester, 'focus-continue');
-      expect(find.byType(ActivityCheckScreen), findsNothing);
-      final saved = h.profiles.focus[uid]!;
-      expect(saved.choices, ['sleep_better']);
-      expect(saved.driver, 'sleep');
-      expect(saved.limited, isNull, reason: 'not asked');
-      expect(h.profiles.existing[uid], ProfileStep.assessment);
-      expect(find.byType(HomeScreen), findsOneWidget);
-    });
+    testWidgets(
+      'pick one (no movement): saved, no activity check, then the plan',
+      (tester) async {
+        final h = at(ProfileStep.focus);
+        await h.boot(tester);
+        expect(
+          find.text('What would you like to work on this week?'),
+          findsOne,
+        );
+        final cont = tester.widget<FilledButton>(
+          find.byKey(const Key('focus-continue')),
+        );
+        expect(cont.onPressed, isNull, reason: 'pick at least one');
+        await tapKey(tester, 'focus-sleep_better');
+        await tapKey(tester, 'focus-continue');
+        expect(find.byType(ActivityCheckScreen), findsNothing);
+        final saved = h.profiles.focus[uid]!;
+        expect(saved.choices, ['sleep_better']);
+        expect(saved.driver, 'sleep');
+        expect(saved.limited, isNull, reason: 'not asked');
+        expect(h.profiles.existing[uid], ProfileStep.plan);
+        expect(find.byType(PlanPreviewScreen), findsOneWidget);
+      },
+    );
 
     testWidgets('two at most, in the order picked; tap again to remove', (
       tester,
@@ -171,7 +175,7 @@ void main() {
       final saved = h.profiles.focus[uid]!;
       expect(saved.driver, 'movement');
       expect(saved.limited, isFalse);
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(PlanPreviewScreen), findsOneWidget);
     });
 
     testWidgets('movement + "Yes": clinician guidance, help now, no exercise', (
@@ -190,7 +194,7 @@ void main() {
       await tester.pumpAndSettle();
       await tapKey(tester, 'activity-continue');
       expect(h.profiles.focus[uid]!.limited, isTrue);
-      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(PlanPreviewScreen), findsOneWidget);
     });
 
     testWidgets('back from the activity check: nothing saved, still here', (

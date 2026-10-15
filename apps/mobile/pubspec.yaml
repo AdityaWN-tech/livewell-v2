@@ -50,6 +50,9 @@ dependencies:
   firebase_analytics: ^12.6.0
   image_picker: ^1.2.4
   audioplayers: ^6.8.1
+  flutter_local_notifications: ^22.3.2
+  timezone: ^0.11.2
+  flutter_timezone: ^5.1.1
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +82,7 @@ flutter:
     - assets/voices/
     # Focus -> driver map (copy of content/plan, checked by a test).
     - assets/plan/
+    - assets/plan/templates/
     # Legal texts users accept (copies of content/legal, checked by a test).
     - assets/legal/
     # Red-flag rules (copy of packages/safety-rules/rules.json, checked by a test).

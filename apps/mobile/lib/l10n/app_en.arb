@@ -893,5 +893,66 @@
   "activityLimitedTitle": "Talk to your clinician first",
   "activityLimitedBody": "Please check with your doctor or nurse before starting new exercise. For now, your plan will focus on sleep, stress, food and routine, with no exercise. You can change this later in Settings.",
   "activityLimitedNow": "If you have chest pain, fainting or trouble breathing right now, get help now.",
-  "activityContinue": "Continue"
+  "activityContinue": "Continue",
+  "planPreviewTitle": "Your 7 days",
+  "planPreviewBody": "One small step a day, sized to the time you have. You can change the times.",
+  "planTouchpoints": "Your 3 daily moments",
+  "planMorning": "Morning greeting",
+  "planMidday": "Midday nudge",
+  "planEvening": "Evening reflection",
+  "planTimeLabel": "{name} at {time}. Tap to change.",
+  "@planTimeLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "planQuietHours": "That’s during quiet hours ({start} to {end}). Please pick another time.",
+  "@planQuietHours": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "planAlsoThisWeek": "Also this week",
+  "planDay": "Day {n}",
+  "@planDay": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "planSmaller": "Short on time? {step}",
+  "@planSmaller": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "planGentle": "A gentle start today.",
+  "planStart": "Start my plan",
+  "planNotReady": "Your starter plan is being reviewed by our care team. Your coach will set it up soon.",
+  "planNotReadyContinue": "Continue",
+  "planReminderTitle": "Get gentle reminders?",
+  "planReminderBody": "Live Well can remind you three times a day: a morning hello, a midday nudge for your step and an evening check-in. Reminders never show health details, and you can turn them off any time. Your plan works without them.",
+  "planReminderAllow": "Allow reminders",
+  "planReminderNotNow": "Not now",
+  "planSaveError": "We couldn’t save your plan. Please try again.",
+  "reminderChannel": "Daily plan",
+  "reminderGreetingTitle": "Good morning",
+  "reminderGreetingBody": "Your coach has a hello and today’s small step for you.",
+  "reminderNudgeTitle": "Time for your small step",
+  "reminderNudgeBody": "Open Live Well when you’re ready.",
+  "reminderReflectionTitle": "A moment to look back",
+  "reminderReflectionBody": "What went well today?"
 }

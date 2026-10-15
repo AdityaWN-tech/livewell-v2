@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../account/application/account_setup.dart' show planPath;
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../domain/focus.dart';
@@ -77,10 +78,9 @@ class _FocusScreenState extends ConsumerState<FocusScreen> {
             choices: [for (final f in _picked) f.id],
             driver: map.driverOf(_picked.first),
             activityLimited: limited,
-            // TODO(T-ONB-03e): the 7-day starter plan comes next.
-            nextStep: ProfileStep.assessment,
+            nextStep: ProfileStep.plan,
           );
-      if (mounted) context.go('/home');
+      if (mounted) context.go(planPath);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)

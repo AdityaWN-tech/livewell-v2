@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "focus": "move_more",
+  "supporting": [
+    {
+      "id": "water_breakfast",
+      "title": "A glass of water with breakfast",
+      "anchor": "With breakfast",
+      "movement": false
+    },
+    {
+      "id": "stand_calls",
+      "title": "Stand up during one phone call",
+      "anchor": "On a call",
+      "movement": true
+    }
+  ],
+  "days": [
+    {
+      "title": "Walk for {minutes} minutes after lunch",
+      "reason": "A short walk after a meal is an easy way to start moving more.",
+      "anchor": "After lunch",
+      "movement": true
+    },
+    {
+      "title": "Stretch gently for {minutes} minutes in the morning",
+      "reason": "Gentle stretching helps your body feel looser for the day.",
+      "anchor": "After you wake up",
+      "movement": true
+    },
+    {
+      "title": "Take a {minutes}-minute walk outside",
+      "reason": "Fresh air and a little movement can lift your mood.",
+      "anchor": "After lunch",
+      "movement": true
+    },
+    {
+      "title": "Walk for {minutes} minutes while listening to music",
+      "reason": "Music can make a walk feel easier and more fun.",
+      "anchor": "After lunch",
+      "movement": true
+    },
+    {
+      "title": "Take the stairs or walk an extra {minutes} minutes today",
+      "reason": "Small bits of movement add up over the day.",
+      "anchor": "On your way somewhere",
+      "movement": true
+    },
+    {
+      "title": "Go for a {minutes}-minute walk with someone you like",
+      "reason": "Moving with a friend or family member makes it easier to keep going.",
+      "anchor": "After dinner",
+      "movement": true
+    },
+    {
+      "title": "Walk for {minutes} minutes and notice how you feel after",
+      "reason": "Noticing how good it feels helps the habit stick.",
+      "anchor": "After lunch",
+      "movement": true
+    }
+  ]
+}

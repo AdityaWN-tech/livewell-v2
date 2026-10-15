@@ -239,6 +239,47 @@ describe('focus choices (T-ONB-03d)', () => {
   });
 });
 
+describe('starter plan (T-ONB-03e: the app writes 7 days)', () => {
+  const day = (o: Record<string, unknown> = {}) => ({
+    next_step: { title: 'Walk for 10 minutes after lunch', reason: 'r', anchor: 'After lunch', minutes: 10,
+      smaller_title: 'Walk for 5 minutes after lunch', smaller_minutes: 5, focus: 'move_more' },
+    alternatives: [], supporting: [{ id: 'water_breakfast', title: 'Water', anchor: 'With breakfast' }],
+    mode: 'normal', day_number: 1, source: 'starter_v1', template_version: 1, ...meta(), ...o,
+  });
+  const ref = (d = '2026-10-15', who = ALICE) => doc(as(who), `users/alice/daily_plans/${d}`);
+
+  it('owner writes starter days and may rewrite them (time edits)', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), day()));
+    await assertSucceeds(setDoc(ref(), day({ mode: 'gentle', updated_at: meta().updated_at })));
+    await assertSucceeds(getDoc(ref()));
+    await assertFails(deleteDoc(ref()));
+    await assertFails(setDoc(ref('2026-10-16', BOB), day()));
+  });
+  it('fixed shape: sizes, at most 2 supporting habits, days 1-7', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), day({ source: 'nightly' })));
+    await assertFails(setDoc(ref(), day({ next_step: { title: 'x', minutes: 45 } })));
+    await assertFails(setDoc(ref(), day({ supporting: [1, 2, 3] })));
+    await assertFails(setDoc(ref(), day({ day_number: 8 })));
+    await assertFails(setDoc(ref(), day({ briefing_media_url: 'x' })));
+    await assertFails(setDoc(ref('today'), day()));
+  });
+  it('never overwrites a plan the server wrote', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/daily_plans/2026-10-15': { next_step: {}, source: 'nightly', ...meta() } });
+    await assertFails(setDoc(ref(), day()));
+  });
+  it('touchpoint times on the profile are HH:MM', async () => {
+    await seedAdult(env);
+    const p = doc(as(ALICE), 'users/alice');
+    const tp = (o: Record<string, unknown> = {}) => ({ morning: '07:00', midday: '13:00', evening: '20:30', ...o });
+    await assertSucceeds(updateDoc(p, { touchpoints: tp(), updated_at: meta().updated_at }));
+    await assertFails(updateDoc(p, { touchpoints: tp({ evening: '25:00' }), updated_at: meta().updated_at }));
+    await assertFails(updateDoc(p, { touchpoints: tp({ night: '23:00' }), updated_at: meta().updated_at }));
+  });
+});
+
 describe('library voices (T-ONB-03c: chosen in the app)', () => {
   const lib = (o: Record<string, unknown> = {}) => ({
     kind: 'library', vendor_voice_id: 'kokoro:af_heart', status: 'active', speed: 1, style: 'calm', ...meta(), ...o,

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "supporting": [
+    {
+      "id": "water_meals",
+      "title": "A glass of water with each meal",
+      "anchor": "With meals",
+      "movement": false
+    },
+    {
+      "id": "gratitude",
+      "title": "Name one good thing before bed",
+      "anchor": "Before bed",
+      "movement": false
+    }
+  ],
+  "days": [
+    {
+      "title": "Do slow breathing for {minutes} minutes while sitting comfortably",
+      "reason": "Slow breathing is calming and gentle on your body.",
+      "anchor": "After lunch",
+      "movement": false
+    },
+    {
+      "title": "Wind down for {minutes} minutes before bed",
+      "reason": "A calm evening can help you sleep better.",
+      "anchor": "Before bed",
+      "movement": false
+    },
+    {
+      "title": "Spend {minutes} minutes planning a simple, healthy meal",
+      "reason": "Planning ahead makes good choices easier.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Sit by a window or outside for {minutes} minutes of daylight",
+      "reason": "Daylight can lift your mood and help your sleep.",
+      "anchor": "In the morning",
+      "movement": false
+    },
+    {
+      "title": "Call or message someone you trust for {minutes} minutes",
+      "reason": "Connecting with people is good for your health.",
+      "anchor": "In the afternoon",
+      "movement": false
+    },
+    {
+      "title": "Write down the questions for your next doctor or nurse visit for {minutes} minutes",
+      "reason": "Being ready helps you get the most from your visit.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Spend {minutes} minutes doing something calm that you enjoy",
+      "reason": "Calm, happy moments are part of living well.",
+      "anchor": "In the evening",
+      "movement": false
+    }
+  ]
+}

@@ -15,10 +15,11 @@ import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
 import '../../features/account/application/account_setup.dart'
-    show avatarPath, checkinPath, focusPath, voicePath, whyPath;
+    show avatarPath, checkinPath, focusPath, planPath, voicePath, whyPath;
 import '../../features/avatar/presentation/avatar_screen.dart';
 import '../../features/voice/presentation/voice_screen.dart';
 import '../../features/focus/presentation/focus_screen.dart';
+import '../../features/starter_plan/presentation/plan_preview_screen.dart';
 import '../../features/focus/presentation/onboarding_checkin_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
@@ -94,6 +95,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: focusPath,
         builder: (context, state) => const FocusScreen(),
+      ),
+      GoRoute(
+        path: planPath,
+        builder: (context, state) => const PlanPreviewScreen(),
       ),
       GoRoute(
         path: '/sign-in',

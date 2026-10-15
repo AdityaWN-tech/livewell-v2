@@ -1702,4 +1702,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activityContinue => 'Continue';
+
+  @override
+  String get planPreviewTitle => 'Your 7 days';
+
+  @override
+  String get planPreviewBody =>
+      'One small step a day, sized to the time you have. You can change the times.';
+
+  @override
+  String get planTouchpoints => 'Your 3 daily moments';
+
+  @override
+  String get planMorning => 'Morning greeting';
+
+  @override
+  String get planMidday => 'Midday nudge';
+
+  @override
+  String get planEvening => 'Evening reflection';
+
+  @override
+  String planTimeLabel(String name, String time) {
+    return '$name at $time. Tap to change.';
+  }
+
+  @override
+  String planQuietHours(String start, String end) {
+    return 'That’s during quiet hours ($start to $end). Please pick another time.';
+  }
+
+  @override
+  String get planAlsoThisWeek => 'Also this week';
+
+  @override
+  String planDay(int n) {
+    return 'Day $n';
+  }
+
+  @override
+  String planSmaller(String step) {
+    return 'Short on time? $step';
+  }
+
+  @override
+  String get planGentle => 'A gentle start today.';
+
+  @override
+  String get planStart => 'Start my plan';
+
+  @override
+  String get planNotReady =>
+      'Your starter plan is being reviewed by our care team. Your coach will set it up soon.';
+
+  @override
+  String get planNotReadyContinue => 'Continue';
+
+  @override
+  String get planReminderTitle => 'Get gentle reminders?';
+
+  @override
+  String get planReminderBody =>
+      'Live Well can remind you three times a day: a morning hello, a midday nudge for your step and an evening check-in. Reminders never show health details, and you can turn them off any time. Your plan works without them.';
+
+  @override
+  String get planReminderAllow => 'Allow reminders';
+
+  @override
+  String get planReminderNotNow => 'Not now';
+
+  @override
+  String get planSaveError => 'We couldn’t save your plan. Please try again.';
+
+  @override
+  String get reminderChannel => 'Daily plan';
+
+  @override
+  String get reminderGreetingTitle => 'Good morning';
+
+  @override
+  String get reminderGreetingBody =>
+      'Your coach has a hello and today’s small step for you.';
+
+  @override
+  String get reminderNudgeTitle => 'Time for your small step';
+
+  @override
+  String get reminderNudgeBody => 'Open Live Well when you’re ready.';
+
+  @override
+  String get reminderReflectionTitle => 'A moment to look back';
+
+  @override
+  String get reminderReflectionBody => 'What went well today?';
 }

@@ -3879,6 +3879,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add your name'**
   String get profileAddName;
+
+  /// No description provided for @planMapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Live Well Map'**
+  String get planMapTitle;
+
+  /// No description provided for @planMapSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'8 Drivers for a Balanced Life'**
+  String get planMapSubtitle;
+
+  /// No description provided for @planMapCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well'**
+  String get planMapCenter;
+
+  /// No description provided for @planMapEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Take your 10-minute check to fill your map.'**
+  String get planMapEmpty;
+
+  /// No description provided for @planMapDriverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {percent}% in the last 30 days. Opens details.'**
+  String planMapDriverLabel(String name, int percent);
+
+  /// No description provided for @planMapDriverLabelEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}. Opens details.'**
+  String planMapDriverLabelEmpty(String name);
+
+  /// No description provided for @planDriverBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of this driver’s steps done in the last 30 days.'**
+  String planDriverBody(int percent);
+
+  /// No description provided for @planDriverBodyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This part of your map fills in after your 10-minute check.'**
+  String get planDriverBodyEmpty;
+
+  /// No description provided for @planGoalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 30-Day Goal'**
+  String get planGoalTitle;
+
+  /// No description provided for @planGoalEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get planGoalEdit;
+
+  /// No description provided for @planGoalEditLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your 30-day goal'**
+  String get planGoalEditLabel;
+
+  /// No description provided for @planGoalDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of {total}'**
+  String planGoalDay(int day, int total);
+
+  /// No description provided for @planGoalPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String planGoalPercent(int percent);
+
+  /// No description provided for @planGoalProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of {total}, {percent}% done'**
+  String planGoalProgressLabel(int day, int total, int percent);
+
+  /// No description provided for @planGoalEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 30-day goal is set after your 10-minute check.'**
+  String get planGoalEmpty;
+
+  /// No description provided for @planGoalEditSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Changing your goal is coming soon'**
+  String get planGoalEditSoonTitle;
+
+  /// No description provided for @planGoalEditSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can change your 30-day goal here. Your coach will help you keep it small and doable.'**
+  String get planGoalEditSoonBody;
+
+  /// No description provided for @planHabitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Microhabits'**
+  String get planHabitsTitle;
+
+  /// No description provided for @planHabitMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'More options for {title}'**
+  String planHabitMenu(String title);
+
+  /// No description provided for @planHabitAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About this habit'**
+  String get planHabitAbout;
+
+  /// No description provided for @planHabitSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it smaller'**
+  String get planHabitSmaller;
+
+  /// No description provided for @planWeekTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your week'**
+  String get planWeekTitle;
+
+  /// No description provided for @planWeekOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open your week'**
+  String get planWeekOpen;
+
+  /// No description provided for @planWeekEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan’s days will show here.'**
+  String get planWeekEmpty;
+
+  /// No description provided for @planWeekToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get planWeekToday;
+
+  /// No description provided for @planFrameworkRow.
+  ///
+  /// In en, this message translates to:
+  /// **'MY GOAL DO IT framework'**
+  String get planFrameworkRow;
+
+  /// No description provided for @planFrameworkRowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 10 building blocks, one letter at a time'**
+  String get planFrameworkRowBody;
 }
 
 class _AppLocalizationsDelegate

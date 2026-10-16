@@ -2149,4 +2149,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileAddName => 'Add your name';
+
+  @override
+  String get planMapTitle => 'Your Live Well Map';
+
+  @override
+  String get planMapSubtitle => '8 Drivers for a Balanced Life';
+
+  @override
+  String get planMapCenter => 'Live Well';
+
+  @override
+  String get planMapEmpty => 'Take your 10-minute check to fill your map.';
+
+  @override
+  String planMapDriverLabel(String name, int percent) {
+    return '$name: $percent% in the last 30 days. Opens details.';
+  }
+
+  @override
+  String planMapDriverLabelEmpty(String name) {
+    return '$name. Opens details.';
+  }
+
+  @override
+  String planDriverBody(int percent) {
+    return '$percent% of this driver’s steps done in the last 30 days.';
+  }
+
+  @override
+  String get planDriverBodyEmpty =>
+      'This part of your map fills in after your 10-minute check.';
+
+  @override
+  String get planGoalTitle => 'Your 30-Day Goal';
+
+  @override
+  String get planGoalEdit => 'Edit';
+
+  @override
+  String get planGoalEditLabel => 'Edit your 30-day goal';
+
+  @override
+  String planGoalDay(int day, int total) {
+    return 'Day $day of $total';
+  }
+
+  @override
+  String planGoalPercent(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String planGoalProgressLabel(int day, int total, int percent) {
+    return 'Day $day of $total, $percent% done';
+  }
+
+  @override
+  String get planGoalEmpty =>
+      'Your 30-day goal is set after your 10-minute check.';
+
+  @override
+  String get planGoalEditSoonTitle => 'Changing your goal is coming soon';
+
+  @override
+  String get planGoalEditSoonBody =>
+      'Soon you can change your 30-day goal here. Your coach will help you keep it small and doable.';
+
+  @override
+  String get planHabitsTitle => 'Daily Microhabits';
+
+  @override
+  String planHabitMenu(String title) {
+    return 'More options for $title';
+  }
+
+  @override
+  String get planHabitAbout => 'About this habit';
+
+  @override
+  String get planHabitSmaller => 'Make it smaller';
+
+  @override
+  String get planWeekTitle => 'Your week';
+
+  @override
+  String get planWeekOpen => 'Open your week';
+
+  @override
+  String get planWeekEmpty => 'Your plan’s days will show here.';
+
+  @override
+  String get planWeekToday => 'Today';
+
+  @override
+  String get planFrameworkRow => 'MY GOAL DO IT framework';
+
+  @override
+  String get planFrameworkRowBody =>
+      'Your 10 building blocks, one letter at a time';
 }

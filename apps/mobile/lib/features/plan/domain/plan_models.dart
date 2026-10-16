@@ -70,3 +70,48 @@ abstract final class HabitLimits {
       !canAdd(habits, HabitRole.microhabit) &&
       !canAdd(habits, HabitRole.supporting);
 }
+
+/// The 30-day goal card (T-UI-02d).
+class PlanGoal {
+  const PlanGoal({
+    required this.title,
+    required this.day,
+    required this.progress,
+  });
+
+  final String title;
+
+  /// Day X of 30.
+  final int day;
+
+  /// 0..1.
+  final double progress;
+
+  static const days = 30;
+}
+
+/// One day of the week view (calendar button).
+class WeekDay {
+  const WeekDay({
+    required this.dayNumber,
+    required this.date,
+    required this.title,
+    required this.minutes,
+  });
+
+  final int dayNumber;
+
+  /// YYYY-MM-DD.
+  final String date;
+  final String title;
+  final int minutes;
+}
+
+/// One of the 8 drivers on the Live Well Map.
+class Driver {
+  const Driver({required this.index, required this.label});
+
+  /// 0..7, fixed order.
+  final int index;
+  final String label;
+}

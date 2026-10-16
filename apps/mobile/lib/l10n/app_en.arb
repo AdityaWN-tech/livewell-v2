@@ -1148,5 +1148,93 @@
   "homeNameSave": "Save",
   "homeNameNotNow": "Not now",
   "homeNameError": "Please use letters only (up to 30).",
-  "profileAddName": "Add your name"
+  "profileAddName": "Add your name",
+  "planMapTitle": "Your Live Well Map",
+  "planMapSubtitle": "8 Drivers for a Balanced Life",
+  "planMapCenter": "Live Well",
+  "planMapEmpty": "Take your 10-minute check to fill your map.",
+  "planMapDriverLabel": "{name}: {percent}% in the last 30 days. Opens details.",
+  "@planMapDriverLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "planMapDriverLabelEmpty": "{name}. Opens details.",
+  "@planMapDriverLabelEmpty": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "planDriverBody": "{percent}% of this driver’s steps done in the last 30 days.",
+  "@planDriverBody": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "planDriverBodyEmpty": "This part of your map fills in after your 10-minute check.",
+  "planGoalTitle": "Your 30-Day Goal",
+  "planGoalEdit": "Edit",
+  "planGoalEditLabel": "Edit your 30-day goal",
+  "planGoalDay": "Day {day} of {total}",
+  "@planGoalDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "planGoalPercent": "{percent}%",
+  "@planGoalPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "planGoalProgressLabel": "Day {day} of {total}, {percent}% done",
+  "@planGoalProgressLabel": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "planGoalEmpty": "Your 30-day goal is set after your 10-minute check.",
+  "planGoalEditSoonTitle": "Changing your goal is coming soon",
+  "planGoalEditSoonBody": "Soon you can change your 30-day goal here. Your coach will help you keep it small and doable.",
+  "planHabitsTitle": "Daily Microhabits",
+  "planHabitMenu": "More options for {title}",
+  "@planHabitMenu": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "planHabitAbout": "About this habit",
+  "planHabitSmaller": "Make it smaller",
+  "planWeekTitle": "Your week",
+  "planWeekOpen": "Open your week",
+  "planWeekEmpty": "Your plan’s days will show here.",
+  "planWeekToday": "Today",
+  "planFrameworkRow": "MY GOAL DO IT framework",
+  "planFrameworkRowBody": "Your 10 building blocks, one letter at a time"
 }

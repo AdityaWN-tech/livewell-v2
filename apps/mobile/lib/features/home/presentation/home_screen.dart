@@ -21,23 +21,11 @@ import '../../starter_plan/presentation/plan_preview_screen.dart'
 import '../../track/domain/track_models.dart';
 import '../../track/presentation/track_screen.dart' show streakProvider;
 import '../application/home_data.dart';
+
+export '../application/home_data.dart'
+    show canCheckInProvider, todayCheckInProvider;
 import '../data/name_prompt.dart';
 import '../domain/home_models.dart';
-
-/// True when check-ins can be saved: signed in, or the dev preview.
-final canCheckInProvider = Provider<bool>(
-  (ref) =>
-      ref.watch(previewModeProvider) ||
-      ref.watch(authServiceProvider).currentUser != null,
-);
-
-/// Today's check-in (local date), live. Re-read on resume so the day
-/// changes after midnight.
-final todayCheckInProvider = StreamProvider<CheckIn?>((ref) {
-  if (!ref.watch(canCheckInProvider)) return Stream.value(null);
-  final today = localDateKey(ref.watch(clockProvider)());
-  return ref.watch(checkInRepositoryProvider).watchDay(today);
-});
 
 /// Home tab (T-UI-02c, illustrated design): greeting header, the coach
 /// hero with a speech bubble, the Why, Today's Next Step, the 4 Quick
@@ -133,11 +121,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // Today's step: lifted here so the card and its sheet agree.
-  // TODO(T-DLY-03): save Done to users/{uid}/habit_logs.
-  bool _done = false;
-  bool _smaller = false;
-
   Future<void> _openStep(TodayStep step, CheckIn? checkIn) async {
     final result = await showModalBottomSheet<String>(
       context: context,
@@ -149,16 +132,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         reason: _stepReason(AppLocalizations.of(context), step, checkIn),
       ),
     );
-    if (!mounted) return;
-    setState(() {
-      if (result == 'done') _done = true;
-      if (result == 'smaller') _smaller = true;
-    });
+    final progress = ref.read(stepProgressActionsProvider);
+    if (result == 'done') progress.markDone();
+    if (result == 'smaller') progress.makeSmaller();
   }
 
   /// A gentle day always gets the smaller step (FR-DLY-02, T-DLY-02).
   bool _isSmall(TodayStep step, CheckIn? checkIn) =>
-      _smaller || (checkIn?.gentleDay ?? false) || step.smallerTitle == null;
+      ref.read(stepProgressProvider).smaller ||
+      (checkIn?.gentleDay ?? false) ||
+      step.smallerTitle == null;
 
   String? _stepReason(AppLocalizations l, TodayStep step, CheckIn? checkIn) {
     final reason = checkIn == null ? null : gentleReasonFor(checkIn);
@@ -199,6 +182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hour = ref.watch(clockProvider)().hour;
     final step = ref.watch(todayStepProvider);
     final gentle = checkIn?.gentleDay ?? false;
+    final progress = ref.watch(stepProgressProvider);
     // Ask once, only for a signed-in account whose profile has loaded
     // without a name (Google or Apple names are used without asking).
     final askName =
@@ -257,7 +241,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         _StepCard(
           step: step,
           checkIn: checkIn,
-          done: _done,
+          done: progress.done,
           small: step != null && _isSmall(step, checkIn),
           reason: step == null ? null : _stepReason(l, step, checkIn),
           onOpen: step == null ? null : () => _openStep(step, checkIn),

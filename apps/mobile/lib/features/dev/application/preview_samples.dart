@@ -136,4 +136,59 @@ abstract final class PreviewSamples {
       sources: ['Book, chapter 2'],
     ),
   ];
+
+  /// 30-day completion per driver, for the Live Well Map (T-UI-02d).
+  static const driverCompletion = [0.6, 0.45, 0.7, 0.3, 0.5, 0.25, 0.4, 0.35];
+
+  static const goal = PlanGoal(
+    title: 'Feel more energetic every day',
+    day: 12,
+    progress: 0.4,
+  );
+
+  /// The week ahead (calendar button), day 9 first.
+  static const week = [
+    WeekDay(
+      dayNumber: 9,
+      date: '2026-10-14',
+      title: '10-min walk after lunch',
+      minutes: 10,
+    ),
+    WeekDay(
+      dayNumber: 10,
+      date: '2026-10-15',
+      title: 'Stretch for 5 minutes after waking',
+      minutes: 5,
+    ),
+    WeekDay(
+      dayNumber: 11,
+      date: '2026-10-16',
+      title: '10-min walk after lunch',
+      minutes: 10,
+    ),
+    WeekDay(
+      dayNumber: 12,
+      date: '2026-10-17',
+      title: 'Glass of water before each meal',
+      minutes: 2,
+    ),
+    WeekDay(
+      dayNumber: 13,
+      date: '2026-10-18',
+      title: '15-min walk with a friend',
+      minutes: 10,
+    ),
+    WeekDay(
+      dayNumber: 14,
+      date: '2026-10-19',
+      title: 'A slow, easy walk',
+      minutes: 5,
+    ),
+    WeekDay(
+      dayNumber: 15,
+      date: '2026-10-20',
+      title: 'Look back on your week',
+      minutes: 5,
+    ),
+  ];
 }

@@ -532,7 +532,7 @@ class FakePlanRepository implements PlanRepository {
     if (fail) throw Exception('offline');
     saves++;
     for (final d in plan.days) {
-      days[d.date] = d;
+      days[d.date] = d.withSupporting(plan.supporting);
     }
     supporting = plan.supporting;
     times = t;

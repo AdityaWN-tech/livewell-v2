@@ -137,6 +137,16 @@ class FirestorePlanRepository implements PlanRepository {
       smallerTitle: step['smaller_title'] as String?,
       smallerMinutes: step['smaller_minutes'] as int?,
       gentle: d['mode'] == 'gentle',
+      supporting: [
+        for (final s in (d['supporting'] as List?) ?? const [])
+          if (s is Map<String, dynamic> && s['title'] is String)
+            SupportingHabit(
+              id: s['id'] as String? ?? s['title'] as String,
+              title: s['title'] as String,
+              anchor: s['anchor'] as String? ?? '',
+              movement: false,
+            ),
+      ],
     );
   }
 
@@ -158,7 +168,7 @@ class InMemoryPlanRepository implements PlanRepository {
   @override
   Future<void> save(StarterPlan plan, TouchpointTimes times) async {
     for (final d in plan.days) {
-      _days[d.date] = d;
+      _days[d.date] = d.withSupporting(plan.supporting);
     }
     _times = times;
   }

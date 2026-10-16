@@ -29,8 +29,7 @@ void main() {
           // The small phone: the sample screen is enough.
           if (phone == 'se' && state != 'preview') continue;
           final prefix = phone == 'se' ? 'home_se' : 'home';
-          final name =
-              '${prefix}_${state}_${dark ? 'dark' : 'light'}_$label';
+          final name = '${prefix}_${state}_${dark ? 'dark' : 'light'}_$label';
           testWidgets(name, (tester) async {
             tester.platformDispatcher.platformBrightnessTestValue = dark
                 ? Brightness.dark

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/time/clock.dart';
 import '../../auth/data/firebase_auth_service.dart';
+import '../../checkin/data/checkin_repository.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../starter_plan/data/plan_repository.dart';
 import '../../starter_plan/domain/starter_plan.dart';
@@ -9,6 +10,21 @@ import '../../account/data/profile_repository.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../domain/home_models.dart';
+
+/// True when check-ins can be saved: signed in, or the dev preview.
+final canCheckInProvider = Provider<bool>(
+  (ref) =>
+      ref.watch(previewModeProvider) ||
+      ref.watch(authServiceProvider).currentUser != null,
+);
+
+/// Today's check-in (local date), live. Re-read on resume so the day
+/// changes after midnight.
+final todayCheckInProvider = StreamProvider<CheckIn?>((ref) {
+  if (!ref.watch(canCheckInProvider)) return Stream.value(null);
+  final today = localDateKey(ref.watch(clockProvider)());
+  return ref.watch(checkInRepositoryProvider).watchDay(today);
+});
 
 /// The person's first name for the greeting, or null.
 final firstNameProvider = Provider<String?>((ref) {
@@ -62,4 +78,61 @@ final todayStepProvider = Provider<TodayStep?>((ref) {
 /// TODO(T-GOL-01): compute from habits and habit_logs.
 final milestoneProvider = Provider<Milestone?>(
   (ref) => ref.watch(previewModeProvider) ? PreviewSamples.milestone : null,
+);
+
+/// Done and "make it smaller" for today's step, shared by Home and Plan so
+/// both always show the same step in the same state (T-UI-02 phone bug).
+/// TODO(T-DLY-03): save Done to users/{uid}/habit_logs.
+class StepProgress {
+  const StepProgress({
+    required this.date,
+    this.done = false,
+    this.smaller = false,
+    this.doneAt,
+  });
+
+  /// Local date it applies to; another day starts fresh.
+  final String date;
+  final bool done;
+  final bool smaller;
+  final DateTime? doneAt;
+}
+
+class StepProgressNotifier extends Notifier<StepProgress> {
+  String get _today => localDateKey(ref.read(clockProvider)());
+
+  @override
+  StepProgress build() => StepProgress(date: _today);
+
+  StepProgress get _current =>
+      state.date == _today ? state : StepProgress(date: _today);
+
+  void markDone() => state = StepProgress(
+    date: _today,
+    done: true,
+    smaller: _current.smaller,
+    doneAt: ref.read(clockProvider)(),
+  );
+
+  void makeSmaller() => state = StepProgress(
+    date: _today,
+    done: _current.done,
+    smaller: true,
+    doneAt: _current.doneAt,
+  );
+}
+
+final _stepProgressStore = NotifierProvider<StepProgressNotifier, StepProgress>(
+  StepProgressNotifier.new,
+);
+
+/// Today's progress (a new day is always fresh).
+final stepProgressProvider = Provider<StepProgress>((ref) {
+  final s = ref.watch(_stepProgressStore);
+  final today = localDateKey(ref.watch(clockProvider)());
+  return s.date == today ? s : StepProgress(date: today);
+});
+
+final stepProgressActionsProvider = Provider<StepProgressNotifier>(
+  (ref) => ref.read(_stepProgressStore.notifier),
 );

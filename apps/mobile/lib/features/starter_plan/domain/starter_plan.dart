@@ -112,6 +112,7 @@ class PlanDay {
     required this.smallerTitle,
     required this.smallerMinutes,
     required this.gentle,
+    this.supporting = const [],
   });
 
   /// Local date, YYYY-MM-DD.
@@ -125,6 +126,23 @@ class PlanDay {
   final String? smallerTitle;
   final int? smallerMinutes;
   final bool gentle;
+
+  /// The plan's supporting habits (at most 2, FR-GOL-01), shown on Plan.
+  final List<SupportingHabit> supporting;
+
+  PlanDay withSupporting(List<SupportingHabit> habits) => PlanDay(
+    date: date,
+    dayNumber: dayNumber,
+    focus: focus,
+    title: title,
+    reason: reason,
+    anchor: anchor,
+    minutes: minutes,
+    smallerTitle: smallerTitle,
+    smallerMinutes: smallerMinutes,
+    gentle: gentle,
+    supporting: habits,
+  );
 }
 
 class StarterPlan {

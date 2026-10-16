@@ -17,7 +17,6 @@ import '../../consent/presentation/microphone_consent.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../../home/application/home_data.dart';
-import '../../home/presentation/home_screen.dart' show todayCheckInProvider;
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';

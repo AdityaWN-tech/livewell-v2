@@ -4215,6 +4215,179 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How was your week? Opens your weekly reflection.'**
   String get trackWeeklyLabel;
+
+  /// No description provided for @learnSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search lessons'**
+  String get learnSearch;
+
+  /// No description provided for @learnSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search lessons and audio'**
+  String get learnSearchHint;
+
+  /// No description provided for @learnSearchStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by title or topic.'**
+  String get learnSearchStart;
+
+  /// No description provided for @learnSearchEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found for “{query}”.'**
+  String learnSearchEmpty(String query);
+
+  /// No description provided for @learnFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get learnFilterAll;
+
+  /// No description provided for @learnFilterLessons.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons'**
+  String get learnFilterLessons;
+
+  /// No description provided for @learnFilterAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get learnFilterAudio;
+
+  /// No description provided for @learnFilterPrograms.
+  ///
+  /// In en, this message translates to:
+  /// **'Programs'**
+  String get learnFilterPrograms;
+
+  /// No description provided for @learnContinueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick up where you left off'**
+  String get learnContinueTitle;
+
+  /// No description provided for @learnKindLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson'**
+  String get learnKindLesson;
+
+  /// No description provided for @learnKindAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get learnKindAudio;
+
+  /// No description provided for @learnMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String learnMinutes(int minutes);
+
+  /// No description provided for @learnPercentDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% done'**
+  String learnPercentDone(int percent);
+
+  /// No description provided for @learnContinueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}. {kind}, {minutes} minutes, {percent}% done. Opens it.'**
+  String learnContinueLabel(
+    String title,
+    String kind,
+    int minutes,
+    int percent,
+  );
+
+  /// No description provided for @learnFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured Lessons'**
+  String get learnFeatured;
+
+  /// No description provided for @learnSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get learnSeeAll;
+
+  /// No description provided for @learnPopularAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular Audio Sessions'**
+  String get learnPopularAudio;
+
+  /// No description provided for @learnPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play {title}'**
+  String learnPlay(String title);
+
+  /// No description provided for @learnOpenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}. {minutes} minutes. Opens it.'**
+  String learnOpenLabel(String title, int minutes);
+
+  /// No description provided for @learnOpenLabelNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}. Opens it.'**
+  String learnOpenLabelNoTime(String title);
+
+  /// No description provided for @learnOpenSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons open here soon'**
+  String get learnOpenSoonTitle;
+
+  /// No description provided for @learnOpenSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can read the full lesson here, and save it to read offline.'**
+  String get learnOpenSoonBody;
+
+  /// No description provided for @learnAudioSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio sessions are coming soon'**
+  String get learnAudioSoonTitle;
+
+  /// No description provided for @learnAudioSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can listen here, and download sessions to listen offline.'**
+  String get learnAudioSoonBody;
+
+  /// No description provided for @learnAudioEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio sessions will show here once they are reviewed.'**
+  String get learnAudioEmpty;
+
+  /// No description provided for @learnProgramsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No programs right now'**
+  String get learnProgramsEmptyTitle;
+
+  /// No description provided for @learnProgramsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Courses from the Live Well Portal show here when one fits you.'**
+  String get learnProgramsEmptyBody;
+
+  /// No description provided for @learnGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get learnGotIt;
 }
 
 class _AppLocalizationsDelegate

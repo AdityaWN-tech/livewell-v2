@@ -13,7 +13,7 @@ import '../domain/portal.dart';
 
 /// Lessons, portal offers and the person's portal events.
 abstract class LearnRepository {
-  /// Approved lessons (content_items).
+  /// Approved lessons and audio sessions (content_items).
   Stream<List<Lesson>> watchLessons();
 
   /// Active and approved portal offers (portal_offers).
@@ -37,7 +37,7 @@ class FirestoreLearnRepository implements LearnRepository {
       .collection('content_items')
       // Must match the rules (approved only), or the query is rejected.
       .where('review_status', isEqualTo: 'approved')
-      .where('type', isEqualTo: 'lesson')
+      .where('type', whereIn: ['lesson', 'audio'])
       .snapshots()
       .map(
         (s) => [
@@ -48,6 +48,10 @@ class FirestoreLearnRepository implements LearnRepository {
               title: d.data()['title'] as String? ?? '',
               summary: d.data()['summary'] as String?,
               readMinutes: (d.data()['read_minutes'] as num?)?.toInt(),
+              kind: d.data()['type'] == 'audio'
+                  ? LessonKind.audio
+                  : LessonKind.lesson,
+              art: d.data()['art_id'] as String?,
             ),
         ],
       );

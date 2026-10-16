@@ -2358,4 +2358,111 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get trackWeeklyLabel =>
       'How was your week? Opens your weekly reflection.';
+
+  @override
+  String get learnSearch => 'Search lessons';
+
+  @override
+  String get learnSearchHint => 'Search lessons and audio';
+
+  @override
+  String get learnSearchStart => 'Search by title or topic.';
+
+  @override
+  String learnSearchEmpty(String query) {
+    return 'Nothing found for “$query”.';
+  }
+
+  @override
+  String get learnFilterAll => 'All';
+
+  @override
+  String get learnFilterLessons => 'Lessons';
+
+  @override
+  String get learnFilterAudio => 'Audio';
+
+  @override
+  String get learnFilterPrograms => 'Programs';
+
+  @override
+  String get learnContinueTitle => 'Pick up where you left off';
+
+  @override
+  String get learnKindLesson => 'Lesson';
+
+  @override
+  String get learnKindAudio => 'Audio';
+
+  @override
+  String learnMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String learnPercentDone(int percent) {
+    return '$percent% done';
+  }
+
+  @override
+  String learnContinueLabel(
+    String title,
+    String kind,
+    int minutes,
+    int percent,
+  ) {
+    return '$title. $kind, $minutes minutes, $percent% done. Opens it.';
+  }
+
+  @override
+  String get learnFeatured => 'Featured Lessons';
+
+  @override
+  String get learnSeeAll => 'See all';
+
+  @override
+  String get learnPopularAudio => 'Popular Audio Sessions';
+
+  @override
+  String learnPlay(String title) {
+    return 'Play $title';
+  }
+
+  @override
+  String learnOpenLabel(String title, int minutes) {
+    return '$title. $minutes minutes. Opens it.';
+  }
+
+  @override
+  String learnOpenLabelNoTime(String title) {
+    return '$title. Opens it.';
+  }
+
+  @override
+  String get learnOpenSoonTitle => 'Lessons open here soon';
+
+  @override
+  String get learnOpenSoonBody =>
+      'Soon you can read the full lesson here, and save it to read offline.';
+
+  @override
+  String get learnAudioSoonTitle => 'Audio sessions are coming soon';
+
+  @override
+  String get learnAudioSoonBody =>
+      'Soon you can listen here, and download sessions to listen offline.';
+
+  @override
+  String get learnAudioEmpty =>
+      'Audio sessions will show here once they are reviewed.';
+
+  @override
+  String get learnProgramsEmptyTitle => 'No programs right now';
+
+  @override
+  String get learnProgramsEmptyBody =>
+      'Courses from the Live Well Portal show here when one fits you.';
+
+  @override
+  String get learnGotIt => 'Got it';
 }

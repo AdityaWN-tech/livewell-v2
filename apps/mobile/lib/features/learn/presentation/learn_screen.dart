@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/design/components/lw_components.dart';
+import '../../../core/design/illustration/illustration.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
@@ -14,60 +15,466 @@ import '../data/learn_repository.dart';
 import '../domain/lesson.dart';
 import '../domain/portal.dart';
 
-/// Learn tab (T-UI-01e, Screen 4): one portal card when every spec 13.3
-/// check passes, then the curated library.
-class LearnScreen extends ConsumerWidget {
+/// The Learn filter chips (T-UI-02f).
+enum LearnFilter { all, lessons, audio, programs }
+
+/// Learn tab (T-UI-02f, illustrated design): search, filter chips, "Pick up
+/// where you left off", Featured Lessons (2 across), Popular Audio
+/// Sessions, and the one portal card when every spec 13.3 check passes
+/// ("Programs"). Only approved content (content_items, review_status
+/// approved) ever appears.
+class LearnScreen extends ConsumerStatefulWidget {
   const LearnScreen({super.key});
 
   static const libraryPath = '/learn/library';
+  static const searchPath = '/learn/search';
 
-  /// Lessons shown on the tab before "View all".
-  static const preview = 3;
+  /// Featured lessons and audio sessions shown in "All".
+  static const preview = 4;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LearnScreen> createState() => _LearnScreenState();
+}
+
+class _LearnScreenState extends ConsumerState<LearnScreen> {
+  LearnFilter _filter = LearnFilter.all;
+
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final p = LwPalette.of(context);
     final offer = ref.watch(portalCardProvider);
-    final lessons = ref.watch(lessonsProvider).value ?? const <Lesson>[];
-    final t = Theme.of(context).textTheme;
+    final all = ref.watch(lessonsProvider).value ?? const <Lesson>[];
+    final lessons = [
+      for (final x in all)
+        if (x.kind == LessonKind.lesson) x,
+    ];
+    final audio = [
+      for (final x in all)
+        if (x.kind == LessonKind.audio) x,
+    ];
+    final next = ref.watch(continueLessonProvider);
+    final f = _filter;
+    final showAll = f == LearnFilter.all;
+
+    final portal = offer == null
+        ? null
+        : _PortalCard(key: ValueKey(offer.id), offer: offer);
     return LwScreen(
       eyebrow: l.learnEyebrow,
       title: l.tabLearn,
+      icons: [
+        IconButton(
+          key: const Key('learn-search'),
+          tooltip: l.learnSearch,
+          onPressed: () => context.push(LearnScreen.searchPath),
+          icon: Icon(Icons.search, color: p.textPrimary),
+        ),
+      ],
       profile: const ProfileButton(),
       children: [
-        if (offer != null) ...[
-          _PortalCard(key: ValueKey(offer.id), offer: offer),
-          const SizedBox(height: LwSpacing.lg),
-        ],
         Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: LwSpacing.xs,
+          runSpacing: LwSpacing.xs,
           children: [
-            Semantics(
-              header: true,
-              child: Text(l.learnLibrary, style: t.titleSmall),
-            ),
-            if (lessons.length > preview)
-              TextButton(
-                key: const Key('learn-view-all'),
-                onPressed: () => context.push(libraryPath),
-                child: Text(l.learnViewAll(lessons.length)),
+            for (final (x, name) in [
+              (LearnFilter.all, l.learnFilterAll),
+              (LearnFilter.lessons, l.learnFilterLessons),
+              (LearnFilter.audio, l.learnFilterAudio),
+              (LearnFilter.programs, l.learnFilterPrograms),
+            ])
+              ChoiceChip(
+                key: Key('learn-filter-${x.name}'),
+                label: Text(name),
+                selected: f == x,
+                onSelected: (_) => setState(() => _filter = x),
               ),
           ],
         ),
-        const SizedBox(height: LwSpacing.xs),
-        if (lessons.isEmpty)
+        const SizedBox(height: LwSpacing.sm),
+        if (showAll && all.isEmpty && portal == null)
           LwEmptyState(
             icon: Icons.menu_book_outlined,
             title: l.learnLessonsEmptyTitle,
             body: l.learnLessonsEmptyBody,
-          )
-        else
-          for (final lesson in lessons.take(preview)) ...[
-            LessonRow(lesson),
-            const SizedBox(height: LwSpacing.sm),
-          ],
+          ),
+        if (showAll && next != null) ...[
+          LwSectionHeader(l.learnContinueTitle),
+          _ContinueCard(next),
+        ],
+        if (showAll || f == LearnFilter.lessons) ...[
+          if (lessons.isNotEmpty || f == LearnFilter.lessons)
+            _Header(
+              title: l.learnFeatured,
+              onSeeAll: showAll && lessons.length > LearnScreen.preview
+                  ? () => context.push(LearnScreen.libraryPath)
+                  : null,
+            ),
+          if (lessons.isEmpty && f == LearnFilter.lessons)
+            LwEmptyState(
+              icon: Icons.menu_book_outlined,
+              title: l.learnLessonsEmptyTitle,
+              body: l.learnLessonsEmptyBody,
+            )
+          else
+            LessonGrid(
+              showAll ? lessons.take(LearnScreen.preview).toList() : lessons,
+            ),
+        ],
+        if (showAll && portal != null) ...[
+          const SizedBox(height: LwSpacing.sectionGap),
+          portal,
+        ],
+        if (showAll || f == LearnFilter.audio) ...[
+          if (audio.isNotEmpty || f == LearnFilter.audio)
+            _Header(title: l.learnPopularAudio),
+          if (audio.isEmpty && f == LearnFilter.audio)
+            LwEmptyState(
+              icon: Icons.headphones_outlined,
+              title: l.learnPopularAudio,
+              body: l.learnAudioEmpty,
+            )
+          else
+            for (final a in showAll ? audio.take(LearnScreen.preview) : audio)
+              Padding(
+                padding: const EdgeInsets.only(bottom: LwSpacing.sm),
+                child: AudioRow(a),
+              ),
+        ],
+        if (f == LearnFilter.programs)
+          portal ??
+              LwEmptyState(
+                icon: Icons.school_outlined,
+                title: l.learnProgramsEmptyTitle,
+                body: l.learnProgramsEmptyBody,
+              ),
       ],
+    );
+  }
+}
+
+/// "Title" with an optional "See all >".
+class _Header extends StatelessWidget {
+  const _Header({required this.title, this.onSeeAll});
+
+  final String title;
+  final VoidCallback? onSeeAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: LwSpacing.lg, bottom: LwSpacing.xs),
+      child: Row(
+        children: [
+          Expanded(
+            child: Semantics(
+              header: true,
+              child: Text(title, style: t.titleMedium),
+            ),
+          ),
+          if (onSeeAll != null)
+            TextButton(
+              key: const Key('learn-view-all'),
+              onPressed: onSeeAll,
+              child: Text(l.learnSeeAll),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Lessons and audio open in the reader / player once they exist
+/// (T-LRN-01); until then a kind "coming soon".
+Future<void> openLesson(BuildContext context, Lesson lesson) {
+  final l = AppLocalizations.of(context);
+  final t = Theme.of(context).textTheme;
+  final audio = lesson.kind == LessonKind.audio;
+  return showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) => SafeArea(
+      child: SingleChildScrollView(
+        key: const Key('learn-open-soon'),
+        padding: const EdgeInsets.fromLTRB(
+          LwSpacing.lg,
+          0,
+          LwSpacing.lg,
+          LwSpacing.lg,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(lesson.title, style: t.titleLarge),
+            if (lesson.summary != null) ...[
+              const SizedBox(height: LwSpacing.xs),
+              Text(lesson.summary!, style: t.bodyMedium),
+            ],
+            const SizedBox(height: LwSpacing.md),
+            Text(
+              audio ? l.learnAudioSoonTitle : l.learnOpenSoonTitle,
+              style: t.titleSmall,
+            ),
+            Text(
+              audio ? l.learnAudioSoonBody : l.learnOpenSoonBody,
+              style: t.bodySmall,
+            ),
+            const SizedBox(height: LwSpacing.lg),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l.learnGotIt),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+String _openLabel(AppLocalizations l, Lesson x) => x.readMinutes == null
+    ? l.learnOpenLabelNoTime(x.title)
+    : l.learnOpenLabel(x.title, x.readMinutes!);
+
+/// "Pick up where you left off": a wide card with art, title, type and
+/// length, a progress bar and a play button.
+class _ContinueCard extends StatelessWidget {
+  const _ContinueCard(this.next);
+  final LessonProgress next;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final x = next.lesson;
+    final kind = x.kind == LessonKind.audio
+        ? l.learnKindAudio
+        : l.learnKindLesson;
+    final pct = (next.progress * 100).round();
+    return Semantics(
+      button: true,
+      container: true,
+      excludeSemantics: true,
+      label: l.learnContinueLabel(x.title, kind, x.readMinutes ?? 0, pct),
+      child: Material(
+        key: const Key('learn-continue'),
+        color: p.peach,
+        borderRadius: LwRadius.lgAll,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openLesson(context, x),
+          child: Padding(
+            padding: const EdgeInsets.all(LwSpacing.cardPadding),
+            child: Row(
+              children: [
+                Illustration(x.artId, width: 72, height: 72),
+                const SizedBox(width: LwSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        x.title,
+                        style: t.titleMedium?.copyWith(color: p.onTint),
+                      ),
+                      Text(
+                        x.readMinutes == null
+                            ? kind
+                            : '$kind · ${l.learnMinutes(x.readMinutes!)}',
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                      const SizedBox(height: LwSpacing.xs),
+                      ClipRRect(
+                        borderRadius: LwRadius.pillAll,
+                        child: LinearProgressIndicator(
+                          value: next.progress,
+                          minHeight: LwSpacing.xxs,
+                          color: p.accent,
+                          backgroundColor: p.surface,
+                        ),
+                      ),
+                      const SizedBox(height: LwSpacing.xxs),
+                      Text(
+                        l.learnPercentDone(pct),
+                        style: t.labelSmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.xs),
+                const _PlayDot(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayDot extends StatelessWidget {
+  const _PlayDot();
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    return Container(
+      width: LwSize.minTapTarget,
+      height: LwSize.minTapTarget,
+      decoration: BoxDecoration(color: p.primary, shape: BoxShape.circle),
+      child: Icon(Icons.play_arrow_rounded, color: p.onPrimary),
+    );
+  }
+}
+
+/// Featured lessons: illustrated cards, 2 across (1 across on small phones
+/// or with large text).
+class LessonGrid extends StatelessWidget {
+  const LessonGrid(this.lessons, {super.key});
+  final List<Lesson> lessons;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      final scale = MediaQuery.textScalerOf(context).scale(1);
+      final columns = box.maxWidth / scale >= 260 ? 2 : 1;
+      final w = (box.maxWidth - LwSpacing.sm * (columns - 1)) / columns;
+      return Wrap(
+        spacing: LwSpacing.sm,
+        runSpacing: LwSpacing.sm,
+        children: [
+          for (final x in lessons) SizedBox(width: w, child: LessonCard(x)),
+        ],
+      );
+    },
+  );
+}
+
+class LessonCard extends StatelessWidget {
+  const LessonCard(this.lesson, {super.key});
+  final Lesson lesson;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final x = lesson;
+    return Semantics(
+      button: true,
+      container: true,
+      excludeSemantics: true,
+      label: _openLabel(l, x),
+      child: Card(
+        key: Key('lesson-${x.id}'),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => openLesson(context, x),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AspectRatio(
+                aspectRatio: 4 / 3,
+                child: Illustration(
+                  x.artId,
+                  fit: BoxFit.cover,
+                  placeholderIcon: true,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(LwSpacing.sm),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(x.title, style: t.titleSmall),
+                    if (x.summary != null)
+                      Text(
+                        x.summary!,
+                        style: t.bodySmall,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (x.readMinutes != null) ...[
+                      const SizedBox(height: LwSpacing.xxs),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.schedule,
+                            size: LwSize.iconSm * 0.8,
+                            color: LwPalette.of(context).textSecondary,
+                          ),
+                          const SizedBox(width: LwSpacing.xxs),
+                          Flexible(
+                            child: Text(
+                              l.learnMinutes(x.readMinutes!),
+                              style: t.labelSmall,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// An audio session row: art, title, length and a play button.
+class AudioRow extends StatelessWidget {
+  const AudioRow(this.lesson, {super.key});
+  final Lesson lesson;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final x = lesson;
+    return Card(
+      key: Key('audio-${x.id}'),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(LwSpacing.sm),
+        child: Row(
+          children: [
+            Illustration(x.artId, width: 56, height: 56),
+            const SizedBox(width: LwSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(x.title, style: t.titleSmall),
+                  Text(
+                    x.readMinutes == null
+                        ? l.learnKindAudio
+                        : '${l.learnMinutes(x.readMinutes!)} · '
+                              '${l.learnKindAudio}',
+                    style: t.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            IconButton.filled(
+              key: Key('audio-${x.id}-play'),
+              tooltip: l.learnPlay(x.title),
+              style: IconButton.styleFrom(
+                backgroundColor: p.primary,
+                foregroundColor: p.onPrimary,
+                minimumSize: const Size.square(LwSize.minTapTarget),
+              ),
+              onPressed: () => openLesson(context, x),
+              icon: const Icon(Icons.play_arrow_rounded),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -212,72 +619,6 @@ class _PortalCardState extends ConsumerState<_PortalCard> {
             child: Text(l.learnNotNow),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// One lesson in the library list. Not tappable until the lesson reader
-/// exists (T-LRN-01).
-class LessonRow extends StatelessWidget {
-  const LessonRow(this.lesson, {super.key});
-  final Lesson lesson;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = LwPalette.of(context);
-    final t = Theme.of(context).textTheme;
-    final l = AppLocalizations.of(context);
-    return Card(
-      key: Key('lesson-${lesson.id}'),
-      child: Padding(
-        padding: const EdgeInsets.all(LwSpacing.cardPadding),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ExcludeSemantics(
-              child: Container(
-                width: LwSize.avatarSm,
-                height: LwSize.avatarSm,
-                decoration: BoxDecoration(
-                  color: p.heroSurface,
-                  borderRadius: LwRadius.smAll,
-                ),
-                child: Icon(
-                  Icons.menu_book_outlined,
-                  size: LwSize.iconSm,
-                  color: p.onHeroSurface,
-                ),
-              ),
-            ),
-            const SizedBox(width: LwSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    spacing: LwSpacing.xs,
-                    children: [
-                      Text(
-                        lesson.category.toUpperCase(),
-                        style: t.labelSmall?.copyWith(color: p.accentStrong),
-                      ),
-                      if (lesson.readMinutes != null)
-                        Text(
-                          l.learnReadTime(lesson.readMinutes!),
-                          style: t.labelSmall,
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: LwSpacing.xxs),
-                  Text(lesson.title, style: t.titleSmall),
-                  if (lesson.summary != null)
-                    Text(lesson.summary!, style: t.bodySmall),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

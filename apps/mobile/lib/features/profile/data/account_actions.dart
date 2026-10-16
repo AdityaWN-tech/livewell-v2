@@ -15,6 +15,7 @@ import '../../voice/data/voice_repository.dart';
 import '../../home/application/home_data.dart' show todayPlanProvider;
 import '../../home/presentation/home_screen.dart'
     show canCheckInProvider, todayCheckInProvider;
+import '../../home/data/name_prompt.dart';
 import '../../onboarding/data/onboarding_store.dart';
 import '../../starter_plan/data/reminders.dart';
 
@@ -124,6 +125,7 @@ class SharedPrefsLocalData implements LocalData {
     'voice_draft',
     'checkin_last_asked_day',
     'reminders_time_zone',
+    'name_prompt_asked',
   ];
 
   @override
@@ -167,6 +169,7 @@ class AccountActions {
       ..invalidate(todayPlanProvider)
       ..invalidate(canCheckInProvider)
       ..invalidate(profilePhotoProvider)
+      ..invalidate(namePromptAskedProvider)
       ..invalidate(planRepositoryProvider)
       ..invalidate(avatarRepositoryProvider)
       ..invalidate(voiceRepositoryProvider);

@@ -157,7 +157,23 @@ class FirebaseAuthService implements AuthService {
     try {
       final signIn = _providerSignIn ?? _auth.signInWithProvider;
       final cred = await signIn(_provider(p));
-      return _user(cred.user!);
+      final user = cred.user!;
+      // Apple shares the name only on the first sign-in, and Firebase
+      // doesn't copy it to the account: keep it there (T-UI-02c).
+      if ((user.displayName?.trim().isEmpty ?? true) &&
+          p == SocialProvider.apple) {
+        final given = appleGivenName(cred.additionalUserInfo?.profile);
+        if (given != null) {
+          try {
+            await user.updateDisplayName(given);
+            await user.reload();
+          } catch (_) {
+            // Best effort; the person can add a name in Profile.
+          }
+          return _user(_auth.currentUser ?? user);
+        }
+      }
+      return _user(user);
     } on fb.FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
         _pending = PendingLink(provider: p, email: e.email);
@@ -239,3 +255,17 @@ class FirebaseAuthService implements AuthService {
 final authServiceProvider = Provider<AuthService>(
   (ref) => FirebaseAuthService(),
 );
+
+/// The first name in Apple's sign-in profile, if it sent one.
+String? appleGivenName(Map<String, dynamic>? profile) {
+  final name = profile?['name'];
+  final candidates = [
+    if (name is Map) name['firstName'],
+    profile?['given_name'],
+    profile?['firstName'],
+  ];
+  for (final c in candidates) {
+    if (c is String && c.trim().isNotEmpty) return c.trim();
+  }
+  return null;
+}

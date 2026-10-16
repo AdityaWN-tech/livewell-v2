@@ -26,6 +26,7 @@ class AvatarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     image: true,
+    container: true,
     label: semanticLabel,
     excludeSemantics: true,
     child: CustomPaint(

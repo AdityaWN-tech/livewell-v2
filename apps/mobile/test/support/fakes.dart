@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:livewell/features/home/data/name_prompt.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/data/selfie_service.dart';
@@ -655,4 +656,18 @@ class FakeLocalData implements LocalData {
     pending = false;
     return p;
   }
+}
+
+/// Name prompt (T-UI-02c). Default: already asked, so tests that aren't
+/// about the name aren't interrupted by it.
+class FakeNamePromptStore implements NamePromptStore {
+  FakeNamePromptStore({this.wasAsked = true});
+
+  bool wasAsked;
+
+  @override
+  Future<bool> asked() async => wasAsked;
+
+  @override
+  Future<void> markAsked() async => wasAsked = true;
 }

@@ -145,9 +145,13 @@ class Illustration extends StatelessWidget {
     this.height,
     this.semanticLabel,
     this.fit = BoxFit.contain,
+    this.placeholderIcon = true,
   });
 
   final String id;
+
+  /// False for backgrounds: the placeholder is then just the soft shape.
+  final bool placeholderIcon;
   final double? width;
   final double? height;
 
@@ -165,7 +169,9 @@ class Illustration extends StatelessWidget {
       final file = e == null ? null : (dark ? e.fileDark ?? e.file : e.file);
       final fallback = IllustrationPlaceholder(
         tint: e?.tint ?? 'mint',
-        icon: illustrationIcons[e?.fallbackIcon] ?? Icons.eco_outlined,
+        icon: placeholderIcon
+            ? illustrationIcons[e?.fallbackIcon] ?? Icons.eco_outlined
+            : null,
         width: width,
         height: height,
       );
@@ -206,7 +212,7 @@ class IllustrationPlaceholder extends StatelessWidget {
   });
 
   final String tint;
-  final IconData icon;
+  final IconData? icon;
   final double? width;
   final double? height;
 
@@ -237,9 +243,11 @@ class IllustrationPlaceholder extends StatelessWidget {
               fill: tintOf(p, tint),
               leaf: p.accent.withValues(alpha: 0.35),
             ),
-            child: Center(
-              child: Icon(icon, size: side * 0.36, color: p.primaryDark),
-            ),
+            child: icon == null
+                ? const SizedBox.expand()
+                : Center(
+                    child: Icon(icon, size: side * 0.36, color: p.primaryDark),
+                  ),
           );
         },
       ),
@@ -257,16 +265,18 @@ class _BlobPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final r = RRect.fromRectAndRadius(
       Offset.zero & size,
-      Radius.circular(size.shortestSide * 0.3),
+      Radius.circular(
+        (size.shortestSide * 0.3).clamp(0, LwRadius.lg).toDouble(),
+      ),
     );
     canvas.drawRRect(r, Paint()..color = fill);
-    // Two small leaves in the bottom-left corner.
-    final s = size.shortestSide * 0.22;
+    // Two small leaves in the bottom-right corner (text starts on the left).
+    final s = (size.shortestSide * 0.22).clamp(0, 40).toDouble();
     final paint = Paint()..color = leaf;
     for (final (dx, angle) in [(0.0, -0.5), (s * 0.55, 0.3)]) {
       canvas
         ..save()
-        ..translate(s * 0.6 + dx, size.height - s * 0.5)
+        ..translate(size.width - s * 1.3 + dx, size.height - s * 0.5)
         ..rotate(angle)
         ..drawOval(
           Rect.fromCenter(center: Offset.zero, width: s * 0.5, height: s),

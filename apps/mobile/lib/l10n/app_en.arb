@@ -285,10 +285,10 @@
   "checkinSleep5": "Very well",
   "checkinStressQuestion": "How stressed do you feel?",
   "checkinStress1": "Not at all",
-  "checkinStress2": "A little",
-  "checkinStress3": "Some",
-  "checkinStress4": "A lot",
-  "checkinStress5": "Very",
+  "checkinStress2": "Low",
+  "checkinStress3": "Moderate",
+  "checkinStress4": "High",
+  "checkinStress5": "Very high",
   "checkinTimeQuestion": "How much time do you have today?",
   "checkinMinutes": "{minutes} min",
   "@checkinMinutes": {
@@ -1052,5 +1052,101 @@
     }
   },
   "profileDeveloper": "Developer",
-  "profileSaved": "Saved."
+  "profileSaved": "Saved.",
+  "homeGreetingMorningNamed": "Good morning, {name}!",
+  "@homeGreetingMorningNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingAfternoonNamed": "Good afternoon, {name}!",
+  "@homeGreetingAfternoonNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingEveningNamed": "Good evening, {name}!",
+  "@homeGreetingEveningNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingMorning": "Good morning!",
+  "homeGreetingAfternoon": "Good afternoon!",
+  "homeGreetingEvening": "Good evening!",
+  "homeSubtitle": "Ready for a healthier, happier you?",
+  "homeBubbleNamed": "Hi, {name}! Let's make today a good day.",
+  "@homeBubbleNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBubble": "Hi! Let's make today a good day.",
+  "homeBubbleGentleNamed": "Hi, {name}. Let's keep today gentle.",
+  "@homeBubbleGentleNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBubbleGentle": "Hi. Let's keep today gentle.",
+  "homeTagline": "Small steps. Brighter days.",
+  "homeNextStepTitle": "Today's Next Step",
+  "homeNextStepOpenLabel": "Today's next step: {title}. Opens Done and a smaller option.",
+  "@homeNextStepOpenLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "homeStepDoneShort": "Done for today",
+  "homeCheckInTitle": "Quick Check-in",
+  "homeTileMood": "Mood",
+  "homeTileEnergy": "Energy",
+  "homeTileSleep": "Sleep",
+  "homeTileStress": "Stress",
+  "homeTileEmpty": "Tap to log",
+  "homeTileSkipped": "Skipped",
+  "homeTileLabel": "{name}: {value}. Opens the check-in.",
+  "@homeTileLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "homeStreakTitle": "{days, plural, =1{1 Day Streak} other{{days} Day Streak}}",
+  "@homeStreakTitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStreakKeepGoing": "Keep going!",
+  "homeStreakEmpty": "Your streak starts with your first step.",
+  "checkinResponseGentleLowMood": "Thanks for telling me. Low days happen, and they pass. Let's keep today gentle.",
+  "checkinResponseGentleStress": "Thanks for telling me. Stress is high today, so let's keep things calm and simple.",
+  "checkinResponseGentleBoth": "Thanks for telling me. Feeling low and stressed is a lot. Let's go slowly today.",
+  "homeStepGentleLowMood": "Feeling low? A small step still counts.",
+  "homeStepGentleStress": "A calm, easy step for a stressful day.",
+  "homeStepGentleBoth": "Go easy on yourself. The smallest step is plenty.",
+  "homeNameTitle": "What should your coach call you?",
+  "homeNameSave": "Save",
+  "homeNameNotNow": "Not now",
+  "homeNameError": "Please use letters only (up to 30).",
+  "profileAddName": "Add your name"
 }

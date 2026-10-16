@@ -662,16 +662,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkinStress1 => 'Not at all';
 
   @override
-  String get checkinStress2 => 'A little';
+  String get checkinStress2 => 'Low';
 
   @override
-  String get checkinStress3 => 'Some';
+  String get checkinStress3 => 'Moderate';
 
   @override
-  String get checkinStress4 => 'A lot';
+  String get checkinStress4 => 'High';
 
   @override
-  String get checkinStress5 => 'Very';
+  String get checkinStress5 => 'Very high';
 
   @override
   String get checkinTimeQuestion => 'How much time do you have today?';
@@ -2012,4 +2012,141 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileSaved => 'Saved.';
+
+  @override
+  String homeGreetingMorningNamed(String name) {
+    return 'Good morning, $name!';
+  }
+
+  @override
+  String homeGreetingAfternoonNamed(String name) {
+    return 'Good afternoon, $name!';
+  }
+
+  @override
+  String homeGreetingEveningNamed(String name) {
+    return 'Good evening, $name!';
+  }
+
+  @override
+  String get homeGreetingMorning => 'Good morning!';
+
+  @override
+  String get homeGreetingAfternoon => 'Good afternoon!';
+
+  @override
+  String get homeGreetingEvening => 'Good evening!';
+
+  @override
+  String get homeSubtitle => 'Ready for a healthier, happier you?';
+
+  @override
+  String homeBubbleNamed(String name) {
+    return 'Hi, $name! Let\'s make today a good day.';
+  }
+
+  @override
+  String get homeBubble => 'Hi! Let\'s make today a good day.';
+
+  @override
+  String homeBubbleGentleNamed(String name) {
+    return 'Hi, $name. Let\'s keep today gentle.';
+  }
+
+  @override
+  String get homeBubbleGentle => 'Hi. Let\'s keep today gentle.';
+
+  @override
+  String get homeTagline => 'Small steps. Brighter days.';
+
+  @override
+  String get homeNextStepTitle => 'Today\'s Next Step';
+
+  @override
+  String homeNextStepOpenLabel(String title) {
+    return 'Today\'s next step: $title. Opens Done and a smaller option.';
+  }
+
+  @override
+  String get homeStepDoneShort => 'Done for today';
+
+  @override
+  String get homeCheckInTitle => 'Quick Check-in';
+
+  @override
+  String get homeTileMood => 'Mood';
+
+  @override
+  String get homeTileEnergy => 'Energy';
+
+  @override
+  String get homeTileSleep => 'Sleep';
+
+  @override
+  String get homeTileStress => 'Stress';
+
+  @override
+  String get homeTileEmpty => 'Tap to log';
+
+  @override
+  String get homeTileSkipped => 'Skipped';
+
+  @override
+  String homeTileLabel(String name, String value) {
+    return '$name: $value. Opens the check-in.';
+  }
+
+  @override
+  String homeStreakTitle(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days Day Streak',
+      one: '1 Day Streak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeStreakKeepGoing => 'Keep going!';
+
+  @override
+  String get homeStreakEmpty => 'Your streak starts with your first step.';
+
+  @override
+  String get checkinResponseGentleLowMood =>
+      'Thanks for telling me. Low days happen, and they pass. Let\'s keep today gentle.';
+
+  @override
+  String get checkinResponseGentleStress =>
+      'Thanks for telling me. Stress is high today, so let\'s keep things calm and simple.';
+
+  @override
+  String get checkinResponseGentleBoth =>
+      'Thanks for telling me. Feeling low and stressed is a lot. Let\'s go slowly today.';
+
+  @override
+  String get homeStepGentleLowMood => 'Feeling low? A small step still counts.';
+
+  @override
+  String get homeStepGentleStress => 'A calm, easy step for a stressful day.';
+
+  @override
+  String get homeStepGentleBoth =>
+      'Go easy on yourself. The smallest step is plenty.';
+
+  @override
+  String get homeNameTitle => 'What should your coach call you?';
+
+  @override
+  String get homeNameSave => 'Save';
+
+  @override
+  String get homeNameNotNow => 'Not now';
+
+  @override
+  String get homeNameError => 'Please use letters only (up to 30).';
+
+  @override
+  String get profileAddName => 'Add your name';
 }

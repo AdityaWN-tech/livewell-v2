@@ -22,7 +22,15 @@ class LwScreen extends StatelessWidget {
     this.icons = const [],
     this.profile,
     this.bottom,
+    this.subtitle,
+    this.titleIcon,
   });
+
+  /// Tab screens: a short line under the title.
+  final String? subtitle;
+
+  /// Tab screens: a small icon after the title (Home's sun or moon).
+  final Widget? titleIcon;
 
   final String title;
   final List<Widget> children;
@@ -71,6 +79,8 @@ class LwScreen extends StatelessWidget {
                         LwTabHeader(
                           eyebrow: eyebrow!,
                           title: title,
+                          subtitle: subtitle,
+                          titleIcon: titleIcon,
                           icons: icons,
                           profile: profile,
                           actions: actions,
@@ -111,10 +121,14 @@ class LwTabHeader extends StatelessWidget {
     this.icons = const [],
     this.profile,
     this.actions = const [],
+    this.subtitle,
+    this.titleIcon,
   });
 
   final String eyebrow;
   final String title;
+  final String? subtitle;
+  final Widget? titleIcon;
   final List<Widget> icons;
   final Widget? profile;
   final List<Widget> actions;
@@ -136,7 +150,25 @@ class LwTabHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(eyebrow.toUpperCase(), style: t.labelSmall),
-                    Text(title, style: t.headlineSmall),
+                    if (titleIcon == null)
+                      Text(title, style: t.headlineSmall)
+                    else
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: '$title '),
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: titleIcon!,
+                            ),
+                          ],
+                        ),
+                        style: t.headlineSmall,
+                      ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: LwSpacing.xxs),
+                      Text(subtitle!, style: t.bodyMedium),
+                    ],
                   ],
                 ),
               ),

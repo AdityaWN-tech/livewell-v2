@@ -264,7 +264,10 @@ class _WheelPainter extends CustomPainter {
       if (f != null && i < f.length) {
         // The filled part grows outwards with completion, a deeper shade.
         final r = inner + (outer - inner) * f[i].clamp(0, 1);
-        canvas.drawPath(wedge(r, i), Paint()..color = _filled(colours[i]));
+        canvas.drawPath(
+          wedge(r, i),
+          Paint()..color = LwPalette.richer(colours[i]),
+        );
       }
     }
     // White gaps between segments and the centre circle.
@@ -276,21 +279,6 @@ class _WheelPainter extends CustomPainter {
       canvas.drawLine(c, c + Offset(math.cos(a), math.sin(a)) * outer, line);
     }
     canvas.drawCircle(c, inner, Paint()..color = gap);
-  }
-
-  /// A richer shade of the same pastel: more colour, a little darker in
-  /// light mode and lighter in dark mode, so the hue stays recognisable.
-  Color _filled(Color c) {
-    final hsl = HSLColor.fromColor(c);
-    final light = hsl.lightness > 0.5;
-    return hsl
-        .withSaturation(
-          (hsl.saturation + (light ? 0.05 : 0.3)).clamp(0, 1).toDouble(),
-        )
-        .withLightness(
-          (hsl.lightness + (light ? -0.13 : 0.14)).clamp(0, 1).toDouble(),
-        )
-        .toColor();
   }
 
   @override

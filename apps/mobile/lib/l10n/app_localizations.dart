@@ -4041,6 +4041,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your 10 building blocks, one letter at a time'**
   String get planFrameworkRowBody;
+
+  /// No description provided for @trackPeriodWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get trackPeriodWeek;
+
+  /// No description provided for @trackPeriodMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get trackPeriodMonth;
+
+  /// No description provided for @trackPeriodQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'90 days'**
+  String get trackPeriodQuarter;
+
+  /// No description provided for @trackPeriodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {period}. Opens the choices.'**
+  String trackPeriodLabel(String period);
+
+  /// No description provided for @trackSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps'**
+  String get trackSteps;
+
+  /// No description provided for @trackStepsOf.
+  ///
+  /// In en, this message translates to:
+  /// **'of {goal}'**
+  String trackStepsOf(String goal);
+
+  /// No description provided for @trackConnectHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Health'**
+  String get trackConnectHealth;
+
+  /// No description provided for @trackConnectHealthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps: connect Apple Health or Health Connect. Opens details.'**
+  String get trackConnectHealthLabel;
+
+  /// No description provided for @trackHealthSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting Health is coming soon'**
+  String get trackHealthSoonTitle;
+
+  /// No description provided for @trackHealthSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can connect Apple Health or Health Connect. Your steps and sleep hours will show here, and only if you choose to share them.'**
+  String get trackHealthSoonBody;
+
+  /// No description provided for @trackSleepHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String trackSleepHours(int hours, int minutes);
+
+  /// No description provided for @trackFromCheckIns.
+  ///
+  /// In en, this message translates to:
+  /// **'From your check-ins'**
+  String get trackFromCheckIns;
+
+  /// No description provided for @trackOutOf5.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} / 5'**
+  String trackOutOf5(String value);
+
+  /// No description provided for @trackNoCheckIns.
+  ///
+  /// In en, this message translates to:
+  /// **'No check-ins yet'**
+  String get trackNoCheckIns;
+
+  /// No description provided for @trackCardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {value}. {detail}'**
+  String trackCardLabel(String name, String value, String detail);
+
+  /// No description provided for @trackProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get trackProgressTitle;
+
+  /// No description provided for @trackThisWeekLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get trackThisWeekLabel;
+
+  /// No description provided for @trackChipHabits.
+  ///
+  /// In en, this message translates to:
+  /// **'Habits'**
+  String get trackChipHabits;
+
+  /// No description provided for @trackChartBarLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: {value}'**
+  String trackChartBarLabel(String day, String value);
+
+  /// No description provided for @trackChartBarEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: nothing logged'**
+  String trackChartBarEmpty(String day);
+
+  /// No description provided for @trackChartSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}. Selected.'**
+  String trackChartSelected(String label);
+
+  /// No description provided for @trackChartStepsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Health to see your steps here.'**
+  String get trackChartStepsEmpty;
+
+  /// No description provided for @trackChartHabitsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your habits will show here once you start one.'**
+  String get trackChartHabitsEmpty;
+
+  /// No description provided for @trackChartEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in to see your week here.'**
+  String get trackChartEmpty;
+
+  /// No description provided for @trackHabitsKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} kept'**
+  String trackHabitsKept(int count);
+
+  /// No description provided for @trackWeeklyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Reflection'**
+  String get trackWeeklyTitle;
+
+  /// No description provided for @trackWeeklyQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How was your week?'**
+  String get trackWeeklyQuestion;
+
+  /// No description provided for @trackWeeklyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Celebrate your wins and set intentions for next week.'**
+  String get trackWeeklyBody;
+
+  /// No description provided for @trackWeeklyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'How was your week? Opens your weekly reflection.'**
+  String get trackWeeklyLabel;
 }
 
 class _AppLocalizationsDelegate

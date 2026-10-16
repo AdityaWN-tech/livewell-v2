@@ -73,6 +73,10 @@ class InMemoryCheckInRepository implements CheckInRepository {
     _days[checkIn.date] = checkIn;
     _changes.add(checkIn.date);
   }
+
+  @override
+  Future<List<CheckIn>> range(String from, String to) async =>
+      checkInsBetween(_days.values, from, to);
 }
 
 /// One in-memory store per app run, so preview check-ins survive tab changes.

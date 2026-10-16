@@ -4388,6 +4388,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Got it'**
   String get learnGotIt;
+
+  /// No description provided for @careTabChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get careTabChat;
+
+  /// No description provided for @careTabVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get careTabVoice;
+
+  /// No description provided for @careTabSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get careTabSaved;
+
+  /// No description provided for @careTabSafety.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety'**
+  String get careTabSafety;
+
+  /// No description provided for @careHeroBubble.
+  ///
+  /// In en, this message translates to:
+  /// **'I’m here for you. What would you like to talk about today?'**
+  String get careHeroBubble;
+
+  /// No description provided for @careHeroCalm.
+  ///
+  /// In en, this message translates to:
+  /// **'I’m glad you told me. Your safety comes first.'**
+  String get careHeroCalm;
+
+  /// No description provided for @carePrompt1.
+  ///
+  /// In en, this message translates to:
+  /// **'I feel stressed'**
+  String get carePrompt1;
+
+  /// No description provided for @carePrompt2.
+  ///
+  /// In en, this message translates to:
+  /// **'I need motivation'**
+  String get carePrompt2;
+
+  /// No description provided for @carePrompt3.
+  ///
+  /// In en, this message translates to:
+  /// **'Help me sleep better'**
+  String get carePrompt3;
+
+  /// No description provided for @carePrompt4.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan my day'**
+  String get carePrompt4;
+
+  /// No description provided for @carePromptsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Things you can ask'**
+  String get carePromptsLabel;
+
+  /// No description provided for @careReplySoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach is coming soon, so there’s no answer yet. Your message stays on this screen only.'**
+  String get careReplySoon;
+
+  /// No description provided for @careTapToSpeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to speak'**
+  String get careTapToSpeak;
+
+  /// No description provided for @careTalkSoonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Talking to your coach is coming soon'**
+  String get careTalkSoonLabel;
+
+  /// No description provided for @careResourcesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Helpful resources'**
+  String get careResourcesTitle;
+
+  /// No description provided for @careResourceFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From {source}'**
+  String careResourceFrom(String source);
+
+  /// No description provided for @careResourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, from {source}. Opens it.'**
+  String careResourceLabel(String title, String source);
+
+  /// No description provided for @careHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Your conversations'**
+  String get careHistory;
+
+  /// No description provided for @careHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your conversations will show here once your coach is ready.'**
+  String get careHistoryEmpty;
+
+  /// No description provided for @careVoiceSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice conversations are coming soon'**
+  String get careVoiceSoonTitle;
+
+  /// No description provided for @careVoiceSoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can talk with your coach out loud. Their voice is always labelled as an AI voice.'**
+  String get careVoiceSoonBody;
+
+  /// No description provided for @careSavedEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing saved yet'**
+  String get careSavedEmptyTitle;
+
+  /// No description provided for @careSavedEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Answers you save from your coach will show here.'**
+  String get careSavedEmptyBody;
+
+  /// No description provided for @careClinicianTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk to a clinician'**
+  String get careClinicianTitle;
+
+  /// No description provided for @careClinicianBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach is an educational companion, not a clinician. For medical advice, or before changing any medication, talk to your doctor or care team.'**
+  String get careClinicianBody;
+
+  /// No description provided for @careGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get careGotIt;
 }
 
 class _AppLocalizationsDelegate

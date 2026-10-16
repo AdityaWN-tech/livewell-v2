@@ -21,7 +21,7 @@ import '../../home/presentation/home_screen.dart' show todayCheckInProvider;
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';
-import '../../settings/presentation/settings_screen.dart';
+import '../../profile/presentation/profile_button.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
 
@@ -63,7 +63,7 @@ class TrackScreen extends ConsumerWidget {
           icon: const Icon(Icons.emoji_events_outlined),
           label: Text(l.trackWeeklyWins),
         ),
-        const SettingsAction(),
+        const ProfileButton(),
       ],
       children: [
         _StreakCard(ref.watch(streakProvider)),

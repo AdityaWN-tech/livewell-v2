@@ -26,9 +26,10 @@ final dayNumberProvider = Provider<int?>((ref) {
   return dayNumber(created.toLocal(), ref.watch(clockProvider)());
 });
 
-/// The coach's name from settings; null means the default "Coach".
-/// TODO(T-AVT-01): read the name chosen in Avatar Studio.
-final coachNameProvider = Provider<String?>((ref) => null);
+/// The coach's name from Profile > My coach; null means "Coach".
+final coachNameProvider = Provider<String?>(
+  (ref) => ref.watch(currentProfileProvider).value?.coachName,
+);
 
 /// Today's planned day: the starter plan (T-ONB-03e) or, later, the
 /// nightly plan, from users/{uid}/daily_plans/{date}.

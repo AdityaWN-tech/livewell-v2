@@ -12,7 +12,7 @@ import '../../checkin/data/checkin_repository.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../checkin/presentation/checkin_sheet.dart';
 import '../../dev/application/preview_mode.dart';
-import '../../settings/presentation/settings_screen.dart';
+import '../../profile/presentation/profile_button.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
     show reminderTexts;
@@ -135,7 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return LwScreen(
       eyebrow: l.homeEyebrow,
       title: l.tabHome,
-      actions: [if (day != null) _DayPill(day), const SettingsAction()],
+      actions: [if (day != null) _DayPill(day), const ProfileButton()],
       children: [
         _CoachCard(
           coach: ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,

@@ -8,7 +8,7 @@ import 'package:livewell/features/care/presentation/care_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/learn/presentation/learn_screen.dart';
 import 'package:livewell/features/plan/presentation/plan_screen.dart';
-import 'package:livewell/features/settings/presentation/settings_screen.dart';
+import 'package:livewell/features/profile/presentation/profile_screen.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
 import 'package:livewell/features/track/presentation/track_screen.dart';
 
@@ -80,7 +80,7 @@ void main() {
     }
   });
 
-  testWidgets('Settings opens from every tab', (tester) async {
+  testWidgets('Profile opens from every tab', (tester) async {
     await bootToShell(tester);
     for (final label in ['Home', 'Plan', 'Track', 'Learn', 'Care']) {
       await tester.tap(
@@ -90,9 +90,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Settings'));
+      await tester.tap(find.byTooltip('Profile'));
       await tester.pumpAndSettle();
-      expect(find.byType(SettingsScreen), findsOneWidget, reason: label);
+      expect(find.byType(ProfileScreen), findsOneWidget, reason: label);
       await tester.pageBack();
       await tester.pumpAndSettle();
     }

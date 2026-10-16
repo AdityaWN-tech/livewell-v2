@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/data/firestore.dart';
 import '../../auth/data/firebase_auth_service.dart';
+import '../../dev/application/preview_mode.dart';
 import '../domain/voice.dart';
 
 /// users/{uid}/voices/{voice_id}: the chosen library voice is active, any
@@ -63,8 +64,20 @@ class FirestoreVoiceRepository implements VoiceRepository {
   }
 }
 
+/// Dev preview: nothing saved.
+class InMemoryVoiceRepository implements VoiceRepository {
+  VoiceChoice? chosen;
+
+  @override
+  Future<void> choose(VoiceChoice choice) async => chosen = choice;
+}
+
 final voiceRepositoryProvider = Provider<VoiceRepository>((ref) {
   final auth = ref.watch(authServiceProvider);
+  // Dev preview or nobody signed in: nothing saved.
+  if (ref.watch(previewModeProvider) || auth.currentUser == null) {
+    return InMemoryVoiceRepository();
+  }
   return FirestoreVoiceRepository(
     ref.watch(firestoreProvider),
     () => auth.currentUser!.uid,

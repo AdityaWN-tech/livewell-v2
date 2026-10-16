@@ -6,6 +6,8 @@ import 'package:livewell/features/avatar/data/selfie_service.dart';
 import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
+import 'package:livewell/features/profile/data/account_actions.dart';
+import 'package:livewell/features/profile/data/appearance.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
 import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
@@ -117,6 +119,33 @@ class FakeAuthService implements AuthService {
   void clearPendingLink() => pending = null;
 
   @override
+  Future<AuthUser> link(SocialProvider p) async {
+    final u = signedIn!;
+    return signedIn = AuthUser(
+      uid: u.uid,
+      email: u.email,
+      phoneNumber: u.phoneNumber,
+      displayName: u.displayName,
+      providers: [...u.providers, p.providerId],
+    );
+  }
+
+  @override
+  Future<AuthUser> unlink(SocialProvider p) async {
+    final u = signedIn!;
+    if (u.providers.length <= 1) {
+      throw const AuthException(AuthFailure.lastMethod);
+    }
+    return signedIn = AuthUser(
+      uid: u.uid,
+      email: u.email,
+      phoneNumber: u.phoneNumber,
+      displayName: u.displayName,
+      providers: [...u.providers]..remove(p.providerId),
+    );
+  }
+
+  @override
   Future<void> linkPending() async {
     if (pending != null) linked.add(pending!.provider);
     pending = null;
@@ -163,18 +192,27 @@ class FakeProfileRepository extends ProfileRepository {
       createdAt: createdAts[uid],
       focusChoices: focus[uid]?.choices ?? const [],
       activityLimited: focus[uid]?.limited,
+      settings: {...?settings[uid]},
     );
   }
 
   @override
   Stream<Profile?> watch(String uid) async* {
     yield await get(uid);
+    // Live, like Firestore: every later write is seen.
+    await for (final changed in _changes.stream) {
+      if (changed == uid) yield await get(uid);
+    }
   }
+
+  final _changes = StreamController<String>.broadcast();
+  void _changed(String uid) => _changes.add(uid);
 
   @override
   Future<void> create(String uid, NewProfile profile) async {
     log.add('profile:$uid');
     created[uid] = profile;
+    _changed(uid);
   }
 
   /// Saved focus answers, by uid.
@@ -191,6 +229,20 @@ class FakeProfileRepository extends ProfileRepository {
   }) async {
     focus[uid] = (choices: choices, driver: driver, limited: activityLimited);
     existing[uid] = nextStep;
+    _changed(uid);
+  }
+
+  /// Settings written through updateSettings, by uid.
+  final settings = <String, Map<String, Object>>{};
+
+  @override
+  Future<void> updateSettings(String uid, Map<String, Object> fields) async {
+    final m = settings.putIfAbsent(uid, () => {});
+    m.addAll(fields);
+    if (fields['display_name'] is String) {
+      names[uid] = fields['display_name']! as String;
+    }
+    _changed(uid);
   }
 
   @override
@@ -201,6 +253,7 @@ class FakeProfileRepository extends ProfileRepository {
     } else if (created[uid] != null) {
       existing[uid] = step;
     }
+    _changed(uid);
   }
 
   @override
@@ -223,6 +276,7 @@ class FakeProfileRepository extends ProfileRepository {
         onboardingStep: nextStep,
       );
     }
+    _changed(uid);
   }
 }
 
@@ -539,4 +593,66 @@ class FakeReminderZoneStore implements ReminderZoneStore {
 
   @override
   Future<void> save(String z) async => zone = z;
+}
+
+class FakeAppearanceStore implements AppearanceStore {
+  Appearance saved = const Appearance();
+
+  @override
+  Future<Appearance> load() async => saved;
+
+  @override
+  Future<void> save(Appearance a) async => saved = a;
+}
+
+/// A profile picture "kept" in memory.
+class FakeProfilePhotoStore implements ProfilePhotoStore {
+  String? path;
+  String? next = 'C:/fake/profile.jpg';
+
+  @override
+  Future<String?> current() async => path;
+
+  @override
+  Future<String?> pick({required bool camera}) async => path = next;
+
+  @override
+  Future<void> remove() async => path = null;
+}
+
+class FakeDeletions implements Deletions {
+  final calls = <String>[];
+  bool fail = false;
+
+  Future<void> _do(String name) async {
+    if (fail) throw Exception('not deployed');
+    calls.add(name);
+  }
+
+  @override
+  Future<void> deleteAvatar() => _do('avatar');
+
+  @override
+  Future<void> deleteVoice() => _do('voice');
+
+  @override
+  Future<void> deleteAccount() => _do('account');
+}
+
+class FakeLocalData implements LocalData {
+  int clears = 0;
+  bool pending = false;
+
+  @override
+  Future<void> clear() async {
+    clears++;
+    pending = true;
+  }
+
+  @override
+  Future<bool> takeCachePending() async {
+    final p = pending;
+    pending = false;
+    return p;
+  }
 }

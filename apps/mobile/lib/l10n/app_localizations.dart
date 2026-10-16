@@ -3255,6 +3255,396 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'What went well today?'**
   String get reminderReflectionBody;
+
+  /// No description provided for @authErrorLastMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your only way to sign in, so it can’t be removed.'**
+  String get authErrorLastMethod;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @profileOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileOpen;
+
+  /// No description provided for @profileSignedInWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in with'**
+  String get profileSignedInWith;
+
+  /// No description provided for @profileMethodEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileMethodEmail;
+
+  /// No description provided for @profileMethodPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get profileMethodPhone;
+
+  /// No description provided for @profileAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get profileAccount;
+
+  /// No description provided for @profileChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile picture'**
+  String get profileChangePhoto;
+
+  /// No description provided for @profileTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo'**
+  String get profileTakePhoto;
+
+  /// No description provided for @profileChoosePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get profileChoosePhoto;
+
+  /// No description provided for @profileRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove picture'**
+  String get profileRemovePhoto;
+
+  /// No description provided for @profilePhotoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your picture is kept on this phone only for now.'**
+  String get profilePhotoNote;
+
+  /// No description provided for @profileEditName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get profileEditName;
+
+  /// No description provided for @profileNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your first name'**
+  String get profileNameHint;
+
+  /// No description provided for @profileSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get profileSave;
+
+  /// No description provided for @profileCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get profileCancel;
+
+  /// No description provided for @profileLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked'**
+  String get profileLinked;
+
+  /// No description provided for @profileLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {provider}'**
+  String profileLink(String provider);
+
+  /// No description provided for @profileUnlink.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {provider}'**
+  String profileUnlink(String provider);
+
+  /// No description provided for @profileLinkPhoneSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a phone number: coming soon'**
+  String get profileLinkPhoneSoon;
+
+  /// No description provided for @profileLogOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out'**
+  String get profileLogOut;
+
+  /// No description provided for @profileSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch account'**
+  String get profileSwitch;
+
+  /// No description provided for @profileLogOutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out?'**
+  String get profileLogOutTitle;
+
+  /// No description provided for @profileLogOutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll clear your data from this phone and stop reminders. Everything stays safe in your account.'**
+  String get profileLogOutBody;
+
+  /// No description provided for @profileMyCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'My coach'**
+  String get profileMyCoach;
+
+  /// No description provided for @profileChangeAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Change avatar'**
+  String get profileChangeAvatar;
+
+  /// No description provided for @profileChangeVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Change voice'**
+  String get profileChangeVoice;
+
+  /// No description provided for @profileCoachName.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach name'**
+  String get profileCoachName;
+
+  /// No description provided for @profileCoachNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'For example, Maya'**
+  String get profileCoachNameHint;
+
+  /// No description provided for @profileCoachNameError.
+  ///
+  /// In en, this message translates to:
+  /// **'Use 1 to 20 letters.'**
+  String get profileCoachNameError;
+
+  /// No description provided for @profileAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get profileAppearance;
+
+  /// No description provided for @profileThemeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get profileThemeSystem;
+
+  /// No description provided for @profileThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get profileThemeLight;
+
+  /// No description provided for @profileThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get profileThemeDark;
+
+  /// No description provided for @profileTextSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Text size'**
+  String get profileTextSize;
+
+  /// No description provided for @profileTextNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get profileTextNormal;
+
+  /// No description provided for @profileTextLarger.
+  ///
+  /// In en, this message translates to:
+  /// **'Larger'**
+  String get profileTextLarger;
+
+  /// No description provided for @profileTextLargest.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest'**
+  String get profileTextLargest;
+
+  /// No description provided for @profileDailyPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily plan'**
+  String get profileDailyPlan;
+
+  /// No description provided for @profileQuietHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours'**
+  String get profileQuietHours;
+
+  /// No description provided for @profileQuietValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} to {end}'**
+  String profileQuietValue(String start, String end);
+
+  /// No description provided for @profileQuietStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours start'**
+  String get profileQuietStart;
+
+  /// No description provided for @profileQuietEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours end'**
+  String get profileQuietEnd;
+
+  /// No description provided for @profileReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get profileReminders;
+
+  /// No description provided for @profileRemindersOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders are off. You can turn them on in Privacy & consents.'**
+  String get profileRemindersOff;
+
+  /// No description provided for @profilePrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & data'**
+  String get profilePrivacy;
+
+  /// No description provided for @profileConsents.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & consents'**
+  String get profileConsents;
+
+  /// No description provided for @profileMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'What my coach remembers'**
+  String get profileMemory;
+
+  /// No description provided for @profileExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export my data'**
+  String get profileExport;
+
+  /// No description provided for @profileSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get profileSoon;
+
+  /// No description provided for @profileDeleteAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my avatar'**
+  String get profileDeleteAvatar;
+
+  /// No description provided for @profileDeleteVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my voice'**
+  String get profileDeleteVoice;
+
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @profileDeleteAvatarBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach’s avatar will be deleted. Your coach will use the default look.'**
+  String get profileDeleteAvatarBody;
+
+  /// No description provided for @profileDeleteVoiceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach’s voice choice will be deleted. Your coach will use the default voice.'**
+  String get profileDeleteVoiceBody;
+
+  /// No description provided for @profileDeleteAccountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes your account and everything in it: your Why, check-ins, plans and reflections. It can’t be undone.'**
+  String get profileDeleteAccountBody;
+
+  /// No description provided for @profileDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get profileDeleteConfirm;
+
+  /// No description provided for @profileDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted.'**
+  String get profileDeleted;
+
+  /// No description provided for @profileDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t delete that right now. Please try again later.'**
+  String get profileDeleteFailed;
+
+  /// No description provided for @profileHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & about'**
+  String get profileHelp;
+
+  /// No description provided for @profileTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get profileTerms;
+
+  /// No description provided for @profilePrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get profilePrivacyPolicy;
+
+  /// No description provided for @profileVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String profileVersion(String version);
+
+  /// No description provided for @profileDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer'**
+  String get profileDeveloper;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get profileSaved;
 }
 
 class _AppLocalizationsDelegate

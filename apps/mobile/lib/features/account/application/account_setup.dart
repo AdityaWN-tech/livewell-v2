@@ -6,6 +6,9 @@ import '../../auth/domain/auth.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../onboarding/data/onboarding_store.dart';
 import '../../onboarding/domain/onboarding_progress.dart';
+import '../../avatar/data/avatar_repository.dart';
+import '../../starter_plan/data/plan_repository.dart';
+import '../../voice/data/voice_repository.dart';
 import '../data/profile_repository.dart';
 
 /// What to do after someone signs in.
@@ -78,6 +81,11 @@ class SignInCompletion {
   final Ref _ref;
 
   Future<String> complete(AuthUser user) async {
+    // Storage chosen while signed out (in memory) must not outlive sign-in.
+    _ref
+      ..invalidate(planRepositoryProvider)
+      ..invalidate(avatarRepositoryProvider)
+      ..invalidate(voiceRepositoryProvider);
     final progress = await _ref.read(onboardingProvider.future);
     final status = await _ref
         .read(accountSetupProvider)

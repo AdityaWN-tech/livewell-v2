@@ -1795,4 +1795,215 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderReflectionBody => 'What went well today?';
+
+  @override
+  String get authErrorLastMethod =>
+      'This is your only way to sign in, so it can’t be removed.';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileOpen => 'Profile';
+
+  @override
+  String get profileSignedInWith => 'Signed in with';
+
+  @override
+  String get profileMethodEmail => 'Email';
+
+  @override
+  String get profileMethodPhone => 'Phone';
+
+  @override
+  String get profileAccount => 'Account';
+
+  @override
+  String get profileChangePhoto => 'Change profile picture';
+
+  @override
+  String get profileTakePhoto => 'Take a photo';
+
+  @override
+  String get profileChoosePhoto => 'Choose from gallery';
+
+  @override
+  String get profileRemovePhoto => 'Remove picture';
+
+  @override
+  String get profilePhotoNote =>
+      'Your picture is kept on this phone only for now.';
+
+  @override
+  String get profileEditName => 'Name';
+
+  @override
+  String get profileNameHint => 'Your first name';
+
+  @override
+  String get profileSave => 'Save';
+
+  @override
+  String get profileCancel => 'Cancel';
+
+  @override
+  String get profileLinked => 'Linked';
+
+  @override
+  String profileLink(String provider) {
+    return 'Add $provider';
+  }
+
+  @override
+  String profileUnlink(String provider) {
+    return 'Remove $provider';
+  }
+
+  @override
+  String get profileLinkPhoneSoon => 'Add a phone number: coming soon';
+
+  @override
+  String get profileLogOut => 'Log out';
+
+  @override
+  String get profileSwitch => 'Switch account';
+
+  @override
+  String get profileLogOutTitle => 'Log out?';
+
+  @override
+  String get profileLogOutBody =>
+      'We’ll clear your data from this phone and stop reminders. Everything stays safe in your account.';
+
+  @override
+  String get profileMyCoach => 'My coach';
+
+  @override
+  String get profileChangeAvatar => 'Change avatar';
+
+  @override
+  String get profileChangeVoice => 'Change voice';
+
+  @override
+  String get profileCoachName => 'Coach name';
+
+  @override
+  String get profileCoachNameHint => 'For example, Maya';
+
+  @override
+  String get profileCoachNameError => 'Use 1 to 20 letters.';
+
+  @override
+  String get profileAppearance => 'Appearance';
+
+  @override
+  String get profileThemeSystem => 'System';
+
+  @override
+  String get profileThemeLight => 'Light';
+
+  @override
+  String get profileThemeDark => 'Dark';
+
+  @override
+  String get profileTextSize => 'Text size';
+
+  @override
+  String get profileTextNormal => 'Normal';
+
+  @override
+  String get profileTextLarger => 'Larger';
+
+  @override
+  String get profileTextLargest => 'Largest';
+
+  @override
+  String get profileDailyPlan => 'Daily plan';
+
+  @override
+  String get profileQuietHours => 'Quiet hours';
+
+  @override
+  String profileQuietValue(String start, String end) {
+    return '$start to $end';
+  }
+
+  @override
+  String get profileQuietStart => 'Quiet hours start';
+
+  @override
+  String get profileQuietEnd => 'Quiet hours end';
+
+  @override
+  String get profileReminders => 'Reminders';
+
+  @override
+  String get profileRemindersOff =>
+      'Reminders are off. You can turn them on in Privacy & consents.';
+
+  @override
+  String get profilePrivacy => 'Privacy & data';
+
+  @override
+  String get profileConsents => 'Privacy & consents';
+
+  @override
+  String get profileMemory => 'What my coach remembers';
+
+  @override
+  String get profileExport => 'Export my data';
+
+  @override
+  String get profileSoon => 'Coming soon';
+
+  @override
+  String get profileDeleteAvatar => 'Delete my avatar';
+
+  @override
+  String get profileDeleteVoice => 'Delete my voice';
+
+  @override
+  String get profileDeleteAccount => 'Delete my account';
+
+  @override
+  String get profileDeleteAvatarBody =>
+      'Your coach’s avatar will be deleted. Your coach will use the default look.';
+
+  @override
+  String get profileDeleteVoiceBody =>
+      'Your coach’s voice choice will be deleted. Your coach will use the default voice.';
+
+  @override
+  String get profileDeleteAccountBody =>
+      'This deletes your account and everything in it: your Why, check-ins, plans and reflections. It can’t be undone.';
+
+  @override
+  String get profileDeleteConfirm => 'Delete';
+
+  @override
+  String get profileDeleted => 'Deleted.';
+
+  @override
+  String get profileDeleteFailed =>
+      'We couldn’t delete that right now. Please try again later.';
+
+  @override
+  String get profileHelp => 'Help & about';
+
+  @override
+  String get profileTerms => 'Terms of use';
+
+  @override
+  String get profilePrivacyPolicy => 'Privacy policy';
+
+  @override
+  String profileVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get profileDeveloper => 'Developer';
+
+  @override
+  String get profileSaved => 'Saved.';
 }

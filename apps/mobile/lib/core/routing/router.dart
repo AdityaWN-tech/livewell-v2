@@ -25,7 +25,7 @@ import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
-import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/track/presentation/track_screen.dart';
@@ -147,9 +147,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/help',
         builder: (context, state) => const HelpNowScreen(),
       ),
+      // Profile (T-ONB-03f) is the settings home; /settings stays as the
+      // parent of the consents screen and opens Profile too.
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
+        builder: (context, state) => const ProfileScreen(),
         routes: [
           GoRoute(
             path: 'consents',

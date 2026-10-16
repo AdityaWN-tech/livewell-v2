@@ -166,6 +166,12 @@ abstract class AppLocalizations {
   /// **'Design tokens'**
   String get devDesignTokens;
 
+  /// No description provided for @devIllustrations.
+  ///
+  /// In en, this message translates to:
+  /// **'Illustrations'**
+  String get devIllustrations;
+
   /// Bottom navigation tabs (spec 14.2).
   ///
   /// In en, this message translates to:
@@ -2719,7 +2725,7 @@ abstract class AppLocalizations {
   /// No description provided for @avatarBgSage.
   ///
   /// In en, this message translates to:
-  /// **'Sage'**
+  /// **'Mint'**
   String get avatarBgSage;
 
   /// No description provided for @avatarBgPeach.
@@ -3273,6 +3279,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get profileOpen;
+
+  /// No description provided for @coachAvatarLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach'**
+  String get coachAvatarLabel;
 
   /// No description provided for @profileSignedInWith.
   ///

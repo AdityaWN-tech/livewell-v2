@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../features/avatar/domain/avatar_config.dart';
 
+/// The coach's face and pose (T-UI-02b). Safety replies always use [calm].
+enum AvatarExpression { happy, waving, talking, listening, calm, celebrating }
+
 /// Static illustrated coach avatar drawn from an [AvatarConfig] (FR-AVT-02).
 /// A placeholder renderer until the stylized animated renderer exists.
 /// TODO(T-AVT-01): replace with the stylized renderer and expressions; the
@@ -12,9 +15,11 @@ class AvatarView extends StatelessWidget {
     required this.config,
     this.size = 160,
     this.semanticLabel,
+    this.expression = AvatarExpression.happy,
   });
 
   final AvatarConfig config;
+  final AvatarExpression expression;
   final double size;
   final String? semanticLabel;
 
@@ -23,7 +28,10 @@ class AvatarView extends StatelessWidget {
     image: true,
     label: semanticLabel,
     excludeSemantics: true,
-    child: CustomPaint(size: Size.square(size), painter: AvatarPainter(config)),
+    child: CustomPaint(
+      size: Size.square(size),
+      painter: AvatarPainter(config, expression),
+    ),
   );
 }
 
@@ -55,7 +63,7 @@ abstract final class AvatarColours {
   ];
 
   static const clothing = [
-    Color(0xFF1E3834), // forest
+    Color(0xFF2E8B62), // forest green (the design's hoodie)
     Color(0xFFB05A3B), // terracotta
     Color(0xFF8FB5AB), // sage
     Color(0xFF2F3E5C), // navy
@@ -64,8 +72,8 @@ abstract final class AvatarColours {
   ];
 
   static const background = [
-    Color(0xFFE1ECEB), // sage-mint
-    Color(0xFFFCEFEA), // soft terracotta
+    Color(0xFFE8F9EE), // mint
+    Color(0xFFFEEBDF), // peach
     Color(0xFFF4EFE6), // cream
     Color(0xFFE3ECF5), // sky
     Color(0xFFECE6F3), // lavender
@@ -100,12 +108,19 @@ abstract final class AvatarColours {
   static const shirt = Color(0xFFFAFAF7);
   static const cheek = Color(0x33E06A5A);
   static const mouth = Color(0xFF5A1F22);
+  static const confetti = [
+    Color(0xFFF6C344),
+    Color(0xFF4CC9A4),
+    Color(0xFFF28DB2),
+    Color(0xFF7FB2F0),
+  ];
 }
 
 class AvatarPainter extends CustomPainter {
-  AvatarPainter(this.c);
+  AvatarPainter(this.c, [this.expression = AvatarExpression.happy]);
 
   final AvatarConfig c;
+  final AvatarExpression expression;
 
   static Paint _fill(Color colour) => Paint()..color = colour;
 
@@ -122,6 +137,13 @@ class AvatarPainter extends CustomPainter {
       ..translate(50, 58)
       ..scale(1.12)
       ..translate(-50, -52);
+    if (expression == AvatarExpression.listening) {
+      // A small head tilt: attentive.
+      canvas
+        ..translate(50, 60)
+        ..rotate(-0.07)
+        ..translate(-50, -60);
+    }
 
     final skin = AvatarColours.skin[c.skin];
     final hair = AvatarColours.hair[c.hairColour];
@@ -242,46 +264,49 @@ class AvatarPainter extends CustomPainter {
     // Eyes have whites and the mouth is filled, so the face reads on every
     // skin tone (line art alone vanished on the deepest tones).
     final white = _fill(AvatarColours.shirt);
-    switch (c.eyes) {
-      case EyeShape.round:
-        canvas.drawCircle(const Offset(43, 47), 3, white);
-        canvas.drawCircle(const Offset(57, 47), 3, white);
-        canvas.drawCircle(const Offset(43.3, 47.3), 1.9, ink);
-        canvas.drawCircle(const Offset(57.3, 47.3), 1.9, ink);
-      case EyeShape.almond:
-        canvas.drawOval(const Rect.fromLTRB(39.5, 45, 46.5, 49.4), white);
-        canvas.drawOval(const Rect.fromLTRB(53.5, 45, 60.5, 49.4), white);
-        canvas.drawCircle(const Offset(43.2, 47.2), 1.8, ink);
-        canvas.drawCircle(const Offset(57.2, 47.2), 1.8, ink);
-      case EyeShape.smiling:
-        for (final x in [43.0, 57.0]) {
-          final r = Rect.fromCenter(center: Offset(x, 48), width: 7, height: 5);
-          canvas.drawArc(r, 3.14, 3.14, true, white);
-          canvas.drawArc(
-            r,
-            3.14,
-            3.14,
-            false,
-            Paint()
-              ..color = AvatarColours.ink
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.6
-              ..strokeCap = StrokeCap.round,
-          );
-        }
+    final lid = Paint()
+      ..color = AvatarColours.ink
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    if (expression == AvatarExpression.calm) {
+      // Closed, relaxed eyes.
+      for (final x in [43.0, 57.0]) {
+        canvas.drawArc(
+          Rect.fromCenter(center: Offset(x, 46.5), width: 7, height: 4),
+          0.2,
+          2.74,
+          false,
+          lid,
+        );
+      }
+    } else {
+      switch (c.eyes) {
+        case EyeShape.round:
+          canvas.drawCircle(const Offset(43, 47), 3, white);
+          canvas.drawCircle(const Offset(57, 47), 3, white);
+          canvas.drawCircle(const Offset(43.3, 47.3), 1.9, ink);
+          canvas.drawCircle(const Offset(57.3, 47.3), 1.9, ink);
+        case EyeShape.almond:
+          canvas.drawOval(const Rect.fromLTRB(39.5, 45, 46.5, 49.4), white);
+          canvas.drawOval(const Rect.fromLTRB(53.5, 45, 60.5, 49.4), white);
+          canvas.drawCircle(const Offset(43.2, 47.2), 1.8, ink);
+          canvas.drawCircle(const Offset(57.2, 47.2), 1.8, ink);
+        case EyeShape.smiling:
+          for (final x in [43.0, 57.0]) {
+            final r = Rect.fromCenter(
+              center: Offset(x, 48),
+              width: 7,
+              height: 5,
+            );
+            canvas.drawArc(r, 3.14, 3.14, true, white);
+            canvas.drawArc(r, 3.14, 3.14, false, lid);
+          }
+      }
     }
     canvas.drawCircle(const Offset(39, 54), 3, _fill(AvatarColours.cheek));
     canvas.drawCircle(const Offset(61, 54), 3, _fill(AvatarColours.cheek));
-    // Open smile: dark mouth with a strip of teeth.
-    final mouth = Path()
-      ..moveTo(44.5, 55.5)
-      ..quadraticBezierTo(50, 62.5, 55.5, 55.5)
-      ..close();
-    canvas.drawPath(mouth, _fill(AvatarColours.mouth));
-    canvas.save();
-    canvas.clipPath(mouth);
-    canvas.drawRect(const Rect.fromLTRB(44, 55, 56, 57), white);
-    canvas.restore();
+    _mouth(canvas, white, lid);
 
     // Glasses.
     final frame = Paint()
@@ -306,7 +331,72 @@ class AvatarPainter extends CustomPainter {
         );
         canvas.drawLine(const Offset(49, 46), const Offset(51, 46), frame);
     }
+    if (expression == AvatarExpression.waving) {
+      _hand(canvas, const Offset(74, 66), skin, cloth);
+    } else if (expression == AvatarExpression.celebrating) {
+      _hand(canvas, const Offset(75, 62), skin, cloth);
+      _hand(canvas, const Offset(25, 62), skin, cloth);
+      for (final (x, y, colour) in [
+        (24.0, 24.0, AvatarColours.confetti[0]),
+        (76.0, 22.0, AvatarColours.confetti[1]),
+        (18.0, 44.0, AvatarColours.confetti[2]),
+        (83.0, 42.0, AvatarColours.confetti[3]),
+      ]) {
+        canvas.drawCircle(Offset(x, y), 2.2, _fill(colour));
+      }
+    }
     canvas.restore();
+  }
+
+  void _mouth(Canvas canvas, Paint white, Paint line) {
+    switch (expression) {
+      case AvatarExpression.talking:
+        // Mid-word: a small open oval.
+        canvas.drawOval(
+          const Rect.fromLTRB(46.5, 55, 53.5, 61),
+          _fill(AvatarColours.mouth),
+        );
+      case AvatarExpression.listening:
+      case AvatarExpression.calm:
+        // A gentle closed smile.
+        canvas.drawArc(
+          const Rect.fromLTRB(45, 52, 55, 58),
+          0.3,
+          2.54,
+          false,
+          line,
+        );
+      case AvatarExpression.happy:
+      case AvatarExpression.waving:
+      case AvatarExpression.celebrating:
+        // Open smile: dark mouth with a strip of teeth; wider when
+        // celebrating.
+        final w = expression == AvatarExpression.celebrating ? 7.0 : 5.5;
+        final mouth = Path()
+          ..moveTo(50 - w, 55.5)
+          ..quadraticBezierTo(50, 62.5 + (w - 5.5), 50 + w, 55.5)
+          ..close();
+        canvas.drawPath(mouth, _fill(AvatarColours.mouth));
+        canvas
+          ..save()
+          ..clipPath(mouth)
+          ..drawRect(Rect.fromLTRB(50 - w, 55, 50 + w, 57), white)
+          ..restore();
+    }
+  }
+
+  /// A raised hand with a sleeve, for waving and celebrating.
+  void _hand(Canvas canvas, Offset at, Color skin, Color cloth) {
+    final dx = at.dx > 50 ? 1.0 : -1.0;
+    canvas.drawLine(
+      Offset(at.dx - 6 * dx, 92),
+      Offset(at.dx, at.dy + 6),
+      Paint()
+        ..color = cloth
+        ..strokeWidth = 9
+        ..strokeCap = StrokeCap.round,
+    );
+    canvas.drawCircle(at, 5.5, _fill(skin));
   }
 
   void _hair(Canvas canvas, Color colour) {
@@ -360,5 +450,6 @@ class AvatarPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(AvatarPainter old) => old.c != c;
+  bool shouldRepaint(AvatarPainter old) =>
+      old.c != c || old.expression != expression;
 }

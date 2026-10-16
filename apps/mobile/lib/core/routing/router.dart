@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
+import '../../features/dev/presentation/illustration_gallery.dart';
 import '../../features/auth/presentation/email_sign_in_screen.dart';
 import '../../features/auth/presentation/phone_sign_in_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
@@ -167,6 +168,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: '/dev/tokens',
           builder: (context, state) => const DesignGallery(),
+        ),
+      if (flavor == Flavor.dev)
+        GoRoute(
+          path: IllustrationGallery.path,
+          builder: (context, state) => const IllustrationGallery(),
         ),
     ],
   );

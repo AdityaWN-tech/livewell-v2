@@ -135,7 +135,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return LwScreen(
       eyebrow: l.homeEyebrow,
       title: l.tabHome,
-      actions: [if (day != null) _DayPill(day), const ProfileButton()],
+      profile: const ProfileButton(),
+      actions: [if (day != null) _DayPill(day)],
       children: [
         _CoachCard(
           coach: ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,

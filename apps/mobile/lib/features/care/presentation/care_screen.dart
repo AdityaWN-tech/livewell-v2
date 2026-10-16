@@ -144,10 +144,8 @@ class _CareScreenState extends ConsumerState<CareScreen> {
     return LwScreen(
       eyebrow: l.careEyebrow,
       title: l.careTitle,
-      actions: [
-        _StatusPill(voiceOn: ref.watch(coachVoiceOnProvider)),
-        const ProfileButton(),
-      ],
+      profile: const ProfileButton(),
+      actions: [_StatusPill(voiceOn: ref.watch(coachVoiceOnProvider))],
       bottom: _Composer(
         controller: _text,
         listening: _listening,

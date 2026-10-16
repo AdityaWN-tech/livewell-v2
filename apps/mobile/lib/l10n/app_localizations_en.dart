@@ -46,6 +46,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get devDesignTokens => 'Design tokens';
 
   @override
+  String get devIllustrations => 'Illustrations';
+
+  @override
   String get tabHome => 'Home';
 
   @override
@@ -1498,7 +1501,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get avatarClothPlum => 'Plum';
 
   @override
-  String get avatarBgSage => 'Sage';
+  String get avatarBgSage => 'Mint';
 
   @override
   String get avatarBgPeach => 'Peach';
@@ -1805,6 +1808,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileOpen => 'Profile';
+
+  @override
+  String get coachAvatarLabel => 'Your coach';
 
   @override
   String get profileSignedInWith => 'Signed in with';

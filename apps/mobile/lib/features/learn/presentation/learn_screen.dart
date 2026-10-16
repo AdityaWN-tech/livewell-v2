@@ -33,7 +33,7 @@ class LearnScreen extends ConsumerWidget {
     return LwScreen(
       eyebrow: l.learnEyebrow,
       title: l.tabLearn,
-      actions: const [ProfileButton()],
+      profile: const ProfileButton(),
       children: [
         if (offer != null) ...[
           _PortalCard(key: ValueKey(offer.id), offer: offer),

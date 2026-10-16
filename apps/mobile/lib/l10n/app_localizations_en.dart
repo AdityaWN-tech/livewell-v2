@@ -2248,4 +2248,114 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get planFrameworkRowBody =>
       'Your 10 building blocks, one letter at a time';
+
+  @override
+  String get trackPeriodWeek => 'This Week';
+
+  @override
+  String get trackPeriodMonth => 'This Month';
+
+  @override
+  String get trackPeriodQuarter => '90 days';
+
+  @override
+  String trackPeriodLabel(String period) {
+    return 'Showing $period. Opens the choices.';
+  }
+
+  @override
+  String get trackSteps => 'Steps';
+
+  @override
+  String trackStepsOf(String goal) {
+    return 'of $goal';
+  }
+
+  @override
+  String get trackConnectHealth => 'Connect Health';
+
+  @override
+  String get trackConnectHealthLabel =>
+      'Steps: connect Apple Health or Health Connect. Opens details.';
+
+  @override
+  String get trackHealthSoonTitle => 'Connecting Health is coming soon';
+
+  @override
+  String get trackHealthSoonBody =>
+      'Soon you can connect Apple Health or Health Connect. Your steps and sleep hours will show here, and only if you choose to share them.';
+
+  @override
+  String trackSleepHours(int hours, int minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String get trackFromCheckIns => 'From your check-ins';
+
+  @override
+  String trackOutOf5(String value) {
+    return '$value / 5';
+  }
+
+  @override
+  String get trackNoCheckIns => 'No check-ins yet';
+
+  @override
+  String trackCardLabel(String name, String value, String detail) {
+    return '$name: $value. $detail';
+  }
+
+  @override
+  String get trackProgressTitle => 'Progress';
+
+  @override
+  String get trackThisWeekLabel => 'This week';
+
+  @override
+  String get trackChipHabits => 'Habits';
+
+  @override
+  String trackChartBarLabel(String day, String value) {
+    return '$day: $value';
+  }
+
+  @override
+  String trackChartBarEmpty(String day) {
+    return '$day: nothing logged';
+  }
+
+  @override
+  String trackChartSelected(String label) {
+    return '$label. Selected.';
+  }
+
+  @override
+  String get trackChartStepsEmpty => 'Connect Health to see your steps here.';
+
+  @override
+  String get trackChartHabitsEmpty =>
+      'Your habits will show here once you start one.';
+
+  @override
+  String get trackChartEmpty => 'Check in to see your week here.';
+
+  @override
+  String trackHabitsKept(int count) {
+    return '$count kept';
+  }
+
+  @override
+  String get trackWeeklyTitle => 'Weekly Reflection';
+
+  @override
+  String get trackWeeklyQuestion => 'How was your week?';
+
+  @override
+  String get trackWeeklyBody =>
+      'Celebrate your wins and set intentions for next week.';
+
+  @override
+  String get trackWeeklyLabel =>
+      'How was your week? Opens your weekly reflection.';
 }

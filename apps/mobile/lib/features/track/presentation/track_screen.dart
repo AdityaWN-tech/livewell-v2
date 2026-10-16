@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/analytics/analytics.dart';
 import '../../../core/design/components/lw_components.dart';
+import '../../../core/design/illustration/illustration.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/speech/dictation.dart';
 import '../../../core/time/clock.dart';
@@ -12,17 +14,17 @@ import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../checkin/domain/checkin.dart';
-import '../../checkin/presentation/checkin_sheet.dart';
 import '../../consent/presentation/microphone_consent.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
-import '../../home/application/home_data.dart';
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';
 import '../../profile/presentation/profile_button.dart';
+import '../application/track_data.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
+import '../domain/track_stats.dart';
 
 /// The streak card's data. Null until habit logs and the streak engine exist.
 /// TODO(T-DLY-07): read users/{uid}/streaks/current and this week's logs.
@@ -36,73 +38,741 @@ final todayReflectionProvider = StreamProvider<Reflection?>((ref) {
   return ref.watch(reflectionRepositoryProvider).watchDay(today);
 });
 
-/// Track tab (T-UI-01d, Screen 3): streak, today's check-in and the evening
-/// reflection.
+/// The 1 to 5 answer words from the check-in, shared by cards and chart.
+String scaleWord(
+  AppLocalizations l,
+  TrackMetric m,
+  int v, {
+  bool stress = false,
+}) {
+  final words = stress
+      ? [
+          l.checkinStress1,
+          l.checkinStress2,
+          l.checkinStress3,
+          l.checkinStress4,
+          l.checkinStress5,
+        ]
+      : m == TrackMetric.sleep
+      ? [
+          l.checkinSleep1,
+          l.checkinSleep2,
+          l.checkinSleep3,
+          l.checkinSleep4,
+          l.checkinSleep5,
+        ]
+      : [
+          l.checkinMood1,
+          l.checkinMood2,
+          l.checkinMood3,
+          l.checkinMood4,
+          l.checkinMood5,
+        ];
+  return words[v.clamp(1, 5) - 1];
+}
+
+/// Track tab (T-UI-02e, illustrated design): period picker, the 2 x 2
+/// metric cards with mini bars, the Mon-Sun Progress chart, the streak, the
+/// Weekly Reflection card and the evening reflection.
 class TrackScreen extends ConsumerWidget {
   const TrackScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final p = LwPalette.of(context);
     return LwScreen(
       eyebrow: l.trackEyebrow,
       title: l.tabTrack,
       profile: const ProfileButton(),
-      actions: [
-        FilledButton.icon(
-          key: const Key('track-weekly-wins'),
-          style: FilledButton.styleFrom(
-            backgroundColor: p.primary,
-            foregroundColor: p.onPrimary,
-            shape: const StadiumBorder(),
-            minimumSize: const Size(LwSize.minTapTarget, LwSize.minTapTarget),
-            padding: const EdgeInsets.symmetric(horizontal: LwSpacing.md),
-          ),
-          onPressed: () => _weeklyWins(context),
-          icon: const Icon(Icons.emoji_events_outlined),
-          label: Text(l.trackWeeklyWins),
-        ),
-      ],
+      actions: const [_PeriodPicker()],
       children: [
+        const _MetricGrid(),
+        LwSectionHeader(l.trackProgressTitle),
+        const _ProgressChart(),
+        const SizedBox(height: LwSpacing.sectionGap),
         _StreakCard(ref.watch(streakProvider)),
-        const SizedBox(height: LwSpacing.lg),
-        _CheckInGrid(checkIn: ref.watch(todayCheckInProvider).value),
-        const SizedBox(height: LwSpacing.lg),
+        LwSectionHeader(l.trackWeeklyTitle),
+        _WeeklyCard(onTap: () => _weeklyWins(context)),
+        const SizedBox(height: LwSpacing.sectionGap),
         const _ReflectionCard(),
       ],
     );
   }
 
   /// FR-DLY-06 weekly review isn't built yet.
-  Future<void> _weeklyWins(BuildContext context) {
-    final l = AppLocalizations.of(context);
+  Future<void> _weeklyWins(BuildContext context) => _infoSheet(
+    context,
+    key: const Key('track-weekly-wins-soon'),
+    title: AppLocalizations.of(context).trackWeeklyWinsSoonTitle,
+    body: AppLocalizations.of(context).trackWeeklyWinsSoonBody,
+  );
+}
+
+Future<void> _infoSheet(
+  BuildContext context, {
+  required Key key,
+  required String title,
+  required String body,
+}) {
+  final t = Theme.of(context).textTheme;
+  final l = AppLocalizations.of(context);
+  return showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) => SafeArea(
+      child: SingleChildScrollView(
+        key: key,
+        padding: const EdgeInsets.fromLTRB(
+          LwSpacing.lg,
+          0,
+          LwSpacing.lg,
+          LwSpacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(title, style: t.titleLarge),
+            const SizedBox(height: LwSpacing.xs),
+            Text(body, style: t.bodyMedium),
+            const SizedBox(height: LwSpacing.lg),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l.trackGotIt),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// "This Week / This Month / 90 days", a pill below the title.
+class _PeriodPicker extends ConsumerWidget {
+  const _PeriodPicker();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
-    return showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          key: const Key('track-weekly-wins-soon'),
-          padding: const EdgeInsets.fromLTRB(
-            LwSpacing.lg,
-            0,
-            LwSpacing.lg,
-            LwSpacing.lg,
+    final l = AppLocalizations.of(context);
+    final period = ref.watch(trackPeriodProvider);
+    String name(TrackPeriod x) => switch (x) {
+      TrackPeriod.week => l.trackPeriodWeek,
+      TrackPeriod.month => l.trackPeriodMonth,
+      TrackPeriod.quarter => l.trackPeriodQuarter,
+    };
+    return Semantics(
+      button: true,
+      container: true,
+      excludeSemantics: true,
+      label: l.trackPeriodLabel(name(period)),
+      child: PopupMenuButton<TrackPeriod>(
+        key: const Key('track-period'),
+        initialValue: period,
+        onSelected: ref.read(trackPeriodProvider.notifier).set,
+        itemBuilder: (context) => [
+          for (final x in TrackPeriod.values)
+            PopupMenuItem(
+              key: Key('track-period-${x.name}'),
+              value: x,
+              child: Text(name(x)),
+            ),
+        ],
+        child: Container(
+          constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
+          padding: const EdgeInsets.symmetric(horizontal: LwSpacing.md),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: LwRadius.pillAll,
+            border: Border.all(color: p.outlineStrong),
           ),
-          child: Column(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(l.trackWeeklyWinsSoonTitle, style: t.titleLarge),
-              const SizedBox(height: LwSpacing.xs),
-              Text(l.trackWeeklyWinsSoonBody, style: t.bodyMedium),
-              const SizedBox(height: LwSpacing.lg),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l.trackGotIt),
+              Text(name(period), style: t.labelLarge),
+              const SizedBox(width: LwSpacing.xxs),
+              Icon(Icons.expand_more, color: p.textPrimary),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Steps, Sleep, Mood and Stress: 2 across (1 across with large text).
+class _MetricGrid extends ConsumerWidget {
+  const _MetricGrid();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = LwPalette.of(context);
+    final l = AppLocalizations.of(context);
+    final stats = ref.watch(trackStatsProvider);
+    final health = ref.watch(healthSummaryProvider);
+    final today = ref.watch(clockProvider)();
+    final number = NumberFormat.decimalPattern(
+      Localizations.localeOf(context).toString(),
+    );
+    String avg(double v) => NumberFormat('0.0').format(v);
+
+    // Steps: only with Apple Health / Health Connect (and its consent).
+    final _Metric steps;
+    if (health == null) {
+      steps = _Metric(
+        id: 'steps',
+        name: l.trackSteps,
+        art: 'icon_steps',
+        tint: p.mint,
+        value: l.trackConnectHealth,
+        detail: '',
+        bars: const [],
+        label: l.trackConnectHealthLabel,
+        onTap: () => _infoSheet(
+          context,
+          key: const Key('track-health-soon'),
+          title: l.trackHealthSoonTitle,
+          body: l.trackHealthSoonBody,
+        ),
+      );
+    } else {
+      final todaySteps = health.stepsWeek[today.weekday - 1];
+      steps = _Metric(
+        id: 'steps',
+        name: l.trackSteps,
+        art: 'icon_steps',
+        tint: p.mint,
+        value: number.format(todaySteps),
+        detail: l.trackStepsOf(number.format(health.stepsGoal)),
+        bars: [
+          for (final s in health.stepsWeek.take(today.weekday))
+            s / health.stepsGoal,
+        ],
+      );
+    }
+
+    final sleepAvg = stats?.sleep;
+    final sleepWord = sleepAvg == null
+        ? null
+        : scaleWord(l, TrackMetric.sleep, TrackStats.nearest(sleepAvg));
+    final sleep = _Metric(
+      id: 'sleep',
+      name: l.trackSleep,
+      art: 'icon_sleep',
+      tint: p.lavender,
+      value: health != null
+          ? l.trackSleepHours(
+              health.sleepMinutesAverage ~/ 60,
+              health.sleepMinutesAverage % 60,
+            )
+          : sleepWord ?? l.trackNoCheckIns,
+      detail: health != null
+          ? (sleepWord ?? '')
+          : (sleepWord == null ? '' : l.trackFromCheckIns),
+      bars: [for (final v in stats?.recent((c) => c.sleep) ?? <int>[]) v / 5],
+    );
+
+    _Metric scale(
+      String id,
+      String name,
+      String art,
+      Color tint,
+      double? value,
+      int? Function(CheckIn) pick, {
+      bool stress = false,
+    }) => _Metric(
+      id: id,
+      name: name,
+      art: art,
+      tint: tint,
+      value: value == null ? l.trackNoCheckIns : l.trackOutOf5(avg(value)),
+      detail: value == null
+          ? ''
+          : scaleWord(
+              l,
+              TrackMetric.mood,
+              TrackStats.nearest(value),
+              stress: stress,
+            ),
+      bars: [for (final v in stats?.recent(pick) ?? <int>[]) v / 5],
+    );
+
+    final cards = [
+      steps,
+      sleep,
+      scale(
+        'mood',
+        l.trackMood,
+        'icon_mood',
+        p.butter,
+        stats?.mood,
+        (c) => c.mood,
+      ),
+      scale(
+        'stress',
+        l.trackStress,
+        'icon_stress',
+        p.sky,
+        stats?.stress,
+        (c) => c.stress,
+        stress: true,
+      ),
+    ];
+    return LayoutBuilder(
+      builder: (context, box) {
+        final scaleF = MediaQuery.textScalerOf(context).scale(1);
+        final columns = box.maxWidth / scaleF >= 260 ? 2 : 1;
+        final w = (box.maxWidth - LwSpacing.sm * (columns - 1)) / columns;
+        return Wrap(
+          spacing: LwSpacing.sm,
+          runSpacing: LwSpacing.sm,
+          children: [
+            for (final c in cards) SizedBox(width: w, child: _MetricCard(c)),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _Metric {
+  const _Metric({
+    required this.id,
+    required this.name,
+    required this.art,
+    required this.tint,
+    required this.value,
+    required this.detail,
+    required this.bars,
+    this.label,
+    this.onTap,
+  });
+
+  final String id;
+  final String name;
+  final String art;
+  final Color tint;
+  final String value;
+  final String detail;
+
+  /// 0..1, oldest first.
+  final List<double> bars;
+  final String? label;
+  final VoidCallback? onTap;
+}
+
+class _MetricCard extends StatelessWidget {
+  const _MetricCard(this.m);
+  final _Metric m;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final body = Padding(
+      padding: const EdgeInsets.all(LwSpacing.cardPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Illustration(m.art, width: 32, height: 32),
+              const SizedBox(width: LwSpacing.xs),
+              Expanded(
+                child: Text(
+                  m.name,
+                  style: t.titleSmall?.copyWith(color: p.onTint),
+                ),
               ),
             ],
+          ),
+          const SizedBox(height: LwSpacing.xs),
+          Text(
+            m.value,
+            key: Key('track-${m.id}-value'),
+            style: t.titleLarge?.copyWith(color: p.onTint),
+          ),
+          if (m.detail.isNotEmpty)
+            Text(
+              m.detail,
+              key: Key('track-${m.id}-detail'),
+              style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+            ),
+          if (m.bars.isNotEmpty) ...[
+            const SizedBox(height: LwSpacing.sm),
+            _MiniBars(m.bars, colour: LwPalette.richer(m.tint)),
+          ],
+        ],
+      ),
+    );
+    return Semantics(
+      button: m.onTap != null,
+      container: true,
+      excludeSemantics: true,
+      label: m.label ?? l.trackCardLabel(m.name, m.value, m.detail).trim(),
+      child: Material(
+        key: Key('track-card-${m.id}'),
+        color: m.tint,
+        borderRadius: LwRadius.lgAll,
+        clipBehavior: Clip.antiAlias,
+        child: m.onTap == null ? body : InkWell(onTap: m.onTap, child: body),
+      ),
+    );
+  }
+}
+
+/// Small rounded bars, oldest first (decoration: the card's label says the
+/// value).
+class _MiniBars extends StatelessWidget {
+  const _MiniBars(this.values, {required this.colour});
+
+  final List<double> values;
+  final Color colour;
+
+  /// Always 7 slim slots, newest on the right, as in the design.
+  static const slots = 7;
+
+  @override
+  Widget build(BuildContext context) {
+    final padded = [
+      for (var i = values.length; i < slots; i++) null,
+      ...values.length > slots ? values.sublist(values.length - slots) : values,
+    ];
+    return SizedBox(
+      height: LwSpacing.xl,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          for (final v in padded)
+            Expanded(
+              child: v == null
+                  ? const SizedBox()
+                  : FractionallySizedBox(
+                      heightFactor: v.clamp(0.08, 1).toDouble(),
+                      widthFactor: 0.6,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colour,
+                          borderRadius: LwRadius.smAll,
+                        ),
+                      ),
+                    ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Progress: Steps / Sleep / Mood / Habits chips and a Mon-Sun bar chart
+/// for this week, the selected day highlighted with its value in a bubble.
+/// Each bar is labelled for screen readers (FR-GOL-05), and the selected
+/// one is marked by its bubble and position, not colour alone.
+class _ProgressChart extends ConsumerStatefulWidget {
+  const _ProgressChart();
+
+  @override
+  ConsumerState<_ProgressChart> createState() => _ProgressChartState();
+}
+
+class _ProgressChartState extends ConsumerState<_ProgressChart> {
+  TrackMetric _metric = TrackMetric.mood;
+  int? _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final now = ref.watch(clockProvider)();
+    final dates = weekDates(now);
+    final todayIndex = now.weekday - 1;
+    final history = {
+      for (final c in ref.watch(trackHistoryProvider).value ?? <CheckIn>[])
+        c.date: c,
+    };
+    final health = ref.watch(healthSummaryProvider);
+    final habits = ref.watch(habitsWeekProvider);
+    final number = NumberFormat.decimalPattern(
+      Localizations.localeOf(context).toString(),
+    );
+    final dayNames = [
+      for (final d in dates) DateFormat.E().format(DateTime.parse(d)),
+    ];
+    final fullDays = [
+      for (final d in dates) DateFormat.EEEE().format(DateTime.parse(d)),
+    ];
+
+    // Per day: bar height 0..1 and the words for the bubble and label.
+    final List<(double, String)?> days;
+    String? empty;
+    switch (_metric) {
+      case TrackMetric.steps:
+        if (health == null) {
+          days = List.filled(7, null);
+          empty = l.trackChartStepsEmpty;
+        } else {
+          final top = [
+            health.stepsGoal,
+            ...health.stepsWeek,
+          ].reduce((a, b) => a > b ? a : b);
+          days = [
+            for (var i = 0; i < 7; i++)
+              i > todayIndex || health.stepsWeek[i] == 0
+                  ? null
+                  : (
+                      health.stepsWeek[i] / top,
+                      number.format(health.stepsWeek[i]),
+                    ),
+          ];
+        }
+      case TrackMetric.habits:
+        if (habits == null) {
+          days = List.filled(7, null);
+          empty = l.trackChartHabitsEmpty;
+        } else {
+          days = [
+            for (var i = 0; i < 7; i++)
+              i > todayIndex
+                  ? null
+                  : (habits[i] / 3, l.trackHabitsKept(habits[i])),
+          ];
+        }
+      case TrackMetric.sleep:
+      case TrackMetric.mood:
+        days = [
+          for (final d in dates)
+            if ((_metric == TrackMetric.sleep
+                    ? history[d]?.sleep
+                    : history[d]?.mood)
+                case final v?)
+              (v / 5, scaleWord(l, _metric, v))
+            else
+              null,
+        ];
+        if (days.every((d) => d == null)) empty = l.trackChartEmpty;
+    }
+
+    // Today, or the latest earlier day with a value, until one is tapped.
+    var latest = todayIndex;
+    while (latest > 0 && days[latest] == null) {
+      latest--;
+    }
+    final selected = _selected ?? latest;
+
+    final chips = [
+      (TrackMetric.steps, l.trackSteps),
+      (TrackMetric.sleep, l.trackSleep),
+      (TrackMetric.mood, l.trackMood),
+      (TrackMetric.habits, l.trackChipHabits),
+    ];
+    const chartHeight = 140.0;
+    final bar = LwPalette.richer(p.mint);
+    return Card(
+      key: const Key('track-progress'),
+      child: Padding(
+        padding: const EdgeInsets.all(LwSpacing.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: LwSpacing.xs,
+              runSpacing: LwSpacing.xs,
+              children: [
+                for (final (m, name) in chips)
+                  ChoiceChip(
+                    key: Key('track-chip-${m.name}'),
+                    label: Text(name),
+                    selected: _metric == m,
+                    onSelected: (_) => setState(() {
+                      _metric = m;
+                      _selected = null;
+                    }),
+                  ),
+              ],
+            ),
+            const SizedBox(height: LwSpacing.sm),
+            Text(l.trackThisWeekLabel, style: t.labelSmall),
+            const SizedBox(height: LwSpacing.sm),
+            if (empty != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: LwSpacing.lg),
+                child: Text(
+                  empty,
+                  key: const Key('track-chart-empty'),
+                  style: t.bodyMedium,
+                ),
+              )
+            else
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  for (var i = 0; i < 7; i++)
+                    Expanded(
+                      child: _Bar(
+                        key: Key('track-bar-$i'),
+                        height: chartHeight,
+                        value: days[i]?.$1,
+                        bubble: i == selected ? days[i]?.$2 : null,
+                        day: dayNames[i],
+                        colour: i == selected ? p.accent : bar,
+                        label: days[i] == null
+                            ? l.trackChartBarEmpty(fullDays[i])
+                            : l.trackChartBarLabel(fullDays[i], days[i]!.$2),
+                        selected: i == selected,
+                        onTap: () => setState(() => _selected = i),
+                      ),
+                    ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Bar extends StatelessWidget {
+  const _Bar({
+    super.key,
+    required this.height,
+    required this.value,
+    required this.bubble,
+    required this.day,
+    required this.colour,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final double height;
+  final double? value;
+  final String? bubble;
+  final String day;
+  final Color colour;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    // The bubble and day names don't grow past 130%, so 7 fit across.
+    final small = MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3);
+    return Semantics(
+      button: true,
+      container: true,
+      excludeSemantics: true,
+      selected: selected,
+      label: selected ? l.trackChartSelected(label) : label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: LwRadius.smAll,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: height,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    if (value != null)
+                      FractionallySizedBox(
+                        heightFactor: (value! * 0.8).clamp(0.06, 0.8),
+                        widthFactor: 0.55,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: colour,
+                            borderRadius: LwRadius.smAll,
+                          ),
+                        ),
+                      ),
+                    if (bubble != null)
+                      Positioned(
+                        top: 0,
+                        child: Container(
+                          key: const Key('track-bubble'),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: LwSpacing.xs,
+                            vertical: LwSpacing.xxs / 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: p.primary,
+                            borderRadius: LwRadius.pillAll,
+                          ),
+                          child: Text(
+                            bubble!,
+                            textScaler: small,
+                            style: t.labelSmall?.copyWith(color: p.onPrimary),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: LwSpacing.xxs),
+              Text(
+                day,
+                textScaler: small,
+                style: t.labelSmall?.copyWith(
+                  color: selected ? p.textPrimary : p.textSecondary,
+                  fontWeight: selected ? FontWeight.w700 : null,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "How was your week?" (opens the weekly review, FR-DLY-06).
+class _WeeklyCard extends StatelessWidget {
+  const _WeeklyCard({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    return Semantics(
+      button: true,
+      container: true,
+      excludeSemantics: true,
+      label: l.trackWeeklyLabel,
+      child: Card(
+        key: const Key('track-weekly-wins'),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(LwSpacing.cardPadding),
+            child: Row(
+              children: [
+                const Illustration('icon_reflection', width: 48, height: 48),
+                const SizedBox(width: LwSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l.trackWeeklyQuestion, style: t.titleSmall),
+                      Text(l.trackWeeklyBody, style: t.bodySmall),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: p.textSecondary),
+              ],
+            ),
           ),
         ),
       ),
@@ -262,180 +932,6 @@ class _DayMark extends StatelessWidget {
                 : Icon(icon, size: LwSize.iconSm, color: iconColor),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CheckInGrid extends ConsumerWidget {
-  const _CheckInGrid({required this.checkIn});
-  final CheckIn? checkIn;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
-    final t = Theme.of(context).textTheme;
-    final c = checkIn;
-    // The 1 to 5 scale words from the check-in, never percentages.
-    final tiles = [
-      (
-        'energy',
-        l.trackEnergy,
-        Icons.bolt_rounded,
-        switch (c?.energy) {
-          1 => l.checkinEnergy1,
-          2 => l.checkinEnergy2,
-          3 => l.checkinEnergy3,
-          4 => l.checkinEnergy4,
-          5 => l.checkinEnergy5,
-          _ => null,
-        },
-      ),
-      (
-        'sleep',
-        l.trackSleep,
-        Icons.bedtime_outlined,
-        switch (c?.sleep) {
-          1 => l.checkinSleep1,
-          2 => l.checkinSleep2,
-          3 => l.checkinSleep3,
-          4 => l.checkinSleep4,
-          5 => l.checkinSleep5,
-          _ => null,
-        },
-      ),
-      (
-        'stress',
-        l.trackStress,
-        Icons.spa_outlined,
-        switch (c?.stress) {
-          1 => l.checkinStress1,
-          2 => l.checkinStress2,
-          3 => l.checkinStress3,
-          4 => l.checkinStress4,
-          5 => l.checkinStress5,
-          _ => null,
-        },
-      ),
-      (
-        'mood',
-        l.trackMood,
-        Icons.sentiment_satisfied_outlined,
-        switch (c?.mood) {
-          1 => l.checkinMood1,
-          2 => l.checkinMood2,
-          3 => l.checkinMood3,
-          4 => l.checkinMood4,
-          5 => l.checkinMood5,
-          _ => null,
-        },
-      ),
-    ];
-
-    Future<void> open() => showCheckInSheet(
-      context,
-      date: localDateKey(ref.read(clockProvider)()),
-      firstName: ref.read(firstNameProvider),
-    );
-
-    final oneColumn = MediaQuery.textScalerOf(context).scale(1) > 1.3;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: LwSpacing.sm,
-          children: [
-            Semantics(
-              header: true,
-              child: Text(l.trackCheckInTitle, style: t.titleSmall),
-            ),
-            Text(l.trackCheckInTap, style: t.bodySmall),
-          ],
-        ),
-        const SizedBox(height: LwSpacing.sm),
-        LayoutBuilder(
-          builder: (context, box) {
-            final w = oneColumn
-                ? box.maxWidth
-                : (box.maxWidth - LwSpacing.sm) / 2;
-            return Wrap(
-              spacing: LwSpacing.sm,
-              runSpacing: LwSpacing.sm,
-              children: [
-                for (final (id, name, icon, value) in tiles)
-                  SizedBox(
-                    width: w,
-                    child: _Tile(
-                      key: Key('track-tile-$id'),
-                      name: name,
-                      icon: icon,
-                      value: value,
-                      onTap: open,
-                    ),
-                  ),
-              ],
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class _Tile extends StatelessWidget {
-  const _Tile({
-    super.key,
-    required this.name,
-    required this.icon,
-    required this.value,
-    required this.onTap,
-  });
-
-  final String name;
-  final IconData icon;
-  final String? value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = LwPalette.of(context);
-    final t = Theme.of(context).textTheme;
-    final l = AppLocalizations.of(context);
-    return Semantics(
-      button: true,
-      container: true,
-      excludeSemantics: true,
-      label: value == null
-          ? l.trackTileEmptyLabel(name)
-          : l.trackTileLabel(name, value!),
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(LwSpacing.cardPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(child: Text(name, style: t.bodySmall)),
-                    Icon(icon, size: LwSize.iconSm, color: p.accent),
-                  ],
-                ),
-                const SizedBox(height: LwSpacing.xs),
-                Text(
-                  value ?? l.trackNotLogged,
-                  style: value == null
-                      ? t.titleMedium?.copyWith(color: p.textSecondary)
-                      : t.titleLarge,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

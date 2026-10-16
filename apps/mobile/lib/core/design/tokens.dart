@@ -243,6 +243,23 @@ class LwPalette extends ThemeExtension<LwPalette> {
     onEmergency: Color(0xFFFFFFFF),
   );
 
+  /// A richer shade of a pastel tint, for chart bars and filled segments:
+  /// more colour, a little darker in light mode and lighter in dark mode,
+  /// so the hue stays recognisable (never colour alone: charts are also
+  /// labelled).
+  static Color richer(Color tint) {
+    final hsl = HSLColor.fromColor(tint);
+    final light = hsl.lightness > 0.5;
+    return hsl
+        .withSaturation(
+          (hsl.saturation + (light ? 0.05 : 0.3)).clamp(0, 1).toDouble(),
+        )
+        .withLightness(
+          (hsl.lightness + (light ? -0.13 : 0.14)).clamp(0, 1).toDouble(),
+        )
+        .toColor();
+  }
+
   static LwPalette of(BuildContext context) =>
       Theme.of(context).extension<LwPalette>()!;
 

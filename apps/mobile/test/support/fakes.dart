@@ -341,6 +341,10 @@ class FakeCheckInRepository implements CheckInRepository {
     days[checkIn.date] = checkIn;
     _changes.add(checkIn.date);
   }
+
+  @override
+  Future<List<CheckIn>> range(String from, String to) async =>
+      checkInsBetween(days.values, from, to);
 }
 
 /// Remembers the last day the check-in was offered.

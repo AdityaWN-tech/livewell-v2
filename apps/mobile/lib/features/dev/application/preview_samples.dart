@@ -5,6 +5,7 @@ import '../../home/domain/home_models.dart';
 import '../../learn/domain/lesson.dart';
 import '../../learn/domain/portal.dart';
 import '../../plan/domain/plan_models.dart';
+import '../../checkin/domain/checkin.dart';
 import '../../track/domain/track_models.dart';
 
 /// Sample data shown only in the dev preview (dev flavour only; AGENTS.md:
@@ -191,4 +192,30 @@ abstract final class PreviewSamples {
       minutes: 5,
     ),
   ];
+
+  /// 90 days of check-ins ending yesterday, for Track (T-UI-02e). The same
+  /// every run, so goldens are stable.
+  static List<CheckIn> checkInHistory(DateTime today) => [
+    for (var i = 89; i >= 1; i--)
+      if (i % 9 != 4) // a few days not logged, as in real life
+        () {
+          final d = DateTime(today.year, today.month, today.day - i);
+          final mood = const [4, 4, 3, 5, 4, 3, 4][i % 7];
+          final stress = const [3, 2, 3, 2, 4, 3, 2][i % 7];
+          return CheckIn(
+            date: localDateKey(d),
+            mood: mood,
+            energy: const [3, 4, 4, 3, 5, 4, 3][i % 7],
+            sleep: const [4, 3, 4, 5, 3, 4, 4][i % 7],
+            stress: stress,
+            gentleDay: isGentleDay(mood: mood, stress: stress),
+          );
+        }(),
+  ];
+
+  /// Apple Health / Health Connect samples (dev preview only).
+  static const stepsGoal = 8000;
+  static const stepsWeek = [5200, 7100, 4800, 6900, 8400, 6432, 3100];
+  static const sleepMinutesAverage = 440; // 7 h 20 min
+  static const habitsWeek = [3, 2, 3, 1, 2, 3, 2];
 }

@@ -16,7 +16,18 @@ abstract class CheckInRepository {
   /// Saves (or re-saves) [checkIn]. Works offline: the write is queued and
   /// synced later.
   Future<void> save(CheckIn checkIn);
+
+  /// Check-ins from [from] to [to] (YYYY-MM-DD, inclusive), oldest first,
+  /// for Track (T-UI-02e). Offline: what the phone has.
+  Future<List<CheckIn>> range(String from, String to);
 }
+
+/// Shared by the in-memory stores.
+List<CheckIn> checkInsBetween(Iterable<CheckIn> all, String from, String to) =>
+    all
+        .where((c) => c.date.compareTo(from) >= 0 && c.date.compareTo(to) <= 0)
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
 
 /// Firestore implementation. Offline support comes from Firestore's own
 /// offline persistence for now.
@@ -51,6 +62,24 @@ class FirestoreCheckInRepository implements CheckInRepository {
   @override
   Stream<CheckIn?> watchDay(String date) =>
       _doc(date).snapshots().map((s) => _from(date, s.data()));
+
+  @override
+  Future<List<CheckIn>> range(String from, String to) async {
+    final query = _db
+        .collection('users')
+        .doc(_uid())
+        .collection('checkins')
+        .where(FieldPath.documentId, isGreaterThanOrEqualTo: from)
+        .where(FieldPath.documentId, isLessThanOrEqualTo: to);
+    QuerySnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await query.get().timeout(serverWait);
+    } catch (_) {
+      snap = await query.get(const GetOptions(source: Source.cache));
+    }
+    return [for (final d in snap.docs) ?_from(d.id, d.data())]
+      ..sort((a, b) => a.date.compareTo(b.date));
+  }
 
   @override
   Future<void> save(CheckIn c) async {

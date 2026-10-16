@@ -1236,5 +1236,109 @@
   "planWeekEmpty": "Your plan’s days will show here.",
   "planWeekToday": "Today",
   "planFrameworkRow": "MY GOAL DO IT framework",
-  "planFrameworkRowBody": "Your 10 building blocks, one letter at a time"
+  "planFrameworkRowBody": "Your 10 building blocks, one letter at a time",
+  "trackPeriodWeek": "This Week",
+  "trackPeriodMonth": "This Month",
+  "trackPeriodQuarter": "90 days",
+  "trackPeriodLabel": "Showing {period}. Opens the choices.",
+  "@trackPeriodLabel": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSteps": "Steps",
+  "trackStepsOf": "of {goal}",
+  "@trackStepsOf": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackConnectHealth": "Connect Health",
+  "trackConnectHealthLabel": "Steps: connect Apple Health or Health Connect. Opens details.",
+  "trackHealthSoonTitle": "Connecting Health is coming soon",
+  "trackHealthSoonBody": "Soon you can connect Apple Health or Health Connect. Your steps and sleep hours will show here, and only if you choose to share them.",
+  "trackSleepHours": "{hours}h {minutes}m",
+  "@trackSleepHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "trackFromCheckIns": "From your check-ins",
+  "trackOutOf5": "{value} / 5",
+  "@trackOutOf5": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoCheckIns": "No check-ins yet",
+  "trackCardLabel": "{name}: {value}. {detail}",
+  "@trackCardLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "trackProgressTitle": "Progress",
+  "trackThisWeekLabel": "This week",
+  "trackChipHabits": "Habits",
+  "trackChartBarLabel": "{day}: {value}",
+  "@trackChartBarLabel": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackChartBarEmpty": "{day}: nothing logged",
+  "@trackChartBarEmpty": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "trackChartSelected": "{label}. Selected.",
+  "@trackChartSelected": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackChartStepsEmpty": "Connect Health to see your steps here.",
+  "trackChartHabitsEmpty": "Your habits will show here once you start one.",
+  "trackChartEmpty": "Check in to see your week here.",
+  "trackHabitsKept": "{count} kept",
+  "@trackHabitsKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackWeeklyTitle": "Weekly Reflection",
+  "trackWeeklyQuestion": "How was your week?",
+  "trackWeeklyBody": "Celebrate your wins and set intentions for next week.",
+  "trackWeeklyLabel": "How was your week? Opens your weekly reflection."
 }

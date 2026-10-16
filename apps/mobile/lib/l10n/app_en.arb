@@ -1429,5 +1429,48 @@
   "learnAudioEmpty": "Audio sessions will show here once they are reviewed.",
   "learnProgramsEmptyTitle": "No programs right now",
   "learnProgramsEmptyBody": "Courses from the Live Well Portal show here when one fits you.",
-  "learnGotIt": "Got it"
+  "learnGotIt": "Got it",
+  "careTabChat": "Chat",
+  "careTabVoice": "Voice",
+  "careTabSaved": "Saved",
+  "careTabSafety": "Safety",
+  "careHeroBubble": "I’m here for you. What would you like to talk about today?",
+  "careHeroCalm": "I’m glad you told me. Your safety comes first.",
+  "carePrompt1": "I feel stressed",
+  "carePrompt2": "I need motivation",
+  "carePrompt3": "Help me sleep better",
+  "carePrompt4": "Plan my day",
+  "carePromptsLabel": "Things you can ask",
+  "careReplySoon": "Your coach is coming soon, so there’s no answer yet. Your message stays on this screen only.",
+  "careTapToSpeak": "Tap to speak",
+  "careTalkSoonLabel": "Talking to your coach is coming soon",
+  "careResourcesTitle": "Helpful resources",
+  "careResourceFrom": "From {source}",
+  "@careResourceFrom": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "careResourceLabel": "{title}, from {source}. Opens it.",
+  "@careResourceLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "careHistory": "Your conversations",
+  "careHistoryEmpty": "Your conversations will show here once your coach is ready.",
+  "careVoiceSoonTitle": "Voice conversations are coming soon",
+  "careVoiceSoonBody": "Soon you can talk with your coach out loud. Their voice is always labelled as an AI voice.",
+  "careSavedEmptyTitle": "Nothing saved yet",
+  "careSavedEmptyBody": "Answers you save from your coach will show here.",
+  "careClinicianTitle": "Talk to a clinician",
+  "careClinicianBody": "Your coach is an educational companion, not a clinician. For medical advice, or before changing any medication, talk to your doctor or care team.",
+  "careGotIt": "Got it"
 }

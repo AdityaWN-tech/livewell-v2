@@ -2465,4 +2465,92 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get learnGotIt => 'Got it';
+
+  @override
+  String get careTabChat => 'Chat';
+
+  @override
+  String get careTabVoice => 'Voice';
+
+  @override
+  String get careTabSaved => 'Saved';
+
+  @override
+  String get careTabSafety => 'Safety';
+
+  @override
+  String get careHeroBubble =>
+      'I’m here for you. What would you like to talk about today?';
+
+  @override
+  String get careHeroCalm => 'I’m glad you told me. Your safety comes first.';
+
+  @override
+  String get carePrompt1 => 'I feel stressed';
+
+  @override
+  String get carePrompt2 => 'I need motivation';
+
+  @override
+  String get carePrompt3 => 'Help me sleep better';
+
+  @override
+  String get carePrompt4 => 'Plan my day';
+
+  @override
+  String get carePromptsLabel => 'Things you can ask';
+
+  @override
+  String get careReplySoon =>
+      'Your coach is coming soon, so there’s no answer yet. Your message stays on this screen only.';
+
+  @override
+  String get careTapToSpeak => 'Tap to speak';
+
+  @override
+  String get careTalkSoonLabel => 'Talking to your coach is coming soon';
+
+  @override
+  String get careResourcesTitle => 'Helpful resources';
+
+  @override
+  String careResourceFrom(String source) {
+    return 'From $source';
+  }
+
+  @override
+  String careResourceLabel(String title, String source) {
+    return '$title, from $source. Opens it.';
+  }
+
+  @override
+  String get careHistory => 'Your conversations';
+
+  @override
+  String get careHistoryEmpty =>
+      'Your conversations will show here once your coach is ready.';
+
+  @override
+  String get careVoiceSoonTitle => 'Voice conversations are coming soon';
+
+  @override
+  String get careVoiceSoonBody =>
+      'Soon you can talk with your coach out loud. Their voice is always labelled as an AI voice.';
+
+  @override
+  String get careSavedEmptyTitle => 'Nothing saved yet';
+
+  @override
+  String get careSavedEmptyBody =>
+      'Answers you save from your coach will show here.';
+
+  @override
+  String get careClinicianTitle => 'Talk to a clinician';
+
+  @override
+  String get careClinicianBody =>
+      'Your coach is an educational companion, not a clinician. For medical advice, or before changing any medication, talk to your doctor or care team.';
+
+  @override
+  String get careGotIt => 'Got it';
 }

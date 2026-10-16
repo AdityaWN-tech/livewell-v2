@@ -138,6 +138,16 @@ void main() {
         'textSecondary on surfaceMuted': (p.textSecondary, p.surfaceMuted),
         'primaryDark on primaryTint': (p.primaryDark, p.primaryTint),
         'primaryDark on surface': (p.primaryDark, p.surface),
+        // Tab screens sit on the mint-to-sky wash.
+        for (final (end, c) in [
+          ('washTop', p.washTop),
+          ('washBottom', p.washBottom),
+        ]) ...{
+          'textPrimary on $end': (p.textPrimary, c),
+          'textSecondary on $end': (p.textSecondary, c),
+          'accentStrong on $end (links)': (p.accentStrong, c),
+          'primary on $end': (p.primary, c),
+        },
         for (final (tint, c) in _tints(p)) ...{
           'onTint on $tint': (p.onTint, c),
           'onTintSecondary on $tint': (p.onTintSecondary, c),

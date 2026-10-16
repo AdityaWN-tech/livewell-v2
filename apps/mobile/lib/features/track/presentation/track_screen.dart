@@ -49,6 +49,7 @@ class TrackScreen extends ConsumerWidget {
     return LwScreen(
       eyebrow: l.trackEyebrow,
       title: l.tabTrack,
+      profile: const ProfileButton(),
       actions: [
         FilledButton.icon(
           key: const Key('track-weekly-wins'),
@@ -63,7 +64,6 @@ class TrackScreen extends ConsumerWidget {
           icon: const Icon(Icons.emoji_events_outlined),
           label: Text(l.trackWeeklyWins),
         ),
-        const ProfileButton(),
       ],
       children: [
         _StreakCard(ref.watch(streakProvider)),

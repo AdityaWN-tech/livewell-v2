@@ -8,6 +8,7 @@ import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/dev/application/preview_mode.dart';
 import 'package:livewell/features/dev/presentation/design_gallery.dart';
+import 'package:livewell/features/dev/presentation/illustration_gallery.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/profile/presentation/profile_screen.dart';
 
@@ -64,6 +65,16 @@ void main() {
     expect(find.byType(DesignGallery), findsOneWidget);
   });
 
+  testWidgets('dev: Profile > Developer has Illustrations, and it opens', (
+    tester,
+  ) async {
+    await signedIn(Flavor.dev).boot(tester);
+    await openSettings(tester);
+    await tester.tap(find.byKey(const Key('dev-illustrations')));
+    await tester.pumpAndSettle();
+    expect(find.byType(IllustrationGallery), findsOneWidget);
+  });
+
   for (final flavor in [Flavor.staging, Flavor.prod]) {
     testWidgets('${flavor.name}: Profile has no Developer section', (
       tester,
@@ -72,6 +83,19 @@ void main() {
       await openSettings(tester);
       expect(find.text('Developer'), findsNothing);
       expect(find.text('Design tokens'), findsNothing);
+      expect(find.byKey(const Key('dev-illustrations')), findsNothing);
+    });
+
+    test('${flavor.name}: the illustrations route is not registered', () {
+      final container = ProviderContainer(
+        overrides: [flavorProvider.overrideWithValue(flavor)],
+      );
+      addTearDown(container.dispose);
+      final match = container
+          .read(routerProvider)
+          .configuration
+          .findMatch(Uri.parse(IllustrationGallery.path));
+      expect(match.matches, isEmpty);
     });
 
     test('${flavor.name}: the design-tokens route is not registered', () {

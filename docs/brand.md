@@ -46,7 +46,7 @@ From the illustrated "Live Well v2" design (`docs/design/live-well-v2-illustrate
 | accentStrong | `#07806F` | `#4CC9A4` | Filled buttons, text links |
 | heroSurface | `#F3F7C4` lime pastel | `#2A2F1A` | Featured card (today's next step, coach bubble, portal card), dark text |
 | Tints | mint `#E8F9EE` · lime `#F3F7C4` · lavender `#F3EFFE` · peach `#FEEBDF` · sky `#EBF5FE` · butter `#FEF6DD` · rose `#FFE3EC` | deep versions of each | Category cards (steps, sleep, mood, stress, …); text on them is `onTint` navy |
-| background / wash | `#F4FBF8`, wash `#E6F7F3` → `#EEF4FC` | `#0D1A1C`, wash `#0F2022` → `#0D1824` | Screens |
+| background / wash | `#F4FBF8`, wash `#F0FAF7` → `#F3F8FD` | `#0D1A1C`, wash `#0F2022` → `#0D1824` | Screens |
 | surface / surfaceMuted | `#FFFFFF` / `#F2F4F6` | `#152528` / `#1F2C2F` | White cards / grey chips |
 | textPrimary / textSecondary | `#1B2433` navy / `#566070` | `#E9F1EF` / `#A9B8B6` | Text |
 | success / caution | `#1E7F55` / `#8A5A00` | `#7FD1A4` / `#E9B85C` | Positive / gentle notices |

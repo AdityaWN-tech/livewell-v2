@@ -56,6 +56,7 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
     return LwScreen(
       eyebrow: l.planEyebrow,
       title: l.tabPlan,
+      profile: const ProfileButton(),
       actions: [
         FilledButton.icon(
           key: const Key('plan-new-habit'),
@@ -70,7 +71,6 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
           icon: const Icon(Icons.add),
           label: Text(l.planNewHabit),
         ),
-        const ProfileButton(),
       ],
       children: [
         const Align(alignment: Alignment.centerLeft, child: _FrameworkChip()),

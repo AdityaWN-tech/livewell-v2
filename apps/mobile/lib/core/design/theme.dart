@@ -54,8 +54,8 @@ abstract final class LwTheme {
         centerTitle: false,
         titleTextStyle: text.headlineSmall,
       ),
-      // Primary action: strong terracotta (T-UI-01). Plain terracotta fails
-      // AA with a label on it.
+      // Primary action: fresh green (T-UI-02). The design's brighter green
+      // fails AA with a white label, so this is one step deeper.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: p.accentStrong,
@@ -107,27 +107,44 @@ abstract final class LwTheme {
           borderSide: BorderSide(color: p.primary, width: 2),
         ),
       ),
+      // Pill chips (T-UI-02): selected is solid green with a white label,
+      // unselected is soft grey.
       chipTheme: ChipThemeData(
-        backgroundColor: p.surface,
-        selectedColor: p.primaryTint,
-        secondarySelectedColor: p.primaryTint,
-        labelStyle: text.labelMedium,
-        side: BorderSide(color: p.outlineStrong),
+        color: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? p.primary : p.surfaceMuted,
+        ),
+        labelStyle: text.labelMedium?.copyWith(
+          color: WidgetStateColor.resolveWith(
+            (s) =>
+                s.contains(WidgetState.selected) ? p.onPrimary : p.textPrimary,
+          ),
+        ),
+        iconTheme: IconThemeData(color: p.textPrimary, size: 18),
+        checkmarkColor: p.onPrimary,
+        side: WidgetStateBorderSide.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? BorderSide(color: p.primary)
+              : BorderSide(color: p.outlineSoft),
+        ),
         shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: LwSpacing.xs),
         showCheckmark: false,
       ),
-      // Selected segment matches selected chips (sage tint).
+      // Segmented tabs match selected chips: solid green pill.
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected) ? p.primaryTint : null,
+            (s) => s.contains(WidgetState.selected) ? p.primary : p.surface,
           ),
           foregroundColor: WidgetStateProperty.resolveWith(
-            (s) => s.contains(WidgetState.selected)
-                ? p.onPrimaryTint
-                : p.textPrimary,
+            (s) =>
+                s.contains(WidgetState.selected) ? p.onPrimary : p.textPrimary,
           ),
+          iconColor: WidgetStateProperty.resolveWith(
+            (s) =>
+                s.contains(WidgetState.selected) ? p.onPrimary : p.textPrimary,
+          ),
+          shape: const WidgetStatePropertyAll(StadiumBorder()),
           side: WidgetStatePropertyAll(BorderSide(color: p.outlineStrong)),
           minimumSize: const WidgetStatePropertyAll(
             Size(LwSize.minTapTarget, LwSize.minTapTarget),
@@ -135,13 +152,18 @@ abstract final class LwTheme {
           textStyle: WidgetStatePropertyAll(text.labelLarge),
         ),
       ),
+      // Big friendly cards with a very soft shadow, no heavy border.
       cardTheme: CardThemeData(
         color: p.surface,
-        elevation: 0,
+        elevation: brightness == Brightness.light ? 1 : 0,
+        shadowColor: LwShadow.soft.first.color,
+        surfaceTintColor: Colors.transparent,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: LwRadius.mdAll,
-          side: BorderSide(color: p.outlineSoft),
+          borderRadius: LwRadius.lgAll,
+          side: brightness == Brightness.light
+              ? BorderSide.none
+              : BorderSide(color: p.outlineSoft),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
@@ -155,7 +177,24 @@ abstract final class LwTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: p.surface,
         indicatorColor: p.primaryTint,
-        labelTextStyle: WidgetStatePropertyAll(text.labelSmall),
+        surfaceTintColor: Colors.transparent,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (s) => IconThemeData(
+            color: s.contains(WidgetState.selected)
+                ? p.onPrimaryTint
+                : p.textSecondary,
+          ),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (s) => text.labelSmall?.copyWith(
+            color: s.contains(WidgetState.selected)
+                ? p.onPrimaryTint
+                : p.textSecondary,
+            fontWeight: s.contains(WidgetState.selected)
+                ? FontWeight.w700
+                : null,
+          ),
+        ),
       ),
       dividerTheme: DividerThemeData(
         color: p.outlineSoft,

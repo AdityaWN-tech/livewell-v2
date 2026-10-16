@@ -91,6 +91,18 @@ double _de2000Lab(_Lab p1, _Lab p2) {
   );
 }
 
+List<(String, Color)> _tints(LwPalette p) => [
+  ('mint', p.mint),
+  ('lime', p.lime),
+  ('lavender', p.lavender),
+  ('peach', p.peach),
+  ('sky', p.sky),
+  ('butter', p.butter),
+  ('rose', p.rose),
+  ('heroSurface', p.heroSurface),
+  ('accentTint', p.accentTint),
+];
+
 void main() {
   for (final (name, p) in [
     ('light', LwPalette.light),
@@ -121,6 +133,16 @@ void main() {
         'success on surface': (p.success, p.surface),
         'caution on surface': (p.caution, p.surface),
         'onEmergency on emergency': (p.onEmergency, p.emergency),
+        // T-UI-02: grey chips, deep green on mint, and every pastel card.
+        'textPrimary on surfaceMuted (chips)': (p.textPrimary, p.surfaceMuted),
+        'textSecondary on surfaceMuted': (p.textSecondary, p.surfaceMuted),
+        'primaryDark on primaryTint': (p.primaryDark, p.primaryTint),
+        'primaryDark on surface': (p.primaryDark, p.surface),
+        for (final (tint, c) in _tints(p)) ...{
+          'onTint on $tint': (p.onTint, c),
+          'onTintSecondary on $tint': (p.onTintSecondary, c),
+          'primaryDark on $tint': (p.primaryDark, c),
+        },
       };
       text.forEach((label, pair) {
         test('$label is 4.5:1 or more', () {
@@ -136,20 +158,46 @@ void main() {
         'accent on surface (icons, dots)': (p.accent, p.surface),
         'accent on background': (p.accent, p.background),
         'accent on heroSurface': (p.accent, p.heroSurface),
+        'primary on surfaceMuted (selected vs unselected chip)': (
+          p.primary,
+          p.surfaceMuted,
+        ),
+        'primary on background (focus ring, active tab)': (
+          p.primary,
+          p.background,
+        ),
       };
       nonText.forEach((label, pair) {
         test('$label is 3:1 or more', () {
           expect(contrast(pair.$1, pair.$2), greaterThanOrEqualTo(3));
         });
       });
-      test(
-        'emergency is clearly different from terracotta (CIEDE2000 >= 15)',
-        () {
-          for (final c in [p.accent, p.accentStrong, LwBrand.terracotta]) {
-            expect(deltaE2000(p.emergency, c), greaterThanOrEqualTo(15));
+      test('emergency red is clearly different from every other colour '
+          '(CIEDE2000 >= 15)', () {
+        for (final c in [
+          p.primary,
+          p.accent,
+          p.accentStrong,
+          p.caution,
+          p.success,
+          for (final (_, t) in _tints(p)) t,
+        ]) {
+          expect(deltaE2000(p.emergency, c), greaterThanOrEqualTo(15));
+        }
+      });
+      test('the 7 pastel tints are told apart (CIEDE2000 >= 3)', () {
+        final t = _tints(p);
+        for (var i = 0; i < t.length; i++) {
+          for (var j = i + 1; j < t.length; j++) {
+            if (t[i].$2 == t[j].$2) continue;
+            expect(
+              deltaE2000(t[i].$2, t[j].$2),
+              greaterThanOrEqualTo(3),
+              reason: '${t[i].$1} vs ${t[j].$1}',
+            );
           }
-        },
-      );
+        }
+      });
     });
   }
 
@@ -162,7 +210,7 @@ void main() {
     expect(_de2000Lab((50, 2.5, 0), (73, 25, -18)), closeTo(27.1492, 1e-3));
   });
 
-  test('filled buttons use the strong terracotta, not plain terracotta', () {
+  test('filled buttons use the AA green, not the brighter chart green', () {
     for (final (theme, p) in [
       (LwTheme.light(), LwPalette.light),
       (LwTheme.dark(), LwPalette.dark),
@@ -170,7 +218,37 @@ void main() {
       final style = theme.filledButtonTheme.style!;
       expect(style.backgroundColor?.resolve({}), p.accentStrong);
       expect(style.foregroundColor?.resolve({}), p.onAccentStrong);
+      expect(p.accentStrong, isNot(p.accent));
     }
+  });
+
+  test('selected chips and segments are solid green with a light label', () {
+    for (final (theme, p) in [
+      (LwTheme.light(), LwPalette.light),
+      (LwTheme.dark(), LwPalette.dark),
+    ]) {
+      const sel = {WidgetState.selected};
+      expect(theme.chipTheme.color?.resolve(sel), p.primary);
+      expect(theme.chipTheme.color?.resolve({}), p.surfaceMuted);
+      final label = theme.chipTheme.labelStyle!.color! as WidgetStateColor;
+      expect(label.resolve(sel), p.onPrimary);
+      expect(label.resolve({}), p.textPrimary);
+      final seg = theme.segmentedButtonTheme.style!;
+      expect(seg.backgroundColor?.resolve(sel), p.primary);
+      expect(seg.foregroundColor?.resolve(sel), p.onPrimary);
+    }
+  });
+
+  test('cards are 24 dp round, buttons 16 dp (T-UI-02)', () {
+    final theme = LwTheme.light();
+    final card = theme.cardTheme.shape! as RoundedRectangleBorder;
+    expect(card.borderRadius, BorderRadius.circular(LwRadius.card));
+    final button =
+        theme.filledButtonTheme.style!.shape!.resolve({})!
+            as RoundedRectangleBorder;
+    expect(button.borderRadius, BorderRadius.circular(LwRadius.button));
+    expect(LwRadius.card, 24);
+    expect(LwRadius.button, 16);
   });
 
   test('no raw colours outside lib/core/design (use tokens)', () {

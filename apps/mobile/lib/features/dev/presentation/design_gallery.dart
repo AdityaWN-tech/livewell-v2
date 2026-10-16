@@ -31,13 +31,14 @@ class DesignGallery extends StatelessWidget {
             Column(
               children: [
                 _Swatch('primary', p.primary),
+                _Swatch('primaryDark', p.primaryDark),
                 _Swatch('primaryTint', p.primaryTint),
-                _Swatch('accent', p.accent),
+                _Swatch('accent (charts only)', p.accent),
                 _Swatch('accentStrong', p.accentStrong),
-                _Swatch('accentTint', p.accentTint),
                 _Swatch('heroSurface', p.heroSurface),
                 _Swatch('background', p.background),
                 _Swatch('surface', p.surface),
+                _Swatch('surfaceMuted', p.surfaceMuted),
                 _Swatch('textPrimary', p.textPrimary),
                 _Swatch('textSecondary', p.textSecondary),
                 _Swatch('outlineStrong', p.outlineStrong),
@@ -45,6 +46,38 @@ class DesignGallery extends StatelessWidget {
                 _Swatch('caution', p.caution),
                 _Swatch('emergency', p.emergency),
               ],
+            ),
+          ]),
+          _Section('Pastel tints', [
+            Wrap(
+              spacing: LwSpacing.xs,
+              runSpacing: LwSpacing.xs,
+              children: [
+                for (final (name, c) in [
+                  ('mint', p.mint),
+                  ('lime', p.lime),
+                  ('lavender', p.lavender),
+                  ('peach', p.peach),
+                  ('sky', p.sky),
+                  ('butter', p.butter),
+                  ('rose', p.rose),
+                ])
+                  _TintCard(name, c),
+              ],
+            ),
+            const SizedBox(height: LwSpacing.xs),
+            Container(
+              height: LwSize.minTapTarget,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: LwRadius.lgAll,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [p.washTop, p.washBottom],
+                ),
+              ),
+              child: Text('Page wash', style: t.labelMedium),
             ),
           ]),
           _Section('Type', [
@@ -97,6 +130,16 @@ class DesignGallery extends StatelessWidget {
               ],
             ),
             const SizedBox(height: LwSpacing.sm),
+            SegmentedButton<int>(
+              segments: const [
+                ButtonSegment(value: 0, label: Text('Week')),
+                ButtonSegment(value: 1, label: Text('Month')),
+              ],
+              selected: const {0},
+              showSelectedIcon: false,
+              onSelectionChanged: (_) {},
+            ),
+            const SizedBox(height: LwSpacing.sm),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(LwSpacing.cardPadding),
@@ -108,6 +151,16 @@ class DesignGallery extends StatelessWidget {
                     Text('Steadier blood sugar', style: t.titleLarge),
                     const SizedBox(height: LwSpacing.xxs),
                     Text('Dr Murthy Gokula', style: t.bodySmall),
+                    const SizedBox(height: LwSpacing.sm),
+                    ClipRRect(
+                      borderRadius: LwRadius.pillAll,
+                      child: LinearProgressIndicator(
+                        value: 0.6,
+                        minHeight: LwSpacing.xs,
+                        color: p.accent,
+                        backgroundColor: p.surfaceMuted,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -123,7 +176,7 @@ class DesignGallery extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "TODAY'S ONE STEP",
+                    "TODAY'S NEXT STEP",
                     style: t.labelSmall?.copyWith(
                       color: p.onHeroSurfaceSecondary,
                     ),
@@ -202,7 +255,12 @@ const _spacings = [
   ('xl', LwSpacing.xl),
 ];
 
-const _radii = [LwRadius.smAll, LwRadius.mdAll, LwRadius.lgAll];
+const _radii = [
+  LwRadius.smAll,
+  LwRadius.mdAll, // buttons
+  LwRadius.lgAll, // cards
+  LwRadius.pillAll, // chips
+];
 
 class _Section extends StatelessWidget {
   const _Section(this.title, this.children);
@@ -247,6 +305,39 @@ class _Swatch extends StatelessWidget {
           ),
           const SizedBox(width: LwSpacing.sm),
           Expanded(child: Text('$name · #$hex', style: t.bodySmall)),
+        ],
+      ),
+    );
+  }
+}
+
+/// A pastel category card, as on Home and Track.
+class _TintCard extends StatelessWidget {
+  const _TintCard(this.name, this.color);
+  final String name;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final hex = color.toARGB32().toRadixString(16).substring(2).toUpperCase();
+    return Container(
+      width: 104,
+      padding: const EdgeInsets.all(LwSpacing.sm),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: LwRadius.lgAll,
+        boxShadow: LwShadow.of(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name, style: t.titleSmall?.copyWith(color: p.onTint)),
+          Text(
+            '#$hex',
+            style: t.labelSmall?.copyWith(color: p.onTintSecondary),
+          ),
         ],
       ),
     );

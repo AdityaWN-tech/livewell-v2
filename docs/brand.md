@@ -21,37 +21,41 @@ and checks every text/background pair for WCAG 2.2 AA in light and dark.
 
 | File | Contents |
 |---|---|
-| `tokens.dart` | `LwBrand` (logo + app colours), `LwPalette` light/dark (semantic colours, via `LwPalette.of(context)`), `LwSpacing`, `LwRadius`, `LwSize`, `LwMotion` |
+| `tokens.dart` | `LwBrand` (logo + app colours), `LwPalette` light/dark (semantic colours, via `LwPalette.of(context)`), `LwShadow`, `LwSpacing`, `LwRadius`, `LwSize`, `LwMotion` |
 | `typography.dart` | `LwType`: Poppins type scale |
 | `theme.dart` | `LwTheme.light()` / `.dark()`: Material theme built from the tokens (buttons, inputs, chips, cards, sheets, nav bar) |
 
 - **Font:** Poppins (the reference screens' font), bundled in `assets/fonts/poppins` (SIL OFL). Body 16, subtitles 16 grey, titles 24 semibold, display 28, meta 12.
 - **Spacing:** 4-point scale `xxs 4 · xs 8 · sm 12 · md 16 · lg 24 · xl 32 · xxl 48`; screen gutter 16.
-- **Radius:** `sm 8` tags · `md 12` buttons, inputs, cards · `lg 20` sheets · `pill` chips. Slightly rounder than the references for warmth.
+- **Radius:** `sm 8` tags · `md 16` buttons, inputs (`LwRadius.button`) · `lg 24` cards, sheets (`LwRadius.card`) · `pill` chips, segmented tabs.
 - **Sizes:** tap targets 48+, buttons 52 high, inputs 56, chips 36.
-- **Style taken from the references:** white cards with a soft 1 px outline on a light grey background, pill chips with outline, selected state as a soft tint (not a solid fill), bold left-aligned screen titles.
+- **Style (T-UI-02):** white and pastel cards with a very soft shadow on a mint-to-sky wash, solid green selected chips, bold left-aligned screen titles.
 - **Kindness rule:** `emergency` red is only for emergency and crisis cards; everyday notices use `caution` amber.
 - **Motion:** 150 / 250 / 400 ms, ease-out; `LwMotion.duration()` returns zero when reduce-motion is on.
 - **Review on a phone:** the dev flavor opens a "Design tokens" gallery (`lib/features/dev/`).
 
-## App colours (T-UI-01, D-25)
-From the "Live Well Companion" mockup (`docs/design/screen.png`). Exact values and every contrast pair: `tokens.dart` and `test/design/tokens_test.dart`.
+## App colours (T-UI-02, D-33)
+From the illustrated "Live Well v2" design (`docs/design/live-well-v2-illustrated.png`). Replaces the T-UI-01 terracotta palette (D-25). Exact values and every contrast pair: `tokens.dart` and `test/design/tokens_test.dart`.
 
 | Token | Light | Dark | Where |
 |---|---|---|---|
-| primary | `#1E3834` Forest Slate | `#A9D3C9` | Headings, selected icons, focus ring, outlined buttons |
-| primaryTint | `#E1ECEB` Sage-Mint | `#24403B` | Nav indicator, selected chips, quiet cards |
-| accent | `#D97457` Terracotta | `#D97457` | **Decorative only**: dots, icons, progress (3:1, not 4.5:1) |
-| accentStrong | `#B05A3B` | `#E58C70` | Filled buttons (white / dark label), text links |
-| accentTint | `#FCEFEA` | `#3A2620` | Soft highlight backgrounds |
-| heroSurface | `#1E3834` | `#1E3834` | Dark hero cards (today's step, coach bubble, portal card) |
-| background / surface | `#F8FAF9` / `#FFFFFF` | `#0E1B19` / `#162724` | Screens / cards |
-| textPrimary / textSecondary | `#1E3834` / `#566864` | `#E8EFED` / `#A7B7B3` | Text |
-| success / caution | `#2B734E` / `#835A00` | `#7FD1A4` / `#E9B85C` | Positive / gentle notices |
-| emergency | `#A50E1E` | `#B3131F` | Emergency and crisis cards **only** |
+| primary | `#07806F` fresh green | `#4CC9A4` | Selected chips and tabs, filled buttons, focus ring, active nav |
+| primaryDark | `#0B5E52` deep green | `#BFF0DF` | Text and icons on green tints |
+| primaryTint | `#E8F9EE` mint | `#1C3A33` | Nav indicator, quiet selected state |
+| accent | `#1E9E70` | `#3DBB96` | **Charts, progress, decoration only** (3:1, not 4.5:1) |
+| accentStrong | `#07806F` | `#4CC9A4` | Filled buttons, text links |
+| heroSurface | `#F3F7C4` lime pastel | `#2A2F1A` | Featured card (today's next step, coach bubble, portal card), dark text |
+| Tints | mint `#E8F9EE` · lime `#F3F7C4` · lavender `#F3EFFE` · peach `#FEEBDF` · sky `#EBF5FE` · butter `#FEF6DD` · rose `#FFE3EC` | deep versions of each | Category cards (steps, sleep, mood, stress, …); text on them is `onTint` navy |
+| background / wash | `#F4FBF8`, wash `#E6F7F3` → `#EEF4FC` | `#0D1A1C`, wash `#0F2022` → `#0D1824` | Screens |
+| surface / surfaceMuted | `#FFFFFF` / `#F2F4F6` | `#152528` / `#1F2C2F` | White cards / grey chips |
+| textPrimary / textSecondary | `#1B2433` navy / `#566070` | `#E9F1EF` / `#A9B8B6` | Text |
+| success / caution | `#1E7F55` / `#8A5A00` | `#7FD1A4` / `#E9B85C` | Positive / gentle notices |
+| emergency | `#C62828` clear red | `#D32F2F` | Emergency and crisis cards **only** |
 
-- Plain terracotta with white text is 3.2:1 and fails AA, so buttons use `accentStrong`.
-- Emergency is a true crimson, kept at CIEDE2000 15 or more from both terracottas (tested), so a safety card never looks like a normal button.
+- The design's chip green `#089787` with white text is 3.6:1 and fails AA, so `primary` is one step deeper (`#07806F`, 4.85:1). The brighter green stays for charts.
+- Green on mint is 4.4:1, so text on mint uses `primaryDark`.
+- Emergency is a clear red, kept at CIEDE2000 15 or more from every green, every tint, caution and success (tested), so a safety card never looks like a normal card.
+- **Shape (T-UI-02):** cards 24 dp radius with a very soft shadow (`LwShadow.soft`) and no border; buttons and inputs 16; chips and segmented tabs are pills; selected chip = solid green with a white label, unselected = soft grey.
 
 ## Logo colours (D-04, logo, splash and icon only)
 | Token | Hex | Where |

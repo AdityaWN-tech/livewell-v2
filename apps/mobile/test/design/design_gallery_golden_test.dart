@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/design/theme.dart';
 import 'package:livewell/features/dev/presentation/design_gallery.dart';
 
-/// Golden images of the dev Design tokens screen (T-UI-01a): light and dark,
-/// normal and large (200%) text. Regenerate after an intended change:
+/// Golden images of the dev Design tokens screen (T-UI-01a, T-UI-02a): light and dark,
+/// text at 100%, 130% and 200%. Regenerate after an intended change:
 ///   flutter test --update-goldens --tags golden
 void main() {
   for (final (name, theme) in [
@@ -15,8 +15,9 @@ void main() {
     ('dark', LwTheme.dark()),
   ]) {
     for (final (size, scale, height) in [
-      ('normal', 1.0, 2300.0),
-      ('large', 2.0, 3900.0),
+      ('normal', 1.0, 2400.0),
+      ('medium', 1.3, 3500.0),
+      ('large', 2.0, 5200.0),
     ]) {
       testWidgets('design tokens screen ($name, $size text)', (tester) async {
         tester.view.physicalSize = Size(400, height);

@@ -280,6 +280,29 @@ describe('starter plan (T-ONB-03e: the app writes 7 days)', () => {
   });
 });
 
+describe('profile settings (T-ONB-03f)', () => {
+  const upd = (o: Record<string, unknown>) =>
+    updateDoc(doc(as(ALICE), 'users/alice'), { ...o, updated_at: meta().updated_at });
+
+  it('coach name, appearance, quiet hours and reminder categories', async () => {
+    await seedAdult(env);
+    await assertSucceeds(upd({ coach_name: 'Maya' }));
+    await assertSucceeds(upd({ appearance: { theme: 'dark', text_scale: 1.15 } }));
+    await assertSucceeds(upd({ quiet_hours: { start: '21:30', end: '06:30' } }));
+    await assertSucceeds(upd({ notification_categories: { greeting: true, nudge: false, reflection: true } }));
+  });
+  it('rejects bad values', async () => {
+    await seedAdult(env);
+    await assertFails(upd({ coach_name: '' }));
+    await assertFails(upd({ coach_name: 'x'.repeat(21) }));
+    await assertFails(upd({ appearance: { theme: 'neon', text_scale: 1 } }));
+    await assertFails(upd({ appearance: { theme: 'dark', text_scale: 3 } }));
+    await assertFails(upd({ quiet_hours: { start: '9pm', end: '06:30' } }));
+    await assertFails(upd({ notification_categories: { greeting: 'yes', nudge: true, reflection: true } }));
+    await assertFails(upd({ notification_categories: { marketing: true } }));
+  });
+});
+
 describe('library voices (T-ONB-03c: chosen in the app)', () => {
   const lib = (o: Record<string, unknown> = {}) => ({
     kind: 'library', vendor_voice_id: 'kokoro:af_heart', status: 'active', speed: 1, style: 'calm', ...meta(), ...o,

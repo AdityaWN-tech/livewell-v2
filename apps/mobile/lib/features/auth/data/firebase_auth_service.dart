@@ -35,6 +35,7 @@ class FirebaseAuthService implements AuthService {
     email: u.email,
     phoneNumber: u.phoneNumber,
     displayName: u.displayName,
+    providers: [for (final p in u.providerData) p.providerId],
   );
 
   Future<AuthUser> _guard(Future<fb.UserCredential> Function() call) async {
@@ -198,6 +199,30 @@ class FirebaseAuthService implements AuthService {
       throw AuthException(authFailureFromCode(e.code), e.message);
     } finally {
       clearPendingLink();
+    }
+  }
+
+  @override
+  Future<AuthUser> link(SocialProvider p) async {
+    final user = _auth.currentUser!;
+    try {
+      final cred = await user.linkWithProvider(_provider(p));
+      return _user(cred.user!);
+    } on fb.FirebaseAuthException catch (e) {
+      throw AuthException(authFailureFromCode(e.code), e.message);
+    }
+  }
+
+  @override
+  Future<AuthUser> unlink(SocialProvider p) async {
+    final user = _auth.currentUser!;
+    if (user.providerData.length <= 1) {
+      throw const AuthException(AuthFailure.lastMethod);
+    }
+    try {
+      return _user(await user.unlink(p.providerId));
+    } on fb.FirebaseAuthException catch (e) {
+      throw AuthException(authFailureFromCode(e.code), e.message);
     }
   }
 

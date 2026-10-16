@@ -21,6 +21,7 @@ String? authErrorText(AppLocalizations l, AuthFailure f) => switch (f) {
   AuthFailure.network => l.authErrorNetwork,
   AuthFailure.methodDisabled => l.authErrorMethodDisabled,
   AuthFailure.accountExists => l.authErrorAccountExists,
+  AuthFailure.lastMethod => l.authErrorLastMethod,
   AuthFailure.cancelled => null,
   AuthFailure.unknown => l.authErrorUnknown,
 };

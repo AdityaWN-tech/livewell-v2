@@ -85,6 +85,16 @@ class TouchpointTimes {
 
 /// No notifications between [start] and [end] (may cross midnight).
 class QuietHours {
+  static QuietHours fromMap(Map<String, dynamic>? m) {
+    const d = QuietHours();
+    return QuietHours(
+      start: ClockTime.parse(m?['start'] as String?) ?? d.start,
+      end: ClockTime.parse(m?['end'] as String?) ?? d.end,
+    );
+  }
+
+  Map<String, String> toMap() => {'start': start.key, 'end': end.key};
+
   const QuietHours({
     this.start = const ClockTime(22, 0),
     this.end = const ClockTime(7, 0),
@@ -133,12 +143,15 @@ abstract final class TouchpointScheduler {
     required QuietHours quiet,
     required bool consent,
     required DateTime now,
+    Set<TouchpointKind> enabled = const {...TouchpointKind.values},
   }) {
     if (!consent) return const [];
     final out = <ScheduledTouchpoint>[];
     for (final day in days) {
       var total = 0, nudges = 0;
       for (final k in TouchpointKind.values) {
+        // Each category can be turned off (FR-TCH-01).
+        if (!enabled.contains(k)) continue;
         final t = times.of(k);
         final when = DateTime(day.year, day.month, day.day, t.hour, t.minute);
         if (!when.isAfter(now) || quiet.contains(t)) continue;
@@ -155,3 +168,13 @@ abstract final class TouchpointScheduler {
     return out;
   }
 }
+
+/// Which touchpoints may notify (Profile > Daily plan). All on by default.
+Set<TouchpointKind> enabledFromMap(Map<String, dynamic>? m) => {
+  for (final k in TouchpointKind.values)
+    if (m?[k.name] != false) k,
+};
+
+Map<String, bool> enabledToMap(Set<TouchpointKind> s) => {
+  for (final k in TouchpointKind.values) k.name: s.contains(k),
+};

@@ -6,7 +6,7 @@ import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../settings/presentation/settings_screen.dart';
+import '../../profile/presentation/profile_button.dart';
 import '../application/plan_data.dart';
 import '../domain/plan_models.dart';
 
@@ -70,7 +70,7 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
           icon: const Icon(Icons.add),
           label: Text(l.planNewHabit),
         ),
-        const SettingsAction(),
+        const ProfileButton(),
       ],
       children: [
         const Align(alignment: Alignment.centerLeft, child: _FrameworkChip()),

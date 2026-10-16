@@ -9,7 +9,7 @@ import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/dev/application/preview_mode.dart';
 import 'package:livewell/features/dev/presentation/design_gallery.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
-import 'package:livewell/features/settings/presentation/settings_screen.dart';
+import 'package:livewell/features/profile/presentation/profile_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
@@ -27,10 +27,19 @@ Harness signedIn(Flavor flavor) {
   return h;
 }
 
+/// Profile (T-ONB-03f) is the settings home; scrolls to its end so the
+/// lazily built Developer section, if any, exists.
 Future<void> openSettings(WidgetTester tester) async {
-  await tester.tap(find.byTooltip('Settings'));
+  await tester.tap(find.byTooltip('Profile'));
   await tester.pumpAndSettle();
-  expect(find.byType(SettingsScreen), findsOneWidget);
+  expect(find.byType(ProfileScreen), findsOneWidget);
+  await tester.scrollUntilVisible(
+    find.byKey(const Key('profile-help-now')),
+    400,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.fling(find.byType(ListView).first, const Offset(0, -3000), 3000);
+  await tester.pumpAndSettle();
 }
 
 void main() {
@@ -44,7 +53,7 @@ void main() {
     });
   }
 
-  testWidgets('dev: Settings > Developer has Design tokens, and it opens', (
+  testWidgets('dev: Profile > Developer has Design tokens, and it opens', (
     tester,
   ) async {
     await signedIn(Flavor.dev).boot(tester);
@@ -56,7 +65,7 @@ void main() {
   });
 
   for (final flavor in [Flavor.staging, Flavor.prod]) {
-    testWidgets('${flavor.name}: Settings has no Developer section', (
+    testWidgets('${flavor.name}: Profile has no Developer section', (
       tester,
     ) async {
       await signedIn(flavor).boot(tester);

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/data/firestore.dart';
 import '../../auth/data/firebase_auth_service.dart';
+import '../../dev/application/preview_mode.dart';
 import '../../focus/domain/focus.dart';
 import '../domain/starter_plan.dart';
 import '../domain/touchpoints.dart';
@@ -149,8 +150,43 @@ class FirestorePlanRepository implements PlanRepository {
   }
 }
 
+/// Dev preview: kept in memory, nothing saved.
+class InMemoryPlanRepository implements PlanRepository {
+  final _days = <String, PlanDay>{};
+  TouchpointTimes _times = const TouchpointTimes();
+
+  @override
+  Future<void> save(StarterPlan plan, TouchpointTimes times) async {
+    for (final d in plan.days) {
+      _days[d.date] = d;
+    }
+    _times = times;
+  }
+
+  @override
+  Future<void> saveTimes(TouchpointTimes times) async => _times = times;
+
+  @override
+  Future<TouchpointTimes> loadTimes() async => _times;
+
+  @override
+  Stream<PlanDay?> watchDay(String date) => Stream.value(_days[date]);
+
+  @override
+  Future<List<String>> datesFrom(String from) async =>
+      _days.keys.where((d) => d.compareTo(from) >= 0).toList()..sort();
+}
+
+final _previewPlansProvider = Provider<PlanRepository>(
+  (ref) => InMemoryPlanRepository(),
+);
+
 final planRepositoryProvider = Provider<PlanRepository>((ref) {
   final auth = ref.watch(authServiceProvider);
+  // Dev preview or nobody signed in: nothing to read or save.
+  if (ref.watch(previewModeProvider) || auth.currentUser == null) {
+    return ref.watch(_previewPlansProvider);
+  }
   return FirestorePlanRepository(
     ref.watch(firestoreProvider),
     () => auth.currentUser!.uid,

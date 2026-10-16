@@ -8,9 +8,14 @@ class AuthUser {
     this.email,
     this.phoneNumber,
     this.displayName,
+    this.providers = const [],
   });
 
   final String uid;
+
+  /// Sign-in methods on this account: 'password', 'phone', 'google.com',
+  /// 'apple.com'.
+  final List<String> providers;
   final String? email;
 
   /// E.164, e.g. +919876543210.
@@ -30,6 +35,9 @@ enum AuthFailure {
   tooManyRequests,
   network,
   methodDisabled,
+
+  /// The only sign-in method left can't be removed.
+  lastMethod,
 
   /// Google or Apple found a Live Well account with the same email that
   /// was made another way (Firebase account-exists-with-different-credential).
@@ -146,13 +154,16 @@ String? inferRegion({String? phoneE164, String? deviceCountry}) {
 
 /// One-tap sign-in providers.
 enum SocialProvider {
-  google('Google'),
-  apple('Apple');
+  google('Google', 'google.com'),
+  apple('Apple', 'apple.com');
 
-  const SocialProvider(this.brandName);
+  const SocialProvider(this.brandName, this.providerId);
 
   /// Brand name, never translated.
   final String brandName;
+
+  /// Firebase provider id.
+  final String providerId;
 }
 
 /// A Google or Apple sign-in that hit an existing account with the same
@@ -199,6 +210,12 @@ abstract class AuthService {
   /// Adds the pending Google/Apple sign-in to the signed-in account.
   Future<void> linkPending();
   void clearPendingLink();
+
+  /// Adds Google or Apple to the signed-in account (Profile).
+  Future<AuthUser> link(SocialProvider provider);
+
+  /// Removes Google or Apple; refuses to remove the last sign-in method.
+  Future<AuthUser> unlink(SocialProvider provider);
 
   Future<void> signOut();
 

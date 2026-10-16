@@ -39,6 +39,7 @@ class Profile {
     this.edSafeMode = false,
     this.focusChoices = const [],
     this.activityLimited,
+    this.settings = const {},
   });
 
   final String uid;
@@ -60,6 +61,12 @@ class Profile {
   /// FR-GOL-03: a clinician limit or warning signs; then no movement plans.
   final bool? activityLimited;
 
+  /// Profile settings (T-ONB-03f): coach_name, appearance, quiet_hours,
+  /// notification_categories, touchpoints. Raw maps; see the readers below.
+  final Map<String, dynamic> settings;
+
+  String? get coachName => settings['coach_name'] as String?;
+
   static Profile fromData(String uid, Map<String, dynamic> d) => Profile(
     uid: uid,
     displayName: d['display_name'] as String?,
@@ -70,7 +77,30 @@ class Profile {
     edSafeMode: d['ed_safe_mode'] as bool? ?? false,
     focusChoices: [...?(d['focus_choices'] as List?)?.cast<String>()],
     activityLimited: d['activity_limited'] as bool?,
+    settings: {
+      for (final k in ProfileSettings.keys)
+        if (d[k] != null) k: d[k],
+    },
   );
+}
+
+/// Settings the app may change on the profile (T-ONB-03f, FR-SET-01),
+/// checked by the rules.
+abstract final class ProfileSettings {
+  static const coachName = 'coach_name';
+  static const appearance = 'appearance';
+  static const quietHours = 'quiet_hours';
+  static const notificationCategories = 'notification_categories';
+  static const touchpoints = 'touchpoints';
+  static const displayName = 'display_name';
+
+  static const keys = [
+    coachName,
+    appearance,
+    quietHours,
+    notificationCategories,
+    touchpoints,
+  ];
 }
 
 /// The users/{uid} root profile (spec 11). Only client-writable fields are
@@ -91,6 +121,9 @@ abstract class ProfileRepository {
 
   /// Moves onboarding to [step] (FR-ONB-06: resumes there).
   Future<void> setStep(String uid, String step);
+
+  /// Changes settings ([ProfileSettings] keys or display_name).
+  Future<void> updateSettings(String uid, Map<String, Object> fields);
 
   /// Saves the focus choices (1 or 2 ids), the main driver and the FR-GOL-03
   /// answer (null when not asked: no movement focus), then moves onboarding
@@ -174,6 +207,12 @@ class FirestoreProfileRepository extends ProfileRepository {
     'onboarding_step': nextStep,
     'updated_at': FieldValue.serverTimestamp(),
   });
+
+  @override
+  Future<void> updateSettings(String uid, Map<String, Object> fields) =>
+      _doc(uid)
+          .update({...fields, 'updated_at': FieldValue.serverTimestamp()})
+          .timeout(const Duration(seconds: 3), onTimeout: () {});
 
   @override
   Future<void> setStep(String uid, String step) => _doc(uid).update({

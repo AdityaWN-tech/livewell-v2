@@ -954,5 +954,101 @@
   "reminderNudgeTitle": "Time for your small step",
   "reminderNudgeBody": "Open Live Well when you’re ready.",
   "reminderReflectionTitle": "A moment to look back",
-  "reminderReflectionBody": "What went well today?"
+  "reminderReflectionBody": "What went well today?",
+  "authErrorLastMethod": "This is your only way to sign in, so it can’t be removed.",
+  "profileTitle": "Profile",
+  "profileOpen": "Profile",
+  "profileSignedInWith": "Signed in with",
+  "profileMethodEmail": "Email",
+  "profileMethodPhone": "Phone",
+  "profileAccount": "Account",
+  "profileChangePhoto": "Change profile picture",
+  "profileTakePhoto": "Take a photo",
+  "profileChoosePhoto": "Choose from gallery",
+  "profileRemovePhoto": "Remove picture",
+  "profilePhotoNote": "Your picture is kept on this phone only for now.",
+  "profileEditName": "Name",
+  "profileNameHint": "Your first name",
+  "profileSave": "Save",
+  "profileCancel": "Cancel",
+  "profileLinked": "Linked",
+  "profileLink": "Add {provider}",
+  "@profileLink": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "profileUnlink": "Remove {provider}",
+  "@profileUnlink": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLinkPhoneSoon": "Add a phone number: coming soon",
+  "profileLogOut": "Log out",
+  "profileSwitch": "Switch account",
+  "profileLogOutTitle": "Log out?",
+  "profileLogOutBody": "We’ll clear your data from this phone and stop reminders. Everything stays safe in your account.",
+  "profileMyCoach": "My coach",
+  "profileChangeAvatar": "Change avatar",
+  "profileChangeVoice": "Change voice",
+  "profileCoachName": "Coach name",
+  "profileCoachNameHint": "For example, Maya",
+  "profileCoachNameError": "Use 1 to 20 letters.",
+  "profileAppearance": "Appearance",
+  "profileThemeSystem": "System",
+  "profileThemeLight": "Light",
+  "profileThemeDark": "Dark",
+  "profileTextSize": "Text size",
+  "profileTextNormal": "Normal",
+  "profileTextLarger": "Larger",
+  "profileTextLargest": "Largest",
+  "profileDailyPlan": "Daily plan",
+  "profileQuietHours": "Quiet hours",
+  "profileQuietValue": "{start} to {end}",
+  "@profileQuietValue": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "profileQuietStart": "Quiet hours start",
+  "profileQuietEnd": "Quiet hours end",
+  "profileReminders": "Reminders",
+  "profileRemindersOff": "Reminders are off. You can turn them on in Privacy & consents.",
+  "profilePrivacy": "Privacy & data",
+  "profileConsents": "Privacy & consents",
+  "profileMemory": "What my coach remembers",
+  "profileExport": "Export my data",
+  "profileSoon": "Coming soon",
+  "profileDeleteAvatar": "Delete my avatar",
+  "profileDeleteVoice": "Delete my voice",
+  "profileDeleteAccount": "Delete my account",
+  "profileDeleteAvatarBody": "Your coach’s avatar will be deleted. Your coach will use the default look.",
+  "profileDeleteVoiceBody": "Your coach’s voice choice will be deleted. Your coach will use the default voice.",
+  "profileDeleteAccountBody": "This deletes your account and everything in it: your Why, check-ins, plans and reflections. It can’t be undone.",
+  "profileDeleteConfirm": "Delete",
+  "profileDeleted": "Deleted.",
+  "profileDeleteFailed": "We couldn’t delete that right now. Please try again later.",
+  "profileHelp": "Help & about",
+  "profileTerms": "Terms of use",
+  "profilePrivacyPolicy": "Privacy policy",
+  "profileVersion": "Version {version}",
+  "@profileVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "profileDeveloper": "Developer",
+  "profileSaved": "Saved."
 }

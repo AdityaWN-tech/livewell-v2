@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/time/clock.dart';
+import '../../account/data/profile_repository.dart';
+import '../../auth/data/firebase_auth_service.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
@@ -15,7 +17,7 @@ class PlanScheduler {
 
   final Ref _ref;
 
-  /// Default quiet hours until they can be edited in Profile (ONB-03f).
+  /// Default quiet hours; Profile > Daily plan can change them.
   static const quiet = QuietHours();
 
   Future<bool> _consent() async => isGranted(
@@ -36,12 +38,23 @@ class PlanScheduler {
     final plans = _ref.read(planRepositoryProvider);
     final now = _ref.read(clockProvider)();
     final dates = await plans.datesFrom(localDateKey(now));
+    final uid = _ref.read(authServiceProvider).currentUser?.uid;
+    final settings = uid == null
+        ? const <String, dynamic>{}
+        : (await _ref.read(profileRepositoryProvider).get(uid))?.settings ??
+              const <String, dynamic>{};
     final items = TouchpointScheduler.build(
       days: [for (final d in dates) DateTime.parse(d)],
       times: await plans.loadTimes(),
-      quiet: quiet,
+      quiet: QuietHours.fromMap(
+        settings[ProfileSettings.quietHours] as Map<String, dynamic>?,
+      ),
       consent: true,
       now: now,
+      enabled: enabledFromMap(
+        settings[ProfileSettings.notificationCategories]
+            as Map<String, dynamic>?,
+      ),
     );
     await reminders.replaceAll(items, texts);
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());

@@ -15,7 +15,7 @@ import '../../home/application/home_data.dart';
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';
-import '../../settings/presentation/settings_screen.dart';
+import '../../profile/presentation/profile_button.dart';
 import '../domain/chat.dart';
 
 /// Earlier conversation. Empty until the AI coach exists; the dev preview
@@ -146,7 +146,7 @@ class _CareScreenState extends ConsumerState<CareScreen> {
       title: l.careTitle,
       actions: [
         _StatusPill(voiceOn: ref.watch(coachVoiceOnProvider)),
-        const SettingsAction(),
+        const ProfileButton(),
       ],
       bottom: _Composer(
         controller: _text,

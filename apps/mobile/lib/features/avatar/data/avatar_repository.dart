@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/data/firestore.dart';
 import '../../auth/data/firebase_auth_service.dart';
+import '../../dev/application/preview_mode.dart';
 import '../domain/avatar_config.dart';
 
 /// users/{uid}/avatar/current (spec 11). The app writes only the style;
@@ -60,8 +61,27 @@ class FirestoreAvatarRepository implements AvatarRepository {
   }
 }
 
+/// Dev preview: kept in memory, nothing saved.
+class InMemoryAvatarRepository implements AvatarRepository {
+  AvatarConfig? _saved;
+
+  @override
+  Future<AvatarConfig?> load() async => _saved;
+
+  @override
+  Future<void> save(AvatarConfig config) async => _saved = config;
+}
+
+final _previewAvatarProvider = Provider<AvatarRepository>(
+  (ref) => InMemoryAvatarRepository(),
+);
+
 final avatarRepositoryProvider = Provider<AvatarRepository>((ref) {
   final auth = ref.watch(authServiceProvider);
+  // Dev preview or nobody signed in: nothing to read or save.
+  if (ref.watch(previewModeProvider) || auth.currentUser == null) {
+    return ref.watch(_previewAvatarProvider);
+  }
   return FirestoreAvatarRepository(
     ref.watch(firestoreProvider),
     () => auth.currentUser!.uid,

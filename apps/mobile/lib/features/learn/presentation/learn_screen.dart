@@ -8,7 +8,7 @@ import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../settings/presentation/settings_screen.dart';
+import '../../profile/presentation/profile_button.dart';
 import '../application/learn_data.dart';
 import '../data/learn_repository.dart';
 import '../domain/lesson.dart';
@@ -33,7 +33,7 @@ class LearnScreen extends ConsumerWidget {
     return LwScreen(
       eyebrow: l.learnEyebrow,
       title: l.tabLearn,
-      actions: const [SettingsAction()],
+      actions: const [ProfileButton()],
       children: [
         if (offer != null) ...[
           _PortalCard(key: ValueKey(offer.id), offer: offer),

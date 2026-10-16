@@ -1340,5 +1340,94 @@
   "trackWeeklyTitle": "Weekly Reflection",
   "trackWeeklyQuestion": "How was your week?",
   "trackWeeklyBody": "Celebrate your wins and set intentions for next week.",
-  "trackWeeklyLabel": "How was your week? Opens your weekly reflection."
+  "trackWeeklyLabel": "How was your week? Opens your weekly reflection.",
+  "learnSearch": "Search lessons",
+  "learnSearchHint": "Search lessons and audio",
+  "learnSearchStart": "Search by title or topic.",
+  "learnSearchEmpty": "Nothing found for “{query}”.",
+  "@learnSearchEmpty": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "learnFilterAll": "All",
+  "learnFilterLessons": "Lessons",
+  "learnFilterAudio": "Audio",
+  "learnFilterPrograms": "Programs",
+  "learnContinueTitle": "Pick up where you left off",
+  "learnKindLesson": "Lesson",
+  "learnKindAudio": "Audio",
+  "learnMinutes": "{minutes} min",
+  "@learnMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "learnPercentDone": "{percent}% done",
+  "@learnPercentDone": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "learnContinueLabel": "{title}. {kind}, {minutes} minutes, {percent}% done. Opens it.",
+  "@learnContinueLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "kind": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "learnFeatured": "Featured Lessons",
+  "learnSeeAll": "See all",
+  "learnPopularAudio": "Popular Audio Sessions",
+  "learnPlay": "Play {title}",
+  "@learnPlay": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "learnOpenLabel": "{title}. {minutes} minutes. Opens it.",
+  "@learnOpenLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "learnOpenLabelNoTime": "{title}. Opens it.",
+  "@learnOpenLabelNoTime": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "learnOpenSoonTitle": "Lessons open here soon",
+  "learnOpenSoonBody": "Soon you can read the full lesson here, and save it to read offline.",
+  "learnAudioSoonTitle": "Audio sessions are coming soon",
+  "learnAudioSoonBody": "Soon you can listen here, and download sessions to listen offline.",
+  "learnAudioEmpty": "Audio sessions will show here once they are reviewed.",
+  "learnProgramsEmptyTitle": "No programs right now",
+  "learnProgramsEmptyBody": "Courses from the Live Well Portal show here when one fits you.",
+  "learnGotIt": "Got it"
 }

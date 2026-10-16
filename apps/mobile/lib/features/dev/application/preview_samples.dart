@@ -96,6 +96,7 @@ abstract final class PreviewSamples {
       id: 'sample-1',
       category: 'Driver 1',
       title: 'Microhabits vs. willpower',
+      art: 'lesson_reduce_stress',
       summary: 'Why starting with 2 minutes helps a habit stick.',
       readMinutes: 3,
     ),
@@ -103,6 +104,7 @@ abstract final class PreviewSamples {
       id: 'sample-2',
       category: 'Driver 3',
       title: 'Moving after meals',
+      art: 'lesson_move_body',
       summary: 'Simple ways to add a short walk to your day.',
       readMinutes: 4,
     ),
@@ -110,6 +112,7 @@ abstract final class PreviewSamples {
       id: 'sample-3',
       category: 'Driver 5',
       title: 'Winding down for sleep',
+      art: 'lesson_better_sleep',
       summary: 'A calm routine for the last hour of your day.',
       readMinutes: 5,
     ),
@@ -117,10 +120,42 @@ abstract final class PreviewSamples {
       id: 'sample-4',
       category: 'Driver 2',
       title: 'Your Why, every day',
+      art: 'lesson_mindful_eating',
       summary: 'Keeping your reason close when motivation dips.',
       readMinutes: 2,
     ),
+    Lesson(
+      id: 'sample-audio-1',
+      category: 'Driver 4',
+      title: 'Breathe and reset',
+      summary: 'A calm audio break for a busy afternoon.',
+      readMinutes: 5,
+      kind: LessonKind.audio,
+      art: 'lesson_breathe_reset',
+    ),
+    Lesson(
+      id: 'sample-audio-2',
+      category: 'Driver 4',
+      title: 'Deep breathing',
+      summary: 'Slow breaths to settle your body.',
+      readMinutes: 5,
+      kind: LessonKind.audio,
+      art: 'lesson_deep_breathing',
+    ),
+    Lesson(
+      id: 'sample-audio-3',
+      category: 'Driver 5',
+      title: 'Wind down for sleep',
+      summary: 'A gentle guide for the last minutes of your day.',
+      readMinutes: 8,
+      kind: LessonKind.audio,
+      art: 'lesson_better_sleep',
+    ),
   ];
+
+  /// "Pick up where you left off": the first audio session, half done.
+  static const continueIndex = 4;
+  static const continueProgress = 0.4;
 
   /// A sample exchange (spec Appendix C wording). The coach isn't built;
   /// staging and prod never show made-up answers.

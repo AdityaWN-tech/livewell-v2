@@ -7,7 +7,7 @@ import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
-import '../../home/presentation/home_screen.dart' show todayCheckInProvider;
+import '../../home/application/home_data.dart' show todayCheckInProvider;
 import '../data/learn_repository.dart';
 import '../domain/lesson.dart';
 import '../domain/portal.dart';
@@ -65,5 +65,18 @@ final portalCardProvider = Provider<PortalOffer?>((ref) {
           : profile?.createdAt,
       events: events,
     ),
+  );
+});
+
+/// Where the person stopped, or null. Progress isn't recorded until the
+/// lesson reader and player exist; the dev preview shows a sample.
+/// TODO(T-LRN-01): read users/{uid}/content_progress.
+final continueLessonProvider = Provider<LessonProgress?>((ref) {
+  if (!ref.watch(previewModeProvider)) return null;
+  final all = ref.watch(lessonsProvider).value;
+  if (all == null || all.length <= PreviewSamples.continueIndex) return null;
+  return LessonProgress(
+    lesson: all[PreviewSamples.continueIndex],
+    progress: PreviewSamples.continueProgress,
   );
 });

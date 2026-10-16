@@ -22,6 +22,7 @@ import '../../features/voice/presentation/voice_screen.dart';
 import '../../features/focus/presentation/focus_screen.dart';
 import '../../features/starter_plan/presentation/plan_preview_screen.dart';
 import '../../features/focus/presentation/onboarding_checkin_screen.dart';
+import '../../features/learn/presentation/learn_search_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
@@ -136,6 +137,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'library',
                         builder: (context, state) => const LibraryScreen(),
+                      ),
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'search',
+                        builder: (context, state) => const LearnSearchScreen(),
                       ),
                   ],
                 ),

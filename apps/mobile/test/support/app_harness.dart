@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/home/data/name_prompt.dart';
 import 'package:livewell/app.dart';
 import 'package:livewell/core/config/feature_flags.dart';
 import 'package:livewell/core/config/flavor.dart';
@@ -34,6 +35,7 @@ import 'frames.dart';
 
 /// Everything a test can look at after booting the app.
 class Harness {
+  final FakeNamePromptStore namePrompt;
   Harness({
     FakeOnboardingStore? store,
     FakeAuthService? auth,
@@ -50,7 +52,9 @@ class Harness {
     FakeReflectionRepository? reflections,
     FakeLearnRepository? learn,
     this.selfie,
-  }) : reflections = reflections ?? FakeReflectionRepository(),
+    FakeNamePromptStore? namePrompt,
+  }) : namePrompt = namePrompt ?? FakeNamePromptStore(),
+       reflections = reflections ?? FakeReflectionRepository(),
        browser = FakePortalBrowser(),
        learn = learn ?? FakeLearnRepository(now: () => defaultNow),
        now = now ?? defaultNow,
@@ -141,6 +145,7 @@ class Harness {
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
           localDataProvider.overrideWithValue(localData),
+          namePromptStoreProvider.overrideWithValue(namePrompt),
           if (selfie != null) selfieAnalyzerProvider.overrideWithValue(selfie!),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(

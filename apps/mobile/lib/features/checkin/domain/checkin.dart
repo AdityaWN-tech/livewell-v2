@@ -81,3 +81,18 @@ CheckInTone toneFor(CheckIn c) {
   if (c.gentleDay) return CheckInTone.gentle;
   return c.mood >= 4 ? CheckInTone.high : CheckInTone.steady;
 }
+
+/// Why today is a gentle day, so the wording fits (T-UI-02c). [other] is a
+/// red flag in the note (D-24) with mood and stress in range: the neutral
+/// wording, never a guess.
+enum GentleReason { lowMood, highStress, both, other }
+
+GentleReason? gentleReasonFor(CheckIn c) {
+  if (!c.gentleDay) return null;
+  final low = c.mood <= 2;
+  final stressed = c.stress != null && c.stress! >= 4;
+  if (low && stressed) return GentleReason.both;
+  if (low) return GentleReason.lowMood;
+  if (stressed) return GentleReason.highStress;
+  return GentleReason.other;
+}

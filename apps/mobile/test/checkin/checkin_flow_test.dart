@@ -163,7 +163,7 @@ void main() {
       expect(find.byType(CheckInSheet), findsNothing);
 
       // The card still opens it on demand.
-      await tester.tap(find.byKey(const Key('home-checkin-card')));
+      await tester.tap(find.byKey(const Key('home-tile-mood')));
       await tester.pumpAndSettle();
       expect(find.byType(CheckInSheet), findsOneWidget);
     },
@@ -194,7 +194,11 @@ void main() {
 
   group('Home after check-in, by mood', () {
     for (final (mood, line) in [
-      (1, "Thanks for telling me. Let's keep today gentle."),
+      (
+        1,
+        'Thanks for telling me. Low days happen, and they pass. '
+            "Let's keep today gentle.",
+      ),
       (3, 'Thanks for checking in. One small step is plenty today.'),
       (5, "Love that energy. Let's use it well today."),
     ]) {
@@ -217,7 +221,10 @@ void main() {
       await tapText(tester, 'Done');
       expect(h.checkIns.days[today]!.gentleDay, isTrue);
       expect(
-        find.text("Thanks for telling me. Let's keep today gentle."),
+        find.text(
+          'Thanks for telling me. Stress is high today, so '
+          "let's keep things calm and simple.",
+        ),
         findsOneWidget,
       );
       expect(

@@ -93,9 +93,24 @@ class SignInCompletion {
     switch (status) {
       case AccountStatus.ready:
         await _ref.read(onboardingProvider.notifier).finish();
-        final profile = await _ref
-            .read(profileRepositoryProvider)
-            .get(user.uid);
+        final profiles = _ref.read(profileRepositoryProvider);
+        final profile = await profiles.get(user.uid);
+        // No name yet but Google or Apple gave one (for example an account
+        // made by phone, then Google linked): use it, so Home can say
+        // "Hi, {first name}" without asking (T-UI-02c).
+        final given = user.displayName?.trim();
+        if (profile != null &&
+            (profile.displayName?.trim().isEmpty ?? true) &&
+            given != null &&
+            given.isNotEmpty) {
+          try {
+            await profiles.updateSettings(user.uid, {
+              ProfileSettings.displayName: given,
+            });
+          } catch (_) {
+            // A name is nice to have; never block sign-in on it.
+          }
+        }
         return routeForProfileStep(profile?.onboardingStep);
       case AccountStatus.needsOnboarding:
         final next = progress.isAdult

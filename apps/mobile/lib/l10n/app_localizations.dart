@@ -1255,25 +1255,25 @@ abstract class AppLocalizations {
   /// No description provided for @checkinStress2.
   ///
   /// In en, this message translates to:
-  /// **'A little'**
+  /// **'Low'**
   String get checkinStress2;
 
   /// No description provided for @checkinStress3.
   ///
   /// In en, this message translates to:
-  /// **'Some'**
+  /// **'Moderate'**
   String get checkinStress3;
 
   /// No description provided for @checkinStress4.
   ///
   /// In en, this message translates to:
-  /// **'A lot'**
+  /// **'High'**
   String get checkinStress4;
 
   /// No description provided for @checkinStress5.
   ///
   /// In en, this message translates to:
-  /// **'Very'**
+  /// **'Very high'**
   String get checkinStress5;
 
   /// No description provided for @checkinTimeQuestion.
@@ -3657,6 +3657,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved.'**
   String get profileSaved;
+
+  /// No description provided for @homeGreetingMorningNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning, {name}!'**
+  String homeGreetingMorningNamed(String name);
+
+  /// No description provided for @homeGreetingAfternoonNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon, {name}!'**
+  String homeGreetingAfternoonNamed(String name);
+
+  /// No description provided for @homeGreetingEveningNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening, {name}!'**
+  String homeGreetingEveningNamed(String name);
+
+  /// No description provided for @homeGreetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning!'**
+  String get homeGreetingMorning;
+
+  /// No description provided for @homeGreetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon!'**
+  String get homeGreetingAfternoon;
+
+  /// No description provided for @homeGreetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening!'**
+  String get homeGreetingEvening;
+
+  /// No description provided for @homeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for a healthier, happier you?'**
+  String get homeSubtitle;
+
+  /// No description provided for @homeBubbleNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, {name}! Let\'s make today a good day.'**
+  String homeBubbleNamed(String name);
+
+  /// No description provided for @homeBubble.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! Let\'s make today a good day.'**
+  String get homeBubble;
+
+  /// No description provided for @homeBubbleGentleNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, {name}. Let\'s keep today gentle.'**
+  String homeBubbleGentleNamed(String name);
+
+  /// No description provided for @homeBubbleGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi. Let\'s keep today gentle.'**
+  String get homeBubbleGentle;
+
+  /// No description provided for @homeTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Small steps. Brighter days.'**
+  String get homeTagline;
+
+  /// No description provided for @homeNextStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Next Step'**
+  String get homeNextStepTitle;
+
+  /// No description provided for @homeNextStepOpenLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s next step: {title}. Opens Done and a smaller option.'**
+  String homeNextStepOpenLabel(String title);
+
+  /// No description provided for @homeStepDoneShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Done for today'**
+  String get homeStepDoneShort;
+
+  /// No description provided for @homeCheckInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Check-in'**
+  String get homeCheckInTitle;
+
+  /// No description provided for @homeTileMood.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood'**
+  String get homeTileMood;
+
+  /// No description provided for @homeTileEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get homeTileEnergy;
+
+  /// No description provided for @homeTileSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get homeTileSleep;
+
+  /// No description provided for @homeTileStress.
+  ///
+  /// In en, this message translates to:
+  /// **'Stress'**
+  String get homeTileStress;
+
+  /// No description provided for @homeTileEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to log'**
+  String get homeTileEmpty;
+
+  /// No description provided for @homeTileSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get homeTileSkipped;
+
+  /// No description provided for @homeTileLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {value}. Opens the check-in.'**
+  String homeTileLabel(String name, String value);
+
+  /// No description provided for @homeStreakTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 Day Streak} other{{days} Day Streak}}'**
+  String homeStreakTitle(int days);
+
+  /// No description provided for @homeStreakKeepGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going!'**
+  String get homeStreakKeepGoing;
+
+  /// No description provided for @homeStreakEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your streak starts with your first step.'**
+  String get homeStreakEmpty;
+
+  /// No description provided for @checkinResponseGentleLowMood.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for telling me. Low days happen, and they pass. Let\'s keep today gentle.'**
+  String get checkinResponseGentleLowMood;
+
+  /// No description provided for @checkinResponseGentleStress.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for telling me. Stress is high today, so let\'s keep things calm and simple.'**
+  String get checkinResponseGentleStress;
+
+  /// No description provided for @checkinResponseGentleBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for telling me. Feeling low and stressed is a lot. Let\'s go slowly today.'**
+  String get checkinResponseGentleBoth;
+
+  /// No description provided for @homeStepGentleLowMood.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeling low? A small step still counts.'**
+  String get homeStepGentleLowMood;
+
+  /// No description provided for @homeStepGentleStress.
+  ///
+  /// In en, this message translates to:
+  /// **'A calm, easy step for a stressful day.'**
+  String get homeStepGentleStress;
+
+  /// No description provided for @homeStepGentleBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Go easy on yourself. The smallest step is plenty.'**
+  String get homeStepGentleBoth;
+
+  /// No description provided for @homeNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What should your coach call you?'**
+  String get homeNameTitle;
+
+  /// No description provided for @homeNameSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get homeNameSave;
+
+  /// No description provided for @homeNameNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get homeNameNotNow;
+
+  /// No description provided for @homeNameError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please use letters only (up to 30).'**
+  String get homeNameError;
+
+  /// No description provided for @profileAddName.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your name'**
+  String get profileAddName;
 }
 
 class _AppLocalizationsDelegate

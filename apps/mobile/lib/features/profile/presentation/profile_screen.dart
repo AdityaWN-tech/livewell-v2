@@ -397,12 +397,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      ref.watch(firstNameProvider) ?? '',
+                      ref.watch(firstNameProvider) ?? l.profileAddName,
                       key: const Key('profile-name'),
-                      style: t.titleLarge,
+                      style: ref.watch(firstNameProvider) == null
+                          ? t.titleLarge?.copyWith(
+                              color: LwPalette.of(context).textSecondary,
+                            )
+                          : t.titleLarge,
                     ),
+                    // One line, ending in "..." rather than breaking the
+                    // address mid-word (T-UI-02 phone bug).
                     if (user?.email != null)
-                      Text(user!.email!, style: t.bodySmall),
+                      Text(
+                        user!.email!,
+                        key: const Key('profile-email'),
+                        style: t.bodySmall,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     if (user?.phoneNumber != null)
                       Text(user!.phoneNumber!, style: t.bodySmall),
                   ],
@@ -444,7 +457,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   key: const Key('profile-edit-name'),
                   leading: const Icon(Icons.badge_outlined),
                   title: Text(l.profileEditName),
-                  subtitle: Text(ref.watch(firstNameProvider) ?? ''),
+                  subtitle: Text(
+                    ref.watch(firstNameProvider) ?? l.profileAddName,
+                  ),
                   onTap: _editName,
                 ),
                 for (final sp in SocialProvider.values)

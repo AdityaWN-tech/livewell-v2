@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/voice_repository.dart';
@@ -49,11 +50,12 @@ class _VoiceLibraryScreenState extends ConsumerState<VoiceLibraryScreen> {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(title: Text(l.voiceLibraryTitle)),
+      appBar: AppBar(),
       body: SafeArea(
         top: false,
         child: Column(
           children: [
+            LwPageTitle(l.voiceLibraryTitle),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(LwSpacing.screenGutter),

@@ -104,9 +104,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         ],
         if (showAll || f == LearnFilter.lessons) ...[
           if (lessons.isNotEmpty || f == LearnFilter.lessons)
-            _Header(
-              title: l.learnFeatured,
-              onSeeAll: showAll && lessons.length > LearnScreen.preview
+            LwSectionHeader(
+              l.learnFeatured,
+              actionLabel: l.learnSeeAll,
+              actionKey: const Key('learn-view-all'),
+              onAction: showAll && lessons.length > LearnScreen.preview
                   ? () => context.push(LearnScreen.libraryPath)
                   : null,
             ),
@@ -127,7 +129,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         ],
         if (showAll || f == LearnFilter.audio) ...[
           if (audio.isNotEmpty || f == LearnFilter.audio)
-            _Header(title: l.learnPopularAudio),
+            LwSectionHeader(l.learnPopularAudio),
           if (audio.isEmpty && f == LearnFilter.audio)
             LwEmptyState(
               icon: Icons.headphones_outlined,
@@ -149,39 +151,6 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
                 body: l.learnProgramsEmptyBody,
               ),
       ],
-    );
-  }
-}
-
-/// "Title" with an optional "See all >".
-class _Header extends StatelessWidget {
-  const _Header({required this.title, this.onSeeAll});
-
-  final String title;
-  final VoidCallback? onSeeAll;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final t = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: LwSpacing.lg, bottom: LwSpacing.xs),
-      child: Row(
-        children: [
-          Expanded(
-            child: Semantics(
-              header: true,
-              child: Text(title, style: t.titleMedium),
-            ),
-          ),
-          if (onSeeAll != null)
-            TextButton(
-              key: const Key('learn-view-all'),
-              onPressed: onSeeAll,
-              child: Text(l.learnSeeAll),
-            ),
-        ],
-      ),
     );
   }
 }

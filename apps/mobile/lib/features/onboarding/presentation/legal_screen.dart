@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/data/firebase_auth_service.dart';
@@ -112,11 +113,12 @@ class LegalDocumentScreen extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final text = ref.watch(legalTextProvider(type));
     return Scaffold(
-      appBar: AppBar(title: Text(type.title(l))),
+      appBar: AppBar(),
       body: switch (text) {
         AsyncData(:final value) => ListView(
           padding: const EdgeInsets.all(LwSpacing.screenGutter),
           children: [
+            LwPageTitle(type.title(l)),
             Text(
               l.legalVersion(ConsentTexts.versionOf(type)),
               style: t.labelSmall,

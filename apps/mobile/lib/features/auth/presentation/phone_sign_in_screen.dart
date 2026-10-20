@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/firebase_auth_service.dart';
@@ -93,7 +94,7 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
     final l = AppLocalizations.of(context);
     final v = _verification;
     return Scaffold(
-      appBar: AppBar(title: Text(v == null ? l.phoneTitle : l.codeTitle)),
+      appBar: AppBar(),
       body: SafeArea(
         top: false,
         child: v == null ? _numberStage(l) : _codeStage(l, v),
@@ -108,6 +109,7 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
       child: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
+          LwPageTitle(l.phoneTitle),
           Text(l.phoneCountryLabel, style: t.labelMedium),
           const SizedBox(height: LwSpacing.xs),
           SegmentedButton<PhoneCountry>(
@@ -158,6 +160,7 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
       child: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
+          LwPageTitle(l.codeTitle),
           Text(l.codeBody(v.phoneNumber), style: t.bodyMedium),
           const SizedBox(height: LwSpacing.lg),
           TextFormField(

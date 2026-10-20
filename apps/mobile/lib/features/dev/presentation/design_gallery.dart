@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/design/components/illustrated.dart';
+import '../../../core/design/components/lw_components.dart';
+import '../../../core/design/components/speech_bubble.dart';
 import '../../../core/design/tokens.dart';
+import '../../track/domain/track_models.dart';
 
 /// Dev-flavor screen showing every design token, for review on a real device.
 /// Not reachable in staging or prod.
@@ -201,6 +205,61 @@ class DesignGallery extends StatelessWidget {
               child: Text(
                 'Emergency card (safety only)',
                 style: t.titleMedium?.copyWith(color: p.onEmergency),
+              ),
+            ),
+          ]),
+          // The shared illustrated components (T-UI-02i).
+          _Section('Illustrated components', [
+            LwSectionHeader(
+              'Section header',
+              actionLabel: 'See all',
+              onAction: () {},
+            ),
+            const SpeechBubble(text: 'A speech bubble from the coach.'),
+            const SizedBox(height: LwSpacing.sm),
+            LwPastelCard(
+              tint: p.lavender,
+              child: Text(
+                'Pastel card',
+                style: t.titleSmall?.copyWith(color: p.onTint),
+              ),
+            ),
+            const SizedBox(height: LwSpacing.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: LwCheckinTile(
+                    id: 'gallery-mood',
+                    label: 'Mood',
+                    art: 'icon_mood',
+                    tint: p.butter,
+                    value: 'Very good',
+                    onTap: () {},
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.xs),
+                Expanded(
+                  child: LwMetricCard(
+                    LwMetric(
+                      id: 'gallery-stress',
+                      name: 'Stress',
+                      art: 'icon_stress',
+                      tint: p.sky,
+                      value: '2.5 / 5',
+                      detail: 'Moderate',
+                      bars: const [0.4, 0.6, 0.4, 0.8, 0.6],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: LwSpacing.sm),
+            const LwStreakCard(StreakSummary(length: 7, best: 7, week: [])),
+            const SizedBox(height: LwSpacing.sm),
+            const Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [LwWaveform(), LwWaveform(mirrored: true)],
               ),
             ),
           ]),

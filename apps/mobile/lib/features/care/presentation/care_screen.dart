@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/illustration/illustration.dart';
 import '../../../core/design/tokens.dart';
@@ -366,23 +367,6 @@ class _TapToSpeak extends StatelessWidget {
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
-    Widget wave(bool left) => ExcludeSemantics(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final h in left ? _wave : _wave.reversed)
-            Container(
-              width: 4,
-              height: h,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              decoration: BoxDecoration(
-                color: p.outlineStrong,
-                borderRadius: LwRadius.pillAll,
-              ),
-            ),
-        ],
-      ),
-    );
     return Semantics(
       key: const Key('care-talk'),
       container: true,
@@ -393,7 +377,7 @@ class _TapToSpeak extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              wave(true),
+              const LwWaveform(),
               const SizedBox(width: LwSpacing.sm),
               Container(
                 width: LwSize.minTapTarget * 1.6,
@@ -410,7 +394,7 @@ class _TapToSpeak extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: LwSpacing.sm),
-              wave(false),
+              const LwWaveform(mirrored: true),
             ],
           ),
           const SizedBox(height: LwSpacing.xs),
@@ -425,8 +409,6 @@ class _TapToSpeak extends StatelessWidget {
     );
   }
 }
-
-const _wave = <double>[10, 18, 26, 14, 22];
 
 /// An approved lesson as a helpful resource, with where it comes from.
 class _ResourceCard extends StatelessWidget {

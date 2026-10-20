@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
@@ -17,10 +18,11 @@ class HelpNowScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l.helpNowTitle)),
+      appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
+          LwPageTitle(l.helpNowTitle),
           Text(l.helpNowBody, style: Theme.of(context).textTheme.bodyLarge),
           const SizedBox(height: LwSpacing.lg),
           const HelpContacts(),

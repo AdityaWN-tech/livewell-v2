@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/config/feature_flags.dart';
+import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/illustration/illustration.dart';
 import '../../../core/design/tokens.dart';
@@ -14,11 +16,12 @@ import '../../checkin/data/checkin_repository.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../checkin/presentation/checkin_sheet.dart';
 import '../../dev/application/preview_mode.dart';
+import '../../learn/presentation/learn_screen.dart' show LearnScreen;
+import '../../notifications/presentation/notifications_screen.dart';
 import '../../profile/presentation/profile_button.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
     show reminderTexts;
-import '../../track/domain/track_models.dart';
 import '../../track/presentation/track_screen.dart' show streakProvider;
 import '../application/home_data.dart';
 
@@ -216,6 +219,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
       subtitle: l.homeSubtitle,
+      icons: [
+        IconButton(
+          key: const Key('home-search'),
+          tooltip: l.homeSearch,
+          onPressed: () => context.push(LearnScreen.searchPath),
+          icon: Icon(Icons.search, color: p.textPrimary),
+        ),
+        IconButton(
+          key: const Key('home-bell'),
+          tooltip: l.homeNotifications,
+          onPressed: () => context.push(NotificationsScreen.path),
+          icon: Icon(Icons.notifications_none, color: p.textPrimary),
+        ),
+      ],
       profile: const ProfileButton(),
       actions: [if (day != null) _DayPill(day)],
       children: [
@@ -225,7 +242,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
         _HeroCard(
           coach: ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,
-          bubble: gentle
+          celebrating: progress.done,
+          bubble: progress.done
+              ? l.homeBubbleDone
+              : gentle
               ? (name == null
                     ? l.homeBubbleGentle
                     : l.homeBubbleGentleNamed(name))
@@ -255,7 +275,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ],
         const SizedBox(height: LwSpacing.sectionGap),
-        _StreakCard(ref.watch(streakProvider)),
+        LwStreakCard(ref.watch(streakProvider)),
         const SizedBox(height: LwSpacing.sm),
         _MilestoneCard(ref.watch(milestoneProvider)),
       ],
@@ -406,9 +426,13 @@ class _HeroCard extends StatelessWidget {
     required this.coach,
     required this.bubble,
     required this.showBriefing,
+    this.celebrating = false,
   });
 
   final String coach;
+
+  /// After today's step is done: the celebrating coach (T-UI-02i).
+  final bool celebrating;
   final String bubble;
   final bool showBriefing;
 
@@ -439,10 +463,16 @@ class _HeroCard extends StatelessWidget {
                   style: t.labelMedium?.copyWith(color: p.onTintSecondary),
                 ),
                 const SizedBox(height: LwSpacing.xs),
-                CoachAvatar(
-                  expression: AvatarExpression.waving,
-                  bubble: bubble,
-                  size: 104,
+                // A gentle bounce once on greeting, and again on Done.
+                LwOnceMotion(
+                  key: ValueKey(celebrating),
+                  child: CoachAvatar(
+                    expression: celebrating
+                        ? AvatarExpression.celebrating
+                        : AvatarExpression.waving,
+                    bubble: bubble,
+                    size: 104,
+                  ),
                 ),
                 const SizedBox(height: LwSpacing.sm),
                 if (showBriefing)
@@ -800,7 +830,7 @@ class _CheckInTiles extends StatelessWidget {
             for (final (id, label, art, tint, v) in tiles)
               SizedBox(
                 width: width,
-                child: _Tile(
+                child: LwCheckinTile(
                   id: id,
                   label: label,
                   art: art,
@@ -812,72 +842,6 @@ class _CheckInTiles extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-class _Tile extends StatelessWidget {
-  const _Tile({
-    required this.id,
-    required this.label,
-    required this.art,
-    required this.tint,
-    required this.value,
-    required this.onTap,
-  });
-
-  final String id;
-  final String label;
-  final String art;
-  final Color tint;
-  final String value;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = LwPalette.of(context);
-    final t = Theme.of(context).textTheme;
-    final l = AppLocalizations.of(context);
-    return Semantics(
-      button: true,
-      label: l.homeTileLabel(label, value),
-      container: true,
-      excludeSemantics: true,
-      child: Material(
-        color: tint,
-        borderRadius: LwRadius.lgAll,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          key: Key('home-tile-$id'),
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: LwSpacing.xs,
-                vertical: LwSpacing.sm,
-              ),
-              child: Column(
-                children: [
-                  Illustration(art, width: 40, height: 40),
-                  const SizedBox(height: LwSpacing.xxs),
-                  Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: t.labelMedium?.copyWith(color: p.onTint),
-                  ),
-                  Text(
-                    value,
-                    key: Key('home-tile-$id-value'),
-                    textAlign: TextAlign.center,
-                    style: t.labelSmall?.copyWith(color: p.onTintSecondary),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -903,53 +867,6 @@ class _CheckInResponse extends StatelessWidget {
             : l.checkinResponseSteady,
     };
     return Text(text, key: const Key('checkin-response'), style: t.bodyMedium);
-  }
-}
-
-/// N Day Streak (T-UI-02c). Grace and restart wording only: no red, no
-/// alarm for missed days (FR-DLY-07).
-class _StreakCard extends StatelessWidget {
-  const _StreakCard(this.streak);
-  final StreakSummary? streak;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = LwPalette.of(context);
-    final t = Theme.of(context).textTheme;
-    final l = AppLocalizations.of(context);
-    final s = streak;
-    return Container(
-      key: const Key('home-streak'),
-      padding: const EdgeInsets.all(LwSpacing.cardPadding),
-      decoration: BoxDecoration(color: p.butter, borderRadius: LwRadius.lgAll),
-      child: Row(
-        children: [
-          const Illustration('icon_streak', width: 48, height: 48),
-          const SizedBox(width: LwSpacing.sm),
-          Expanded(
-            child: s == null || s.length == 0
-                ? Text(
-                    l.homeStreakEmpty,
-                    style: t.bodyMedium?.copyWith(color: p.onTint),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l.homeStreakTitle(s.length),
-                        style: t.titleMedium?.copyWith(color: p.onTint),
-                      ),
-                      Text(
-                        l.homeStreakKeepGoing,
-                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
-                      ),
-                    ],
-                  ),
-          ),
-          const Illustration('lesson_driver_1', width: 40, height: 40),
-        ],
-      ),
-    );
   }
 }
 

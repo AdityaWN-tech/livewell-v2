@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/analytics/analytics.dart';
+import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/illustration/illustration.dart';
 import '../../../core/design/tokens.dart';
@@ -90,7 +91,7 @@ class TrackScreen extends ConsumerWidget {
         LwSectionHeader(l.trackProgressTitle),
         const _ProgressChart(),
         const SizedBox(height: LwSpacing.sectionGap),
-        _StreakCard(ref.watch(streakProvider)),
+        _WeekStreakCard(ref.watch(streakProvider)),
         LwSectionHeader(l.trackWeeklyTitle),
         _WeeklyCard(onTap: () => _weeklyWins(context)),
         const SizedBox(height: LwSpacing.sectionGap),
@@ -219,9 +220,9 @@ class _MetricGrid extends ConsumerWidget {
     String avg(double v) => NumberFormat('0.0').format(v);
 
     // Steps: only with Apple Health / Health Connect (and its consent).
-    final _Metric steps;
+    final LwMetric steps;
     if (health == null) {
-      steps = _Metric(
+      steps = LwMetric(
         id: 'steps',
         name: l.trackSteps,
         art: 'icon_steps',
@@ -239,7 +240,7 @@ class _MetricGrid extends ConsumerWidget {
       );
     } else {
       final todaySteps = health.stepsWeek[today.weekday - 1];
-      steps = _Metric(
+      steps = LwMetric(
         id: 'steps',
         name: l.trackSteps,
         art: 'icon_steps',
@@ -257,7 +258,7 @@ class _MetricGrid extends ConsumerWidget {
     final sleepWord = sleepAvg == null
         ? null
         : scaleWord(l, TrackMetric.sleep, TrackStats.nearest(sleepAvg));
-    final sleep = _Metric(
+    final sleep = LwMetric(
       id: 'sleep',
       name: l.trackSleep,
       art: 'icon_sleep',
@@ -274,7 +275,7 @@ class _MetricGrid extends ConsumerWidget {
       bars: [for (final v in stats?.recent((c) => c.sleep) ?? <int>[]) v / 5],
     );
 
-    _Metric scale(
+    LwMetric scale(
       String id,
       String name,
       String art,
@@ -282,7 +283,7 @@ class _MetricGrid extends ConsumerWidget {
       double? value,
       int? Function(CheckIn) pick, {
       bool stress = false,
-    }) => _Metric(
+    }) => LwMetric(
       id: id,
       name: name,
       art: art,
@@ -329,140 +330,10 @@ class _MetricGrid extends ConsumerWidget {
           spacing: LwSpacing.sm,
           runSpacing: LwSpacing.sm,
           children: [
-            for (final c in cards) SizedBox(width: w, child: _MetricCard(c)),
+            for (final c in cards) SizedBox(width: w, child: LwMetricCard(c)),
           ],
         );
       },
-    );
-  }
-}
-
-class _Metric {
-  const _Metric({
-    required this.id,
-    required this.name,
-    required this.art,
-    required this.tint,
-    required this.value,
-    required this.detail,
-    required this.bars,
-    this.label,
-    this.onTap,
-  });
-
-  final String id;
-  final String name;
-  final String art;
-  final Color tint;
-  final String value;
-  final String detail;
-
-  /// 0..1, oldest first.
-  final List<double> bars;
-  final String? label;
-  final VoidCallback? onTap;
-}
-
-class _MetricCard extends StatelessWidget {
-  const _MetricCard(this.m);
-  final _Metric m;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = LwPalette.of(context);
-    final t = Theme.of(context).textTheme;
-    final l = AppLocalizations.of(context);
-    final body = Padding(
-      padding: const EdgeInsets.all(LwSpacing.cardPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Illustration(m.art, width: 32, height: 32),
-              const SizedBox(width: LwSpacing.xs),
-              Expanded(
-                child: Text(
-                  m.name,
-                  style: t.titleSmall?.copyWith(color: p.onTint),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: LwSpacing.xs),
-          Text(
-            m.value,
-            key: Key('track-${m.id}-value'),
-            style: t.titleLarge?.copyWith(color: p.onTint),
-          ),
-          if (m.detail.isNotEmpty)
-            Text(
-              m.detail,
-              key: Key('track-${m.id}-detail'),
-              style: t.bodySmall?.copyWith(color: p.onTintSecondary),
-            ),
-          if (m.bars.isNotEmpty) ...[
-            const SizedBox(height: LwSpacing.sm),
-            _MiniBars(m.bars, colour: LwPalette.richer(m.tint)),
-          ],
-        ],
-      ),
-    );
-    return Semantics(
-      button: m.onTap != null,
-      container: true,
-      excludeSemantics: true,
-      label: m.label ?? l.trackCardLabel(m.name, m.value, m.detail).trim(),
-      child: Material(
-        key: Key('track-card-${m.id}'),
-        color: m.tint,
-        borderRadius: LwRadius.lgAll,
-        clipBehavior: Clip.antiAlias,
-        child: m.onTap == null ? body : InkWell(onTap: m.onTap, child: body),
-      ),
-    );
-  }
-}
-
-/// Small rounded bars, oldest first (decoration: the card's label says the
-/// value).
-class _MiniBars extends StatelessWidget {
-  const _MiniBars(this.values, {required this.colour});
-
-  final List<double> values;
-  final Color colour;
-
-  /// Always 7 slim slots, newest on the right, as in the design.
-  static const slots = 7;
-
-  @override
-  Widget build(BuildContext context) {
-    final padded = [
-      for (var i = values.length; i < slots; i++) null,
-      ...values.length > slots ? values.sublist(values.length - slots) : values,
-    ];
-    return SizedBox(
-      height: LwSpacing.xl,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          for (final v in padded)
-            Expanded(
-              child: v == null
-                  ? const SizedBox()
-                  : FractionallySizedBox(
-                      heightFactor: v.clamp(0.08, 1).toDouble(),
-                      widthFactor: 0.6,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: colour,
-                          borderRadius: LwRadius.smAll,
-                        ),
-                      ),
-                    ),
-            ),
-        ],
-      ),
     );
   }
 }
@@ -780,8 +651,8 @@ class _WeeklyCard extends StatelessWidget {
   }
 }
 
-class _StreakCard extends StatelessWidget {
-  const _StreakCard(this.streak);
+class _WeekStreakCard extends StatelessWidget {
+  const _WeekStreakCard(this.streak);
   final StreakSummary? streak;
 
   @override

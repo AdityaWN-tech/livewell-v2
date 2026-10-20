@@ -47,6 +47,8 @@ Future<Harness> bootPreview(WidgetTester tester, {CheckIn? checkIn}) async {
   final h = Harness(flavor: Flavor.dev);
   if (checkIn != null) h.checkIns.days[today] = checkIn;
   await h.boot(tester);
+  // Welcome scrolls at large text sizes: bring the button into view.
+  await tester.scrollUntilVisible(find.text(previewLabel), 200);
   await tester.tap(find.text(previewLabel));
   await tester.pumpAndSettle();
   expect(find.byType(HomeScreen), findsOneWidget);
@@ -382,6 +384,11 @@ void main() {
       expect(find.text('Driver 3'), findsOneWidget);
       expect(find.text('14 Day Streak'), findsOneWidget);
       expect(find.text('Keep going!'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Phase 1 of 3'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Phase 1 of 3'), findsOneWidget);
       expect(find.bySemanticsLabel('7 of 9 habits kept'), findsOneWidget);
       expectActionLimit();

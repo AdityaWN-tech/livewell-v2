@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../application/learn_data.dart';
@@ -64,10 +65,11 @@ class _LearnSearchScreenState extends ConsumerState<LearnSearchScreen> {
         if (x.kind == LessonKind.audio) x,
     ];
     return Scaffold(
-      appBar: AppBar(title: Text(l.learnSearch)),
+      appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
+          LwPageTitle(l.learnSearch),
           TextField(
             key: const Key('learn-search-field'),
             controller: _text,

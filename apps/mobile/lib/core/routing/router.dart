@@ -23,6 +23,7 @@ import '../../features/focus/presentation/focus_screen.dart';
 import '../../features/starter_plan/presentation/plan_preview_screen.dart';
 import '../../features/focus/presentation/onboarding_checkin_screen.dart';
 import '../../features/learn/presentation/learn_search_screen.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
@@ -148,6 +149,11 @@ final routerProvider = Provider<GoRouter>((ref) {
               ],
             ),
         ],
+      ),
+      // Today's reminders, from the bell on Home (T-UI-02i).
+      GoRoute(
+        path: NotificationsScreen.path,
+        builder: (context, state) => const NotificationsScreen(),
       ),
       // Safety resources, always reachable from Care (spec 14.2).
       GoRoute(

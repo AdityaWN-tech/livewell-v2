@@ -6,6 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../studio/presentation/studio_screen.dart';
 import '../../studio/presentation/studio_widgets.dart' show StudioTab;
 import '../../../core/config/flavor.dart';
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
@@ -359,10 +360,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.profileTitle)),
+      appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
+          LwPageTitle(l.profileTitle),
           // ---- Header ----
           Row(
             children: [
@@ -457,7 +459,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 if (!providers.contains('phone'))
                   soon(
                     'profile-link-phone',
-                    l.profileLinkPhoneSoon,
+                    // "Coming soon" is the subtitle; never twice (phone bug).
+                    l.profileLinkPhone,
                     Icons.phone_iphone,
                   ),
                 ListTile(

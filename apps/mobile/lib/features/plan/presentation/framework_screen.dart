@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
@@ -36,10 +37,11 @@ class FrameworkScreen extends ConsumerWidget {
       ('T', l.frameworkTracking, l.frameworkTrackingBody, '/track'),
     ];
     return Scaffold(
-      appBar: AppBar(title: Text(l.frameworkTitle)),
+      appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
+          LwPageTitle(l.frameworkTitle),
           Text(l.frameworkIntro, style: t.bodyMedium),
           const SizedBox(height: LwSpacing.md),
           for (final (i, (letter, name, body, target)) in rows.indexed) ...[

@@ -2685,4 +2685,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studioSceneBeach => 'Beach';
+
+  @override
+  String get profileLinkPhone => 'Add a phone number';
+
+  @override
+  String get homeSearch => 'Search lessons';
+
+  @override
+  String get homeNotifications => 'Today’s reminders';
+
+  @override
+  String get notificationsTitle => 'Today’s reminders';
+
+  @override
+  String get notificationsBody =>
+      'Your coach checks in three times a day. Reminders never show health details, and quiet hours always apply.';
+
+  @override
+  String get notificationsOn => 'On';
+
+  @override
+  String get notificationsOff => 'Off';
+
+  @override
+  String notificationsRowLabel(String name, String time, String state) {
+    return '$name at $time. $state.';
+  }
+
+  @override
+  String notificationsQuiet(String start, String end) {
+    return 'Quiet hours: $start to $end';
+  }
+
+  @override
+  String get notificationsSignedOut => 'Sign in to get gentle reminders.';
+
+  @override
+  String get notificationsEdit => 'Change times in Profile';
+
+  @override
+  String get tourStepTitle => 'One small step a day';
+
+  @override
+  String get tourStepBody =>
+      'A plan sized to the time you have, made smaller on hard days.';
+
+  @override
+  String get tourCheckInTitle => 'A 30-second check-in';
+
+  @override
+  String get tourCheckInBody =>
+      'Tell your coach how you feel, and your day adapts.';
+
+  @override
+  String get tourRemindersTitle => 'Gentle reminders';
+
+  @override
+  String get tourRemindersBody =>
+      'Three kind check-ins a day. No health details on your lock screen.';
+
+  @override
+  String get tourCoachTitle => 'Your coach, your way';
+
+  @override
+  String get tourCoachBody =>
+      'Pick how your coach looks and sounds. Change it any time.';
+
+  @override
+  String tourPage(int n, int total) {
+    return '$n of $total';
+  }
+
+  @override
+  String get tourNext => 'Next tip';
+
+  @override
+  String get tourPrevious => 'Previous tip';
+
+  @override
+  String tourLabel(String title, String body, int n, int total) {
+    return '$title. $body Tip $n of $total.';
+  }
+
+  @override
+  String get homeBubbleDone => 'Nice work! Today’s step is done.';
 }

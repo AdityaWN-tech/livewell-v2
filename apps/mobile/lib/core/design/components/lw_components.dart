@@ -99,10 +99,10 @@ class LwScreen extends StatelessWidget {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: actions),
+      appBar: AppBar(actions: actions),
       body: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
-        children: children,
+        children: [LwPageTitle(title), ...children],
       ),
     );
   }
@@ -192,18 +192,64 @@ class LwTabHeader extends StatelessWidget {
   }
 }
 
-/// Section title inside a screen.
-class LwSectionHeader extends StatelessWidget {
-  const LwSectionHeader(this.text, {super.key});
+/// A screen's title inside the page, under a back-arrow-only app bar
+/// (T-UI-02i): it wraps at large text sizes instead of being cut off the
+/// way an app bar title is.
+class LwPageTitle extends StatelessWidget {
+  const LwPageTitle(this.text, {super.key});
 
   final String text;
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: LwSpacing.lg, bottom: LwSpacing.xs),
+    padding: const EdgeInsets.only(bottom: LwSpacing.md),
     child: Semantics(
       header: true,
-      child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+      child: Text(text, style: Theme.of(context).textTheme.headlineSmall),
+    ),
+  );
+}
+
+/// Section title inside a screen, with an optional action on the right
+/// (for example "See all").
+class LwSectionHeader extends StatelessWidget {
+  const LwSectionHeader(
+    this.text, {
+    super.key,
+    this.actionLabel,
+    this.onAction,
+    this.actionKey,
+  });
+
+  final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  final Key? actionKey;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: LwSpacing.lg, bottom: LwSpacing.xs),
+    child: Row(
+      children: [
+        Expanded(
+          child: Semantics(
+            header: true,
+            child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+          ),
+        ),
+        if (actionLabel != null && onAction != null)
+          TextButton(
+            key: actionKey,
+            onPressed: onAction,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(actionLabel!),
+                const Icon(Icons.chevron_right, size: LwSize.iconSm),
+              ],
+            ),
+          ),
+      ],
     ),
   );
 }

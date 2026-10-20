@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/firebase_auth_service.dart';
@@ -65,7 +66,7 @@ class _EmailSignInScreenState extends ConsumerState<EmailSignInScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l.emailTitle)),
+      appBar: AppBar(),
       body: SafeArea(
         top: false,
         child: Form(
@@ -73,6 +74,7 @@ class _EmailSignInScreenState extends ConsumerState<EmailSignInScreen> {
           child: ListView(
             padding: const EdgeInsets.all(LwSpacing.screenGutter),
             children: [
+              LwPageTitle(l.emailTitle),
               SegmentedButton<bool>(
                 segments: [
                   ButtonSegment(value: false, label: Text(l.emailModeSignIn)),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design/avatar/avatar_art.dart';
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/avatar_repository.dart';
@@ -119,7 +120,7 @@ class _AvatarCreatorScreenState extends ConsumerState<AvatarCreatorScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.avatarCreatorTitle)),
+      appBar: AppBar(),
       body: SafeArea(
         top: false,
         child: Column(
@@ -155,6 +156,7 @@ class _AvatarCreatorScreenState extends ConsumerState<AvatarCreatorScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(LwSpacing.screenGutter),
                 children: [
+                  LwPageTitle(l.avatarCreatorTitle),
                   section(
                     l.avatarSectionSkin,
                     swatches(

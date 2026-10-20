@@ -142,6 +142,7 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
     ];
     return OnboardingScaffold(
       title: l.whyTitle,
+      art: 'icon_goal',
       primaryLabel: l.whySave,
       onPrimary: _valid && !_saving ? _save : null,
       footer: _valid

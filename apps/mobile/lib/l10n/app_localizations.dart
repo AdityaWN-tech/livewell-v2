@@ -4790,6 +4790,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Beach'**
   String get studioSceneBeach;
+
+  /// No description provided for @profileLinkPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a phone number'**
+  String get profileLinkPhone;
+
+  /// No description provided for @homeSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search lessons'**
+  String get homeSearch;
+
+  /// No description provided for @homeNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Today’s reminders'**
+  String get homeNotifications;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today’s reminders'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach checks in three times a day. Reminders never show health details, and quiet hours always apply.'**
+  String get notificationsBody;
+
+  /// No description provided for @notificationsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get notificationsOn;
+
+  /// No description provided for @notificationsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get notificationsOff;
+
+  /// No description provided for @notificationsRowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} at {time}. {state}.'**
+  String notificationsRowLabel(String name, String time, String state);
+
+  /// No description provided for @notificationsQuiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours: {start} to {end}'**
+  String notificationsQuiet(String start, String end);
+
+  /// No description provided for @notificationsSignedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to get gentle reminders.'**
+  String get notificationsSignedOut;
+
+  /// No description provided for @notificationsEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Change times in Profile'**
+  String get notificationsEdit;
+
+  /// No description provided for @tourStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One small step a day'**
+  String get tourStepTitle;
+
+  /// No description provided for @tourStepBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A plan sized to the time you have, made smaller on hard days.'**
+  String get tourStepBody;
+
+  /// No description provided for @tourCheckInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A 30-second check-in'**
+  String get tourCheckInTitle;
+
+  /// No description provided for @tourCheckInBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell your coach how you feel, and your day adapts.'**
+  String get tourCheckInBody;
+
+  /// No description provided for @tourRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle reminders'**
+  String get tourRemindersTitle;
+
+  /// No description provided for @tourRemindersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Three kind check-ins a day. No health details on your lock screen.'**
+  String get tourRemindersBody;
+
+  /// No description provided for @tourCoachTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach, your way'**
+  String get tourCoachTitle;
+
+  /// No description provided for @tourCoachBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick how your coach looks and sounds. Change it any time.'**
+  String get tourCoachBody;
+
+  /// No description provided for @tourPage.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} of {total}'**
+  String tourPage(int n, int total);
+
+  /// No description provided for @tourNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next tip'**
+  String get tourNext;
+
+  /// No description provided for @tourPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous tip'**
+  String get tourPrevious;
+
+  /// No description provided for @tourLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}. {body} Tip {n} of {total}.'**
+  String tourLabel(String title, String body, int n, int total);
+
+  /// No description provided for @homeBubbleDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice work! Today’s step is done.'**
+  String get homeBubbleDone;
 }
 
 class _AppLocalizationsDelegate

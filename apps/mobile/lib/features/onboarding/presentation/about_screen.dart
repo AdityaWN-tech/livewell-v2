@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/design/components/lw_components.dart';
+import '../../../core/design/illustration/illustration.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/onboarding_store.dart';
@@ -19,6 +20,7 @@ class AboutScreen extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     return OnboardingScaffold(
       title: l.aboutTitle,
+      art: 'feature_reflection',
       primaryLabel: l.commonContinue,
       onPrimary: () async {
         await ref.read(onboardingProvider.notifier).goTo(OnboardingStep.age);
@@ -75,8 +77,10 @@ class _Point extends StatelessWidget {
   );
 }
 
-/// Shared layout for onboarding steps: title, scrolling content and one
-/// primary button pinned at the bottom (one primary action, spec 4.1).
+/// Shared layout for onboarding steps (illustrated style, T-UI-02i): the
+/// soft page wash, optional art, the title in the page (it wraps at large
+/// text sizes), scrolling content and one primary button pinned at the
+/// bottom (one primary action, spec 4.1).
 class OnboardingScaffold extends StatelessWidget {
   const OnboardingScaffold({
     super.key,
@@ -85,6 +89,7 @@ class OnboardingScaffold extends StatelessWidget {
     required this.primaryLabel,
     required this.onPrimary,
     this.footer,
+    this.art,
   });
 
   final String title;
@@ -97,35 +102,59 @@ class OnboardingScaffold extends StatelessWidget {
   /// Optional line above the button (e.g. why it is disabled).
   final Widget? footer;
 
+  /// Optional illustration id (assets/illustrations) above the title.
+  final String? art;
+
   @override
   Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(LwSpacing.screenGutter),
-                children: children,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(LwSpacing.screenGutter),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (footer != null) ...[
-                    footer!,
-                    const SizedBox(height: LwSpacing.xs),
+      backgroundColor: p.washTop,
+      appBar: AppBar(backgroundColor: p.washTop),
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [p.washTop, p.washBottom],
+          ),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(LwSpacing.screenGutter),
+                  children: [
+                    if (art != null) ...[
+                      Center(child: Illustration(art!, width: 120, height: 96)),
+                      const SizedBox(height: LwSpacing.md),
+                    ],
+                    LwPageTitle(title),
+                    ...children,
                   ],
-                  FilledButton(onPressed: onPrimary, child: Text(primaryLabel)),
-                ],
+                ),
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(LwSpacing.screenGutter),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (footer != null) ...[
+                      footer!,
+                      const SizedBox(height: LwSpacing.xs),
+                    ],
+                    FilledButton(
+                      onPressed: onPrimary,
+                      child: Text(primaryLabel),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

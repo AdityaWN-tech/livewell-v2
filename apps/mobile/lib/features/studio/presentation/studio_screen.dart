@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/feature_flags.dart';
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/data/avatar_repository.dart';
@@ -286,11 +287,7 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
           key: const Key('studio'),
           padding: const EdgeInsets.all(LwSpacing.screenGutter),
           children: [
-            Semantics(
-              header: true,
-              child: Text(l.studioTitle, style: t.headlineSmall),
-            ),
-            const SizedBox(height: LwSpacing.sm),
+            LwPageTitle(l.studioTitle),
             StudioTabs(
               tab: _tab,
               onChanged: (x) {

@@ -1553,5 +1553,78 @@
   "studioSceneGarden": "Garden",
   "studioSceneSunrise": "Sunrise",
   "studioSceneRoom": "Cosy room",
-  "studioSceneBeach": "Beach"
+  "studioSceneBeach": "Beach",
+  "profileLinkPhone": "Add a phone number",
+  "homeSearch": "Search lessons",
+  "homeNotifications": "Today’s reminders",
+  "notificationsTitle": "Today’s reminders",
+  "notificationsBody": "Your coach checks in three times a day. Reminders never show health details, and quiet hours always apply.",
+  "notificationsOn": "On",
+  "notificationsOff": "Off",
+  "notificationsRowLabel": "{name} at {time}. {state}.",
+  "@notificationsRowLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsQuiet": "Quiet hours: {start} to {end}",
+  "@notificationsQuiet": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsSignedOut": "Sign in to get gentle reminders.",
+  "notificationsEdit": "Change times in Profile",
+  "tourStepTitle": "One small step a day",
+  "tourStepBody": "A plan sized to the time you have, made smaller on hard days.",
+  "tourCheckInTitle": "A 30-second check-in",
+  "tourCheckInBody": "Tell your coach how you feel, and your day adapts.",
+  "tourRemindersTitle": "Gentle reminders",
+  "tourRemindersBody": "Three kind check-ins a day. No health details on your lock screen.",
+  "tourCoachTitle": "Your coach, your way",
+  "tourCoachBody": "Pick how your coach looks and sounds. Change it any time.",
+  "tourPage": "{n} of {total}",
+  "@tourPage": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "tourNext": "Next tip",
+  "tourPrevious": "Previous tip",
+  "tourLabel": "{title}. {body} Tip {n} of {total}.",
+  "@tourLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "body": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "homeBubbleDone": "Nice work! Today’s step is done."
 }

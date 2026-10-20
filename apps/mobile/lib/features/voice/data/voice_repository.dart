@@ -14,6 +14,9 @@ import '../domain/voice.dart';
 /// other library voice inactive (one active). Cloned voices are server-only.
 abstract class VoiceRepository {
   Future<void> choose(VoiceChoice choice);
+
+  /// The active library voice, or null when none was chosen yet.
+  Future<VoiceChoice?> current();
 }
 
 class FirestoreVoiceRepository implements VoiceRepository {
@@ -62,6 +65,31 @@ class FirestoreVoiceRepository implements VoiceRepository {
     }
     await batch.commit().timeout(const Duration(seconds: 3), onTimeout: () {});
   }
+
+  @override
+  Future<VoiceChoice?> current() async {
+    final query = _voices
+        .where('kind', isEqualTo: 'library')
+        .where('status', isEqualTo: 'active')
+        .limit(1);
+    QuerySnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await query.get().timeout(const Duration(seconds: 5));
+    } catch (_) {
+      snap = await query.get(const GetOptions(source: Source.cache));
+    }
+    if (snap.docs.isEmpty) return null;
+    final d = snap.docs.first;
+    return VoiceChoice(
+      voiceId: VoiceLibrary.byId(d.id).id,
+      speed: (d.data()['speed'] as num?)?.toDouble() ?? 1.0,
+      style:
+          VoiceStyle.values
+              .where((v) => v.name == d.data()['style'])
+              .firstOrNull ??
+          VoiceStyle.calm,
+    ).copyWith();
+  }
 }
 
 /// Dev preview: nothing saved.
@@ -70,6 +98,9 @@ class InMemoryVoiceRepository implements VoiceRepository {
 
   @override
   Future<void> choose(VoiceChoice choice) async => chosen = choice;
+
+  @override
+  Future<VoiceChoice?> current() async => chosen;
 }
 
 final voiceRepositoryProvider = Provider<VoiceRepository>((ref) {

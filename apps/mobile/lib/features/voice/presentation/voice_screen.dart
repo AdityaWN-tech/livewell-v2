@@ -96,39 +96,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
     await _save(chosen);
   }
 
-  void _ownVoice() {
-    final l = AppLocalizations.of(context);
-    final t = Theme.of(context).textTheme;
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          key: const Key('voice-own-sheet'),
-          padding: const EdgeInsets.fromLTRB(
-            LwSpacing.lg,
-            0,
-            LwSpacing.lg,
-            LwSpacing.lg,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(l.voiceOwnTitle, style: t.titleLarge),
-              const SizedBox(height: LwSpacing.xs),
-              Text(l.voiceOwnBody, style: t.bodyMedium),
-              const SizedBox(height: LwSpacing.lg),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l.voiceGotIt),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  void _ownVoice() => showOwnVoiceSheet(context);
 
   @override
   Widget build(BuildContext context) {
@@ -144,25 +112,43 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
           child: ListView(
             padding: const EdgeInsets.all(LwSpacing.screenGutter),
             children: [
+              Text(l.studioTitle.toUpperCase(), style: t.labelSmall),
               Semantics(
                 header: true,
-                child: Text(l.voiceTitle, style: t.displaySmall),
+                child: Text(l.voiceTitle, style: t.headlineSmall),
               ),
-              const SizedBox(height: LwSpacing.lg),
-              Center(
-                child: AvatarView(
-                  config: _avatar,
-                  semanticLabel: l.avatarPreviewLabel,
+              const SizedBox(height: LwSpacing.md),
+              // The coach talking on their own background (Studio design).
+              Container(
+                padding: const EdgeInsets.all(LwSpacing.md),
+                decoration: BoxDecoration(
+                  color: AvatarColours.background[_avatar.background],
+                  borderRadius: LwRadius.lgAll,
+                  boxShadow: LwShadow.of(context),
                 ),
-              ),
-              const SizedBox(height: LwSpacing.sm),
-              const Center(child: AiVoiceLabel()),
-              const SizedBox(height: LwSpacing.sm),
-              Text(
-                name == null ? l.voiceGreeting : l.voiceGreetingNamed(name),
-                key: const Key('voice-greeting'),
-                textAlign: TextAlign.center,
-                style: t.titleLarge,
+                child: Column(
+                  children: [
+                    AvatarView(
+                      config: _avatar,
+                      expression: AvatarExpression.talking,
+                      semanticLabel: l.avatarPreviewLabel,
+                    ),
+                    const SizedBox(height: LwSpacing.sm),
+                    const AiVoiceLabel(),
+                    const SizedBox(height: LwSpacing.sm),
+                    Text(
+                      name == null
+                          ? l.voiceGreeting
+                          : l.voiceGreetingNamed(name),
+                      key: const Key('voice-greeting'),
+                      textAlign: TextAlign.center,
+                      // The art colours are light in both modes.
+                      style: t.titleLarge?.copyWith(
+                        color: LwPalette.light.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Center(
                 child: TextButton.icon(
@@ -214,6 +200,42 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
       ),
     );
   }
+}
+
+/// "Use my own voice" with the clone flag on: an explanation only, nothing
+/// is recorded or built (FR-VOC-02, spec 7.4).
+Future<void> showOwnVoiceSheet(BuildContext context) {
+  final l = AppLocalizations.of(context);
+  final t = Theme.of(context).textTheme;
+  return showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    builder: (context) => SafeArea(
+      child: Padding(
+        key: const Key('voice-own-sheet'),
+        padding: const EdgeInsets.fromLTRB(
+          LwSpacing.lg,
+          0,
+          LwSpacing.lg,
+          LwSpacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l.voiceOwnTitle, style: t.titleLarge),
+            const SizedBox(height: LwSpacing.xs),
+            Text(l.voiceOwnBody, style: t.bodyMedium),
+            const SizedBox(height: LwSpacing.lg),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l.voiceGotIt),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 /// The "AI voice" label (FR-VOC-08), shown wherever the coach's voice plays.

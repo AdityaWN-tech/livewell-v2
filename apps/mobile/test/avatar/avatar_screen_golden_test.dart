@@ -32,7 +32,7 @@ void main() {
             await tapKey(tester, 'avatar-skin-7');
             await tapKey(tester, 'avatar-covering-Hijab');
           } else {
-            await tapKey(tester, 'avatar-look-woman');
+            await tapKey(tester, 'avatar-character-long_hair');
           }
           await tester.pumpAndSettle();
           await expectLater(

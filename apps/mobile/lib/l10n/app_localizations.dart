@@ -4544,6 +4544,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Got it'**
   String get careGotIt;
+
+  /// No description provided for @studioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar & Voice Studio'**
+  String get studioTitle;
+
+  /// No description provided for @studioTabAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get studioTabAvatar;
+
+  /// No description provided for @studioTabVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get studioTabVoice;
+
+  /// No description provided for @studioTabBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get studioTabBackground;
+
+  /// No description provided for @studioPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous look'**
+  String get studioPrevious;
+
+  /// No description provided for @studioNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next look'**
+  String get studioNext;
+
+  /// No description provided for @studioPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Look {n} of {total}'**
+  String studioPage(int n, int total);
+
+  /// No description provided for @studioCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own look'**
+  String get studioCustom;
+
+  /// No description provided for @studioCustomize.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize'**
+  String get studioCustomize;
+
+  /// No description provided for @studioUseLook.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this look'**
+  String get studioUseLook;
+
+  /// No description provided for @studioChooseVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Your Voice'**
+  String get studioChooseVoice;
+
+  /// No description provided for @studioVoiceActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get studioVoiceActive;
+
+  /// No description provided for @studioVoiceSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get studioVoiceSoon;
+
+  /// No description provided for @studioVoiceRowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {detail}. {state}'**
+  String studioVoiceRowLabel(String name, String detail, String state);
+
+  /// No description provided for @studioVoiceSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get studioVoiceSelected;
+
+  /// No description provided for @studioVoiceNotSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not selected'**
+  String get studioVoiceNotSelected;
+
+  /// No description provided for @studioMyVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'My Voice (Cloned)'**
+  String get studioMyVoice;
+
+  /// No description provided for @studioLovedOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a Loved One’s Voice'**
+  String get studioLovedOne;
+
+  /// No description provided for @studioDrGokula.
+  ///
+  /// In en, this message translates to:
+  /// **'Dr. Gokula (Licensed)'**
+  String get studioDrGokula;
+
+  /// No description provided for @studioConsentBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice consent active. You can delete your voice data anytime from settings.'**
+  String get studioConsentBanner;
+
+  /// No description provided for @studioUseVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this voice'**
+  String get studioUseVoice;
+
+  /// No description provided for @studioColours.
+  ///
+  /// In en, this message translates to:
+  /// **'Colours'**
+  String get studioColours;
+
+  /// No description provided for @studioScenes.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenes'**
+  String get studioScenes;
+
+  /// No description provided for @studioLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocks with a {days}-day streak'**
+  String studioLocked(int days);
+
+  /// No description provided for @studioSceneSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming with the new art'**
+  String get studioSceneSoon;
+
+  /// No description provided for @studioUseBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this background'**
+  String get studioUseBackground;
+
+  /// No description provided for @studioCharacterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}. {state}'**
+  String studioCharacterLabel(String name, String state);
+
+  /// No description provided for @avatarCharacterHoodie.
+  ///
+  /// In en, this message translates to:
+  /// **'Green hoodie'**
+  String get avatarCharacterHoodie;
+
+  /// No description provided for @avatarCharacterLongHair.
+  ///
+  /// In en, this message translates to:
+  /// **'Long hair'**
+  String get avatarCharacterLongHair;
+
+  /// No description provided for @avatarCharacterGlasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses'**
+  String get avatarCharacterGlasses;
+
+  /// No description provided for @avatarCharacterCurly.
+  ///
+  /// In en, this message translates to:
+  /// **'Curly hair'**
+  String get avatarCharacterCurly;
+
+  /// No description provided for @avatarCharacterHijab.
+  ///
+  /// In en, this message translates to:
+  /// **'Hijab'**
+  String get avatarCharacterHijab;
+
+  /// No description provided for @avatarCharacterTurban.
+  ///
+  /// In en, this message translates to:
+  /// **'Turban'**
+  String get avatarCharacterTurban;
+
+  /// No description provided for @avatarCharacterOlder.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey hair'**
+  String get avatarCharacterOlder;
+
+  /// No description provided for @avatarPickCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a starting look'**
+  String get avatarPickCharacter;
+
+  /// No description provided for @profileStudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar & Voice Studio'**
+  String get profileStudio;
+
+  /// No description provided for @profileStudioBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach’s look, voice and background'**
+  String get profileStudioBody;
+
+  /// No description provided for @studioSceneGarden.
+  ///
+  /// In en, this message translates to:
+  /// **'Garden'**
+  String get studioSceneGarden;
+
+  /// No description provided for @studioSceneSunrise.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get studioSceneSunrise;
+
+  /// No description provided for @studioSceneRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Cosy room'**
+  String get studioSceneRoom;
+
+  /// No description provided for @studioSceneBeach.
+  ///
+  /// In en, this message translates to:
+  /// **'Beach'**
+  String get studioSceneBeach;
 }
 
 class _AppLocalizationsDelegate

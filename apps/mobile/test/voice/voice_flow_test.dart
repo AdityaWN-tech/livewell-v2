@@ -8,6 +8,7 @@ import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/onboarding/presentation/why_screen.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
+import 'package:livewell/features/studio/presentation/studio_widgets.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/voice/presentation/voice_library_screen.dart';
 import 'package:livewell/features/voice/presentation/voice_screen.dart';
@@ -113,6 +114,9 @@ void main() {
       await tapKey(tester, 'voice-play-lw-clear');
       expect(h.player.played.last, ('assets/voices/lw-clear_calm.m4a', 1.0));
 
+      // Back to the top of the library, where the style buttons are.
+      await tester.drag(find.byType(ListView).last, const Offset(0, 2000));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Energetic'));
       await tester.pumpAndSettle();
       final slider = tester.widget<Slider>(
@@ -168,10 +172,11 @@ void main() {
       );
       await h.boot(tester);
       expect(find.byType(VoiceLibraryScreen), findsOneWidget);
-      final tile = tester.widget<ListTile>(
+      final row = tester.widget<VoiceRow>(
         find.byKey(const Key('voice-lw-gentle')),
       );
-      expect(tile.selected, isTrue);
+      expect(row.selected, isTrue);
+      expect(row.status, 'Active');
       expect(find.text('0.9x'), findsOneWidget);
     });
 

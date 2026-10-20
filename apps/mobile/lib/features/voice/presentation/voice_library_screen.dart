@@ -5,10 +5,15 @@ import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/voice_repository.dart';
 import '../domain/voice.dart';
-import 'voice_screen.dart' show AiVoiceLabel;
+import '../../../core/config/feature_flags.dart';
+import '../../studio/presentation/studio_screen.dart'
+    show clonedVoiceConsentProvider;
+import '../../studio/presentation/studio_widgets.dart';
+import 'voice_screen.dart' show AiVoiceLabel, showOwnVoiceSheet;
 
-/// The voice library (FR-VOC-01): preview each voice, pick calm or
-/// energetic, and a speed from 0.8x to 1.2x. Choices are kept as a draft so
+/// The voice library (FR-VOC-01), in the Studio's "Choose Your Voice"
+/// design (T-UI-02h): preview each voice, pick calm or energetic, and a
+/// speed from 0.8x to 1.2x. Choices are kept as a draft so
 /// the step resumes here.
 class VoiceLibraryScreen extends ConsumerStatefulWidget {
   const VoiceLibraryScreen({super.key, required this.initial});
@@ -43,15 +48,6 @@ class _VoiceLibraryScreenState extends ConsumerState<VoiceLibraryScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
-    final p = LwPalette.of(context);
-    String name(LibraryVoice v) => switch (v.id) {
-      'lw-warm' => l.voiceNameWarm,
-      'lw-bright' => l.voiceNameBright,
-      'lw-steady' => l.voiceNameSteady,
-      'lw-deep' => l.voiceNameDeep,
-      'lw-gentle' => l.voiceNameGentle,
-      _ => l.voiceNameClear,
-    };
     return Scaffold(
       appBar: AppBar(title: Text(l.voiceLibraryTitle)),
       body: SafeArea(
@@ -82,6 +78,7 @@ class _VoiceLibraryScreenState extends ConsumerState<VoiceLibraryScreen> {
                       ),
                     ],
                     selected: {_c.style},
+                    showSelectedIcon: false,
                     onSelectionChanged: (s) =>
                         _set(_c.copyWith(style: s.single)),
                   ),
@@ -106,50 +103,22 @@ class _VoiceLibraryScreenState extends ConsumerState<VoiceLibraryScreen> {
                     onChanged: (v) => _set(_c.copyWith(speed: v)),
                   ),
                   const SizedBox(height: LwSpacing.sm),
-                  for (final v in VoiceLibrary.all)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: LwSpacing.xs),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: LwRadius.mdAll,
-                          side: BorderSide(
-                            color: _c.voiceId == v.id
-                                ? p.primary
-                                : p.outlineSoft,
-                            width: _c.voiceId == v.id ? 2 : 1,
-                          ),
-                        ),
-                        child: ListTile(
-                          key: Key('voice-${v.id}'),
-                          selected: _c.voiceId == v.id,
-                          leading: Icon(
-                            _c.voiceId == v.id
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_unchecked,
-                            color: p.primary,
-                          ),
-                          title: Text(name(v), style: t.titleMedium),
-                          subtitle: Text(
-                            v.accent == VoiceAccent.us
-                                ? l.voiceAccentUs
-                                : l.voiceAccentUk,
-                          ),
-                          trailing: IconButton(
-                            key: Key('voice-play-${v.id}'),
-                            tooltip: l.voicePreview(name(v)),
-                            icon: const Icon(Icons.play_circle_outline),
-                            onPressed: () {
-                              _set(_c.copyWith(voiceId: v.id));
-                              _preview(v);
-                            },
-                          ),
-                          onTap: () {
-                            _set(_c.copyWith(voiceId: v.id));
-                            _preview(v);
-                          },
-                        ),
-                      ),
+                  VoiceChoices(
+                    selectedId: _c.voiceId,
+                    flags: ref.watch(featureFlagsProvider),
+                    hasClonedVoiceConsent: ref.watch(
+                      clonedVoiceConsentProvider,
                     ),
+                    onSelect: (v) {
+                      _set(_c.copyWith(voiceId: v.id));
+                      _preview(v);
+                    },
+                    onPreview: (v) {
+                      _set(_c.copyWith(voiceId: v.id));
+                      _preview(v);
+                    },
+                    onOwnVoice: () => showOwnVoiceSheet(context),
+                  ),
                 ],
               ),
             ),

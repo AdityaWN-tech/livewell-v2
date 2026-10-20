@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/application/account_setup.dart' show voicePath;
@@ -10,13 +9,18 @@ import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../data/avatar_repository.dart';
 import '../data/selfie_service.dart';
+import '../../studio/presentation/studio_widgets.dart';
 import '../domain/avatar_config.dart';
+import '../domain/characters.dart';
 import 'avatar_creator_screen.dart';
 import 'selfie_consent.dart';
 
 /// "Create your coach" (T-ONB-03b, FR-AVT-01/02), the first step after
-/// sign-up. Three ways: a starting look, the cartoon creator, or a selfie
-/// that suggests features on the phone. "Skip, use default" never blocks.
+/// sign-up, in the Avatar & Voice Studio design (T-UI-02h): a large preview
+/// with arrows and the default characters, the cartoon creator
+/// ("Customize"), or a selfie that suggests features on the phone. Nothing
+/// is guessed: "Use this" waits for the person's pick (D-28). "Skip, use
+/// default" never blocks.
 class AvatarScreen extends ConsumerStatefulWidget {
   const AvatarScreen({super.key});
 
@@ -25,7 +29,8 @@ class AvatarScreen extends ConsumerStatefulWidget {
 }
 
 class _AvatarScreenState extends ConsumerState<AvatarScreen> {
-  AvatarLook? _look;
+  /// The person's pick (a character, or their customized look).
+  AvatarConfig? _picked;
   bool _busy = false;
 
   @override
@@ -35,13 +40,26 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final draft = await ref.read(avatarDraftStoreProvider).load();
       if (!mounted || draft == null) return;
-      if (draft.config.look != null) setState(() => _look = draft.config.look);
+      setState(() => _picked = draft.config);
       if (draft.inCreator) await _openCreator(draft.config);
     });
   }
 
-  AvatarConfig get _preview =>
-      _look == null ? AvatarConfig.fallback : AvatarConfig.forLook(_look!);
+  AvatarConfig get _preview => _picked ?? CoachCharacters.all.first.config;
+
+  void _pick(int i) {
+    final config = CoachCharacters.all[i].config;
+    setState(() => _picked = config);
+    ref
+        .read(avatarDraftStoreProvider)
+        .save(AvatarDraft(config: config, inCreator: false));
+  }
+
+  void _step(int by) {
+    final n = CoachCharacters.all.length;
+    final i = _picked == null ? -1 : CoachCharacters.indexOf(_picked!);
+    _pick(i < 0 ? (by > 0 ? (_picked == null ? 1 : 0) : n - 1) : (i + by) % n);
+  }
 
   Future<void> _save(AvatarConfig config) async {
     final l = AppLocalizations.of(context);
@@ -77,9 +95,9 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
     if (chosen == null) {
       // Back from the creator: keep the choices, not the creator.
       final draft = await drafts.load();
-      await drafts.save(
-        AvatarDraft(config: draft?.config ?? start, inCreator: false),
-      );
+      final kept = draft?.config ?? start;
+      await drafts.save(AvatarDraft(config: kept, inCreator: false));
+      if (mounted) setState(() => _picked = kept);
       return;
     }
     await _save(chosen);
@@ -112,11 +130,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
-    final looks = [
-      (AvatarLook.woman, l.avatarLookWoman),
-      (AvatarLook.man, l.avatarLookMan),
-      (AvatarLook.neutral, l.avatarLookNeutral),
-    ];
+    final index = _picked == null ? 0 : CoachCharacters.indexOf(_picked!);
     return Scaffold(
       body: SafeArea(
         child: AbsorbPointer(
@@ -124,58 +138,34 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
           child: ListView(
             padding: const EdgeInsets.all(LwSpacing.screenGutter),
             children: [
+              Text(l.studioTitle.toUpperCase(), style: t.labelSmall),
               Semantics(
                 header: true,
-                child: Text(l.avatarTitle, style: t.displaySmall),
+                child: Text(l.avatarTitle, style: t.headlineSmall),
               ),
               const SizedBox(height: LwSpacing.xs),
               Text(l.avatarBody, style: t.bodyMedium),
-              const SizedBox(height: LwSpacing.lg),
-              Center(
-                child: AvatarView(
-                  key: const Key('avatar-preview'),
-                  config: _preview,
-                  semanticLabel: l.avatarPreviewLabel,
-                ),
-              ),
-              const SizedBox(height: LwSpacing.lg),
-              Text(l.avatarPickLook, style: t.titleSmall),
+              const SizedBox(height: LwSpacing.md),
+              AvatarStage(config: _preview, index: index, onStep: _step),
+              const SizedBox(height: LwSpacing.md),
+              Text(l.avatarPickCharacter, style: t.titleSmall),
               const SizedBox(height: LwSpacing.xs),
-              Wrap(
-                spacing: LwSpacing.xs,
-                runSpacing: LwSpacing.xs,
-                children: [
-                  for (final (look, label) in looks)
-                    ChoiceChip(
-                      key: Key('avatar-look-${look.name}'),
-                      label: Text(label),
-                      selected: _look == look,
-                      onSelected: (_) {
-                        setState(() => _look = look);
-                        ref
-                            .read(avatarDraftStoreProvider)
-                            .save(
-                              AvatarDraft(
-                                config: AvatarConfig.forLook(look),
-                                inCreator: false,
-                              ),
-                            );
-                      },
-                    ),
-                ],
+              CharacterStrip(
+                selected: _picked == null ? -1 : index,
+                onPick: _pick,
               ),
               const SizedBox(height: LwSpacing.lg),
               FilledButton(
                 key: const Key('avatar-use'),
-                onPressed: _look == null ? null : () => _save(_preview),
+                onPressed: _picked == null ? null : () => _save(_preview),
                 child: Text(l.avatarUseThis),
               ),
               const SizedBox(height: LwSpacing.sm),
               OutlinedButton.icon(
                 key: const Key('avatar-cartoon'),
-                icon: const Icon(Icons.palette_outlined),
+                icon: const Icon(Icons.tune),
                 onPressed: () => _openCreator(_preview),
-                label: Text(l.avatarMakeCartoon),
+                label: Text(l.studioCustomize),
               ),
               const SizedBox(height: LwSpacing.sm),
               OutlinedButton.icon(

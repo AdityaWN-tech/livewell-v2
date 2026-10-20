@@ -495,6 +495,9 @@ class FakeVoiceRepository implements VoiceRepository {
     if (fail) throw Exception('offline');
     chosen = choice;
   }
+
+  @override
+  Future<VoiceChoice?> current() async => chosen;
 }
 
 class FakeVoiceDraftStore implements VoiceDraftStore {

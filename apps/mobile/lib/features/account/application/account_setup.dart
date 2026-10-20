@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../auth/data/firebase_auth_service.dart';
 import '../../auth/domain/auth.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../onboarding/data/onboarding_store.dart';
@@ -87,6 +88,10 @@ class SignInCompletion {
       ..invalidate(avatarRepositoryProvider)
       ..invalidate(voiceRepositoryProvider);
     final progress = await _ref.read(onboardingProvider.future);
+    // Everything that depends on who is signed in follows the new account.
+    // (After an await: this can run while the startup provider is still
+    // being created, when changing another provider isn't allowed.)
+    _ref.read(signedInUidProvider.notifier).refresh();
     final status = await _ref
         .read(accountSetupProvider)
         .afterSignIn(user, progress);

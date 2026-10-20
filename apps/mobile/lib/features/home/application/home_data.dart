@@ -14,8 +14,7 @@ import '../domain/home_models.dart';
 /// True when check-ins can be saved: signed in, or the dev preview.
 final canCheckInProvider = Provider<bool>(
   (ref) =>
-      ref.watch(previewModeProvider) ||
-      ref.watch(authServiceProvider).currentUser != null,
+      ref.watch(previewModeProvider) || ref.watch(signedInUidProvider) != null,
 );
 
 /// Today's check-in (local date), live. Re-read on resume so the day
@@ -51,7 +50,7 @@ final coachNameProvider = Provider<String?>(
 /// nightly plan, from users/{uid}/daily_plans/{date}.
 final todayPlanProvider = StreamProvider<PlanDay?>((ref) {
   if (ref.watch(previewModeProvider) ||
-      ref.watch(authServiceProvider).currentUser == null) {
+      ref.watch(signedInUidProvider) == null) {
     return Stream.value(null);
   }
   final today = localDateKey(ref.watch(clockProvider)());

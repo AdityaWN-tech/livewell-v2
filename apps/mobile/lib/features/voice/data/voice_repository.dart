@@ -106,7 +106,8 @@ class InMemoryVoiceRepository implements VoiceRepository {
 final voiceRepositoryProvider = Provider<VoiceRepository>((ref) {
   final auth = ref.watch(authServiceProvider);
   // Dev preview or nobody signed in: nothing saved.
-  if (ref.watch(previewModeProvider) || auth.currentUser == null) {
+  if (ref.watch(previewModeProvider) ||
+      ref.watch(signedInUidProvider) == null) {
     return InMemoryVoiceRepository();
   }
   return FirestoreVoiceRepository(

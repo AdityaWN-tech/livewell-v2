@@ -50,6 +50,7 @@ class AgeGateScreen extends ConsumerWidget {
                       await auth.deleteCurrentUser();
                     } catch (_) {
                       await auth.signOut();
+                      ref.read(signedInUidProvider.notifier).refresh();
                     }
                   }
                   await ref.read(onboardingProvider.notifier).finish();

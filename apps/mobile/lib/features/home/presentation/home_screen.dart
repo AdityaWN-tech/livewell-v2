@@ -190,7 +190,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // without a name (Google or Apple names are used without asking).
     final askName =
         name == null &&
-        ref.watch(authServiceProvider).currentUser != null &&
+        ref.watch(signedInUidProvider) != null &&
         ref.watch(currentProfileProvider).hasValue &&
         ref.watch(namePromptAskedProvider).value == false;
     final evening = hour >= 18 || hour < 5;

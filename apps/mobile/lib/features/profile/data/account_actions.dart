@@ -161,6 +161,7 @@ class AccountActions {
     await _ref.read(localDataProvider).clear();
     await _ref.read(onboardingStoreProvider).clear();
     await _ref.read(authServiceProvider).signOut();
+    _ref.read(signedInUidProvider.notifier).refresh();
     // Nothing of the old account may show after switching.
     _ref
       ..invalidate(onboardingProvider)

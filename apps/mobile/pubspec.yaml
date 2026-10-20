@@ -91,6 +91,8 @@ flutter:
     - assets/safety/
     # Illustrations and characters by id (T-UI-02b, docs/design/asset-brief.md).
     - assets/illustrations/
+    # Layered avatar parts by category (T-UI-02h; T-AVT-06 adds styles).
+    - assets/avatar/
     # Design references (portal screenshots). Remove before the first store release
     # so they don't ship in the app (NFR-08 size budget).
     - assets/design-reference/

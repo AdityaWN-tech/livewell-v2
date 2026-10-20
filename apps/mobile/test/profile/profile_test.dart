@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/avatar/domain/characters.dart';
+import 'package:livewell/features/studio/presentation/studio_screen.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
@@ -198,14 +200,19 @@ void main() {
       final h = signedIn();
       await h.boot(tester);
       await openProfile(tester);
+      // Both open the Avatar & Voice Studio, on their own tab (T-UI-02h).
       await tapKey(tester, 'profile-avatar');
-      await tester.tap(find.byKey(const Key('avatar-creator-use')));
+      expect(find.byType(StudioScreen), findsOneWidget);
+      await tapKey(tester, 'avatar-character-curly');
+      await tapKey(tester, 'studio-save-avatar');
+      // The character, on the background already chosen (its own tab).
+      expect(CoachCharacters.indexOf(h.avatars.saved!), 3);
+      await tester.pageBack();
       await tester.pumpAndSettle();
-      expect(h.avatars.saved, isNotNull);
       await tapKey(tester, 'profile-voice');
-      await tester.tap(find.byKey(const Key('voice-use')));
-      await tester.pumpAndSettle();
-      expect(h.voices.chosen, isNotNull);
+      await tapKey(tester, 'voice-lw-deep');
+      await tapKey(tester, 'studio-save-voice');
+      expect(h.voices.chosen!.voiceId, 'lw-deep');
     });
   });
 

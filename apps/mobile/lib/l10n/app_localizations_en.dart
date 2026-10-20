@@ -2553,4 +2553,136 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get careGotIt => 'Got it';
+
+  @override
+  String get studioTitle => 'Avatar & Voice Studio';
+
+  @override
+  String get studioTabAvatar => 'Avatar';
+
+  @override
+  String get studioTabVoice => 'Voice';
+
+  @override
+  String get studioTabBackground => 'Background';
+
+  @override
+  String get studioPrevious => 'Previous look';
+
+  @override
+  String get studioNext => 'Next look';
+
+  @override
+  String studioPage(int n, int total) {
+    return 'Look $n of $total';
+  }
+
+  @override
+  String get studioCustom => 'Your own look';
+
+  @override
+  String get studioCustomize => 'Customize';
+
+  @override
+  String get studioUseLook => 'Use this look';
+
+  @override
+  String get studioChooseVoice => 'Choose Your Voice';
+
+  @override
+  String get studioVoiceActive => 'Active';
+
+  @override
+  String get studioVoiceSoon => 'Coming soon';
+
+  @override
+  String studioVoiceRowLabel(String name, String detail, String state) {
+    return '$name, $detail. $state';
+  }
+
+  @override
+  String get studioVoiceSelected => 'Selected';
+
+  @override
+  String get studioVoiceNotSelected => 'Not selected';
+
+  @override
+  String get studioMyVoice => 'My Voice (Cloned)';
+
+  @override
+  String get studioLovedOne => 'Add a Loved One’s Voice';
+
+  @override
+  String get studioDrGokula => 'Dr. Gokula (Licensed)';
+
+  @override
+  String get studioConsentBanner =>
+      'Voice consent active. You can delete your voice data anytime from settings.';
+
+  @override
+  String get studioUseVoice => 'Use this voice';
+
+  @override
+  String get studioColours => 'Colours';
+
+  @override
+  String get studioScenes => 'Scenes';
+
+  @override
+  String studioLocked(int days) {
+    return 'Unlocks with a $days-day streak';
+  }
+
+  @override
+  String get studioSceneSoon => 'Coming with the new art';
+
+  @override
+  String get studioUseBackground => 'Use this background';
+
+  @override
+  String studioCharacterLabel(String name, String state) {
+    return '$name. $state';
+  }
+
+  @override
+  String get avatarCharacterHoodie => 'Green hoodie';
+
+  @override
+  String get avatarCharacterLongHair => 'Long hair';
+
+  @override
+  String get avatarCharacterGlasses => 'Glasses';
+
+  @override
+  String get avatarCharacterCurly => 'Curly hair';
+
+  @override
+  String get avatarCharacterHijab => 'Hijab';
+
+  @override
+  String get avatarCharacterTurban => 'Turban';
+
+  @override
+  String get avatarCharacterOlder => 'Grey hair';
+
+  @override
+  String get avatarPickCharacter => 'Pick a starting look';
+
+  @override
+  String get profileStudio => 'Avatar & Voice Studio';
+
+  @override
+  String get profileStudioBody => 'Your coach’s look, voice and background';
+
+  @override
+  String get studioSceneGarden => 'Garden';
+
+  @override
+  String get studioSceneSunrise => 'Sunrise';
+
+  @override
+  String get studioSceneRoom => 'Cosy room';
+
+  @override
+  String get studioSceneBeach => 'Beach';
 }

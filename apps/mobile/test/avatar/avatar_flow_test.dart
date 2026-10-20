@@ -11,6 +11,7 @@ import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/data/selfie_service.dart';
 import 'package:livewell/features/avatar/domain/avatar_config.dart';
+import 'package:livewell/features/avatar/domain/characters.dart';
 import 'package:livewell/features/avatar/presentation/avatar_creator_screen.dart';
 import 'package:livewell/features/avatar/presentation/avatar_screen.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
@@ -167,20 +168,65 @@ void main() {
       expect(use.onPressed, isNull);
     });
 
-    for (final look in AvatarLook.values) {
-      testWidgets('pick "${look.name}", Use this: saved, then the voice step', (
+    for (final c in CoachCharacters.all) {
+      testWidgets('pick "${c.id}", Use this: saved, then the voice step', (
         tester,
       ) async {
         final h = atAvatar();
         await h.boot(tester);
-        await tapKey(tester, 'avatar-look-${look.name}');
+        await tapKey(tester, 'avatar-character-${c.id}');
         await tapKey(tester, 'avatar-use');
-        expect(h.avatars.saved, AvatarConfig.forLook(look));
+        expect(h.avatars.saved, c.config);
         expect(h.profiles.existing[uid], ProfileStep.voice);
         expect(h.avatarDrafts.draft, isNull);
         expect(find.byType(VoiceScreen), findsOneWidget);
       });
     }
+
+    testWidgets('the arrows move through the characters and count as a pick', (
+      tester,
+    ) async {
+      final h = atAvatar();
+      await h.boot(tester);
+      await tapKey(tester, 'studio-next');
+      final second = CoachCharacters.all[1];
+      expect(
+        tester
+            .widget<AvatarView>(find.byKey(const Key('avatar-preview')))
+            .config,
+        second.config,
+      );
+      await tapKey(tester, 'studio-prev');
+      await tapKey(tester, 'studio-prev');
+      expect(
+        tester
+            .widget<AvatarView>(find.byKey(const Key('avatar-preview')))
+            .config,
+        CoachCharacters.all.last.config,
+      );
+      await tapKey(tester, 'avatar-use');
+      expect(h.avatars.saved, CoachCharacters.all.last.config);
+    });
+
+    test('characters: one per character illustration, all different', () {
+      final ids = CoachCharacters.all.map((c) => c.id).toList();
+      expect(ids.toSet().length, ids.length);
+      expect(
+        CoachCharacters.all.map((c) => c.config).toSet().length,
+        ids.length,
+      );
+      final manifest = File('assets/illustrations/illustrations.json')
+          .readAsStringSync();
+      for (final c in CoachCharacters.all) {
+        expect(manifest, contains('"${c.illustrationId}"'), reason: c.id);
+        expect(CoachCharacters.indexOf(c.config), ids.indexOf(c.id));
+      }
+      // The background is chosen on its own: still the same character.
+      final c = CoachCharacters.all[2];
+      expect(CoachCharacters.indexOf(c.config.copyWith(background: 5)), 2);
+      // Customized: no longer a character.
+      expect(CoachCharacters.indexOf(c.config.copyWith(skin: 9)), -1);
+    });
 
     testWidgets('"Skip, use default" never blocks', (tester) async {
       final h = atAvatar();

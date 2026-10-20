@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../studio/presentation/studio_screen.dart';
+import '../../studio/presentation/studio_widgets.dart' show StudioTab;
 import '../../../core/config/flavor.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
@@ -10,18 +12,12 @@ import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../auth/domain/auth.dart';
 import '../../auth/presentation/auth_copy.dart';
-import '../../avatar/data/avatar_repository.dart';
-import '../../avatar/domain/avatar_config.dart';
-import '../../avatar/presentation/avatar_creator_screen.dart';
 import '../../home/application/home_data.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
 import '../../starter_plan/data/plan_repository.dart';
 import '../../starter_plan/domain/touchpoints.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
     show reminderTexts;
-import '../../voice/data/voice_repository.dart';
-import '../../voice/domain/voice.dart';
-import '../../voice/presentation/voice_library_screen.dart';
 import '../data/account_actions.dart';
 import '../data/appearance.dart';
 import 'profile_button.dart';
@@ -213,33 +209,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (mounted) context.go('/sign-in');
   }
 
-  Future<void> _changeAvatar() async {
-    final saved =
-        await ref.read(avatarRepositoryProvider).load() ??
-        AvatarConfig.fallback;
-    if (!mounted) return;
+  /// The Avatar & Voice Studio (T-UI-02h), on the avatar or voice tab.
+  Future<void> _openStudio(StudioTab tab) async {
     // A message from before must not cover the next screen's button.
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    final chosen = await Navigator.of(context).push<AvatarConfig>(
-      MaterialPageRoute(builder: (_) => AvatarCreatorScreen(initial: saved)),
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => StudioScreen(initialTab: tab)),
     );
-    await ref.read(avatarDraftStoreProvider).clear();
-    if (chosen == null) return;
-    await ref.read(avatarRepositoryProvider).save(chosen);
-    if (mounted) _say(AppLocalizations.of(context).profileSaved);
-  }
-
-  Future<void> _changeVoice() async {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    final chosen = await Navigator.of(context).push<VoiceChoice>(
-      MaterialPageRoute(
-        builder: (_) => const VoiceLibraryScreen(initial: VoiceChoice.fallback),
-      ),
-    );
-    await ref.read(voiceDraftStoreProvider).clear();
-    if (chosen == null) return;
-    await ref.read(voiceRepositoryProvider).choose(chosen);
-    if (mounted) _say(AppLocalizations.of(context).profileSaved);
   }
 
   Future<void> _coachName() async {
@@ -509,13 +485,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   key: const Key('profile-avatar'),
                   leading: const Icon(Icons.face_outlined),
                   title: Text(l.profileChangeAvatar),
-                  onTap: _changeAvatar,
+                  onTap: () => _openStudio(StudioTab.avatar),
                 ),
                 ListTile(
                   key: const Key('profile-voice'),
                   leading: const Icon(Icons.record_voice_over_outlined),
                   title: Text(l.profileChangeVoice),
-                  onTap: _changeVoice,
+                  onTap: () => _openStudio(StudioTab.voice),
                 ),
                 ListTile(
                   key: const Key('profile-coach-name'),

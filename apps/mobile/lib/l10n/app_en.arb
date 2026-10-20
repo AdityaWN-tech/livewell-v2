@@ -1472,5 +1472,86 @@
   "careSavedEmptyBody": "Answers you save from your coach will show here.",
   "careClinicianTitle": "Talk to a clinician",
   "careClinicianBody": "Your coach is an educational companion, not a clinician. For medical advice, or before changing any medication, talk to your doctor or care team.",
-  "careGotIt": "Got it"
+  "careGotIt": "Got it",
+  "studioTitle": "Avatar & Voice Studio",
+  "studioTabAvatar": "Avatar",
+  "studioTabVoice": "Voice",
+  "studioTabBackground": "Background",
+  "studioPrevious": "Previous look",
+  "studioNext": "Next look",
+  "studioPage": "Look {n} of {total}",
+  "@studioPage": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studioCustom": "Your own look",
+  "studioCustomize": "Customize",
+  "studioUseLook": "Use this look",
+  "studioChooseVoice": "Choose Your Voice",
+  "studioVoiceActive": "Active",
+  "studioVoiceSoon": "Coming soon",
+  "studioVoiceRowLabel": "{name}, {detail}. {state}",
+  "@studioVoiceRowLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "detail": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "studioVoiceSelected": "Selected",
+  "studioVoiceNotSelected": "Not selected",
+  "studioMyVoice": "My Voice (Cloned)",
+  "studioLovedOne": "Add a Loved One’s Voice",
+  "studioDrGokula": "Dr. Gokula (Licensed)",
+  "studioConsentBanner": "Voice consent active. You can delete your voice data anytime from settings.",
+  "studioUseVoice": "Use this voice",
+  "studioColours": "Colours",
+  "studioScenes": "Scenes",
+  "studioLocked": "Unlocks with a {days}-day streak",
+  "@studioLocked": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "studioSceneSoon": "Coming with the new art",
+  "studioUseBackground": "Use this background",
+  "studioCharacterLabel": "{name}. {state}",
+  "@studioCharacterLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "avatarCharacterHoodie": "Green hoodie",
+  "avatarCharacterLongHair": "Long hair",
+  "avatarCharacterGlasses": "Glasses",
+  "avatarCharacterCurly": "Curly hair",
+  "avatarCharacterHijab": "Hijab",
+  "avatarCharacterTurban": "Turban",
+  "avatarCharacterOlder": "Grey hair",
+  "avatarPickCharacter": "Pick a starting look",
+  "profileStudio": "Avatar & Voice Studio",
+  "profileStudioBody": "Your coach’s look, voice and background",
+  "studioSceneGarden": "Garden",
+  "studioSceneSunrise": "Sunrise",
+  "studioSceneRoom": "Cosy room",
+  "studioSceneBeach": "Beach"
 }

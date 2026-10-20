@@ -36,7 +36,7 @@ class NotificationsScreen extends ConsumerWidget {
     final ml = MaterialLocalizations.of(context);
     String fmt(ClockTime c) =>
         ml.formatTimeOfDay(TimeOfDay(hour: c.hour, minute: c.minute));
-    final signedIn = ref.watch(authServiceProvider).currentUser != null;
+    final signedIn = ref.watch(signedInUidProvider) != null;
     final settings =
         ref.watch(currentProfileProvider).value?.settings ??
         const <String, dynamic>{};

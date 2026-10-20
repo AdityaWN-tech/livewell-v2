@@ -86,7 +86,7 @@ final planGoalProvider = Provider<PlanGoal?>(
 /// The plan's days from today on (calendar button).
 final weekPlanProvider = FutureProvider<List<WeekDay>>((ref) async {
   if (ref.watch(previewModeProvider)) return PreviewSamples.week;
-  if (ref.watch(authServiceProvider).currentUser == null) return const [];
+  if (ref.watch(signedInUidProvider) == null) return const [];
   final repo = ref.watch(planRepositoryProvider);
   final today = localDateKey(ref.watch(clockProvider)());
   try {

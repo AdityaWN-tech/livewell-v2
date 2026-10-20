@@ -194,7 +194,8 @@ final _previewPlansProvider = Provider<PlanRepository>(
 final planRepositoryProvider = Provider<PlanRepository>((ref) {
   final auth = ref.watch(authServiceProvider);
   // Dev preview or nobody signed in: nothing to read or save.
-  if (ref.watch(previewModeProvider) || auth.currentUser == null) {
+  if (ref.watch(previewModeProvider) ||
+      ref.watch(signedInUidProvider) == null) {
     return ref.watch(_previewPlansProvider);
   }
   return FirestorePlanRepository(

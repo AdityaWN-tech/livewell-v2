@@ -237,7 +237,7 @@ final profileRepositoryProvider = Provider<ProfileRepository>(
 /// mode, or before the profile exists.
 final currentProfileProvider = StreamProvider<Profile?>((ref) {
   if (ref.watch(previewModeProvider)) return Stream.value(null);
-  final uid = ref.watch(authServiceProvider).currentUser?.uid;
+  final uid = ref.watch(signedInUidProvider);
   if (uid == null) return Stream.value(null);
   return ref.watch(profileRepositoryProvider).watch(uid);
 });

@@ -31,7 +31,7 @@ final trackHistoryProvider = FutureProvider<List<CheckIn>>((ref) async {
   if (ref.watch(previewModeProvider)) {
     return [...PreviewSamples.checkInHistory(now), ?todayCheckIn];
   }
-  if (ref.watch(authServiceProvider).currentUser == null) return const [];
+  if (ref.watch(signedInUidProvider) == null) return const [];
   try {
     return await ref.watch(checkInRepositoryProvider).range(from, today);
   } catch (_) {

@@ -269,3 +269,19 @@ String? appleGivenName(Map<String, dynamic>? profile) {
   }
   return null;
 }
+
+/// The signed-in account's uid, as a value providers can watch (T-ONB-03g).
+/// [AuthService.currentUser] is a plain getter, so a provider that read it
+/// while nobody was signed in (the theme reads the profile at startup) kept
+/// "signed out" after a first sign-up until the app restarted: Home showed
+/// no name, Why or Day. Sign-in completion and log out call [refresh].
+class SignedInUid extends Notifier<String?> {
+  @override
+  String? build() => ref.read(authServiceProvider).currentUser?.uid;
+
+  void refresh() => state = ref.read(authServiceProvider).currentUser?.uid;
+}
+
+final signedInUidProvider = NotifierProvider<SignedInUid, String?>(
+  SignedInUid.new,
+);

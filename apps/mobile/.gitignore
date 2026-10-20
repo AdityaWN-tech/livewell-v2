@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Walkthrough video frames (made on demand, T-ONB-03g)
+test/journey/frames/

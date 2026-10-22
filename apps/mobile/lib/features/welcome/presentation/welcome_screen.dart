@@ -188,11 +188,7 @@ class _FeatureTourState extends State<FeatureTour> {
                 child: Row(
                   children: [
                     if (art == null)
-                      CoachAvatar(
-                        expression: AvatarExpression.waving,
-                        config: defaultCoach,
-                        size: 72,
-                      )
+                      CoachAvatar(expression: AvatarExpression.waving, size: 72)
                     else
                       Illustration(art, width: 72, height: 72),
                     const SizedBox(width: LwSpacing.sm),

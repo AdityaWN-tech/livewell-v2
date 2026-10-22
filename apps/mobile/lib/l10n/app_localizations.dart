@@ -2347,74 +2347,14 @@ abstract class AppLocalizations {
   /// No description provided for @avatarTitle.
   ///
   /// In en, this message translates to:
-  /// **'Create your coach'**
+  /// **'Meet your coach'**
   String get avatarTitle;
 
   /// No description provided for @avatarBody.
   ///
   /// In en, this message translates to:
-  /// **'Choose how your coach looks. You can change it any time.'**
+  /// **'Your coach greets you, reminds you of your small steps and cheers you on.'**
   String get avatarBody;
-
-  /// No description provided for @avatarPickLook.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick a starting look'**
-  String get avatarPickLook;
-
-  /// No description provided for @avatarLookWoman.
-  ///
-  /// In en, this message translates to:
-  /// **'Woman'**
-  String get avatarLookWoman;
-
-  /// No description provided for @avatarLookMan.
-  ///
-  /// In en, this message translates to:
-  /// **'Man'**
-  String get avatarLookMan;
-
-  /// No description provided for @avatarLookNeutral.
-  ///
-  /// In en, this message translates to:
-  /// **'Neutral'**
-  String get avatarLookNeutral;
-
-  /// No description provided for @avatarUseThis.
-  ///
-  /// In en, this message translates to:
-  /// **'Use this'**
-  String get avatarUseThis;
-
-  /// No description provided for @avatarMakeCartoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Make a cartoon avatar'**
-  String get avatarMakeCartoon;
-
-  /// No description provided for @avatarUseSelfie.
-  ///
-  /// In en, this message translates to:
-  /// **'Start from a selfie'**
-  String get avatarUseSelfie;
-
-  /// No description provided for @avatarSelfieNote.
-  ///
-  /// In en, this message translates to:
-  /// **'Your photo stays on this phone and is deleted right after.'**
-  String get avatarSelfieNote;
-
-  /// No description provided for @avatarPhotorealSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Real-looking video avatars: coming soon'**
-  String get avatarPhotorealSoon;
-
-  /// No description provided for @avatarSkip.
-  ///
-  /// In en, this message translates to:
-  /// **'Skip, use default'**
-  String get avatarSkip;
 
   /// No description provided for @avatarPreviewLabel.
   ///
@@ -2427,312 +2367,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn’t save your coach. Please try again.'**
   String get avatarSaveError;
-
-  /// No description provided for @avatarCreatorTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Make your coach'**
-  String get avatarCreatorTitle;
-
-  /// No description provided for @avatarSuggested.
-  ///
-  /// In en, this message translates to:
-  /// **'We suggested a skin tone and hair colour from your selfie. Please check them. Your photo has been deleted.'**
-  String get avatarSuggested;
-
-  /// No description provided for @avatarSelfieConsentTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Use your selfie?'**
-  String get avatarSelfieConsentTitle;
-
-  /// No description provided for @avatarSelfieConsentBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Live Well will look at one selfie on this phone to suggest a skin tone and hair colour for your cartoon coach. This uses your camera and reads features of your face. The photo is not uploaded and is deleted right after. You can change this any time in Settings > Consents.'**
-  String get avatarSelfieConsentBody;
-
-  /// No description provided for @avatarSelfieAllow.
-  ///
-  /// In en, this message translates to:
-  /// **'Allow'**
-  String get avatarSelfieAllow;
-
-  /// No description provided for @avatarSelfieNotNow.
-  ///
-  /// In en, this message translates to:
-  /// **'Not now'**
-  String get avatarSelfieNotNow;
-
-  /// No description provided for @avatarSelfieFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'We couldn’t read that photo. You can pick the features yourself.'**
-  String get avatarSelfieFailed;
-
-  /// No description provided for @avatarSectionSkin.
-  ///
-  /// In en, this message translates to:
-  /// **'Skin tone'**
-  String get avatarSectionSkin;
-
-  /// No description provided for @avatarSectionHair.
-  ///
-  /// In en, this message translates to:
-  /// **'Hair style'**
-  String get avatarSectionHair;
-
-  /// No description provided for @avatarSectionHairColour.
-  ///
-  /// In en, this message translates to:
-  /// **'Hair colour'**
-  String get avatarSectionHairColour;
-
-  /// No description provided for @avatarSectionEyes.
-  ///
-  /// In en, this message translates to:
-  /// **'Eyes'**
-  String get avatarSectionEyes;
-
-  /// No description provided for @avatarSectionGlasses.
-  ///
-  /// In en, this message translates to:
-  /// **'Glasses'**
-  String get avatarSectionGlasses;
-
-  /// No description provided for @avatarSectionHeadCovering.
-  ///
-  /// In en, this message translates to:
-  /// **'Head covering'**
-  String get avatarSectionHeadCovering;
-
-  /// No description provided for @avatarSectionClothing.
-  ///
-  /// In en, this message translates to:
-  /// **'Clothing'**
-  String get avatarSectionClothing;
-
-  /// No description provided for @avatarSectionClothingColour.
-  ///
-  /// In en, this message translates to:
-  /// **'Clothing colour'**
-  String get avatarSectionClothingColour;
-
-  /// No description provided for @avatarSectionBackground.
-  ///
-  /// In en, this message translates to:
-  /// **'Background'**
-  String get avatarSectionBackground;
-
-  /// No description provided for @avatarSkinTone.
-  ///
-  /// In en, this message translates to:
-  /// **'Skin tone {n} of 10'**
-  String avatarSkinTone(int n);
-
-  /// No description provided for @avatarHairNone.
-  ///
-  /// In en, this message translates to:
-  /// **'None'**
-  String get avatarHairNone;
-
-  /// No description provided for @avatarHairShort.
-  ///
-  /// In en, this message translates to:
-  /// **'Short'**
-  String get avatarHairShort;
-
-  /// No description provided for @avatarHairLong.
-  ///
-  /// In en, this message translates to:
-  /// **'Long'**
-  String get avatarHairLong;
-
-  /// No description provided for @avatarHairCurly.
-  ///
-  /// In en, this message translates to:
-  /// **'Curly'**
-  String get avatarHairCurly;
-
-  /// No description provided for @avatarHairCoily.
-  ///
-  /// In en, this message translates to:
-  /// **'Coily'**
-  String get avatarHairCoily;
-
-  /// No description provided for @avatarHairWavy.
-  ///
-  /// In en, this message translates to:
-  /// **'Wavy'**
-  String get avatarHairWavy;
-
-  /// No description provided for @avatarHairBun.
-  ///
-  /// In en, this message translates to:
-  /// **'Bun'**
-  String get avatarHairBun;
-
-  /// No description provided for @avatarHairBuzz.
-  ///
-  /// In en, this message translates to:
-  /// **'Buzz cut'**
-  String get avatarHairBuzz;
-
-  /// No description provided for @avatarHairColourBlack.
-  ///
-  /// In en, this message translates to:
-  /// **'Black'**
-  String get avatarHairColourBlack;
-
-  /// No description provided for @avatarHairColourDarkBrown.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark brown'**
-  String get avatarHairColourDarkBrown;
-
-  /// No description provided for @avatarHairColourBrown.
-  ///
-  /// In en, this message translates to:
-  /// **'Brown'**
-  String get avatarHairColourBrown;
-
-  /// No description provided for @avatarHairColourAuburn.
-  ///
-  /// In en, this message translates to:
-  /// **'Auburn'**
-  String get avatarHairColourAuburn;
-
-  /// No description provided for @avatarHairColourBlonde.
-  ///
-  /// In en, this message translates to:
-  /// **'Blonde'**
-  String get avatarHairColourBlonde;
-
-  /// No description provided for @avatarHairColourGrey.
-  ///
-  /// In en, this message translates to:
-  /// **'Grey'**
-  String get avatarHairColourGrey;
-
-  /// No description provided for @avatarHairColourWhite.
-  ///
-  /// In en, this message translates to:
-  /// **'White'**
-  String get avatarHairColourWhite;
-
-  /// No description provided for @avatarEyesRound.
-  ///
-  /// In en, this message translates to:
-  /// **'Round'**
-  String get avatarEyesRound;
-
-  /// No description provided for @avatarEyesAlmond.
-  ///
-  /// In en, this message translates to:
-  /// **'Almond'**
-  String get avatarEyesAlmond;
-
-  /// No description provided for @avatarEyesSmiling.
-  ///
-  /// In en, this message translates to:
-  /// **'Smiling'**
-  String get avatarEyesSmiling;
-
-  /// No description provided for @avatarGlassesNone.
-  ///
-  /// In en, this message translates to:
-  /// **'None'**
-  String get avatarGlassesNone;
-
-  /// No description provided for @avatarGlassesRound.
-  ///
-  /// In en, this message translates to:
-  /// **'Round'**
-  String get avatarGlassesRound;
-
-  /// No description provided for @avatarGlassesSquare.
-  ///
-  /// In en, this message translates to:
-  /// **'Square'**
-  String get avatarGlassesSquare;
-
-  /// No description provided for @avatarCoveringNone.
-  ///
-  /// In en, this message translates to:
-  /// **'None'**
-  String get avatarCoveringNone;
-
-  /// No description provided for @avatarCoveringHijab.
-  ///
-  /// In en, this message translates to:
-  /// **'Hijab'**
-  String get avatarCoveringHijab;
-
-  /// No description provided for @avatarCoveringTurban.
-  ///
-  /// In en, this message translates to:
-  /// **'Turban'**
-  String get avatarCoveringTurban;
-
-  /// No description provided for @avatarCoveringKippah.
-  ///
-  /// In en, this message translates to:
-  /// **'Kippah'**
-  String get avatarCoveringKippah;
-
-  /// No description provided for @avatarClothingCrew.
-  ///
-  /// In en, this message translates to:
-  /// **'T-shirt'**
-  String get avatarClothingCrew;
-
-  /// No description provided for @avatarClothingCollar.
-  ///
-  /// In en, this message translates to:
-  /// **'Collar'**
-  String get avatarClothingCollar;
-
-  /// No description provided for @avatarClothingCardigan.
-  ///
-  /// In en, this message translates to:
-  /// **'Cardigan'**
-  String get avatarClothingCardigan;
-
-  /// No description provided for @avatarClothForest.
-  ///
-  /// In en, this message translates to:
-  /// **'Forest'**
-  String get avatarClothForest;
-
-  /// No description provided for @avatarClothTerracotta.
-  ///
-  /// In en, this message translates to:
-  /// **'Terracotta'**
-  String get avatarClothTerracotta;
-
-  /// No description provided for @avatarClothSage.
-  ///
-  /// In en, this message translates to:
-  /// **'Sage'**
-  String get avatarClothSage;
-
-  /// No description provided for @avatarClothNavy.
-  ///
-  /// In en, this message translates to:
-  /// **'Navy'**
-  String get avatarClothNavy;
-
-  /// No description provided for @avatarClothMustard.
-  ///
-  /// In en, this message translates to:
-  /// **'Mustard'**
-  String get avatarClothMustard;
-
-  /// No description provided for @avatarClothPlum.
-  ///
-  /// In en, this message translates to:
-  /// **'Plum'**
-  String get avatarClothPlum;
 
   /// No description provided for @avatarBgSage.
   ///
@@ -4593,42 +4227,6 @@ abstract class AppLocalizations {
   /// **'Background'**
   String get studioTabBackground;
 
-  /// No description provided for @studioPrevious.
-  ///
-  /// In en, this message translates to:
-  /// **'Previous look'**
-  String get studioPrevious;
-
-  /// No description provided for @studioNext.
-  ///
-  /// In en, this message translates to:
-  /// **'Next look'**
-  String get studioNext;
-
-  /// No description provided for @studioPage.
-  ///
-  /// In en, this message translates to:
-  /// **'Look {n} of {total}'**
-  String studioPage(int n, int total);
-
-  /// No description provided for @studioCustom.
-  ///
-  /// In en, this message translates to:
-  /// **'Your own look'**
-  String get studioCustom;
-
-  /// No description provided for @studioCustomize.
-  ///
-  /// In en, this message translates to:
-  /// **'Customize'**
-  String get studioCustomize;
-
-  /// No description provided for @studioUseLook.
-  ///
-  /// In en, this message translates to:
-  /// **'Use this look'**
-  String get studioUseLook;
-
   /// No description provided for @studioChooseVoice.
   ///
   /// In en, this message translates to:
@@ -4725,12 +4323,6 @@ abstract class AppLocalizations {
   /// **'Use this background'**
   String get studioUseBackground;
 
-  /// No description provided for @studioCharacterLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'{name}. {state}'**
-  String studioCharacterLabel(String name, String state);
-
   /// No description provided for @avatarCharacterHoodie.
   ///
   /// In en, this message translates to:
@@ -4772,12 +4364,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Grey hair'**
   String get avatarCharacterOlder;
-
-  /// No description provided for @avatarPickCharacter.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick a starting look'**
-  String get avatarPickCharacter;
 
   /// No description provided for @profileStudio.
   ///
@@ -5120,6 +4706,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Avatar Moments'**
   String get devMoments;
+
+  /// No description provided for @avatarMoreSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon you can pick from ready-made coaches, make one from your photo, or build your own. For now, meet your coach.'**
+  String get avatarMoreSoon;
+
+  /// No description provided for @avatarContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get avatarContinue;
+
+  /// No description provided for @devAvatarFrames.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar frames'**
+  String get devAvatarFrames;
+
+  /// No description provided for @devAvatarTalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk (mouth frames only)'**
+  String get devAvatarTalk;
 }
 
 class _AppLocalizationsDelegate

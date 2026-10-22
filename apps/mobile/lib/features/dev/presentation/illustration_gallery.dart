@@ -44,11 +44,7 @@ class IllustrationGallery extends StatelessWidget {
                   for (final x in AvatarExpression.values)
                     Column(
                       children: [
-                        CoachAvatar(
-                          expression: x,
-                          size: 88,
-                          config: defaultCoach,
-                        ),
+                        CoachAvatar(expression: x, size: 88),
                         Text(x.name, style: t.labelSmall),
                       ],
                     ),
@@ -57,7 +53,6 @@ class IllustrationGallery extends StatelessWidget {
               const SizedBox(height: LwSpacing.md),
               CoachAvatar(
                 expression: AvatarExpression.waving,
-                config: defaultCoach,
                 size: 96,
                 bubble: 'Good morning! Let\'s make today a great day.',
               ),

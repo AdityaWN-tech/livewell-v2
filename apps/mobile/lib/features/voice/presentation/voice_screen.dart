@@ -11,6 +11,7 @@ import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../avatar/data/avatar_repository.dart';
 import '../../avatar/domain/avatar_config.dart';
+import '../../avatar/presentation/coach_avatar.dart' show coachImagesProvider;
 import '../../home/application/home_data.dart';
 import '../data/voice_repository.dart';
 import '../domain/voice.dart';
@@ -129,7 +130,8 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                 child: Column(
                   children: [
                     AvatarView(
-                      config: _avatar,
+                      images: ref.watch(coachImagesProvider).value,
+                      background: AvatarColours.background[_avatar.background],
                       expression: AvatarExpression.talking,
                       semanticLabel: l.avatarPreviewLabel,
                     ),

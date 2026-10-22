@@ -1,0 +1,72 @@
+{
+  "avatar_id": "placeholder",
+  "version": 1,
+  "style": "3d_adult",
+  "canvas": {
+    "width": 1024,
+    "height": 1024
+  },
+  "sizes": [
+    "2x",
+    "3x"
+  ],
+  "note": "Placeholder cards, not a face: for developing the frame player (T-AVT-08a). Dev builds only.",
+  "frames": {
+    "neutral": {
+      "2x": "neutral@2x.webp",
+      "3x": "neutral@3x.webp"
+    },
+    "happy": {
+      "2x": "happy@2x.webp",
+      "3x": "happy@3x.webp"
+    },
+    "waving": {
+      "2x": "waving@2x.webp",
+      "3x": "waving@3x.webp"
+    },
+    "listening": {
+      "2x": "listening@2x.webp",
+      "3x": "listening@3x.webp"
+    },
+    "calm": {
+      "2x": "calm@2x.webp",
+      "3x": "calm@3x.webp"
+    },
+    "celebrating": {
+      "2x": "celebrating@2x.webp",
+      "3x": "celebrating@3x.webp"
+    },
+    "blink": {
+      "2x": "blink@2x.webp",
+      "3x": "blink@3x.webp"
+    },
+    "mouth_A": {
+      "2x": "mouth_A@2x.webp",
+      "3x": "mouth_A@3x.webp"
+    },
+    "mouth_I": {
+      "2x": "mouth_I@2x.webp",
+      "3x": "mouth_I@3x.webp"
+    },
+    "mouth_U": {
+      "2x": "mouth_U@2x.webp",
+      "3x": "mouth_U@3x.webp"
+    },
+    "mouth_E": {
+      "2x": "mouth_E@2x.webp",
+      "3x": "mouth_E@3x.webp"
+    },
+    "mouth_O": {
+      "2x": "mouth_O@2x.webp",
+      "3x": "mouth_O@3x.webp"
+    },
+    "mouth_closed": {
+      "2x": "mouth_closed@2x.webp",
+      "3x": "mouth_closed@3x.webp"
+    },
+    "thumb": {
+      "2x": "thumb@2x.webp",
+      "3x": "thumb@3x.webp"
+    }
+  }
+}

@@ -6,13 +6,9 @@ import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/data/avatar_repository.dart';
-import '../../avatar/data/selfie_service.dart';
 import '../../avatar/domain/avatar_config.dart';
-import '../../avatar/domain/characters.dart';
-import '../../avatar/presentation/avatar_creator_screen.dart';
 import '../../avatar/presentation/coach_avatar.dart'
     show coachAvatarConfigProvider, defaultCoach;
-import '../../avatar/presentation/selfie_consent.dart';
 import '../../voice/data/voice_repository.dart';
 import '../../voice/domain/voice.dart';
 import '../../voice/presentation/voice_screen.dart'
@@ -26,7 +22,8 @@ import 'studio_widgets.dart';
 final clonedVoiceConsentProvider = Provider<bool>((ref) => false);
 
 /// The Avatar & Voice Studio (T-UI-02h), from Profile: the coach's look,
-/// voice and background, each saved with its own button.
+/// voice and background, each saved with its own button. The look tab shows
+/// the coach until the 3D Avatar Studio replaces it (T-AVT-08b).
 class StudioScreen extends ConsumerStatefulWidget {
   const StudioScreen({super.key, this.initialTab = StudioTab.avatar});
 
@@ -102,57 +99,6 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
     }
   }
 
-  void _step(int by) {
-    final n = CoachCharacters.all.length;
-    final i = CoachCharacters.indexOf(_avatar);
-    final next = i < 0 ? (by > 0 ? 0 : n - 1) : (i + by) % n;
-    _pick(next);
-  }
-
-  void _pick(int i) => setState(
-    () => _avatar = CoachCharacters.all[i].config.copyWith(
-      background: _avatar.background,
-    ),
-  );
-
-  Future<void> _customize({bool suggested = false, AvatarConfig? start}) async {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    final chosen = await Navigator.of(context).push<AvatarConfig>(
-      MaterialPageRoute(
-        builder: (_) => AvatarCreatorScreen(
-          initial: start ?? _avatar,
-          suggested: suggested,
-        ),
-      ),
-    );
-    await ref.read(avatarDraftStoreProvider).clear();
-    if (chosen != null && mounted) setState(() => _avatar = chosen);
-  }
-
-  /// The selfie suggests skin tone and hair colour on the phone, then the
-  /// creator opens; the photo is never kept (T-ONB-03b, D-28).
-  Future<void> _selfie() async {
-    final l = AppLocalizations.of(context);
-    if (!await ensureSelfieConsent(context, ref) || !mounted) return;
-    setState(() => _busy = true);
-    SelfieSuggestion? suggestion;
-    var failed = false;
-    try {
-      suggestion = await ref.read(selfieAnalyzerProvider).takeAndSuggest();
-    } catch (_) {
-      failed = true;
-    }
-    if (!mounted) return;
-    setState(() => _busy = false);
-    if (failed) {
-      _say(l.avatarSelfieFailed);
-      await _customize();
-      return;
-    }
-    if (suggestion == null) return;
-    await _customize(suggested: true, start: suggestion.applyTo(_avatar));
-  }
-
   Future<void> _preview(LibraryVoice v) => ref
       .read(voicePreviewPlayerProvider)
       .play(v.previewAsset(_voice.style), speed: _voice.speed);
@@ -162,39 +108,16 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final flags = ref.watch(featureFlagsProvider);
-    final index = CoachCharacters.indexOf(_avatar);
     final children = switch (_tab) {
+      // Choosing a coach comes with the Avatar Studio (T-AVT-08b); the
+      // cartoon creator and its selfie suggestion are gone (T-AVT-08a).
       StudioTab.avatar => [
-        AvatarStage(config: _avatar, index: index, onStep: _step),
+        const AvatarStage(),
         const SizedBox(height: LwSpacing.md),
-        Text(l.avatarPickCharacter, style: t.titleSmall),
-        const SizedBox(height: LwSpacing.xs),
-        CharacterStrip(
-          selected: index,
-          onPick: _pick,
-          background: _avatar.background,
-        ),
-        const SizedBox(height: LwSpacing.md),
-        OutlinedButton.icon(
-          key: const Key('studio-customize'),
-          icon: const Icon(Icons.tune),
-          onPressed: _customize,
-          label: Text(l.studioCustomize),
-        ),
-        const SizedBox(height: LwSpacing.xs),
-        OutlinedButton.icon(
-          key: const Key('studio-selfie'),
-          icon: const Icon(Icons.photo_camera_outlined),
-          onPressed: _selfie,
-          label: Text(l.avatarUseSelfie),
-        ),
-        const SizedBox(height: LwSpacing.xs),
-        Text(l.avatarSelfieNote, style: t.bodySmall),
-        const SizedBox(height: LwSpacing.md),
-        FilledButton(
-          key: const Key('studio-save-avatar'),
-          onPressed: _busy ? null : _saveAvatar,
-          child: Text(l.studioUseLook),
+        Text(
+          l.avatarMoreSoon,
+          key: const Key('avatar-more-soon'),
+          style: t.bodySmall,
         ),
       ],
       StudioTab.voice => [
@@ -262,10 +185,10 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
         ),
       ],
       StudioTab.background => [
-        AvatarStage(config: _avatar, index: index, onStep: _step),
+        AvatarStage(background: _avatar.background),
         const SizedBox(height: LwSpacing.md),
         BackgroundChoices(
-          config: _avatar,
+          selected: _avatar.background,
           onPick: (i) =>
               setState(() => _avatar = _avatar.copyWith(background: i)),
         ),

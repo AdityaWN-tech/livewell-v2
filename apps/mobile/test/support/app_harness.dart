@@ -22,7 +22,8 @@ import 'package:livewell/features/safety/presentation/safety_screens.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
 import 'package:livewell/features/dev/application/preview_mode.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
-import 'package:livewell/features/avatar/data/selfie_service.dart';
+import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
+    show avatarIdleMotionProvider;
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
@@ -55,7 +56,6 @@ class Harness {
     this.flags = const FeatureFlags(),
     FakeReflectionRepository? reflections,
     FakeLearnRepository? learn,
-    this.selfie,
     FakeNamePromptStore? namePrompt,
   }) : namePrompt = namePrompt ?? FakeNamePromptStore(),
        speaker = FakeCoachSpeaker(),
@@ -85,8 +85,6 @@ class Harness {
   final FakeReflectionRepository reflections;
   final FakeLearnRepository learn;
   final avatars = FakeAvatarRepository();
-  final avatarDrafts = FakeAvatarDraftStore();
-  final photos = FakePhotoSource();
   final voices = FakeVoiceRepository();
   final voiceDrafts = FakeVoiceDraftStore();
   final player = FakeVoicePreviewPlayer();
@@ -100,8 +98,8 @@ class Harness {
   final deletions = FakeDeletions();
   final localData = FakeLocalData();
 
-  /// A selfie analyzer to use instead of the real one over [photos].
-  final SelfieAnalyzer? selfie;
+  /// The coach blinks and breathes (off by default so screens settle).
+  bool idleMotion = false;
   final FakePortalBrowser browser;
 
   /// Feature flags (Remote Config later).
@@ -140,8 +138,6 @@ class Harness {
           reflectionRepositoryProvider.overrideWithValue(reflections),
           portalBrowserProvider.overrideWithValue(browser),
           avatarRepositoryProvider.overrideWithValue(avatars),
-          avatarDraftStoreProvider.overrideWithValue(avatarDrafts),
-          photoSourceProvider.overrideWithValue(photos),
           voiceRepositoryProvider.overrideWithValue(voices),
           voiceDraftStoreProvider.overrideWithValue(voiceDrafts),
           voicePreviewPlayerProvider.overrideWithValue(player),
@@ -156,7 +152,7 @@ class Harness {
           coachSpeakerProvider.overrideWithValue(speaker),
           coachFacesProvider.overrideWithValue(faces),
           momentSeenStoreProvider.overrideWithValue(momentSeen),
-          if (selfie != null) selfieAnalyzerProvider.overrideWithValue(selfie!),
+          avatarIdleMotionProvider.overrideWithValue(idleMotion),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(
             (ref) => ref.watch(previewModeProvider)

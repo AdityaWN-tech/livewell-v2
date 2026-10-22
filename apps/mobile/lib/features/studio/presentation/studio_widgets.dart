@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/feature_flags.dart';
 import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../avatar/domain/avatar_config.dart';
-import '../../avatar/domain/characters.dart';
+import '../../avatar/presentation/coach_avatar.dart'
+    show avatarIdleMotionProvider, coachBackgroundProvider, coachImagesProvider;
 import '../../voice/domain/voice.dart';
 
 /// Shared parts of the Avatar & Voice Studio (T-UI-02h), used by the Studio
@@ -63,199 +64,46 @@ class StudioTabs extends StatelessWidget {
   }
 }
 
-/// The large preview of the coach on its background, with left / right
-/// arrows and page dots to move between the default characters.
-class AvatarStage extends StatelessWidget {
-  const AvatarStage({
-    super.key,
-    required this.config,
-    required this.index,
-    required this.onStep,
-  });
+/// The large live preview of the coach on its background: it blinks and
+/// breathes (T-AVT-08a). Choosing a coach comes with the Avatar Studio
+/// (T-AVT-08b).
+class AvatarStage extends ConsumerWidget {
+  const AvatarStage({super.key, this.background});
 
-  final AvatarConfig config;
-
-  /// The character shown, or -1 for a customized look.
-  final int index;
-
-  /// -1 previous, +1 next.
-  final ValueChanged<int> onStep;
+  /// A background being tried (the Background tab); else the saved one.
+  final int? background;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final t = Theme.of(context).textTheme;
-    final count = CoachCharacters.all.length;
-    final name = index < 0
-        ? l.studioCustom
-        : characterName(l, CoachCharacters.all[index].id);
+    final colour = background == null
+        ? ref.watch(coachBackgroundProvider)
+        : AvatarColours.background[background!];
     return Container(
       key: const Key('studio-stage'),
       padding: const EdgeInsets.all(LwSpacing.md),
       decoration: BoxDecoration(
-        color: AvatarColours.background[config.background],
+        color: colour,
         borderRadius: LwRadius.lgAll,
         boxShadow: LwShadow.of(context),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              _Arrow(
-                key: const Key('studio-prev'),
-                icon: Icons.chevron_left,
-                tooltip: l.studioPrevious,
-                onTap: () => onStep(-1),
-              ),
-              Expanded(
-                child: Center(
-                  child: LayoutBuilder(
-                    builder: (context, box) => AvatarView(
-                      key: const Key('avatar-preview'),
-                      config: config,
-                      expression: AvatarExpression.waving,
-                      size: box.maxWidth.clamp(96, 180).toDouble(),
-                      semanticLabel: l.avatarPreviewLabel,
-                    ),
-                  ),
-                ),
-              ),
-              _Arrow(
-                key: const Key('studio-next'),
-                icon: Icons.chevron_right,
-                tooltip: l.studioNext,
-                onTap: () => onStep(1),
-              ),
-            ],
+      child: Center(
+        child: LayoutBuilder(
+          builder: (context, box) => AvatarView(
+            key: const Key('avatar-preview'),
+            images: ref.watch(coachImagesProvider).value,
+            background: colour,
+            expression: AvatarExpression.talking,
+            animate: ref.watch(avatarIdleMotionProvider),
+            size: box.maxWidth.clamp(96, 200).toDouble(),
+            semanticLabel: l.avatarPreviewLabel,
           ),
-          const SizedBox(height: LwSpacing.xs),
-          // The art colours are light pastels in both modes, so the name and
-          // dots always use the light palette's dark ink.
-          Text(
-            name,
-            key: const Key('studio-name'),
-            style: t.titleSmall?.copyWith(color: LwPalette.light.textPrimary),
-          ),
-          const SizedBox(height: LwSpacing.xs),
-          Semantics(
-            container: true,
-            label: index < 0 ? l.studioCustom : l.studioPage(index + 1, count),
-            excludeSemantics: true,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (var i = 0; i < count; i++)
-                  Container(
-                    width: i == index ? LwSpacing.md : LwSpacing.xs,
-                    height: LwSpacing.xs,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: LwSpacing.xxs / 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: i == index
-                          ? LwPalette.light.primary
-                          : LwPalette.light.outlineStrong,
-                      borderRadius: LwRadius.pillAll,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _Arrow extends StatelessWidget {
-  const _Arrow({
-    super.key,
-    required this.icon,
-    required this.tooltip,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => IconButton.filledTonal(
-    tooltip: tooltip,
-    style: IconButton.styleFrom(
-      backgroundColor: LwPalette.light.surface,
-      foregroundColor: LwPalette.light.textPrimary,
-      minimumSize: const Size.square(LwSize.minTapTarget),
-    ),
-    onPressed: onTap,
-    icon: Icon(icon),
-  );
-}
-
-/// The row of default characters to pick from.
-class CharacterStrip extends StatelessWidget {
-  const CharacterStrip({
-    super.key,
-    required this.selected,
-    required this.onPick,
-    this.background,
-  });
-
-  /// Index in [CoachCharacters.all], or -1.
-  final int selected;
-  final ValueChanged<int> onPick;
-
-  /// Shows every character on this background (the person's choice).
-  final int? background;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = LwPalette.of(context);
-    final l = AppLocalizations.of(context);
-    return Wrap(
-      spacing: LwSpacing.xs,
-      runSpacing: LwSpacing.xs,
-      children: [
-        for (final (i, c) in CoachCharacters.all.indexed)
-          Semantics(
-            key: Key('avatar-character-${c.id}'),
-            button: true,
-            selected: selected == i,
-            container: true,
-            excludeSemantics: true,
-            label: l.studioCharacterLabel(
-              characterName(l, c.id),
-              selected == i ? l.studioVoiceSelected : l.studioVoiceNotSelected,
-            ),
-            child: InkWell(
-              customBorder: RoundedRectangleBorder(
-                borderRadius: LwRadius.mdAll,
-              ),
-              onTap: () => onPick(i),
-              child: Container(
-                padding: const EdgeInsets.all(LwSpacing.xxs),
-                decoration: BoxDecoration(
-                  borderRadius: LwRadius.mdAll,
-                  border: Border.all(
-                    color: selected == i ? p.primary : p.outlineSoft,
-                    width: selected == i ? 3 : 1,
-                  ),
-                ),
-                child: AvatarView(
-                  config: background == null
-                      ? c.config
-                      : c.config.copyWith(background: background),
-                  size: LwSize.minTapTarget * 1.2,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-/// One row of "Choose Your Voice": icon, name, detail, a status pill and a
 /// radio button.
 class VoiceRow extends StatelessWidget {
   const VoiceRow({
@@ -527,18 +375,19 @@ class VoiceChoices extends StatelessWidget {
 
 /// The avatar background colours, and the scene backgrounds that come with
 /// the art kit (one unlocked by a streak, FR-GAM-03).
-class BackgroundChoices extends StatelessWidget {
+class BackgroundChoices extends ConsumerWidget {
   const BackgroundChoices({
     super.key,
-    required this.config,
+    required this.selected,
     required this.onPick,
   });
 
-  final AvatarConfig config;
+  /// The background index chosen.
+  final int selected;
   final ValueChanged<int> onPick;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
@@ -573,7 +422,7 @@ class BackgroundChoices extends StatelessWidget {
               Semantics(
                 key: Key('studio-bg-$i'),
                 button: true,
-                selected: config.background == i,
+                selected: selected == i,
                 container: true,
                 excludeSemantics: true,
                 label: names[i],
@@ -587,14 +436,14 @@ class BackgroundChoices extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: LwRadius.lgAll,
                       border: Border.all(
-                        color: config.background == i
-                            ? p.primary
-                            : p.outlineSoft,
-                        width: config.background == i ? 3 : 1,
+                        color: selected == i ? p.primary : p.outlineSoft,
+                        width: selected == i ? 3 : 1,
                       ),
                     ),
                     child: AvatarView(
-                      config: config.copyWith(background: i),
+                      images: ref.watch(coachImagesProvider).value,
+                      background: AvatarColours.background[i],
+                      expression: AvatarExpression.talking,
                       size: LwSize.minTapTarget * 1.4,
                     ),
                   ),

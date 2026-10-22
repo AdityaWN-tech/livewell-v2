@@ -6,11 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../core/design/avatar/avatar_art.dart';
-import '../../avatar/domain/avatar_config.dart';
+import '../../avatar/data/avatar_frames_store.dart';
+import '../../avatar/domain/coach_face.dart';
 import '../../starter_plan/domain/touchpoints.dart';
 
-/// The coach's face for each reminder (T-DLY-03c): the moment's expression
-/// on the person's own avatar. A cartoon face only, never text.
+/// The coach's face for each reminder (T-DLY-03c): the moment's expression.
 AvatarExpression faceFor(TouchpointKind k) => switch (k) {
   TouchpointKind.greeting => AvatarExpression.waving,
   // Encouraging uses the happy face until the art kit has its own.
@@ -19,27 +19,45 @@ AvatarExpression faceFor(TouchpointKind k) => switch (k) {
   TouchpointKind.weekly => AvatarExpression.happy,
 };
 
-/// Draws the faces as PNG files for the notifications.
+/// Picture files for the notifications.
 abstract class CoachFaces {
-  /// Paths by kind; empty when they can't be drawn (the text still goes).
-  Future<Map<TouchpointKind, String>> render(AvatarConfig config);
+  /// Paths by kind; empty when there are none (the text still goes). Uses
+  /// the coach's frame set on the device (T-AVT-08a), else a soft circle
+  /// with the coach's [initial] on [background] (mint by default).
+  Future<Map<TouchpointKind, String>> render({
+    CachedFrameSet? frames,
+    String initial = '',
+    Color? background,
+  });
 }
 
 class FileCoachFaces implements CoachFaces {
   static const _px = 192.0;
 
   @override
-  Future<Map<TouchpointKind, String>> render(AvatarConfig config) async {
+  Future<Map<TouchpointKind, String>> render({
+    CachedFrameSet? frames,
+    String initial = '',
+    Color? background,
+  }) async {
     try {
-      final dir = Directory(
-        '${(await getApplicationSupportDirectory()).path}/coach_faces',
-      );
-      await dir.create(recursive: true);
       final out = <TouchpointKind, String>{};
+      File? circle;
       for (final k in TouchpointKind.values) {
-        final file = File('${dir.path}/${k.name}.png');
-        await file.writeAsBytes(await png(config, faceFor(k)));
-        out[k] = file.path;
+        // TODO(T-AVT-08d): the small expression thumbnails, once exported.
+        final frame = frames?.file(
+          expressionFrame(faceFor(k)),
+          devicePixelRatio: 2,
+        );
+        if (frame != null) {
+          out[k] = frame.path;
+          continue;
+        }
+        circle ??= await _circleFile(
+          initial,
+          background ?? AvatarColours.background.first,
+        );
+        out[k] = circle.path;
       }
       return out;
     } catch (_) {
@@ -47,16 +65,43 @@ class FileCoachFaces implements CoachFaces {
     }
   }
 
-  /// One face as PNG bytes.
-  static Future<List<int>> png(
-    AvatarConfig config,
-    AvatarExpression expression,
-  ) async {
+  Future<File> _circleFile(String initial, Color background) async {
+    final dir = Directory(
+      '${(await getApplicationSupportDirectory()).path}/coach_faces',
+    );
+    await dir.create(recursive: true);
+    final file = File('${dir.path}/initial.png');
+    await file.writeAsBytes(await circlePng(initial, background));
+    return file;
+  }
+
+  /// The initial circle as PNG bytes (never a code-drawn face).
+  static Future<List<int>> circlePng(String initial, Color background) async {
     final recorder = ui.PictureRecorder();
-    AvatarPainter(
-      config,
-      expression,
-    ).paint(Canvas(recorder), const Size(_px, _px));
+    final canvas = Canvas(recorder);
+    const r = _px / 2;
+    canvas
+      ..drawCircle(const Offset(r, r), r, Paint()..color = background)
+      ..drawCircle(
+        const Offset(r, r),
+        r - 3,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 6
+          ..color = AvatarColours.ring,
+      );
+    final text = TextPainter(
+      text: TextSpan(
+        text: initial,
+        style: const TextStyle(
+          fontSize: r * 0.84,
+          fontWeight: FontWeight.w600,
+          color: AvatarColours.ink,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    text.paint(canvas, Offset(r - text.width / 2, r - text.height / 2));
     final image = await recorder.endRecording().toImage(
       _px.toInt(),
       _px.toInt(),

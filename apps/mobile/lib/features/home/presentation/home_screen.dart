@@ -688,8 +688,8 @@ class _MomentCard extends ConsumerWidget {
           child: Row(
             children: [
               AvatarView(
-                config:
-                    ref.watch(coachAvatarConfigProvider).value ?? defaultCoach,
+                images: ref.watch(coachImagesProvider).value,
+                background: ref.watch(coachBackgroundProvider),
                 expression: AvatarExpression.waving,
                 size: LwSize.inputHeight,
               ),
@@ -1075,7 +1075,8 @@ class _CheckInResponse extends ConsumerWidget {
         children: [
           AvatarView(
             key: Key('checkin-reaction-${face.name}'),
-            config: ref.watch(coachAvatarConfigProvider).value ?? defaultCoach,
+            images: ref.watch(coachImagesProvider).value,
+            background: ref.watch(coachBackgroundProvider),
             expression: face,
             size: LwSize.inputHeight,
           ),

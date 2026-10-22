@@ -6,8 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../avatar/domain/coach_face.dart';
 import '../../avatar/presentation/coach_avatar.dart'
-    show coachAvatarConfigProvider, defaultCoach;
+    show avatarIdleMotionProvider, coachBackgroundProvider, coachImagesProvider;
 import '../../voice/presentation/voice_screen.dart' show AiVoiceLabel;
 import '../application/coach_state.dart';
 import '../application/moment_context.dart';
@@ -62,10 +63,13 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
   bool _muted = false;
   bool _textOnly = false;
   int _revealed = 0;
-  bool _mouthOpen = false;
-  bool _blink = false;
+
+  /// The talking mouth (kept from T-AVT-06b): the vowels of the word being
+  /// said, from the engine's word timing, else the caption pace.
+  MouthShape? _mouth;
+  int _wordAt = 0;
+  int _tick = 0;
   Timer? _lips;
-  Timer? _blinks;
   Timer? _reveal;
   CoachMessage? _message;
   late final CoachSpeaker _speaker;
@@ -90,11 +94,9 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
 
   void _stopTimers() {
     _lips?.cancel();
-    _blinks?.cancel();
     _reveal?.cancel();
-    _lips = _blinks = _reveal = null;
-    _mouthOpen = false;
-    _blink = false;
+    _lips = _reveal = null;
+    _mouth = null;
   }
 
   Future<void> _play(CoachMessage m) async {
@@ -110,7 +112,9 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     final ok = await _speaker.speak(
       m,
       speed: speed,
-      onWord: (_, end) {
+      onWord: (start, end) {
+        _wordAt = start;
+        _tick = 0;
         if (mounted && end > _revealed) setState(() => _revealed = end);
       },
       onDone: () {
@@ -134,15 +138,17 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
       return;
     }
     if (_stillAvatar || _phase != _Phase.speaking) return;
-    // The mouth moves while the coach speaks; the eyes blink now and then.
+    // The mouth follows the words while the coach speaks (the avatar
+    // blinks by itself).
+    _wordAt = 0;
+    _tick = 0;
     _lips = Timer.periodic(const Duration(milliseconds: 160), (_) {
-      if (mounted) setState(() => _mouthOpen = !_mouthOpen);
-    });
-    _blinks = Timer.periodic(const Duration(milliseconds: 3600), (_) {
       if (!mounted) return;
-      setState(() => _blink = true);
-      Timer(const Duration(milliseconds: 140), () {
-        if (mounted) setState(() => _blink = false);
+      setState(() {
+        final at = _wordAt > 0
+            ? _wordAt
+            : (_revealed - 1).clamp(0, m.text.length);
+        _mouth = visemeAt(m.text, at, _tick++);
       });
     });
     // Engines that don't report words: reveal at a speaking pace.
@@ -188,7 +194,7 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final async = ref.watch(coachMessageProvider(widget.moment));
-    final config = ref.watch(coachAvatarConfigProvider).value ?? defaultCoach;
+    final background = ref.watch(coachBackgroundProvider);
     final m = async.value;
     if (m != null && _message == null) {
       _message = m;
@@ -208,13 +214,15 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     }
     final speaking = _phase == _Phase.speaking;
     final voiceOn = !_muted && !_textOnly;
-    final face = speaking && _mouthOpen
+    // Talking: the neutral face with the mouth frames; at rest, the
+    // moment's expression. Reduced motion: the player shows a still face.
+    final face = speaking && !_stillAvatar
         ? AvatarExpression.talking
         : m == null
         ? AvatarExpression.happy
         : expressionFor(m.emotion);
     return Scaffold(
-      backgroundColor: AvatarColours.background[config.background],
+      backgroundColor: background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, box) => SingleChildScrollView(
@@ -269,9 +277,11 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
                           child: LayoutBuilder(
                             builder: (context, b) => AvatarView(
                               key: const Key('moment-avatar'),
-                              config: config,
+                              images: ref.watch(coachImagesProvider).value,
+                              background: background,
                               expression: face,
-                              blink: _blink,
+                              mouth: speaking ? _mouth : null,
+                              animate: ref.watch(avatarIdleMotionProvider),
                               size: (b.maxWidth * 0.62).clamp(140, 260),
                               semanticLabel: l.coachAvatarLabel,
                             ),

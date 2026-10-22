@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/painting.dart' show Color;
 import 'package:livewell/features/moments/application/moment_launcher.dart';
 import 'package:livewell/features/moments/data/coach_faces.dart';
 import 'package:livewell/features/moments/data/coach_speaker.dart';
@@ -7,7 +8,7 @@ import 'package:livewell/features/moments/domain/coach_message.dart';
 import 'package:livewell/features/home/data/name_prompt.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
-import 'package:livewell/features/avatar/data/selfie_service.dart';
+import 'package:livewell/features/avatar/data/avatar_frames_store.dart';
 import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
@@ -464,31 +465,6 @@ class FakeAvatarRepository implements AvatarRepository {
   }
 }
 
-class FakeAvatarDraftStore implements AvatarDraftStore {
-  AvatarDraft? draft;
-
-  @override
-  Future<AvatarDraft?> load() async => draft;
-
-  @override
-  Future<void> save(AvatarDraft d) async => draft = d;
-
-  @override
-  Future<void> clear() async => draft = null;
-}
-
-/// Hands back a photo file prepared by the test (or null = cancelled).
-class FakePhotoSource implements PhotoSource {
-  String? path;
-  int taken = 0;
-
-  @override
-  Future<String?> takeSelfie() async {
-    taken++;
-    return path;
-  }
-}
-
 /// The chosen voice, in memory.
 class FakeVoiceRepository implements VoiceRepository {
   VoiceChoice? chosen;
@@ -623,11 +599,16 @@ class FakeReminders implements Reminders {
 }
 
 class FakeCoachFaces implements CoachFaces {
-  final drawn = <AvatarConfig>[];
+  /// The coach's initial each time the faces were made.
+  final drawn = <String>[];
 
   @override
-  Future<Map<TouchpointKind, String>> render(AvatarConfig config) async {
-    drawn.add(config);
+  Future<Map<TouchpointKind, String>> render({
+    CachedFrameSet? frames,
+    String initial = '',
+    Color? background,
+  }) async {
+    drawn.add(initial);
     return {for (final k in TouchpointKind.values) k: 'faces/${k.name}.png'};
   }
 }

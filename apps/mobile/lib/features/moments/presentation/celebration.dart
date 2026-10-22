@@ -9,7 +9,7 @@ import '../../../core/design/components/speech_bubble.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/presentation/coach_avatar.dart'
-    show coachAvatarConfigProvider, defaultCoach;
+    show avatarIdleMotionProvider, coachBackgroundProvider, coachImagesProvider;
 import '../application/coach_state.dart';
 import '../application/moment_context.dart';
 import '../data/coach_speaker.dart';
@@ -118,7 +118,6 @@ class _CelebrationState extends ConsumerState<Celebration>
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final p = LwPalette.of(context);
-    final config = ref.watch(coachAvatarConfigProvider).value ?? defaultCoach;
     final text = _message?.text ?? l.celebrationDone;
     return Semantics(
       button: true,
@@ -161,7 +160,9 @@ class _CelebrationState extends ConsumerState<Celebration>
                       const SizedBox(height: LwSpacing.md),
                       AvatarView(
                         key: const Key('celebration-avatar'),
-                        config: config,
+                        images: ref.watch(coachImagesProvider).value,
+                        background: ref.watch(coachBackgroundProvider),
+                        animate: ref.watch(avatarIdleMotionProvider),
                         expression: AvatarExpression.celebrating,
                         size: 180,
                       ),

@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/data/firestore.dart';
 import '../../auth/data/firebase_auth_service.dart';
@@ -88,55 +86,3 @@ final avatarRepositoryProvider = Provider<AvatarRepository>((ref) {
     () => auth.currentUser!.uid,
   );
 });
-
-/// The avatar being made, kept on the phone so onboarding resumes mid-step
-/// (FR-ONB-06). Only cartoon choices, nothing personal (spec 10.4 allows
-/// SharedPreferences for this).
-class AvatarDraft {
-  const AvatarDraft({required this.config, required this.inCreator});
-
-  final AvatarConfig config;
-
-  /// The person was in the creator when the app closed.
-  final bool inCreator;
-}
-
-abstract class AvatarDraftStore {
-  Future<AvatarDraft?> load();
-  Future<void> save(AvatarDraft draft);
-  Future<void> clear();
-}
-
-class SharedPrefsAvatarDraftStore implements AvatarDraftStore {
-  static const _key = 'avatar_draft';
-
-  @override
-  Future<AvatarDraft?> load() async {
-    final raw = (await SharedPreferences.getInstance()).getString(_key);
-    if (raw == null) return null;
-    try {
-      final m = jsonDecode(raw) as Map<String, dynamic>;
-      return AvatarDraft(
-        config: AvatarConfig.fromMap(m['config'] as Map<String, dynamic>),
-        inCreator: m['in_creator'] == true,
-      );
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  Future<void> save(AvatarDraft d) async =>
-      (await SharedPreferences.getInstance()).setString(
-        _key,
-        jsonEncode({'config': d.config.toMap(), 'in_creator': d.inCreator}),
-      );
-
-  @override
-  Future<void> clear() async =>
-      (await SharedPreferences.getInstance()).remove(_key);
-}
-
-final avatarDraftStoreProvider = Provider<AvatarDraftStore>(
-  (ref) => SharedPrefsAvatarDraftStore(),
-);

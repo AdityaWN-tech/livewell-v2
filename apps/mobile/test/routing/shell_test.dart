@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/app.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/startup/app_startup.dart';
+import 'package:livewell/core/time/clock.dart';
 import 'package:livewell/features/care/presentation/care_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/learn/presentation/learn_screen.dart';
@@ -24,6 +25,9 @@ Future<void> bootToShell(
         flavorProvider.overrideWithValue(flavor),
         splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
         appStartupProvider.overrideWith((ref) async => StartDestination.home),
+        // A fixed morning, so the time-of-day greeting never changes the
+        // golden images.
+        clockProvider.overrideWithValue(() => DateTime(2026, 10, 14, 8, 30)),
       ],
       child: const LiveWellApp(),
     ),

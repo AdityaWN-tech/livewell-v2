@@ -4934,6 +4934,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nice work! Today’s step is done.'**
   String get homeBubbleDone;
+
+  /// No description provided for @momentClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get momentClose;
+
+  /// No description provided for @momentPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get momentPause;
+
+  /// No description provided for @momentPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get momentPlay;
+
+  /// No description provided for @momentReplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play again'**
+  String get momentReplay;
+
+  /// No description provided for @momentMute.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute: show text only'**
+  String get momentMute;
+
+  /// No description provided for @momentUnmute.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn the voice on'**
+  String get momentUnmute;
+
+  /// No description provided for @momentSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get momentSkip;
+
+  /// No description provided for @momentTextOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach’s voice isn’t available right now, so here is the message as text.'**
+  String get momentTextOnly;
+
+  /// No description provided for @momentNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing from your coach right now.'**
+  String get momentNone;
+
+  /// No description provided for @momentActionCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in'**
+  String get momentActionCheckIn;
+
+  /// No description provided for @momentActionStartStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Start my step'**
+  String get momentActionStartStep;
+
+  /// No description provided for @momentActionMakeSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it smaller'**
+  String get momentActionMakeSmaller;
+
+  /// No description provided for @momentActionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get momentActionDone;
+
+  /// No description provided for @momentActionNotToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Not today'**
+  String get momentActionNotToday;
+
+  /// No description provided for @momentActionClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get momentActionClose;
+
+  /// No description provided for @momentActionReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get momentActionReply;
+
+  /// No description provided for @momentActionRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get momentActionRestart;
+
+  /// No description provided for @momentActionSeeWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'See my week'**
+  String get momentActionSeeWeek;
+
+  /// No description provided for @devMoments.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar Moments'**
+  String get devMoments;
 }
 
 class _AppLocalizationsDelegate

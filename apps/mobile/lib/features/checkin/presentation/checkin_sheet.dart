@@ -10,6 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../consent/presentation/microphone_consent.dart';
+import '../../moments/application/coach_state.dart';
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';
@@ -126,6 +127,8 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
       final rules = await ref.read(safetyRulesProvider.future);
       final result = rules.check(barrierText);
       if (!result.isClear) {
+        // The coach stays quiet for the rest of today (T-DLY-03d).
+        ref.read(safetyHoldStoreProvider.notifier).holdToday();
         final uid = ref.read(authServiceProvider).currentUser?.uid;
         final region = uid == null
             ? null

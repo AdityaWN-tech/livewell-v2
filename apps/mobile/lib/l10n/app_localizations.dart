@@ -4959,6 +4959,54 @@ abstract class AppLocalizations {
   /// **'Nice work! Today’s step is done.'**
   String get homeBubbleDone;
 
+  /// No description provided for @homeBubbleStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for your small step?'**
+  String get homeBubbleStep;
+
+  /// No description provided for @homeBubbleStepNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready for your small step, {name}?'**
+  String homeBubbleStepNamed(String name);
+
+  /// No description provided for @homeBubbleEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'How did today go?'**
+  String get homeBubbleEvening;
+
+  /// No description provided for @homeBubbleEveningNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'How did today go, {name}?'**
+  String homeBubbleEveningNamed(String name);
+
+  /// No description provided for @homeBubbleRestart.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s restart with a small step.'**
+  String get homeBubbleRestart;
+
+  /// No description provided for @homeMomentPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Hear your coach'**
+  String get homeMomentPlay;
+
+  /// No description provided for @celebrationDone.
+  ///
+  /// In en, this message translates to:
+  /// **'You did it!'**
+  String get celebrationDone;
+
+  /// No description provided for @celebrationSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to close'**
+  String get celebrationSkip;
+
   /// No description provided for @momentClose.
   ///
   /// In en, this message translates to:

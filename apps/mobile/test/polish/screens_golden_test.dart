@@ -45,6 +45,9 @@ void main() {
         scrollable: find.byType(Scrollable).last,
       );
       await tester.tap(find.byKey(const Key('step-done')));
+      await tester.pump();
+      // Skip the celebration (it has its own goldens, T-DLY-03d).
+      await tester.tap(find.byKey(const Key('celebration')));
       await tester.pumpAndSettle();
       // Back to the top, where the coach is.
       await tester.drag(find.byType(Scrollable).first, const Offset(0, 3000));

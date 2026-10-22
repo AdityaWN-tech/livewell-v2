@@ -17,21 +17,21 @@ All final art must be **original or licensed for commercial use**, recorded per 
 2. In the manifest, set `file`, `file_dark` (optional), `source`, `licence`, and `status: "final"`.
 3. Run `flutter test` (manifest test), then the goldens.
 
-## Characters: expressions
-Every character in **all 6 expressions**: `happy`, `waving`, `talking`, `listening`, `calm`, `celebrating`. Safety replies always use `calm`. Characters must cover a range of skin tones (Monk Skin Tone Scale), ages, hair types and head coverings, and include a wheelchair user (FR-AVT-02). The person chooses their coach; the app never guesses gender or looks (D-28).
+## Coaches: the 3D frame sets (T-AVT-08)
+The 8 ready-made coaches are semi-realistic 3D adults in the style of `docs/design/avatar-style-3d-reference.png`, made from the prompts in `docs/design/avatar-prompts.md`. Each needs the **14-frame set**: `neutral`, `happy`, `waving`, `listening`, `calm`, `celebrating`, `blink`, `mouth_A`, `mouth_I`, `mouth_U`, `mouth_E`, `mouth_O`, `mouth_closed`, `thumb`, on one canvas with the face in the same place, WebP at 2x and 3x, with `avatar_frames.json` (schema `packages/schemas/avatar_frames.schema.json`), in `apps/mobile/assets/avatar/frames/coaches/<id>/`. Safety replies always use `calm`. Adults only; the coaches cover a range of skin tones, ages, hair types and head coverings, and include a wheelchair user (FR-AVT-02). The person chooses their coach; the app never guesses gender or looks (D-28).
 
-## Characters (default coach avatars)
+## Coaches (the 8 ready-made coaches)
 
 | id | What to draw | Alt text | Status |
 |---|---|---|---|
-| `character_hoodie` | Young man in a green hoodie (the default coach in the design). All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_hoodie_{expression}.png | Your coach | placeholder |
-| `character_long_hair` | Woman with long hair. All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_long_hair_{expression}.png | Your coach | placeholder |
-| `character_glasses` | Man with glasses. All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_glasses_{expression}.png | Your coach | placeholder |
-| `character_curly` | Woman with curly hair. All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_curly_{expression}.png | Your coach | placeholder |
-| `character_hijab` | Woman wearing a hijab. All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_hijab_{expression}.png | Your coach | placeholder |
-| `character_turban` | Man wearing a turban. All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_turban_{expression}.png | Your coach | placeholder |
-| `character_older` | Older adult with grey hair. All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_older_{expression}.png | Your coach | placeholder |
-| `character_wheelchair` | Person using a wheelchair. All 6 expressions: happy, waving, talking, listening, calm, celebrating. File pattern: character_wheelchair_{expression}.png | Your coach | placeholder |
+| `coach_brown_hair` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Adult man in his 30s, messy brown hair, light stubble, fair skin with freckles (the style reference, docs/design/avatar-style-3d-reference.png). The default coach. The 14-frame set goes in assets/avatar/frames/coaches/brown_hair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
+| `coach_long_black_hair` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): South Asian woman in her 30s, long black hair, warm brown skin. The 14-frame set goes in assets/avatar/frames/coaches/long_black_hair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
+| `coach_green_hijab` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Woman in her 40s wearing a soft green hijab, medium brown skin. The 14-frame set goes in assets/avatar/frames/coaches/green_hijab/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
+| `coach_navy_turban` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Sikh man in his 40s with a navy turban and neat black beard. The 14-frame set goes in assets/avatar/frames/coaches/navy_turban/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
+| `coach_grey_glasses` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Man in his 60s with short grey hair, round glasses and a kind smile. The 14-frame set goes in assets/avatar/frames/coaches/grey_glasses/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
+| `coach_short_curls` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Black woman in her 50s with short natural curly hair. The 14-frame set goes in assets/avatar/frames/coaches/short_curls/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
+| `coach_short_black_hair` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): East Asian man in his 20s with short black hair. The 14-frame set goes in assets/avatar/frames/coaches/short_black_hair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
+| `coach_wheelchair` | Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Woman in her 30s using a wheelchair, shoulder-length auburn hair (wheelchair visible at the bottom edge). The 14-frame set goes in assets/avatar/frames/coaches/wheelchair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then). | Your coach | placeholder |
 
 ## Scenes and Studio backgrounds
 

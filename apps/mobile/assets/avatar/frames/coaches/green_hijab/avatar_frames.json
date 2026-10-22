@@ -1,0 +1,57 @@
+{
+  "avatar_id": "green_hijab",
+  "version": 1,
+  "style": "3d_adult",
+  "canvas": {
+    "width": 1024,
+    "height": 1024
+  },
+  "sizes": [
+    "2x"
+  ],
+  "note": "Placeholder cards, not a face (T-AVT-08b). Dev builds only until the final art exists.",
+  "frames": {
+    "neutral": {
+      "2x": "neutral@2x.webp"
+    },
+    "happy": {
+      "2x": "happy@2x.webp"
+    },
+    "waving": {
+      "2x": "waving@2x.webp"
+    },
+    "listening": {
+      "2x": "listening@2x.webp"
+    },
+    "calm": {
+      "2x": "calm@2x.webp"
+    },
+    "celebrating": {
+      "2x": "celebrating@2x.webp"
+    },
+    "blink": {
+      "2x": "blink@2x.webp"
+    },
+    "mouth_A": {
+      "2x": "mouth_A@2x.webp"
+    },
+    "mouth_I": {
+      "2x": "mouth_I@2x.webp"
+    },
+    "mouth_U": {
+      "2x": "mouth_U@2x.webp"
+    },
+    "mouth_E": {
+      "2x": "mouth_E@2x.webp"
+    },
+    "mouth_O": {
+      "2x": "mouth_O@2x.webp"
+    },
+    "mouth_closed": {
+      "2x": "mouth_closed@2x.webp"
+    },
+    "thumb": {
+      "2x": "thumb@2x.webp"
+    }
+  }
+}

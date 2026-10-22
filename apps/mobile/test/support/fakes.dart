@@ -9,7 +9,7 @@ import 'package:livewell/features/home/data/name_prompt.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/data/avatar_frames_store.dart';
-import 'package:livewell/features/avatar/domain/avatar_config.dart';
+import 'package:livewell/features/avatar/domain/coach_choice.dart';
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
@@ -452,14 +452,14 @@ class FakePortalBrowser implements PortalBrowser {
 
 /// The saved avatar, in memory.
 class FakeAvatarRepository implements AvatarRepository {
-  AvatarConfig? saved;
+  CoachChoice? saved;
   bool fail = false;
 
   @override
-  Future<AvatarConfig?> load() async => saved;
+  Future<CoachChoice?> load() async => saved;
 
   @override
-  Future<void> save(AvatarConfig config) async {
+  Future<void> save(CoachChoice config) async {
     if (fail) throw Exception('offline');
     saved = config;
   }

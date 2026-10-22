@@ -8,10 +8,11 @@ import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/domain/coach_face.dart';
+import '../../avatar/domain/coaches.dart';
 import '../../avatar/presentation/coach_avatar.dart';
 
 /// Developer > Avatar frames (dev flavour only, T-AVT-08a): the frame
-/// player with the placeholder frame set: every expression, blinking,
+/// player with the default coach's frame set (placeholders for now): every expression, blinking,
 /// breathing, and the mouth frames following a sample line. Nothing is
 /// spoken here; the Avatar Moments speak approved lines.
 class AvatarFramesGallery extends ConsumerStatefulWidget {
@@ -63,7 +64,9 @@ class _AvatarFramesGalleryState extends ConsumerState<AvatarFramesGallery> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
-    final images = ref.watch(placeholderFramesProvider).value;
+    final images = ref
+        .watch(readyCoachFramesProvider(ReadyCoach.fallback))
+        .value;
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(

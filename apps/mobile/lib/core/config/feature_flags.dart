@@ -9,6 +9,7 @@ class FeatureFlags {
     this.portalCards = false,
     this.voiceClone = false,
     this.drGokulaVoice = false,
+    this.avatarFromPhoto = false,
   });
 
   /// Morning briefing player (FR-DLY-01). Off until briefings are generated.
@@ -25,6 +26,10 @@ class FeatureFlags {
   /// "Dr. Gokula (Licensed)" in the voice list (FR-VOC-01). Off until the
   /// licence is signed; always labelled as an AI voice.
   final bool drGokulaVoice;
+
+  /// "Make me from my photo" in the Avatar Studio (T-AVT-08e). Off in prod
+  /// until counsel review (T-CMP-02).
+  final bool avatarFromPhoto;
 }
 
 final featureFlagsProvider = Provider<FeatureFlags>(

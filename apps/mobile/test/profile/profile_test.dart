@@ -11,6 +11,7 @@ import 'package:livewell/features/profile/data/appearance.dart';
 import 'package:livewell/features/profile/presentation/profile_screen.dart';
 import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/welcome/presentation/welcome_screen.dart';
+import 'package:livewell/features/avatar/domain/coaches.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
@@ -186,7 +187,8 @@ void main() {
       expect(find.text('Use 1 to 20 letters.'), findsOneWidget);
       await tester.enterText(find.byKey(const Key('profile-text')), 'Maya');
       await tapText(tester, 'Save');
-      expect(h.profiles.settings[uid]!['coach_name'], 'Maya');
+      // Saved with the avatar (T-AVT-08b).
+      expect(h.avatars.saved!.coachName, 'Maya');
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.byType(HomeScreen), findsOneWidget);
@@ -202,11 +204,12 @@ void main() {
       // Both open the Avatar & Voice Studio, on their own tab (T-UI-02h).
       await tapKey(tester, 'profile-avatar');
       expect(find.byType(StudioScreen), findsOneWidget);
-      expect(find.byKey(const Key('avatar-more-soon')), findsOneWidget);
-      // The background is saved on its own tab.
+      // A ready-made coach, on a background, saved together.
+      await tapKey(tester, 'coach-navy_turban');
       await tapKey(tester, 'studio-tab-background');
       await tapKey(tester, 'studio-bg-3');
-      await tapKey(tester, 'studio-save-background');
+      await tapKey(tester, 'studio-save-avatar');
+      expect(h.avatars.saved!.coach, ReadyCoach.navyTurban);
       expect(h.avatars.saved!.background, 3);
       await tester.pageBack();
       await tester.pumpAndSettle();

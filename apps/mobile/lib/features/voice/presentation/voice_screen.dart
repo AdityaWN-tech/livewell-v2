@@ -9,9 +9,8 @@ import '../../../l10n/app_localizations.dart';
 import '../../account/application/account_setup.dart' show whyPath;
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
-import '../../avatar/data/avatar_repository.dart';
-import '../../avatar/domain/avatar_config.dart';
-import '../../avatar/presentation/coach_avatar.dart' show coachImagesProvider;
+import '../../avatar/presentation/coach_avatar.dart'
+    show coachBackgroundProvider, coachImagesProvider;
 import '../../home/application/home_data.dart';
 import '../data/voice_repository.dart';
 import '../domain/voice.dart';
@@ -28,18 +27,12 @@ class VoiceScreen extends ConsumerStatefulWidget {
 }
 
 class _VoiceScreenState extends ConsumerState<VoiceScreen> {
-  AvatarConfig _avatar = AvatarConfig.fallback;
   bool _busy = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final saved = await ref
-          .read(avatarRepositoryProvider)
-          .load()
-          .catchError((_) => null);
-      if (mounted && saved != null) setState(() => _avatar = saved);
       // Resume in the library if the person was there (FR-ONB-06).
       final draft = await ref.read(voiceDraftStoreProvider).load();
       if (!mounted) return;
@@ -123,7 +116,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
               Container(
                 padding: const EdgeInsets.all(LwSpacing.md),
                 decoration: BoxDecoration(
-                  color: AvatarColours.background[_avatar.background],
+                  color: ref.watch(coachBackgroundProvider),
                   borderRadius: LwRadius.lgAll,
                   boxShadow: LwShadow.of(context),
                 ),
@@ -131,7 +124,7 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                   children: [
                     AvatarView(
                       images: ref.watch(coachImagesProvider).value,
-                      background: AvatarColours.background[_avatar.background],
+                      background: ref.watch(coachBackgroundProvider),
                       expression: AvatarExpression.talking,
                       semanticLabel: l.avatarPreviewLabel,
                     ),

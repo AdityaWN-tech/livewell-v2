@@ -82,15 +82,16 @@ class SignInCompletion {
   final Ref _ref;
 
   Future<String> complete(AuthUser user) async {
+    final progress = await _ref.read(onboardingProvider.future);
+    // (After an await: this can run while the startup provider is still
+    // being created, when changing another provider isn't allowed; the app
+    // already watches the coach's avatar from its first frame.)
     // Storage chosen while signed out (in memory) must not outlive sign-in.
     _ref
       ..invalidate(planRepositoryProvider)
       ..invalidate(avatarRepositoryProvider)
       ..invalidate(voiceRepositoryProvider);
-    final progress = await _ref.read(onboardingProvider.future);
     // Everything that depends on who is signed in follows the new account.
-    // (After an await: this can run while the startup provider is still
-    // being created, when changing another provider isn't allowed.)
     _ref.read(signedInUidProvider.notifier).refresh();
     final status = await _ref
         .read(accountSetupProvider)

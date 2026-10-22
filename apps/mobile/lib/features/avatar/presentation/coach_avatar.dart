@@ -10,73 +10,83 @@ import '../../../core/design/components/speech_bubble.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/data/firebase_auth_service.dart';
+import '../../../core/config/flavor.dart';
+import '../../../core/design/illustration/illustration.dart';
 import '../../dev/application/preview_mode.dart';
 import '../data/avatar_frames_store.dart';
 import '../data/avatar_repository.dart';
-import '../domain/avatar_config.dart';
+import '../domain/coach_choice.dart';
+import '../domain/coaches.dart';
 import '../domain/avatar_frames.dart';
 
 export '../../../core/design/avatar/avatar_art.dart' show AvatarExpression;
 
-/// The person's saved avatar settings from users/{uid}/avatar/current (the
-/// background for now), or the default.
-/// TODO(T-AVT-08b): the 3d_adult document (source, frames_version, options,
-/// coach_name) replaces the cartoon style_config.
-final coachAvatarConfigProvider = FutureProvider<AvatarConfig>((ref) async {
+/// The person's coach from users/{uid}/avatar/current (T-AVT-08b), or the
+/// default ready-made coach.
+final coachChoiceProvider = FutureProvider<CoachChoice>((ref) async {
   try {
-    return await ref.watch(avatarRepositoryProvider).load() ?? defaultCoach;
+    return await ref.watch(avatarRepositoryProvider).load() ??
+        CoachChoice.fallback;
   } catch (_) {
     // Offline or unreadable: the default, never an error on screen.
-    return defaultCoach;
+    return CoachChoice.fallback;
   }
 });
 
-/// The default settings (mint background).
-final defaultCoach = AvatarConfig.fallback.copyWith(clothingColour: 0);
-
 /// The coach's background colour.
 final coachBackgroundProvider = Provider<Color>((ref) {
-  final config = ref.watch(coachAvatarConfigProvider).value ?? defaultCoach;
-  return AvatarColours.background[config.background];
+  final choice = ref.watch(coachChoiceProvider).value ?? CoachChoice.fallback;
+  return AvatarColours.background[choice.background];
 });
 
 /// Blinking and idle breathing on (tests turn it off so screens settle).
 final avatarIdleMotionProvider = Provider<bool>((ref) => true);
 
-/// The person's frame set version, once they have one.
-/// TODO(T-AVT-08b): from users/{uid}/avatar/current.frames_version.
-final avatarFramesVersionProvider = Provider<int?>((ref) => null);
+/// The person's made-for-you frame set version (selfie or built), once the
+/// Media Service has made it (T-AVT-08c/d).
+final avatarFramesVersionProvider = Provider<int?>(
+  (ref) => ref.watch(coachChoiceProvider).value?.framesVersion,
+);
 
-/// The default coach's frames, bundled with the app.
-/// TODO(T-AVT-08b): the 8 ready-made coaches; none are bundled yet.
+/// Whether a ready-made coach's art may be shown: always in dev builds;
+/// elsewhere only once its art is final (illustrations.json), so nobody
+/// outside development sees placeholder cards.
+final readyCoachArtFinalProvider = FutureProvider.family<bool, ReadyCoach>((
+  ref,
+  coach,
+) async {
+  if (ref.watch(flavorProvider) == Flavor.dev) return true;
+  final catalog = await IllustrationCatalog.load();
+  return catalog[coach.illustrationId]?.status == 'final';
+});
+
+/// A ready-made coach's bundled frame set, or null while its art isn't
+/// final (outside dev) or can't be read.
+final readyCoachFramesProvider =
+    FutureProvider.family<AvatarImages?, ReadyCoach>((ref, coach) async {
+      try {
+        if (!await ref.watch(readyCoachArtFinalProvider(coach).future)) {
+          return null;
+        }
+        final manifest = AvatarFrameManifest.fromJson(
+          jsonDecode(
+            await rootBundle.loadString(
+              '${coach.framesDir}/avatar_frames.json',
+            ),
+          ) as Map<String, dynamic>,
+        );
+        return assetFrames(manifest, coach.framesDir);
+      } catch (_) {
+        return null;
+      }
+    });
+
+/// The chosen ready-made coach's frames (the default coach step of the
+/// fallback chain).
 final defaultCoachImagesProvider = FutureProvider<AvatarImages?>((ref) async {
-  // The dev preview shows the placeholder frames (dev builds only).
-  if (ref.watch(previewModeProvider)) {
-    return ref.watch(placeholderFramesProvider.future);
-  }
-  return null;
+  final choice = ref.watch(coachChoiceProvider).value ?? CoachChoice.fallback;
+  return ref.watch(readyCoachFramesProvider(choice.coach).future);
 });
-
-/// The placeholder frame set (labelled cards, no face) for developing the
-/// player before the art exists. Dev preview and the dev gallery only.
-final placeholderFramesProvider = FutureProvider<AvatarImages?>((ref) async {
-  try {
-    return assetFrames(
-      AvatarFrameManifest.fromJson(
-        jsonDecode(
-          await rootBundle.loadString(
-            '$placeholderFramesDir/avatar_frames.json',
-          ),
-        ) as Map<String, dynamic>,
-      ),
-      placeholderFramesDir,
-    );
-  } catch (_) {
-    return null;
-  }
-});
-
-const placeholderFramesDir = 'assets/avatar/frames/placeholder';
 
 /// A bundled frame set as images.
 AvatarImages assetFrames(

@@ -22,6 +22,9 @@ import '../../starter_plan/presentation/plan_preview_screen.dart'
 import '../data/account_actions.dart';
 import '../data/appearance.dart';
 import 'profile_button.dart';
+import '../../avatar/data/avatar_repository.dart';
+import '../../avatar/domain/coach_choice.dart';
+import '../../avatar/presentation/coach_avatar.dart' show coachChoiceProvider;
 
 final _versionProvider = FutureProvider<String>(
   (ref) async => (await PackageInfo.fromPlatform()).version,
@@ -232,10 +235,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           : l.profileCoachNameError,
     );
     if (name == null) return;
-    await ref.read(profileRepositoryProvider).updateSettings(_uid, {
-      ProfileSettings.coachName: name,
-    });
-    ref.invalidate(currentProfileProvider);
+    // Saved with the avatar (T-AVT-08b).
+    final avatars = ref.read(avatarRepositoryProvider);
+    final choice = await avatars.load() ?? CoachChoice.fallback;
+    await avatars.save(choice.copyWith(coachName: CoachChoice.cleanName(name)));
+    ref.invalidate(coachChoiceProvider);
     if (mounted) _say(l.profileSaved);
   }
 
@@ -488,7 +492,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   key: const Key('profile-avatar'),
                   leading: const Icon(Icons.face_outlined),
                   title: Text(l.profileChangeAvatar),
-                  onTap: () => _openStudio(StudioTab.avatar),
+                  onTap: () => _openStudio(StudioTab.coaches),
                 ),
                 ListTile(
                   key: const Key('profile-voice'),

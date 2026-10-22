@@ -727,78 +727,10 @@
       }
     }
   },
-  "avatarTitle": "Create your coach",
-  "avatarBody": "Choose how your coach looks. You can change it any time.",
-  "avatarPickLook": "Pick a starting look",
-  "avatarLookWoman": "Woman",
-  "avatarLookMan": "Man",
-  "avatarLookNeutral": "Neutral",
-  "avatarUseThis": "Use this",
-  "avatarMakeCartoon": "Make a cartoon avatar",
-  "avatarUseSelfie": "Start from a selfie",
-  "avatarSelfieNote": "Your photo stays on this phone and is deleted right after.",
-  "avatarPhotorealSoon": "Real-looking video avatars: coming soon",
-  "avatarSkip": "Skip, use default",
+  "avatarTitle": "Meet your coach",
+  "avatarBody": "Your coach greets you, reminds you of your small steps and cheers you on.",
   "avatarPreviewLabel": "Your coach’s avatar",
   "avatarSaveError": "We couldn’t save your coach. Please try again.",
-  "avatarCreatorTitle": "Make your coach",
-  "avatarSuggested": "We suggested a skin tone and hair colour from your selfie. Please check them. Your photo has been deleted.",
-  "avatarSelfieConsentTitle": "Use your selfie?",
-  "avatarSelfieConsentBody": "Live Well will look at one selfie on this phone to suggest a skin tone and hair colour for your cartoon coach. This uses your camera and reads features of your face. The photo is not uploaded and is deleted right after. You can change this any time in Settings > Consents.",
-  "avatarSelfieAllow": "Allow",
-  "avatarSelfieNotNow": "Not now",
-  "avatarSelfieFailed": "We couldn’t read that photo. You can pick the features yourself.",
-  "avatarSectionSkin": "Skin tone",
-  "avatarSectionHair": "Hair style",
-  "avatarSectionHairColour": "Hair colour",
-  "avatarSectionEyes": "Eyes",
-  "avatarSectionGlasses": "Glasses",
-  "avatarSectionHeadCovering": "Head covering",
-  "avatarSectionClothing": "Clothing",
-  "avatarSectionClothingColour": "Clothing colour",
-  "avatarSectionBackground": "Background",
-  "avatarSkinTone": "Skin tone {n} of 10",
-  "@avatarSkinTone": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      }
-    }
-  },
-  "avatarHairNone": "None",
-  "avatarHairShort": "Short",
-  "avatarHairLong": "Long",
-  "avatarHairCurly": "Curly",
-  "avatarHairCoily": "Coily",
-  "avatarHairWavy": "Wavy",
-  "avatarHairBun": "Bun",
-  "avatarHairBuzz": "Buzz cut",
-  "avatarHairColourBlack": "Black",
-  "avatarHairColourDarkBrown": "Dark brown",
-  "avatarHairColourBrown": "Brown",
-  "avatarHairColourAuburn": "Auburn",
-  "avatarHairColourBlonde": "Blonde",
-  "avatarHairColourGrey": "Grey",
-  "avatarHairColourWhite": "White",
-  "avatarEyesRound": "Round",
-  "avatarEyesAlmond": "Almond",
-  "avatarEyesSmiling": "Smiling",
-  "avatarGlassesNone": "None",
-  "avatarGlassesRound": "Round",
-  "avatarGlassesSquare": "Square",
-  "avatarCoveringNone": "None",
-  "avatarCoveringHijab": "Hijab",
-  "avatarCoveringTurban": "Turban",
-  "avatarCoveringKippah": "Kippah",
-  "avatarClothingCrew": "T-shirt",
-  "avatarClothingCollar": "Collar",
-  "avatarClothingCardigan": "Cardigan",
-  "avatarClothForest": "Forest",
-  "avatarClothTerracotta": "Terracotta",
-  "avatarClothSage": "Sage",
-  "avatarClothNavy": "Navy",
-  "avatarClothMustard": "Mustard",
-  "avatarClothPlum": "Plum",
   "avatarBgSage": "Mint",
   "avatarBgPeach": "Peach",
   "avatarBgCream": "Cream",
@@ -1481,22 +1413,6 @@
   "studioTabAvatar": "Avatar",
   "studioTabVoice": "Voice",
   "studioTabBackground": "Background",
-  "studioPrevious": "Previous look",
-  "studioNext": "Next look",
-  "studioPage": "Look {n} of {total}",
-  "@studioPage": {
-    "placeholders": {
-      "n": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "studioCustom": "Your own look",
-  "studioCustomize": "Customize",
-  "studioUseLook": "Use this look",
   "studioChooseVoice": "Choose Your Voice",
   "studioVoiceActive": "Active",
   "studioVoiceSoon": "Coming soon",
@@ -1533,17 +1449,6 @@
   },
   "studioSceneSoon": "Coming with the new art",
   "studioUseBackground": "Use this background",
-  "studioCharacterLabel": "{name}. {state}",
-  "@studioCharacterLabel": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "state": {
-        "type": "String"
-      }
-    }
-  },
   "avatarCharacterHoodie": "Green hoodie",
   "avatarCharacterLongHair": "Long hair",
   "avatarCharacterGlasses": "Glasses",
@@ -1551,7 +1456,6 @@
   "avatarCharacterHijab": "Hijab",
   "avatarCharacterTurban": "Turban",
   "avatarCharacterOlder": "Grey hair",
-  "avatarPickCharacter": "Pick a starting look",
   "profileStudio": "Avatar & Voice Studio",
   "profileStudioBody": "Your coach’s look, voice and background",
   "studioSceneGarden": "Garden",
@@ -1671,5 +1575,9 @@
   "momentActionReply": "Reply",
   "momentActionRestart": "Restart",
   "momentActionSeeWeek": "See my week",
-  "devMoments": "Avatar Moments"
+  "devMoments": "Avatar Moments",
+  "avatarMoreSoon": "Soon you can pick from ready-made coaches, make one from your photo, or build your own. For now, meet your coach.",
+  "avatarContinue": "Continue",
+  "devAvatarFrames": "Avatar frames",
+  "devAvatarTalk": "Talk (mouth frames only)"
 }

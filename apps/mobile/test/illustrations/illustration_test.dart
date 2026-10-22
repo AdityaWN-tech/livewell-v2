@@ -238,8 +238,8 @@ void main() {
       });
     }
 
-    testWidgets('uses the saved avatar (avatar/current)', (tester) async {
-      final saved = AvatarConfig.forLook(AvatarLook.woman);
+    testWidgets('uses the saved background (avatar/current)', (tester) async {
+      final saved = AvatarConfig.fallback.copyWith(background: 3);
       await tester.pumpWidget(
         app(
           const CoachAvatar(),
@@ -247,20 +247,25 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(tester.widget<AvatarView>(find.byType(AvatarView)).config, saved);
+      expect(
+        tester.widget<AvatarView>(find.byType(AvatarView)).background,
+        AvatarColours.background[3],
+      );
     });
 
     for (final (name, repo) in [
       ('no avatar yet', FakeAvatarRepository()),
       ('unreadable', _ThrowingAvatars()),
     ]) {
-      testWidgets('$name: the default coach (green top)', (tester) async {
+      testWidgets('$name: no frames yet, the initial circle on mint', (
+        tester,
+      ) async {
         await tester.pumpWidget(app(const CoachAvatar(), avatars: repo));
         await tester.pumpAndSettle();
-        expect(
-          tester.widget<AvatarView>(find.byType(AvatarView)).config,
-          defaultCoach,
-        );
+        final view = tester.widget<AvatarView>(find.byType(AvatarView));
+        expect(view.images, isNull);
+        expect(view.background, AvatarColours.background.first);
+        expect(find.byKey(const Key('avatar-initial')), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     }

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/time/clock.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
-import 'package:livewell/features/avatar/presentation/coach_avatar.dart';
 import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
 import 'package:livewell/features/focus/domain/focus.dart';
@@ -368,7 +367,8 @@ void main() {
         expect(s, isNot(contains('walk')), reason: 'no health details');
       }
       // The person's own avatar (the default until they make one).
-      expect(faces.drawn.single, defaultCoach);
+      // No frame set yet: the coach's initial ("Coach" until named).
+      expect(faces.drawn.single, 'C');
       expect(reminders.faces.keys, containsAll(TouchpointKind.values));
     });
 

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/design/avatar/avatar_art.dart';
-import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
-    show defaultCoach;
 import 'package:livewell/features/focus/domain/focus.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/moments/application/moment_launcher.dart';
@@ -73,11 +71,10 @@ void main() {
     expect(faceFor(TouchpointKind.reflection), AvatarExpression.listening);
   });
 
-  testWidgets("the coach's face draws as a PNG for the notification", (
-    tester,
-  ) async {
+  testWidgets('without frames, the notification face is the initial circle '
+      'as a PNG', (tester) async {
     final bytes = await tester.runAsync(
-      () => FileCoachFaces.png(defaultCoach, AvatarExpression.waving),
+      () => FileCoachFaces.circlePng('C', AvatarColours.background.first),
     );
     // The PNG signature.
     expect(bytes!.take(4), [0x89, 0x50, 0x4E, 0x47]);

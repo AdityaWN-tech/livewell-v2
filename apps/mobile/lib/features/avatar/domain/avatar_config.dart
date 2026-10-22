@@ -168,14 +168,3 @@ class AvatarConfig {
   @override
   int get hashCode => toMap().toString().hashCode;
 }
-
-/// What the selfie suggested (on the device). Null fields: no suggestion.
-class SelfieSuggestion {
-  const SelfieSuggestion({this.skin, this.hairColour});
-
-  final int? skin;
-  final int? hairColour;
-
-  AvatarConfig applyTo(AvatarConfig c) =>
-      c.copyWith(skin: skin, hairColour: hairColour);
-}

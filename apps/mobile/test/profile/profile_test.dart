@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:livewell/features/avatar/domain/characters.dart';
 import 'package:livewell/features/studio/presentation/studio_screen.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
@@ -203,10 +202,12 @@ void main() {
       // Both open the Avatar & Voice Studio, on their own tab (T-UI-02h).
       await tapKey(tester, 'profile-avatar');
       expect(find.byType(StudioScreen), findsOneWidget);
-      await tapKey(tester, 'avatar-character-curly');
-      await tapKey(tester, 'studio-save-avatar');
-      // The character, on the background already chosen (its own tab).
-      expect(CoachCharacters.indexOf(h.avatars.saved!), 3);
+      expect(find.byKey(const Key('avatar-more-soon')), findsOneWidget);
+      // The background is saved on its own tab.
+      await tapKey(tester, 'studio-tab-background');
+      await tapKey(tester, 'studio-bg-3');
+      await tapKey(tester, 'studio-save-background');
+      expect(h.avatars.saved!.background, 3);
       await tester.pageBack();
       await tester.pumpAndSettle();
       await tapKey(tester, 'profile-voice');

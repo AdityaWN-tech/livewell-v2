@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
 import '../../features/dev/presentation/illustration_gallery.dart';
+import '../../features/dev/presentation/avatar_frames_gallery.dart';
 import '../../features/dev/presentation/moments_gallery.dart';
 import '../../features/moments/domain/coach_message.dart';
 import '../../features/moments/presentation/moment_screen.dart';
@@ -199,6 +200,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: MomentsGallery.path,
           builder: (context, state) => const MomentsGallery(),
+        ),
+      if (flavor == Flavor.dev)
+        GoRoute(
+          path: AvatarFramesGallery.path,
+          builder: (context, state) => const AvatarFramesGallery(),
         ),
       if (flavor == Flavor.dev)
         GoRoute(

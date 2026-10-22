@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show StringCharacters;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/time/clock.dart';
@@ -7,6 +8,7 @@ import '../../avatar/presentation/coach_avatar.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
+import '../../home/application/home_data.dart' show coachNameProvider;
 import '../../moments/data/coach_faces.dart';
 import '../data/plan_repository.dart';
 import '../data/reminders.dart';
@@ -60,11 +62,23 @@ class PlanScheduler {
     );
     final faces = items.isEmpty
         ? const <TouchpointKind, String>{}
-        : await _ref
-              .read(coachFacesProvider)
-              .render(await _ref.read(coachAvatarConfigProvider.future));
+        : await _faces();
     await reminders.replaceAll(items, texts, faces: faces);
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());
+  }
+
+  /// The coach's face per reminder: its frames on the device, else the
+  /// initial circle (T-AVT-08a).
+  Future<Map<TouchpointKind, String>> _faces() async {
+    await _ref.read(coachAvatarConfigProvider.future);
+    final name = _ref.read(coachNameProvider) ?? 'Coach';
+    return _ref
+        .read(coachFacesProvider)
+        .render(
+          frames: await _ref.read(ownFrameSetProvider.future),
+          initial: name.isEmpty ? '' : name.characters.first.toUpperCase(),
+          background: _ref.read(coachBackgroundProvider),
+        );
   }
 
   /// Today's morning reminder leaves the tray once its moment was played

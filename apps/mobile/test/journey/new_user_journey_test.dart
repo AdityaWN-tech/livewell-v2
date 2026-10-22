@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/features/auth/presentation/sign_in_screen.dart';
-import 'package:livewell/features/avatar/domain/characters.dart';
+import 'package:livewell/features/avatar/domain/avatar_config.dart';
 import 'package:livewell/features/avatar/presentation/avatar_screen.dart';
 import 'package:livewell/features/focus/presentation/focus_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
@@ -120,11 +120,10 @@ Future<Harness> runJourney(WidgetTester tester, {double scale = 1}) async {
   const uid = 'google:1';
   expect(h.profiles.created.keys, [uid]);
 
-  // 3. Create your coach: a default look (ONB-03b, Studio design).
+  // 3. Meet your coach (ONB-03b); choosing one comes with T-AVT-08b.
   expect(find.byType(AvatarScreen), findsOneWidget);
-  await tapKey(tester, 'avatar-character-hoodie');
   await tapKey(tester, 'avatar-use');
-  expect(h.avatars.saved, CoachCharacters.all.first.config);
+  expect(h.avatars.saved, AvatarConfig.fallback);
 
   // 4. The default voice: "Sounds good" (ONB-03c).
   expect(find.byType(VoiceScreen), findsOneWidget);
@@ -220,7 +219,6 @@ void main() {
     await tapLabel(tester, "Yes, I'm 18 or older");
     await acceptLegal(tester);
     await tapKey(tester, 'sign-in-google');
-    await tapKey(tester, 'avatar-character-curly');
     await tapKey(tester, 'avatar-use');
     // Restart while on the voice step: it opens again, not Welcome.
     await h.boot(tester);

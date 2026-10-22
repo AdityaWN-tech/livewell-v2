@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livewell.app/schemas/avatar_frames.schema.json",
+  "title": "Avatar frame set (avatar_frames.json)",
+  "description": "T-AVT-08a. The 14 images of one avatar that the app plays for expressions, blinking and lip movement. Files sit next to this manifest in Cloud Storage avatars/{uid}/{version}/ (or bundled for the default coaches).",
+  "type": "object",
+  "required": [
+    "avatar_id",
+    "version",
+    "style",
+    "sizes",
+    "frames"
+  ],
+  "properties": {
+    "avatar_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "style": {
+      "const": "3d_adult"
+    },
+    "canvas": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        }
+      }
+    },
+    "sizes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "2x",
+          "3x"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "note": {
+      "type": "string"
+    },
+    "frames": {
+      "type": "object",
+      "required": [
+        "neutral",
+        "happy",
+        "waving",
+        "listening",
+        "calm",
+        "celebrating",
+        "blink",
+        "mouth_A",
+        "mouth_I",
+        "mouth_U",
+        "mouth_E",
+        "mouth_O",
+        "mouth_closed",
+        "thumb"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "neutral": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "happy": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "waving": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "listening": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "calm": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "celebrating": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "blink": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "mouth_A": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "mouth_I": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "mouth_U": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "mouth_E": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "mouth_O": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "mouth_closed": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        },
+        "thumb": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_@.\\-]+$"
+          }
+        }
+      }
+    }
+  }
+}

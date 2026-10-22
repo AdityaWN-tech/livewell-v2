@@ -3,7 +3,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:livewell/features/avatar/domain/characters.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
 
 import 'studio_test.dart' show openStudio, signedIn, tapKey;
@@ -35,7 +34,6 @@ void main() {
             tester.platformDispatcher.textScaleFactorTestValue = scale;
             addTearDown(tester.platformDispatcher.clearAllTestValues);
             final h = signedIn();
-            h.avatars.saved = CoachCharacters.all.first.config;
             h.voices.chosen = const VoiceChoice(voiceId: 'lw-warm');
             await h.boot(tester);
             await openStudio(tester);

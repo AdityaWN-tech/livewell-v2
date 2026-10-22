@@ -1304,42 +1304,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get avatarTitle => 'Create your coach';
+  String get avatarTitle => 'Meet your coach';
 
   @override
   String get avatarBody =>
-      'Choose how your coach looks. You can change it any time.';
-
-  @override
-  String get avatarPickLook => 'Pick a starting look';
-
-  @override
-  String get avatarLookWoman => 'Woman';
-
-  @override
-  String get avatarLookMan => 'Man';
-
-  @override
-  String get avatarLookNeutral => 'Neutral';
-
-  @override
-  String get avatarUseThis => 'Use this';
-
-  @override
-  String get avatarMakeCartoon => 'Make a cartoon avatar';
-
-  @override
-  String get avatarUseSelfie => 'Start from a selfie';
-
-  @override
-  String get avatarSelfieNote =>
-      'Your photo stays on this phone and is deleted right after.';
-
-  @override
-  String get avatarPhotorealSoon => 'Real-looking video avatars: coming soon';
-
-  @override
-  String get avatarSkip => 'Skip, use default';
+      'Your coach greets you, reminds you of your small steps and cheers you on.';
 
   @override
   String get avatarPreviewLabel => 'Your coach’s avatar';
@@ -1347,164 +1316,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get avatarSaveError =>
       'We couldn’t save your coach. Please try again.';
-
-  @override
-  String get avatarCreatorTitle => 'Make your coach';
-
-  @override
-  String get avatarSuggested =>
-      'We suggested a skin tone and hair colour from your selfie. Please check them. Your photo has been deleted.';
-
-  @override
-  String get avatarSelfieConsentTitle => 'Use your selfie?';
-
-  @override
-  String get avatarSelfieConsentBody =>
-      'Live Well will look at one selfie on this phone to suggest a skin tone and hair colour for your cartoon coach. This uses your camera and reads features of your face. The photo is not uploaded and is deleted right after. You can change this any time in Settings > Consents.';
-
-  @override
-  String get avatarSelfieAllow => 'Allow';
-
-  @override
-  String get avatarSelfieNotNow => 'Not now';
-
-  @override
-  String get avatarSelfieFailed =>
-      'We couldn’t read that photo. You can pick the features yourself.';
-
-  @override
-  String get avatarSectionSkin => 'Skin tone';
-
-  @override
-  String get avatarSectionHair => 'Hair style';
-
-  @override
-  String get avatarSectionHairColour => 'Hair colour';
-
-  @override
-  String get avatarSectionEyes => 'Eyes';
-
-  @override
-  String get avatarSectionGlasses => 'Glasses';
-
-  @override
-  String get avatarSectionHeadCovering => 'Head covering';
-
-  @override
-  String get avatarSectionClothing => 'Clothing';
-
-  @override
-  String get avatarSectionClothingColour => 'Clothing colour';
-
-  @override
-  String get avatarSectionBackground => 'Background';
-
-  @override
-  String avatarSkinTone(int n) {
-    return 'Skin tone $n of 10';
-  }
-
-  @override
-  String get avatarHairNone => 'None';
-
-  @override
-  String get avatarHairShort => 'Short';
-
-  @override
-  String get avatarHairLong => 'Long';
-
-  @override
-  String get avatarHairCurly => 'Curly';
-
-  @override
-  String get avatarHairCoily => 'Coily';
-
-  @override
-  String get avatarHairWavy => 'Wavy';
-
-  @override
-  String get avatarHairBun => 'Bun';
-
-  @override
-  String get avatarHairBuzz => 'Buzz cut';
-
-  @override
-  String get avatarHairColourBlack => 'Black';
-
-  @override
-  String get avatarHairColourDarkBrown => 'Dark brown';
-
-  @override
-  String get avatarHairColourBrown => 'Brown';
-
-  @override
-  String get avatarHairColourAuburn => 'Auburn';
-
-  @override
-  String get avatarHairColourBlonde => 'Blonde';
-
-  @override
-  String get avatarHairColourGrey => 'Grey';
-
-  @override
-  String get avatarHairColourWhite => 'White';
-
-  @override
-  String get avatarEyesRound => 'Round';
-
-  @override
-  String get avatarEyesAlmond => 'Almond';
-
-  @override
-  String get avatarEyesSmiling => 'Smiling';
-
-  @override
-  String get avatarGlassesNone => 'None';
-
-  @override
-  String get avatarGlassesRound => 'Round';
-
-  @override
-  String get avatarGlassesSquare => 'Square';
-
-  @override
-  String get avatarCoveringNone => 'None';
-
-  @override
-  String get avatarCoveringHijab => 'Hijab';
-
-  @override
-  String get avatarCoveringTurban => 'Turban';
-
-  @override
-  String get avatarCoveringKippah => 'Kippah';
-
-  @override
-  String get avatarClothingCrew => 'T-shirt';
-
-  @override
-  String get avatarClothingCollar => 'Collar';
-
-  @override
-  String get avatarClothingCardigan => 'Cardigan';
-
-  @override
-  String get avatarClothForest => 'Forest';
-
-  @override
-  String get avatarClothTerracotta => 'Terracotta';
-
-  @override
-  String get avatarClothSage => 'Sage';
-
-  @override
-  String get avatarClothNavy => 'Navy';
-
-  @override
-  String get avatarClothMustard => 'Mustard';
-
-  @override
-  String get avatarClothPlum => 'Plum';
 
   @override
   String get avatarBgSage => 'Mint';
@@ -2579,26 +2390,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studioTabBackground => 'Background';
 
   @override
-  String get studioPrevious => 'Previous look';
-
-  @override
-  String get studioNext => 'Next look';
-
-  @override
-  String studioPage(int n, int total) {
-    return 'Look $n of $total';
-  }
-
-  @override
-  String get studioCustom => 'Your own look';
-
-  @override
-  String get studioCustomize => 'Customize';
-
-  @override
-  String get studioUseLook => 'Use this look';
-
-  @override
   String get studioChooseVoice => 'Choose Your Voice';
 
   @override
@@ -2652,11 +2443,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studioUseBackground => 'Use this background';
 
   @override
-  String studioCharacterLabel(String name, String state) {
-    return '$name. $state';
-  }
-
-  @override
   String get avatarCharacterHoodie => 'Green hoodie';
 
   @override
@@ -2676,9 +2462,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avatarCharacterOlder => 'Grey hair';
-
-  @override
-  String get avatarPickCharacter => 'Pick a starting look';
 
   @override
   String get profileStudio => 'Avatar & Voice Studio';
@@ -2868,4 +2651,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get devMoments => 'Avatar Moments';
+
+  @override
+  String get avatarMoreSoon =>
+      'Soon you can pick from ready-made coaches, make one from your photo, or build your own. For now, meet your coach.';
+
+  @override
+  String get avatarContinue => 'Continue';
+
+  @override
+  String get devAvatarFrames => 'Avatar frames';
+
+  @override
+  String get devAvatarTalk => 'Talk (mouth frames only)';
 }

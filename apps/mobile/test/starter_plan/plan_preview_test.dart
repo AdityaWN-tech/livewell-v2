@@ -88,7 +88,7 @@ void main() {
     expect(h.plans.days, hasLength(7));
     expect(h.reminders.scheduled, isNotEmpty);
     // Lock-screen safe: generic texts only.
-    expect(h.reminders.texts!.nudgeBody, 'Open Live Well when you’re ready.');
+    expect(h.reminders.texts!.nudgeBody, 'Your coach has a message for you.');
     expect(h.profiles.existing[uid], ProfileStep.assessment);
     expect(find.byType(HomeScreen), findsOneWidget);
     // Home's step now comes from the plan (5 min: the check-in was skipped).

@@ -382,6 +382,9 @@ void main() {
       expect(find.byKey(const Key('coach-avatar-waving')), findsOneWidget);
       expect(find.text('10-min walk after lunch'), findsOneWidget);
       expect(find.text('Driver 3'), findsOneWidget);
+      // The coach's morning card sits on top (T-DLY-03c).
+      expect(find.byKey(const Key('home-moment-card')), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('14 Day Streak'), 200);
       expect(find.text('14 Day Streak'), findsOneWidget);
       expect(find.text('Keep going!'), findsOneWidget);
       await tester.scrollUntilVisible(

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:livewell/features/moments/application/moment_launcher.dart';
+import 'package:livewell/features/moments/data/coach_faces.dart';
 import 'package:livewell/features/moments/data/coach_speaker.dart';
 import 'package:livewell/features/moments/domain/coach_message.dart';
 import 'package:livewell/features/home/data/name_prompt.dart';
@@ -567,8 +569,18 @@ class FakeReminders implements Reminders {
   int permissionAsks = 0;
   List<ScheduledTouchpoint> scheduled = [];
   ReminderTexts? texts;
+  Map<TouchpointKind, String> faces = const {};
   int cancels = 0;
+  final dismissed = <int>[];
   String zone = 'Asia/Kolkata';
+
+  /// The payload of the reminder that "started" the app.
+  String? launch;
+  final _taps = StreamController<String>.broadcast();
+
+  /// Simulates tapping a reminder while the app runs.
+  void tap(TouchpointKind k) => tapPayload(k.name);
+  void tapPayload(String payload) => _taps.add(payload);
 
   @override
   Future<bool> requestPermission() async {
@@ -579,10 +591,25 @@ class FakeReminders implements Reminders {
   @override
   Future<void> replaceAll(
     List<ScheduledTouchpoint> items,
-    ReminderTexts t,
-  ) async {
+    ReminderTexts t, {
+    Map<TouchpointKind, String> faces = const {},
+  }) async {
     scheduled = items;
     texts = t;
+    this.faces = faces;
+  }
+
+  @override
+  Future<void> dismiss(int id) async => dismissed.add(id);
+
+  @override
+  Stream<String> get taps => _taps.stream;
+
+  @override
+  Future<String?> launchPayload() async {
+    final p = launch;
+    launch = null;
+    return p;
   }
 
   @override
@@ -593,6 +620,26 @@ class FakeReminders implements Reminders {
 
   @override
   Future<String> timeZone() async => zone;
+}
+
+class FakeCoachFaces implements CoachFaces {
+  final drawn = <AvatarConfig>[];
+
+  @override
+  Future<Map<TouchpointKind, String>> render(AvatarConfig config) async {
+    drawn.add(config);
+    return {for (final k in TouchpointKind.values) k: 'faces/${k.name}.png'};
+  }
+}
+
+class FakeMomentSeenStore implements MomentSeenStore {
+  String? date;
+
+  @override
+  Future<String?> load() async => date;
+
+  @override
+  Future<void> save(String d) async => date = d;
 }
 
 class FakeReminderZoneStore implements ReminderZoneStore {

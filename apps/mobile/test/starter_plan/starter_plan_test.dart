@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/time/clock.dart';
+import 'package:livewell/features/avatar/data/avatar_repository.dart';
+import 'package:livewell/features/avatar/presentation/coach_avatar.dart';
 import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
 import 'package:livewell/features/focus/domain/focus.dart';
+import 'package:livewell/features/moments/data/coach_faces.dart';
 import 'package:livewell/features/starter_plan/application/plan_scheduler.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
@@ -46,6 +49,8 @@ const texts = ReminderTexts(
   nudgeBody: 'Open Live Well.',
   reflectionTitle: 'A moment to look back',
   reflectionBody: 'What went well today?',
+  weeklyTitle: 'Your week',
+  weeklyBody: 'A look back.',
   channelName: 'Daily plan',
 );
 
@@ -177,7 +182,8 @@ void main() {
   group('touchpoints and reminders', () {
     final days = [for (var i = 0; i < 7; i++) DateTime(2026, 10, 15 + i)];
 
-    test('3 a day at the default times, never the ones already past', () {
+    test('3 a day at the default times, never the ones already past; the '
+        'weekly review on Sunday at 8:00', () {
       final s = TouchpointScheduler.build(
         days: days,
         times: const TouchpointTimes(),
@@ -190,8 +196,44 @@ void main() {
         TouchpointKind.nudge,
         TouchpointKind.reflection,
       ]);
-      expect(s, hasLength(2 + 6 * 3));
+      // Plus the weekly review on Sunday the 18th only.
+      expect(s, hasLength(2 + 6 * 3 + 1));
       expect(s.first.when, DateTime(2026, 10, 15, 13));
+      final weekly = s.where((x) => x.kind == TouchpointKind.weekly);
+      expect(weekly.single.when, DateTime(2026, 10, 18, 8));
+      expect(weekly.single.when.weekday, DateTime.sunday);
+    });
+
+    test('the weekly review follows quiet hours and its switch', () {
+      List<ScheduledTouchpoint> build(
+        QuietHours q, [
+        Set<TouchpointKind> on = const {...TouchpointKind.values},
+      ]) => TouchpointScheduler.build(
+        days: days,
+        times: const TouchpointTimes(morning: ClockTime(9, 0)),
+        quiet: q,
+        consent: true,
+        now: DateTime(2026, 10, 14),
+        enabled: on,
+      );
+      bool hasWeekly(List<ScheduledTouchpoint> s) =>
+          s.any((x) => x.kind == TouchpointKind.weekly);
+      expect(hasWeekly(build(const QuietHours())), isTrue);
+      // Quiet until 8:30: no 8:00 review.
+      expect(
+        hasWeekly(build(const QuietHours(end: ClockTime(8, 30)))),
+        isFalse,
+      );
+      expect(
+        hasWeekly(
+          build(const QuietHours(), {
+            TouchpointKind.greeting,
+            TouchpointKind.nudge,
+            TouchpointKind.reflection,
+          }),
+        ),
+        isFalse,
+      );
     });
 
     test('caps: at most 4 a day and 3 nudges a day', () {
@@ -205,6 +247,8 @@ void main() {
       for (final d in days) {
         final today = s.where((x) => x.when.day == d.day);
         expect(today.length, lessThanOrEqualTo(NotificationCaps.perDay));
+        // Sunday has all 4; the other days 3.
+        expect(today.length, d.weekday == DateTime.sunday ? 4 : 3);
         expect(
           today.where((x) => x.kind == TouchpointKind.nudge).length,
           lessThanOrEqualTo(NotificationCaps.nudgesPerDay),
@@ -282,6 +326,8 @@ void main() {
     late FakeReminders reminders;
     late FakeReminderZoneStore zone;
     late FakeConsentRepository consents;
+    late FakeAvatarRepository avatars;
+    late FakeCoachFaces faces;
     late ProviderContainer c;
 
     setUp(() async {
@@ -289,6 +335,8 @@ void main() {
       reminders = FakeReminders();
       zone = FakeReminderZoneStore();
       consents = FakeConsentRepository();
+      avatars = FakeAvatarRepository();
+      faces = FakeCoachFaces();
       await plans.save(plan(), const TouchpointTimes());
       c = ProviderContainer(
         overrides: [
@@ -296,24 +344,42 @@ void main() {
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(zone),
           consentRepositoryProvider.overrideWithValue(consents),
+          avatarRepositoryProvider.overrideWithValue(avatars),
+          coachFacesProvider.overrideWithValue(faces),
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 15, 8)),
         ],
       );
     });
     tearDown(() => c.dispose());
 
-    test('with consent: schedules the plan, generic texts only', () async {
+    test('with consent: schedules the plan, generic texts only, the '
+        "coach's face on each", () async {
       await consents.record(ConsentType.notifications, granted: true);
       await c.read(planSchedulerProvider).reschedule(texts);
-      expect(reminders.scheduled, hasLength(2 + 6 * 3));
+      // 15 Oct from 8:00: no greeting; Sunday the 18th adds the review.
+      expect(reminders.scheduled, hasLength(2 + 6 * 3 + 1));
       expect(zone.zone, 'Asia/Kolkata');
       for (final s in [
         texts.greetingBody,
         texts.nudgeBody,
         texts.reflectionBody,
+        texts.weeklyBody,
       ]) {
         expect(s, isNot(contains('walk')), reason: 'no health details');
       }
+      // The person's own avatar (the default until they make one).
+      expect(faces.drawn.single, defaultCoach);
+      expect(reminders.faces.keys, containsAll(TouchpointKind.values));
+    });
+
+    test("played in the app: today's morning reminder leaves the tray", () async {
+      await c.read(planSchedulerProvider).dismissMorning();
+      expect(reminders.dismissed, [
+        TouchpointScheduler.idFor(
+          DateTime(2026, 10, 15),
+          TouchpointKind.greeting,
+        ),
+      ]);
     });
 
     test('without consent: everything is cancelled', () async {

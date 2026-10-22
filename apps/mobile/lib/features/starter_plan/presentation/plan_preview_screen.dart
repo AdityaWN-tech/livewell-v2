@@ -19,7 +19,8 @@ import '../data/reminders.dart';
 import '../domain/starter_plan.dart';
 import '../domain/touchpoints.dart';
 
-/// Generic reminder texts (no personal or health details, AGENTS.md).
+/// Reminder texts in the coach's voice, generic on purpose (no name,
+/// personal or health details on the lock screen, AGENTS.md).
 ReminderTexts reminderTexts(AppLocalizations l) => ReminderTexts(
   greetingTitle: l.reminderGreetingTitle,
   greetingBody: l.reminderGreetingBody,
@@ -27,6 +28,8 @@ ReminderTexts reminderTexts(AppLocalizations l) => ReminderTexts(
   nudgeBody: l.reminderNudgeBody,
   reflectionTitle: l.reminderReflectionTitle,
   reflectionBody: l.reminderReflectionBody,
+  weeklyTitle: l.reminderWeeklyTitle,
+  weeklyBody: l.reminderWeeklyBody,
   channelName: l.reminderChannel,
 );
 

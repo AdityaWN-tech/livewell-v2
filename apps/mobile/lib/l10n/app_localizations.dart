@@ -976,6 +976,18 @@ abstract class AppLocalizations {
   /// **'Your Why'**
   String get homeWhyEyebrow;
 
+  /// No description provided for @homeMomentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach has a message'**
+  String get homeMomentTitle;
+
+  /// No description provided for @homeMomentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to hear it.'**
+  String get homeMomentBody;
+
   /// No description provided for @safetyEmergencyTitle.
   ///
   /// In en, this message translates to:
@@ -3229,13 +3241,13 @@ abstract class AppLocalizations {
   /// No description provided for @reminderGreetingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Good morning'**
+  /// **'Good morning ☀️'**
   String get reminderGreetingTitle;
 
   /// No description provided for @reminderGreetingBody.
   ///
   /// In en, this message translates to:
-  /// **'Your coach has a hello and today’s small step for you.'**
+  /// **'Your coach has a message for you.'**
   String get reminderGreetingBody;
 
   /// No description provided for @reminderNudgeTitle.
@@ -3247,20 +3259,32 @@ abstract class AppLocalizations {
   /// No description provided for @reminderNudgeBody.
   ///
   /// In en, this message translates to:
-  /// **'Open Live Well when you’re ready.'**
+  /// **'Your coach has a message for you.'**
   String get reminderNudgeBody;
 
   /// No description provided for @reminderReflectionTitle.
   ///
   /// In en, this message translates to:
-  /// **'A moment to look back'**
+  /// **'Good evening'**
   String get reminderReflectionTitle;
 
   /// No description provided for @reminderReflectionBody.
   ///
   /// In en, this message translates to:
-  /// **'What went well today?'**
+  /// **'Your coach has a message for you.'**
   String get reminderReflectionBody;
+
+  /// No description provided for @reminderWeeklyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your week'**
+  String get reminderWeeklyTitle;
+
+  /// No description provided for @reminderWeeklyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach has a look back at your week for you.'**
+  String get reminderWeeklyBody;
 
   /// No description provided for @authErrorLastMethod.
   ///

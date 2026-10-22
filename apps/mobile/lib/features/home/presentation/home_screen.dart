@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/config/feature_flags.dart';
+import '../../../core/design/avatar/avatar_art.dart' show AvatarView;
 import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/illustration/illustration.dart';
@@ -17,9 +20,13 @@ import '../../checkin/domain/checkin.dart';
 import '../../checkin/presentation/checkin_sheet.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../learn/presentation/learn_screen.dart' show LearnScreen;
+import '../../moments/application/moment_launcher.dart';
+import '../../moments/domain/coach_message.dart';
+import '../../moments/presentation/moment_screen.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../profile/presentation/profile_button.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
+import '../../starter_plan/data/reminders.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
     show reminderTexts;
 import '../../track/presentation/track_screen.dart' show streakProvider;
@@ -47,6 +54,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late final AppLifecycleListener _lifecycle;
+  StreamSubscription<String>? _reminderTaps;
   bool _asking = false;
 
   @override
@@ -55,15 +63,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _lifecycle = AppLifecycleListener(
       onResume: () {
         ref.invalidate(todayCheckInProvider);
+        // A new morning, or the morning time has come: the coach's card.
+        ref.invalidate(morningMomentProvider);
         _maybeAsk();
         _followTimeZone();
       },
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeAsk());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _start());
   }
+
+  /// A reminder that started the app opens its moment (the moment offers
+  /// the check-in); otherwise the usual first-open check-in.
+  Future<void> _start() async {
+    final reminders = ref.read(remindersProvider);
+    String? launch;
+    try {
+      _reminderTaps = reminders.taps.listen(_openReminder);
+      launch = await reminders.launchPayload();
+    } catch (_) {
+      // No notifications on this device: Home as usual.
+    }
+    if (!mounted) return;
+    if (launch != null && await _openReminder(launch)) return;
+    _maybeAsk();
+  }
+
+  /// Tapping a reminder opens the coach's moment (T-DLY-03c).
+  Future<bool> _openReminder(String payload) async {
+    final m = await ref.read(momentLauncherProvider).forPayload(payload);
+    if (!mounted || m == null) return false;
+    _playMoment(m);
+    return true;
+  }
+
+  void _playMoment(Moment m) => context.push(MomentScreen.pathFor(m));
 
   @override
   void dispose() {
+    _reminderTaps?.cancel();
     _lifecycle.dispose();
     super.dispose();
   }
@@ -236,6 +273,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       profile: const ProfileButton(),
       actions: [if (day != null) _DayPill(day)],
       children: [
+        if (ref.watch(morningCardProvider) case final moment?) ...[
+          _MomentCard(onPlay: () => _playMoment(moment)),
+          const SizedBox(height: LwSpacing.sm),
+        ],
         if (askName) ...[
           _NamePrompt(onSave: _saveName, onSkip: _skipName),
           const SizedBox(height: LwSpacing.sm),
@@ -518,6 +559,56 @@ class _BriefingRow extends StatelessWidget {
           const SizedBox(width: LwSpacing.sm),
           Expanded(child: Text(l.homeBriefingSoon, style: t.titleSmall)),
         ],
+      ),
+    );
+  }
+}
+
+/// "Your coach has a message" (T-DLY-03c): the morning moment, when the
+/// app is opened before its reminder was tapped. Tapping plays it.
+class _MomentCard extends ConsumerWidget {
+  const _MomentCard({required this.onPlay});
+  final VoidCallback onPlay;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = Theme.of(context).textTheme;
+    final p = LwPalette.of(context);
+    return Card(
+      key: const Key('home-moment-card'),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPlay,
+        child: Padding(
+          padding: const EdgeInsets.all(LwSpacing.cardPadding),
+          child: Row(
+            children: [
+              AvatarView(
+                config:
+                    ref.watch(coachAvatarConfigProvider).value ?? defaultCoach,
+                expression: AvatarExpression.waving,
+                size: LwSize.inputHeight,
+              ),
+              const SizedBox(width: LwSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l.homeMomentTitle, style: t.titleMedium),
+                    Text(l.homeMomentBody, style: t.bodyMedium),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.play_circle_fill,
+                color: p.primary,
+                size: LwSize.minTapTarget,
+                semanticLabel: l.momentPlay,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

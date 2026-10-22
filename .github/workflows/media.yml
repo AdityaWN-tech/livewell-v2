@@ -1,0 +1,36 @@
+# Media Service (T-AVT-08c): lint, types and tests.
+name: media
+
+on:
+  pull_request:
+    paths:
+      - "services/media/**"
+      - "docs/design/avatar-prompts.md"
+      - "content/avatar/**"
+      - ".github/workflows/media.yml"
+  push:
+    branches: [main]
+    paths:
+      - "services/media/**"
+      - "docs/design/avatar-prompts.md"
+      - "content/avatar/**"
+      - ".github/workflows/media.yml"
+
+defaults:
+  run:
+    working-directory: services/media
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests
+      - run: ruff format --check src tests
+      - run: mypy
+      - run: pytest -q

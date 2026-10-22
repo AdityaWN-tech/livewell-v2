@@ -298,6 +298,8 @@ def client(**settings: object) -> tuple[TestClient, Services, FakeStylizer]:
         consents=consents,
         stylizer=stylizer,
         inspector=FakeInspector(),
+        # The frame set has its own tests (test_frames.py).
+        build_frames=False,
         clock=lambda: NOW,
     )
     return TestClient(create_app(services)), services, stylizer

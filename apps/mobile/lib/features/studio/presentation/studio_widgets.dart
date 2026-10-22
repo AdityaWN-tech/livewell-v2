@@ -184,9 +184,7 @@ class CoachGrid extends ConsumerWidget {
                           const SizedBox(height: LwSpacing.xxs),
                           Text(
                             readyCoachLabel(l, c),
-                            style: t.labelSmall?.copyWith(
-                              color: p.textPrimary,
-                            ),
+                            style: t.labelSmall?.copyWith(color: p.textPrimary),
                             textAlign: TextAlign.center,
                           ),
                         ],

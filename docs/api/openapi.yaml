@@ -90,4 +90,10 @@ components:
           description: "A kind message for the app to show: avatar_not_made | avatar_no_portrait"
         portrait_id:
           type: [string, "null"]
-          description: The approved portrait; the frame set is built from it (T-AVT-08d)
+          description: The approved portrait the frame set is built from
+        frames_version:
+          type: [integer, "null"]
+          description: >
+            The 14-frame set made from the portrait (T-AVT-08d), in Cloud
+            Storage avatars/{uid}/{frames_version}/ with avatar_frames.json;
+            also written to users/{uid}/avatar/current.frames_version

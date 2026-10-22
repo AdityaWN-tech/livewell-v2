@@ -167,6 +167,37 @@
           }
         }
       }
+    },
+    "thumbnails": {
+      "type": "object",
+      "description": "T-AVT-08d: small PNG expression thumbnails for notifications and the widget.",
+      "properties": {
+        "neutral": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_@.\\-]+$"
+        },
+        "happy": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_@.\\-]+$"
+        },
+        "waving": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_@.\\-]+$"
+        },
+        "listening": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_@.\\-]+$"
+        },
+        "calm": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_@.\\-]+$"
+        },
+        "celebrating": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_@.\\-]+$"
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

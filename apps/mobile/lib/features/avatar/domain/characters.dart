@@ -120,7 +120,12 @@ abstract final class CoachCharacters {
 
   /// The character [config] was made from, ignoring the background (that is
   /// chosen separately), or -1 after customizing.
-  static int indexOf(AvatarConfig config) => all.indexWhere(
+  /// The character [config] is, or -1. The characters are Illustrated, so
+  /// an Anime look is never one of them.
+  static int indexOf(AvatarConfig config) =>
+      config.style != AvatarStyle.illustrated ? -1 : _indexOf(config);
+
+  static int _indexOf(AvatarConfig config) => all.indexWhere(
     (c) => c.config.copyWith(background: config.background) == _plain(config),
   );
 

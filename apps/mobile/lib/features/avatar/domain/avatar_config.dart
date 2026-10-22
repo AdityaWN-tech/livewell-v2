@@ -3,6 +3,10 @@
 /// person makes; nothing is guessed from their photo or name.
 library;
 
+import 'anime_parts.dart';
+
+export 'anime_parts.dart';
+
 /// Starting look for the quick option. Chosen by the person, never inferred.
 enum AvatarLook { woman, man, neutral }
 
@@ -36,6 +40,8 @@ class AvatarConfig {
     required this.clothingColour,
     required this.background,
     this.look,
+    this.style = AvatarStyle.illustrated,
+    this.anime = AnimeParts.defaults,
   });
 
   /// Palette indexes.
@@ -51,6 +57,33 @@ class AvatarConfig {
 
   /// The starting look picked, if any (kept for "reset to start").
   final AvatarLook? look;
+
+  /// The art style (T-AVT-06a). Skin, hair colour, clothing colour,
+  /// glasses, head covering and background are shared by both styles; the
+  /// other fields belong to Illustrated and [anime] to Anime.
+  final AvatarStyle style;
+  final AnimeParts anime;
+
+  /// The same coach in [next] style: the shared choices stay, the rest
+  /// starts fresh in the new style (the Illustrated parts from the starting
+  /// look, the Anime parts from their defaults).
+  AvatarConfig withStyle(AvatarStyle next) {
+    if (next == style) return this;
+    final start = forLook(look ?? AvatarLook.neutral);
+    return AvatarConfig(
+      skin: skin,
+      hair: start.hair,
+      hairColour: hairColour,
+      eyes: start.eyes,
+      glasses: glasses,
+      headCovering: headCovering,
+      clothing: start.clothing,
+      clothingColour: clothingColour,
+      background: background,
+      look: look,
+      style: next,
+    );
+  }
 
   /// The default for each starting look. Skin and hair stay mid-range so the
   /// default doesn't stand for any one group; the person changes them.
@@ -106,6 +139,7 @@ class AvatarConfig {
     Clothing? clothing,
     int? clothingColour,
     int? background,
+    AnimeParts? anime,
   }) => AvatarConfig(
     skin: skin ?? this.skin,
     hair: hair ?? this.hair,
@@ -117,10 +151,15 @@ class AvatarConfig {
     clothingColour: clothingColour ?? this.clothingColour,
     background: background ?? this.background,
     look: look,
+    style: style,
+    anime: anime ?? this.anime,
   );
 
+  /// style_config v2 (T-AVT-06a): adds `style` and, for Anime, `anime`.
   Map<String, Object> toMap() => {
-    'version': 1,
+    'version': 2,
+    'style': style.name,
+    if (style == AvatarStyle.anime) 'anime': anime.toMap(),
     'skin': skin,
     'hair': hair.name,
     'hair_colour': hairColour,
@@ -158,6 +197,9 @@ class AvatarConfig {
       ),
       background: idx(m['background'], AvatarPalettes.backgrounds, 0),
       look: AvatarLook.values.where((v) => v.name == m['look']).firstOrNull,
+      // v1 documents have no style: Illustrated.
+      style: pick(AvatarStyle.values, m['style'], AvatarStyle.illustrated),
+      anime: AnimeParts.fromMap(m['anime']),
     );
   }
 

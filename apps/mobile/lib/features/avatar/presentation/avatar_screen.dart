@@ -61,6 +61,15 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
     _pick(i < 0 ? (by > 0 ? (_picked == null ? 1 : 0) : n - 1) : (i + by) % n);
   }
 
+  /// Anime or Illustrated: the person's choice, kept as a draft.
+  void _style(AvatarStyle style) {
+    final config = _preview.withStyle(style);
+    setState(() => _picked = config);
+    ref
+        .read(avatarDraftStoreProvider)
+        .save(AvatarDraft(config: config, inCreator: false));
+  }
+
   Future<void> _save(AvatarConfig config) async {
     final l = AppLocalizations.of(context);
     setState(() => _busy = true);
@@ -131,6 +140,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final index = _picked == null ? 0 : CoachCharacters.indexOf(_picked!);
+    final anime = _preview.style == AvatarStyle.anime;
     return Scaffold(
       body: SafeArea(
         child: AbsorbPointer(
@@ -146,14 +156,29 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen> {
               const SizedBox(height: LwSpacing.xs),
               Text(l.avatarBody, style: t.bodyMedium),
               const SizedBox(height: LwSpacing.md),
-              AvatarStage(config: _preview, index: index, onStep: _step),
-              const SizedBox(height: LwSpacing.md),
-              Text(l.avatarPickCharacter, style: t.titleSmall),
-              const SizedBox(height: LwSpacing.xs),
-              CharacterStrip(
-                selected: _picked == null ? -1 : index,
-                onPick: _pick,
+              AvatarStyleSwitch(style: _preview.style, onChanged: _style),
+              const SizedBox(height: LwSpacing.sm),
+              AvatarStage(
+                config: _preview,
+                index: index,
+                // The characters are Illustrated (T-AVT-06a).
+                onStep: anime ? null : _step,
               ),
+              const SizedBox(height: LwSpacing.md),
+              if (anime)
+                Text(
+                  l.avatarAnimeSoon,
+                  key: const Key('avatar-anime-soon'),
+                  style: t.bodySmall,
+                )
+              else ...[
+                Text(l.avatarPickCharacter, style: t.titleSmall),
+                const SizedBox(height: LwSpacing.xs),
+                CharacterStrip(
+                  selected: _picked == null ? -1 : index,
+                  onPick: _pick,
+                ),
+              ],
               const SizedBox(height: LwSpacing.lg),
               FilledButton(
                 key: const Key('avatar-use'),

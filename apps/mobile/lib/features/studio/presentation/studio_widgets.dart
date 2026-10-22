@@ -63,6 +63,53 @@ class StudioTabs extends StatelessWidget {
   }
 }
 
+/// Anime or Illustrated (T-AVT-06a), at the top of the avatar maker. The
+/// preview under it changes as soon as a style is picked.
+class AvatarStyleSwitch extends StatelessWidget {
+  const AvatarStyleSwitch({
+    super.key,
+    required this.style,
+    required this.onChanged,
+  });
+
+  final AvatarStyle style;
+  final ValueChanged<AvatarStyle> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Semantics(
+      container: true,
+      label: l.avatarStyle,
+      child: SizedBox(
+        width: double.infinity,
+        child: SegmentedButton<AvatarStyle>(
+          key: const Key('avatar-style'),
+          segments: [
+            ButtonSegment(
+              value: AvatarStyle.illustrated,
+              label: Text(
+                l.avatarStyleIllustrated,
+                key: const Key('avatar-style-illustrated'),
+              ),
+            ),
+            ButtonSegment(
+              value: AvatarStyle.anime,
+              label: Text(
+                l.avatarStyleAnime,
+                key: const Key('avatar-style-anime'),
+              ),
+            ),
+          ],
+          selected: {style},
+          showSelectedIcon: false,
+          onSelectionChanged: (s) => onChanged(s.single),
+        ),
+      ),
+    );
+  }
+}
+
 /// The large preview of the coach on its background, with left / right
 /// arrows and page dots to move between the default characters.
 class AvatarStage extends StatelessWidget {
@@ -78,15 +125,19 @@ class AvatarStage extends StatelessWidget {
   /// The character shown, or -1 for a customized look.
   final int index;
 
-  /// -1 previous, +1 next.
-  final ValueChanged<int> onStep;
+  /// -1 previous, +1 next. Null: no characters to step through (the
+  /// characters are Illustrated, so not for an Anime look).
+  final ValueChanged<int>? onStep;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final count = CoachCharacters.all.length;
-    final name = index < 0
+    final step = onStep;
+    final name = config.style == AvatarStyle.anime
+        ? l.avatarAnimeName
+        : index < 0
         ? l.studioCustom
         : characterName(l, CoachCharacters.all[index].id);
     return Container(
@@ -101,12 +152,13 @@ class AvatarStage extends StatelessWidget {
         children: [
           Row(
             children: [
-              _Arrow(
-                key: const Key('studio-prev'),
-                icon: Icons.chevron_left,
-                tooltip: l.studioPrevious,
-                onTap: () => onStep(-1),
-              ),
+              if (step != null)
+                _Arrow(
+                  key: const Key('studio-prev'),
+                  icon: Icons.chevron_left,
+                  tooltip: l.studioPrevious,
+                  onTap: () => step(-1),
+                ),
               Expanded(
                 child: Center(
                   child: LayoutBuilder(
@@ -120,12 +172,13 @@ class AvatarStage extends StatelessWidget {
                   ),
                 ),
               ),
-              _Arrow(
-                key: const Key('studio-next'),
-                icon: Icons.chevron_right,
-                tooltip: l.studioNext,
-                onTap: () => onStep(1),
-              ),
+              if (step != null)
+                _Arrow(
+                  key: const Key('studio-next'),
+                  icon: Icons.chevron_right,
+                  tooltip: l.studioNext,
+                  onTap: () => step(1),
+                ),
             ],
           ),
           const SizedBox(height: LwSpacing.xs),
@@ -136,31 +189,35 @@ class AvatarStage extends StatelessWidget {
             key: const Key('studio-name'),
             style: t.titleSmall?.copyWith(color: LwPalette.light.textPrimary),
           ),
-          const SizedBox(height: LwSpacing.xs),
-          Semantics(
-            container: true,
-            label: index < 0 ? l.studioCustom : l.studioPage(index + 1, count),
-            excludeSemantics: true,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (var i = 0; i < count; i++)
-                  Container(
-                    width: i == index ? LwSpacing.md : LwSpacing.xs,
-                    height: LwSpacing.xs,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: LwSpacing.xxs / 2,
+          if (step != null) ...[
+            const SizedBox(height: LwSpacing.xs),
+            Semantics(
+              container: true,
+              label: index < 0
+                  ? l.studioCustom
+                  : l.studioPage(index + 1, count),
+              excludeSemantics: true,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var i = 0; i < count; i++)
+                    Container(
+                      width: i == index ? LwSpacing.md : LwSpacing.xs,
+                      height: LwSpacing.xs,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: LwSpacing.xxs / 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: i == index
+                            ? LwPalette.light.primary
+                            : LwPalette.light.outlineStrong,
+                        borderRadius: LwRadius.pillAll,
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      color: i == index
-                          ? LwPalette.light.primary
-                          : LwPalette.light.outlineStrong,
-                      borderRadius: LwRadius.pillAll,
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

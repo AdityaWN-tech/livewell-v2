@@ -2868,4 +2868,290 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get devMoments => 'Avatar Moments';
+
+  @override
+  String get avatarStyle => 'Art style';
+
+  @override
+  String get avatarStyleIllustrated => 'Illustrated';
+
+  @override
+  String get avatarStyleAnime => 'Anime';
+
+  @override
+  String get avatarAnimeSoon =>
+      'Anime art is on its way. Choose every part now: until the art is ready, your coach shows its initial.';
+
+  @override
+  String get avatarAnimeName => 'Anime look';
+
+  @override
+  String get avatarHiddenByCovering => 'Hidden under the head covering.';
+
+  @override
+  String get avatarHiddenByCap => 'Hidden under the cap.';
+
+  @override
+  String get avatarSectionCategories => 'Parts';
+
+  @override
+  String get avatarAnimeSectionFace => 'Face shape';
+
+  @override
+  String get avatarAnimeFaceOval => 'Oval';
+
+  @override
+  String get avatarAnimeFaceRound => 'Round';
+
+  @override
+  String get avatarAnimeFaceHeart => 'Heart';
+
+  @override
+  String get avatarAnimeFaceSquare => 'Square';
+
+  @override
+  String get avatarAnimeFaceLong => 'Long';
+
+  @override
+  String get avatarAnimeFaceSoft => 'Soft';
+
+  @override
+  String get avatarAnimeSectionEyes => 'Eyes';
+
+  @override
+  String get avatarAnimeEyesRound => 'Round';
+
+  @override
+  String get avatarAnimeEyesAlmond => 'Almond';
+
+  @override
+  String get avatarAnimeEyesDroopy => 'Droopy';
+
+  @override
+  String get avatarAnimeEyesUpturned => 'Upturned';
+
+  @override
+  String get avatarAnimeEyesWide => 'Wide';
+
+  @override
+  String get avatarAnimeEyesGentle => 'Gentle';
+
+  @override
+  String get avatarAnimeSectionEyeHighlight => 'Eye highlights';
+
+  @override
+  String get avatarAnimeEyeHighlightSparkle => 'Sparkle';
+
+  @override
+  String get avatarAnimeEyeHighlightNone => 'None';
+
+  @override
+  String get avatarAnimeEyeHighlightDot => 'Dot';
+
+  @override
+  String get avatarAnimeEyeHighlightDouble => 'Double';
+
+  @override
+  String get avatarAnimeEyeHighlightStar => 'Star';
+
+  @override
+  String get avatarAnimeSectionEyebrows => 'Eyebrows';
+
+  @override
+  String get avatarAnimeEyebrowsSoft => 'Soft';
+
+  @override
+  String get avatarAnimeEyebrowsStraight => 'Straight';
+
+  @override
+  String get avatarAnimeEyebrowsArched => 'Arched';
+
+  @override
+  String get avatarAnimeEyebrowsThick => 'Thick';
+
+  @override
+  String get avatarAnimeEyebrowsThin => 'Thin';
+
+  @override
+  String get avatarAnimeSectionNose => 'Nose';
+
+  @override
+  String get avatarAnimeNoseDot => 'Dot';
+
+  @override
+  String get avatarAnimeNoseSmall => 'Small';
+
+  @override
+  String get avatarAnimeNoseButton => 'Button';
+
+  @override
+  String get avatarAnimeNoseLine => 'Line';
+
+  @override
+  String get avatarAnimeSectionLips => 'Lips';
+
+  @override
+  String get avatarAnimeLipsSmile => 'Smile';
+
+  @override
+  String get avatarAnimeLipsSoft => 'Soft';
+
+  @override
+  String get avatarAnimeLipsWide => 'Wide';
+
+  @override
+  String get avatarAnimeLipsSmall => 'Small';
+
+  @override
+  String get avatarAnimeLipsFull => 'Full';
+
+  @override
+  String get avatarAnimeSectionBlush => 'Blush';
+
+  @override
+  String get avatarAnimeBlushLight => 'Light';
+
+  @override
+  String get avatarAnimeBlushNone => 'None';
+
+  @override
+  String get avatarAnimeBlushRound => 'Round';
+
+  @override
+  String get avatarAnimeBlushLines => 'Lines';
+
+  @override
+  String get avatarAnimeSectionHair => 'Hairstyle';
+
+  @override
+  String get avatarAnimeHairShort => 'Short';
+
+  @override
+  String get avatarAnimeHairBob => 'Bob';
+
+  @override
+  String get avatarAnimeHairLong => 'Long';
+
+  @override
+  String get avatarAnimeHairPonytail => 'Ponytail';
+
+  @override
+  String get avatarAnimeHairTwinTails => 'Twin tails';
+
+  @override
+  String get avatarAnimeHairBun => 'Bun';
+
+  @override
+  String get avatarAnimeHairCurly => 'Curly';
+
+  @override
+  String get avatarAnimeHairCoily => 'Coily';
+
+  @override
+  String get avatarAnimeHairBraids => 'Braids';
+
+  @override
+  String get avatarAnimeHairWavy => 'Wavy';
+
+  @override
+  String get avatarAnimeHairBuzz => 'Buzz cut';
+
+  @override
+  String get avatarAnimeHairNone => 'No hair';
+
+  @override
+  String get avatarAnimeSectionBangs => 'Bangs';
+
+  @override
+  String get avatarAnimeBangsSide => 'Side';
+
+  @override
+  String get avatarAnimeBangsNone => 'None';
+
+  @override
+  String get avatarAnimeBangsStraight => 'Straight';
+
+  @override
+  String get avatarAnimeBangsCurtain => 'Curtain';
+
+  @override
+  String get avatarAnimeBangsWispy => 'Wispy';
+
+  @override
+  String get avatarAnimeSectionOutfit => 'Outfit';
+
+  @override
+  String get avatarAnimeOutfitTee => 'T-shirt';
+
+  @override
+  String get avatarAnimeOutfitHoodie => 'Hoodie';
+
+  @override
+  String get avatarAnimeOutfitCardigan => 'Cardigan';
+
+  @override
+  String get avatarAnimeOutfitKurta => 'Kurta';
+
+  @override
+  String get avatarAnimeOutfitBlazer => 'Blazer';
+
+  @override
+  String get avatarAnimeOutfitSweater => 'Sweater';
+
+  @override
+  String get avatarAnimeSectionCap => 'Caps and hats';
+
+  @override
+  String get avatarAnimeCapNone => 'None';
+
+  @override
+  String get avatarAnimeCapBeanie => 'Beanie';
+
+  @override
+  String get avatarAnimeCapBaseball => 'Baseball cap';
+
+  @override
+  String get avatarAnimeCapBucket => 'Bucket hat';
+
+  @override
+  String get avatarAnimeCapBeret => 'Beret';
+
+  @override
+  String get avatarAnimeCapSunHat => 'Sun hat';
+
+  @override
+  String get avatarAnimeSectionHairAccessory => 'Hair accessories';
+
+  @override
+  String get avatarAnimeHairAccessoryNone => 'None';
+
+  @override
+  String get avatarAnimeHairAccessoryClip => 'Clip';
+
+  @override
+  String get avatarAnimeHairAccessoryRibbon => 'Ribbon';
+
+  @override
+  String get avatarAnimeHairAccessoryFlower => 'Flower';
+
+  @override
+  String get avatarAnimeHairAccessoryHeadband => 'Headband';
+
+  @override
+  String get avatarAnimeSectionAccessory => 'Accessories';
+
+  @override
+  String get avatarAnimeAccessoryNone => 'None';
+
+  @override
+  String get avatarAnimeAccessoryEarrings => 'Earrings';
+
+  @override
+  String get avatarAnimeAccessoryHearingAid => 'Hearing aid';
+
+  @override
+  String get avatarAnimeAccessoryNecklace => 'Necklace';
+
+  @override
+  String get avatarAnimeAccessoryScarf => 'Scarf';
 }

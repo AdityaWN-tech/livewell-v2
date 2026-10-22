@@ -5120,6 +5120,576 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Avatar Moments'**
   String get devMoments;
+
+  /// No description provided for @avatarStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Art style'**
+  String get avatarStyle;
+
+  /// No description provided for @avatarStyleIllustrated.
+  ///
+  /// In en, this message translates to:
+  /// **'Illustrated'**
+  String get avatarStyleIllustrated;
+
+  /// No description provided for @avatarStyleAnime.
+  ///
+  /// In en, this message translates to:
+  /// **'Anime'**
+  String get avatarStyleAnime;
+
+  /// No description provided for @avatarAnimeSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Anime art is on its way. Choose every part now: until the art is ready, your coach shows its initial.'**
+  String get avatarAnimeSoon;
+
+  /// No description provided for @avatarAnimeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Anime look'**
+  String get avatarAnimeName;
+
+  /// No description provided for @avatarHiddenByCovering.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden under the head covering.'**
+  String get avatarHiddenByCovering;
+
+  /// No description provided for @avatarHiddenByCap.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden under the cap.'**
+  String get avatarHiddenByCap;
+
+  /// No description provided for @avatarSectionCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Parts'**
+  String get avatarSectionCategories;
+
+  /// No description provided for @avatarAnimeSectionFace.
+  ///
+  /// In en, this message translates to:
+  /// **'Face shape'**
+  String get avatarAnimeSectionFace;
+
+  /// No description provided for @avatarAnimeFaceOval.
+  ///
+  /// In en, this message translates to:
+  /// **'Oval'**
+  String get avatarAnimeFaceOval;
+
+  /// No description provided for @avatarAnimeFaceRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Round'**
+  String get avatarAnimeFaceRound;
+
+  /// No description provided for @avatarAnimeFaceHeart.
+  ///
+  /// In en, this message translates to:
+  /// **'Heart'**
+  String get avatarAnimeFaceHeart;
+
+  /// No description provided for @avatarAnimeFaceSquare.
+  ///
+  /// In en, this message translates to:
+  /// **'Square'**
+  String get avatarAnimeFaceSquare;
+
+  /// No description provided for @avatarAnimeFaceLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Long'**
+  String get avatarAnimeFaceLong;
+
+  /// No description provided for @avatarAnimeFaceSoft.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft'**
+  String get avatarAnimeFaceSoft;
+
+  /// No description provided for @avatarAnimeSectionEyes.
+  ///
+  /// In en, this message translates to:
+  /// **'Eyes'**
+  String get avatarAnimeSectionEyes;
+
+  /// No description provided for @avatarAnimeEyesRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Round'**
+  String get avatarAnimeEyesRound;
+
+  /// No description provided for @avatarAnimeEyesAlmond.
+  ///
+  /// In en, this message translates to:
+  /// **'Almond'**
+  String get avatarAnimeEyesAlmond;
+
+  /// No description provided for @avatarAnimeEyesDroopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Droopy'**
+  String get avatarAnimeEyesDroopy;
+
+  /// No description provided for @avatarAnimeEyesUpturned.
+  ///
+  /// In en, this message translates to:
+  /// **'Upturned'**
+  String get avatarAnimeEyesUpturned;
+
+  /// No description provided for @avatarAnimeEyesWide.
+  ///
+  /// In en, this message translates to:
+  /// **'Wide'**
+  String get avatarAnimeEyesWide;
+
+  /// No description provided for @avatarAnimeEyesGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle'**
+  String get avatarAnimeEyesGentle;
+
+  /// No description provided for @avatarAnimeSectionEyeHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Eye highlights'**
+  String get avatarAnimeSectionEyeHighlight;
+
+  /// No description provided for @avatarAnimeEyeHighlightSparkle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sparkle'**
+  String get avatarAnimeEyeHighlightSparkle;
+
+  /// No description provided for @avatarAnimeEyeHighlightNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get avatarAnimeEyeHighlightNone;
+
+  /// No description provided for @avatarAnimeEyeHighlightDot.
+  ///
+  /// In en, this message translates to:
+  /// **'Dot'**
+  String get avatarAnimeEyeHighlightDot;
+
+  /// No description provided for @avatarAnimeEyeHighlightDouble.
+  ///
+  /// In en, this message translates to:
+  /// **'Double'**
+  String get avatarAnimeEyeHighlightDouble;
+
+  /// No description provided for @avatarAnimeEyeHighlightStar.
+  ///
+  /// In en, this message translates to:
+  /// **'Star'**
+  String get avatarAnimeEyeHighlightStar;
+
+  /// No description provided for @avatarAnimeSectionEyebrows.
+  ///
+  /// In en, this message translates to:
+  /// **'Eyebrows'**
+  String get avatarAnimeSectionEyebrows;
+
+  /// No description provided for @avatarAnimeEyebrowsSoft.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft'**
+  String get avatarAnimeEyebrowsSoft;
+
+  /// No description provided for @avatarAnimeEyebrowsStraight.
+  ///
+  /// In en, this message translates to:
+  /// **'Straight'**
+  String get avatarAnimeEyebrowsStraight;
+
+  /// No description provided for @avatarAnimeEyebrowsArched.
+  ///
+  /// In en, this message translates to:
+  /// **'Arched'**
+  String get avatarAnimeEyebrowsArched;
+
+  /// No description provided for @avatarAnimeEyebrowsThick.
+  ///
+  /// In en, this message translates to:
+  /// **'Thick'**
+  String get avatarAnimeEyebrowsThick;
+
+  /// No description provided for @avatarAnimeEyebrowsThin.
+  ///
+  /// In en, this message translates to:
+  /// **'Thin'**
+  String get avatarAnimeEyebrowsThin;
+
+  /// No description provided for @avatarAnimeSectionNose.
+  ///
+  /// In en, this message translates to:
+  /// **'Nose'**
+  String get avatarAnimeSectionNose;
+
+  /// No description provided for @avatarAnimeNoseDot.
+  ///
+  /// In en, this message translates to:
+  /// **'Dot'**
+  String get avatarAnimeNoseDot;
+
+  /// No description provided for @avatarAnimeNoseSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get avatarAnimeNoseSmall;
+
+  /// No description provided for @avatarAnimeNoseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Button'**
+  String get avatarAnimeNoseButton;
+
+  /// No description provided for @avatarAnimeNoseLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Line'**
+  String get avatarAnimeNoseLine;
+
+  /// No description provided for @avatarAnimeSectionLips.
+  ///
+  /// In en, this message translates to:
+  /// **'Lips'**
+  String get avatarAnimeSectionLips;
+
+  /// No description provided for @avatarAnimeLipsSmile.
+  ///
+  /// In en, this message translates to:
+  /// **'Smile'**
+  String get avatarAnimeLipsSmile;
+
+  /// No description provided for @avatarAnimeLipsSoft.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft'**
+  String get avatarAnimeLipsSoft;
+
+  /// No description provided for @avatarAnimeLipsWide.
+  ///
+  /// In en, this message translates to:
+  /// **'Wide'**
+  String get avatarAnimeLipsWide;
+
+  /// No description provided for @avatarAnimeLipsSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get avatarAnimeLipsSmall;
+
+  /// No description provided for @avatarAnimeLipsFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get avatarAnimeLipsFull;
+
+  /// No description provided for @avatarAnimeSectionBlush.
+  ///
+  /// In en, this message translates to:
+  /// **'Blush'**
+  String get avatarAnimeSectionBlush;
+
+  /// No description provided for @avatarAnimeBlushLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get avatarAnimeBlushLight;
+
+  /// No description provided for @avatarAnimeBlushNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get avatarAnimeBlushNone;
+
+  /// No description provided for @avatarAnimeBlushRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Round'**
+  String get avatarAnimeBlushRound;
+
+  /// No description provided for @avatarAnimeBlushLines.
+  ///
+  /// In en, this message translates to:
+  /// **'Lines'**
+  String get avatarAnimeBlushLines;
+
+  /// No description provided for @avatarAnimeSectionHair.
+  ///
+  /// In en, this message translates to:
+  /// **'Hairstyle'**
+  String get avatarAnimeSectionHair;
+
+  /// No description provided for @avatarAnimeHairShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Short'**
+  String get avatarAnimeHairShort;
+
+  /// No description provided for @avatarAnimeHairBob.
+  ///
+  /// In en, this message translates to:
+  /// **'Bob'**
+  String get avatarAnimeHairBob;
+
+  /// No description provided for @avatarAnimeHairLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Long'**
+  String get avatarAnimeHairLong;
+
+  /// No description provided for @avatarAnimeHairPonytail.
+  ///
+  /// In en, this message translates to:
+  /// **'Ponytail'**
+  String get avatarAnimeHairPonytail;
+
+  /// No description provided for @avatarAnimeHairTwinTails.
+  ///
+  /// In en, this message translates to:
+  /// **'Twin tails'**
+  String get avatarAnimeHairTwinTails;
+
+  /// No description provided for @avatarAnimeHairBun.
+  ///
+  /// In en, this message translates to:
+  /// **'Bun'**
+  String get avatarAnimeHairBun;
+
+  /// No description provided for @avatarAnimeHairCurly.
+  ///
+  /// In en, this message translates to:
+  /// **'Curly'**
+  String get avatarAnimeHairCurly;
+
+  /// No description provided for @avatarAnimeHairCoily.
+  ///
+  /// In en, this message translates to:
+  /// **'Coily'**
+  String get avatarAnimeHairCoily;
+
+  /// No description provided for @avatarAnimeHairBraids.
+  ///
+  /// In en, this message translates to:
+  /// **'Braids'**
+  String get avatarAnimeHairBraids;
+
+  /// No description provided for @avatarAnimeHairWavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Wavy'**
+  String get avatarAnimeHairWavy;
+
+  /// No description provided for @avatarAnimeHairBuzz.
+  ///
+  /// In en, this message translates to:
+  /// **'Buzz cut'**
+  String get avatarAnimeHairBuzz;
+
+  /// No description provided for @avatarAnimeHairNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No hair'**
+  String get avatarAnimeHairNone;
+
+  /// No description provided for @avatarAnimeSectionBangs.
+  ///
+  /// In en, this message translates to:
+  /// **'Bangs'**
+  String get avatarAnimeSectionBangs;
+
+  /// No description provided for @avatarAnimeBangsSide.
+  ///
+  /// In en, this message translates to:
+  /// **'Side'**
+  String get avatarAnimeBangsSide;
+
+  /// No description provided for @avatarAnimeBangsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get avatarAnimeBangsNone;
+
+  /// No description provided for @avatarAnimeBangsStraight.
+  ///
+  /// In en, this message translates to:
+  /// **'Straight'**
+  String get avatarAnimeBangsStraight;
+
+  /// No description provided for @avatarAnimeBangsCurtain.
+  ///
+  /// In en, this message translates to:
+  /// **'Curtain'**
+  String get avatarAnimeBangsCurtain;
+
+  /// No description provided for @avatarAnimeBangsWispy.
+  ///
+  /// In en, this message translates to:
+  /// **'Wispy'**
+  String get avatarAnimeBangsWispy;
+
+  /// No description provided for @avatarAnimeSectionOutfit.
+  ///
+  /// In en, this message translates to:
+  /// **'Outfit'**
+  String get avatarAnimeSectionOutfit;
+
+  /// No description provided for @avatarAnimeOutfitTee.
+  ///
+  /// In en, this message translates to:
+  /// **'T-shirt'**
+  String get avatarAnimeOutfitTee;
+
+  /// No description provided for @avatarAnimeOutfitHoodie.
+  ///
+  /// In en, this message translates to:
+  /// **'Hoodie'**
+  String get avatarAnimeOutfitHoodie;
+
+  /// No description provided for @avatarAnimeOutfitCardigan.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardigan'**
+  String get avatarAnimeOutfitCardigan;
+
+  /// No description provided for @avatarAnimeOutfitKurta.
+  ///
+  /// In en, this message translates to:
+  /// **'Kurta'**
+  String get avatarAnimeOutfitKurta;
+
+  /// No description provided for @avatarAnimeOutfitBlazer.
+  ///
+  /// In en, this message translates to:
+  /// **'Blazer'**
+  String get avatarAnimeOutfitBlazer;
+
+  /// No description provided for @avatarAnimeOutfitSweater.
+  ///
+  /// In en, this message translates to:
+  /// **'Sweater'**
+  String get avatarAnimeOutfitSweater;
+
+  /// No description provided for @avatarAnimeSectionCap.
+  ///
+  /// In en, this message translates to:
+  /// **'Caps and hats'**
+  String get avatarAnimeSectionCap;
+
+  /// No description provided for @avatarAnimeCapNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get avatarAnimeCapNone;
+
+  /// No description provided for @avatarAnimeCapBeanie.
+  ///
+  /// In en, this message translates to:
+  /// **'Beanie'**
+  String get avatarAnimeCapBeanie;
+
+  /// No description provided for @avatarAnimeCapBaseball.
+  ///
+  /// In en, this message translates to:
+  /// **'Baseball cap'**
+  String get avatarAnimeCapBaseball;
+
+  /// No description provided for @avatarAnimeCapBucket.
+  ///
+  /// In en, this message translates to:
+  /// **'Bucket hat'**
+  String get avatarAnimeCapBucket;
+
+  /// No description provided for @avatarAnimeCapBeret.
+  ///
+  /// In en, this message translates to:
+  /// **'Beret'**
+  String get avatarAnimeCapBeret;
+
+  /// No description provided for @avatarAnimeCapSunHat.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun hat'**
+  String get avatarAnimeCapSunHat;
+
+  /// No description provided for @avatarAnimeSectionHairAccessory.
+  ///
+  /// In en, this message translates to:
+  /// **'Hair accessories'**
+  String get avatarAnimeSectionHairAccessory;
+
+  /// No description provided for @avatarAnimeHairAccessoryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get avatarAnimeHairAccessoryNone;
+
+  /// No description provided for @avatarAnimeHairAccessoryClip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clip'**
+  String get avatarAnimeHairAccessoryClip;
+
+  /// No description provided for @avatarAnimeHairAccessoryRibbon.
+  ///
+  /// In en, this message translates to:
+  /// **'Ribbon'**
+  String get avatarAnimeHairAccessoryRibbon;
+
+  /// No description provided for @avatarAnimeHairAccessoryFlower.
+  ///
+  /// In en, this message translates to:
+  /// **'Flower'**
+  String get avatarAnimeHairAccessoryFlower;
+
+  /// No description provided for @avatarAnimeHairAccessoryHeadband.
+  ///
+  /// In en, this message translates to:
+  /// **'Headband'**
+  String get avatarAnimeHairAccessoryHeadband;
+
+  /// No description provided for @avatarAnimeSectionAccessory.
+  ///
+  /// In en, this message translates to:
+  /// **'Accessories'**
+  String get avatarAnimeSectionAccessory;
+
+  /// No description provided for @avatarAnimeAccessoryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get avatarAnimeAccessoryNone;
+
+  /// No description provided for @avatarAnimeAccessoryEarrings.
+  ///
+  /// In en, this message translates to:
+  /// **'Earrings'**
+  String get avatarAnimeAccessoryEarrings;
+
+  /// No description provided for @avatarAnimeAccessoryHearingAid.
+  ///
+  /// In en, this message translates to:
+  /// **'Hearing aid'**
+  String get avatarAnimeAccessoryHearingAid;
+
+  /// No description provided for @avatarAnimeAccessoryNecklace.
+  ///
+  /// In en, this message translates to:
+  /// **'Necklace'**
+  String get avatarAnimeAccessoryNecklace;
+
+  /// No description provided for @avatarAnimeAccessoryScarf.
+  ///
+  /// In en, this message translates to:
+  /// **'Scarf'**
+  String get avatarAnimeAccessoryScarf;
 }
 
 class _AppLocalizationsDelegate

@@ -33,11 +33,69 @@ class AvatarView extends StatelessWidget {
     container: true,
     label: semanticLabel,
     excludeSemantics: true,
-    child: CustomPaint(
-      size: Size.square(size),
-      painter: AvatarPainter(config, expression, blink),
-    ),
+    child: config.style == AvatarStyle.anime
+        ? AnimePlaceholder(
+            key: const Key('avatar-anime-placeholder'),
+            config: config,
+            size: size,
+          )
+        : CustomPaint(
+            size: Size.square(size),
+            painter: AvatarPainter(config, expression, blink),
+          ),
   );
+}
+
+/// The coach's initial (from the coach's name), for the Anime placeholder.
+/// Set once above the app; without it the placeholder shows no letter.
+class AvatarInitial extends InheritedWidget {
+  const AvatarInitial({super.key, required this.initial, required super.child});
+
+  final String initial;
+
+  static String? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<AvatarInitial>()?.initial;
+
+  @override
+  bool updateShouldNotify(AvatarInitial old) => old.initial != initial;
+}
+
+/// The Anime style until its art exists (T-AVT-06c): a soft circle in the
+/// chosen background with the coach's initial. Anime parts are never drawn
+/// in code; the layered art replaces this circle.
+class AnimePlaceholder extends StatelessWidget {
+  const AnimePlaceholder({super.key, required this.config, required this.size});
+
+  final AvatarConfig config;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = AvatarInitial.of(context) ?? '';
+    return Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AvatarColours.background[config.background],
+        border: Border.all(
+          color: AvatarColours.clothing[config.clothingColour],
+          width: size / 40,
+        ),
+      ),
+      child: Text(
+        initial,
+        // Fixed size: it is part of the picture, not body text.
+        textScaler: TextScaler.noScaling,
+        style: TextStyle(
+          fontSize: size * 0.42,
+          fontWeight: FontWeight.w600,
+          color: AvatarColours.ink,
+        ),
+      ),
+    );
+  }
 }
 
 /// Colours for the avatar options. Avatar art, not UI colours, so they live

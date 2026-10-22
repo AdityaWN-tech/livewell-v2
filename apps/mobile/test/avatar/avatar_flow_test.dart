@@ -53,6 +53,14 @@ class FakeSelfieAnalyzer extends SelfieAnalyzer {
 }
 
 Future<void> tapKey(WidgetTester tester, String key) async {
+  // Lists build lazily: scroll to it first if it isn't built yet.
+  if (find.byKey(Key(key)).evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      find.byKey(Key(key)),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+  }
   await tester.ensureVisible(find.byKey(Key(key)));
   await tester.tap(find.byKey(Key(key)));
   await tester.pumpAndSettle();
@@ -258,9 +266,13 @@ void main() {
       await h.boot(tester);
       await tapKey(tester, 'avatar-cartoon');
       expect(find.byType(AvatarCreatorScreen), findsOneWidget);
+      // One tab per part (T-AVT-06a).
       await tapKey(tester, 'avatar-skin-9');
+      await tapKey(tester, 'avatar-tab-head_covering');
       await tapKey(tester, 'avatar-covering-Hijab');
+      await tapKey(tester, 'avatar-tab-glasses');
       await tapKey(tester, 'avatar-glasses-Round');
+      await tapKey(tester, 'avatar-tab-background');
       await tapKey(tester, 'avatar-background-3');
       final preview = tester.widget<AvatarView>(
         find.byKey(const Key('avatar-creator-preview')),

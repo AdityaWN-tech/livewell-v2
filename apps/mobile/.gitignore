@@ -49,3 +49,4 @@ app.*.map.json
 
 # Walkthrough video frames (made on demand, T-ONB-03g)
 test/journey/frames/
+test/avatar/frames/

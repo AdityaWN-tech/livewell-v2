@@ -626,7 +626,10 @@ class FakeCoachFaces implements CoachFaces {
   final drawn = <AvatarConfig>[];
 
   @override
-  Future<Map<TouchpointKind, String>> render(AvatarConfig config) async {
+  Future<Map<TouchpointKind, String>> render(
+    AvatarConfig config, {
+    String initial = '',
+  }) async {
     drawn.add(config);
     return {for (final k in TouchpointKind.values) k: 'faces/${k.name}.png'};
   }

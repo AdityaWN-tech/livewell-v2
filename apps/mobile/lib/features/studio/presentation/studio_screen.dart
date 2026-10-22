@@ -163,17 +163,37 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
     final t = Theme.of(context).textTheme;
     final flags = ref.watch(featureFlagsProvider);
     final index = CoachCharacters.indexOf(_avatar);
+    final anime = _avatar.style == AvatarStyle.anime;
+    // The characters are Illustrated: no stepping through them in Anime.
+    final stage = AvatarStage(
+      config: _avatar,
+      index: index,
+      onStep: anime ? null : _step,
+    );
     final children = switch (_tab) {
       StudioTab.avatar => [
-        AvatarStage(config: _avatar, index: index, onStep: _step),
-        const SizedBox(height: LwSpacing.md),
-        Text(l.avatarPickCharacter, style: t.titleSmall),
-        const SizedBox(height: LwSpacing.xs),
-        CharacterStrip(
-          selected: index,
-          onPick: _pick,
-          background: _avatar.background,
+        AvatarStyleSwitch(
+          style: _avatar.style,
+          onChanged: (s) => setState(() => _avatar = _avatar.withStyle(s)),
         ),
+        const SizedBox(height: LwSpacing.sm),
+        stage,
+        const SizedBox(height: LwSpacing.md),
+        if (anime)
+          Text(
+            l.avatarAnimeSoon,
+            key: const Key('avatar-anime-soon'),
+            style: t.bodySmall,
+          )
+        else ...[
+          Text(l.avatarPickCharacter, style: t.titleSmall),
+          const SizedBox(height: LwSpacing.xs),
+          CharacterStrip(
+            selected: index,
+            onPick: _pick,
+            background: _avatar.background,
+          ),
+        ],
         const SizedBox(height: LwSpacing.md),
         OutlinedButton.icon(
           key: const Key('studio-customize'),
@@ -262,7 +282,7 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
         ),
       ],
       StudioTab.background => [
-        AvatarStage(config: _avatar, index: index, onStep: _step),
+        stage,
         const SizedBox(height: LwSpacing.md),
         BackgroundChoices(
           config: _avatar,

@@ -22,14 +22,21 @@ AvatarExpression faceFor(TouchpointKind k) => switch (k) {
 /// Draws the faces as PNG files for the notifications.
 abstract class CoachFaces {
   /// Paths by kind; empty when they can't be drawn (the text still goes).
-  Future<Map<TouchpointKind, String>> render(AvatarConfig config);
+  /// [initial] is the coach's, for the Anime placeholder (T-AVT-06a).
+  Future<Map<TouchpointKind, String>> render(
+    AvatarConfig config, {
+    String initial = '',
+  });
 }
 
 class FileCoachFaces implements CoachFaces {
   static const _px = 192.0;
 
   @override
-  Future<Map<TouchpointKind, String>> render(AvatarConfig config) async {
+  Future<Map<TouchpointKind, String>> render(
+    AvatarConfig config, {
+    String initial = '',
+  }) async {
     try {
       final dir = Directory(
         '${(await getApplicationSupportDirectory()).path}/coach_faces',
@@ -38,7 +45,9 @@ class FileCoachFaces implements CoachFaces {
       final out = <TouchpointKind, String>{};
       for (final k in TouchpointKind.values) {
         final file = File('${dir.path}/${k.name}.png');
-        await file.writeAsBytes(await png(config, faceFor(k)));
+        await file.writeAsBytes(
+          await png(config, faceFor(k), initial: initial),
+        );
         out[k] = file.path;
       }
       return out;
@@ -50,13 +59,16 @@ class FileCoachFaces implements CoachFaces {
   /// One face as PNG bytes.
   static Future<List<int>> png(
     AvatarConfig config,
-    AvatarExpression expression,
-  ) async {
+    AvatarExpression expression, {
+    String initial = '',
+  }) async {
     final recorder = ui.PictureRecorder();
-    AvatarPainter(
-      config,
-      expression,
-    ).paint(Canvas(recorder), const Size(_px, _px));
+    final canvas = Canvas(recorder);
+    if (config.style == AvatarStyle.anime) {
+      _placeholder(canvas, config, initial);
+    } else {
+      AvatarPainter(config, expression).paint(canvas, const Size(_px, _px));
+    }
     final image = await recorder.endRecording().toImage(
       _px.toInt(),
       _px.toInt(),
@@ -65,6 +77,38 @@ class FileCoachFaces implements CoachFaces {
     image.dispose();
     return data!.buffer.asUint8List();
   }
+}
+
+/// The Anime placeholder (never a code-drawn face): a soft circle with the
+/// coach's initial, as on screen.
+void _placeholder(Canvas canvas, AvatarConfig config, String initial) {
+  const r = FileCoachFaces._px / 2;
+  canvas
+    ..drawCircle(
+      const Offset(r, r),
+      r,
+      Paint()..color = AvatarColours.background[config.background],
+    )
+    ..drawCircle(
+      const Offset(r, r),
+      r - 3,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6
+        ..color = AvatarColours.clothing[config.clothingColour],
+    );
+  final text = TextPainter(
+    text: TextSpan(
+      text: initial,
+      style: const TextStyle(
+        fontSize: r * 0.84,
+        fontWeight: FontWeight.w600,
+        color: AvatarColours.ink,
+      ),
+    ),
+    textDirection: TextDirection.ltr,
+  )..layout();
+  text.paint(canvas, Offset(r - text.width / 2, r - text.height / 2));
 }
 
 final coachFacesProvider = Provider<CoachFaces>((ref) => FileCoachFaces());

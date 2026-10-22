@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show StringCharacters;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/time/clock.dart';
@@ -7,6 +8,7 @@ import '../../avatar/presentation/coach_avatar.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
+import '../../home/application/home_data.dart' show coachNameProvider;
 import '../../moments/data/coach_faces.dart';
 import '../data/plan_repository.dart';
 import '../data/reminders.dart';
@@ -62,9 +64,18 @@ class PlanScheduler {
         ? const <TouchpointKind, String>{}
         : await _ref
               .read(coachFacesProvider)
-              .render(await _ref.read(coachAvatarConfigProvider.future));
+              .render(
+                await _ref.read(coachAvatarConfigProvider.future),
+                initial: _coachInitial(),
+              );
     await reminders.replaceAll(items, texts, faces: faces);
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());
+  }
+
+  /// The coach's initial, for an Anime avatar's placeholder face.
+  String _coachInitial() {
+    final name = _ref.read(coachNameProvider) ?? 'Coach';
+    return name.isEmpty ? '' : name.characters.first.toUpperCase();
   }
 
   /// Today's morning reminder leaves the tray once its moment was played

@@ -30,6 +30,7 @@ void main() {
           if (screen == 'creator') {
             await tapKey(tester, 'avatar-cartoon');
             await tapKey(tester, 'avatar-skin-7');
+            await tapKey(tester, 'avatar-tab-head_covering');
             await tapKey(tester, 'avatar-covering-Hijab');
           } else {
             await tapKey(tester, 'avatar-character-long_hair');

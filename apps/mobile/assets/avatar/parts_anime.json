@@ -1,0 +1,722 @@
+{
+  "version": 1,
+  "style": "anime",
+  "note": "T-AVT-06a. The Anime style's own full part set, on the same canvas and anchors as the illustrated kit (parts.json). Categories marked shared are the same choice in both styles (kept when the style is switched): skin, hair_colour, outfit_colour (clothing_colour), glasses, head_covering, background. status: placeholder | final. Anime parts are never drawn in code: until final or licensed placeholder art exists (T-AVT-06c, docs/design/asset-licences.md), the app shows a soft circle with the coach's initial. Expression and mouth versions per part come with T-AVT-06b.",
+  "canvas": {
+    "width": 512,
+    "height": 512
+  },
+  "rules": [
+    {
+      "when": {
+        "head_covering": "hijab"
+      },
+      "hides": [
+        "hair",
+        "bangs",
+        "hair_accessory",
+        "cap"
+      ]
+    },
+    {
+      "when": {
+        "head_covering": "turban"
+      },
+      "hides": [
+        "hair",
+        "bangs",
+        "hair_accessory",
+        "cap"
+      ]
+    },
+    {
+      "when": {
+        "cap": "!none"
+      },
+      "hides": [
+        "bangs",
+        "hair_accessory"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "face",
+      "kind": "part",
+      "options": [
+        {
+          "id": "oval",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "round",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "heart",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "square",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "long",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "soft",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "skin",
+      "kind": "colour",
+      "shared": true,
+      "options": [
+        {
+          "id": "0",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "1",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "2",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "3",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "4",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "5",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "6",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "7",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "8",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "9",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "eyes",
+      "kind": "part",
+      "options": [
+        {
+          "id": "round",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "almond",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "droopy",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "upturned",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "wide",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "gentle",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "eye_highlight",
+      "kind": "part",
+      "options": [
+        {
+          "id": "sparkle",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "dot",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "double",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "star",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "eyebrows",
+      "kind": "part",
+      "options": [
+        {
+          "id": "soft",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "straight",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "arched",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "thick",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "thin",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "nose",
+      "kind": "part",
+      "options": [
+        {
+          "id": "dot",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "small",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "button",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "line",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "lips",
+      "kind": "part",
+      "options": [
+        {
+          "id": "smile",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "soft",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "wide",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "small",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "full",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "blush",
+      "kind": "part",
+      "options": [
+        {
+          "id": "light",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "round",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "lines",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "hair",
+      "kind": "part",
+      "options": [
+        {
+          "id": "short",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "bob",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "long",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "ponytail",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "twin_tails",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "bun",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "curly",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "coily",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "braids",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "wavy",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "buzz",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "bangs",
+      "kind": "part",
+      "options": [
+        {
+          "id": "side",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "straight",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "curtain",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "wispy",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "hair_colour",
+      "kind": "colour",
+      "shared": true,
+      "options": [
+        {
+          "id": "0",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "1",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "2",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "3",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "4",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "5",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "6",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "outfit",
+      "kind": "part",
+      "options": [
+        {
+          "id": "tee",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "hoodie",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "cardigan",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "kurta",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "blazer",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "sweater",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "outfit_colour",
+      "kind": "colour",
+      "shared": true,
+      "options": [
+        {
+          "id": "0",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "1",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "2",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "3",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "4",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "5",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "cap",
+      "kind": "part",
+      "options": [
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "beanie",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "baseball",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "bucket",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "beret",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "sun_hat",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "head_covering",
+      "kind": "part",
+      "shared": true,
+      "options": [
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "hijab",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "turban",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "kippah",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "glasses",
+      "kind": "part",
+      "shared": true,
+      "options": [
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "round",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "square",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "hair_accessory",
+      "kind": "part",
+      "options": [
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "clip",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "ribbon",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "flower",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "headband",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "accessory",
+      "kind": "part",
+      "options": [
+        {
+          "id": "none",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "earrings",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "hearing_aid",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "necklace",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "scarf",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    },
+    {
+      "id": "background",
+      "kind": "colour",
+      "shared": true,
+      "options": [
+        {
+          "id": "0",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "1",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "2",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "3",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "4",
+          "file": null,
+          "status": "placeholder"
+        },
+        {
+          "id": "5",
+          "file": null,
+          "status": "placeholder"
+        }
+      ]
+    }
+  ],
+  "expressions": [
+    "happy",
+    "waving",
+    "talking",
+    "listening",
+    "calm",
+    "celebrating"
+  ]
+}

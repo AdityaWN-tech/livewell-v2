@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/time/clock.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
+import '../../avatar/presentation/coach_avatar.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
+import '../../moments/data/coach_faces.dart';
 import '../data/plan_repository.dart';
 import '../data/reminders.dart';
 import '../domain/touchpoints.dart';
@@ -56,9 +58,25 @@ class PlanScheduler {
             as Map<String, dynamic>?,
       ),
     );
-    await reminders.replaceAll(items, texts);
+    final faces = items.isEmpty
+        ? const <TouchpointKind, String>{}
+        : await _ref
+              .read(coachFacesProvider)
+              .render(await _ref.read(coachAvatarConfigProvider.future));
+    await reminders.replaceAll(items, texts, faces: faces);
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());
   }
+
+  /// Today's morning reminder leaves the tray once its moment was played
+  /// in the app (T-DLY-03c).
+  Future<void> dismissMorning() => _ref
+      .read(remindersProvider)
+      .dismiss(
+        TouchpointScheduler.idFor(
+          _ref.read(clockProvider)(),
+          TouchpointKind.greeting,
+        ),
+      );
 
   /// After travel the wall-clock times must follow the new zone, so a
   /// change of time zone reschedules everything.

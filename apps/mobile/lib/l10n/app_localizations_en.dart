@@ -501,6 +501,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeWhyEyebrow => 'Your Why';
 
   @override
+  String get homeMomentTitle => 'Your coach has a message';
+
+  @override
+  String get homeMomentBody => 'Tap to hear it.';
+
+  @override
   String get safetyEmergencyTitle => 'This could be an emergency';
 
   @override
@@ -1781,23 +1787,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderChannel => 'Daily plan';
 
   @override
-  String get reminderGreetingTitle => 'Good morning';
+  String get reminderGreetingTitle => 'Good morning ☀️';
 
   @override
-  String get reminderGreetingBody =>
-      'Your coach has a hello and today’s small step for you.';
+  String get reminderGreetingBody => 'Your coach has a message for you.';
 
   @override
   String get reminderNudgeTitle => 'Time for your small step';
 
   @override
-  String get reminderNudgeBody => 'Open Live Well when you’re ready.';
+  String get reminderNudgeBody => 'Your coach has a message for you.';
 
   @override
-  String get reminderReflectionTitle => 'A moment to look back';
+  String get reminderReflectionTitle => 'Good evening';
 
   @override
-  String get reminderReflectionBody => 'What went well today?';
+  String get reminderReflectionBody => 'Your coach has a message for you.';
+
+  @override
+  String get reminderWeeklyTitle => 'Your week';
+
+  @override
+  String get reminderWeeklyBody =>
+      'Your coach has a look back at your week for you.';
 
   @override
   String get authErrorLastMethod =>

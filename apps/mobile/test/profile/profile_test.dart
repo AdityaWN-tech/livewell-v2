@@ -275,6 +275,7 @@ void main() {
         'greeting': true,
         'nudge': false,
         'reflection': true,
+        'weekly': true,
       });
       expect(
         h.reminders.scheduled.where((s) => s.kind == TouchpointKind.nudge),

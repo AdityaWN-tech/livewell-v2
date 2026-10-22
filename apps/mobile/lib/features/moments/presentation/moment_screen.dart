@@ -10,6 +10,7 @@ import '../../avatar/presentation/coach_avatar.dart'
     show coachAvatarConfigProvider, defaultCoach;
 import '../../voice/presentation/voice_screen.dart' show AiVoiceLabel;
 import '../application/moment_context.dart';
+import '../application/moment_launcher.dart';
 import '../data/coach_speaker.dart';
 import '../domain/coach_message.dart';
 
@@ -191,6 +192,11 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && !_muted) _play(m);
       });
+      // Played: the morning card on Home and the reminder go (T-DLY-03c).
+      if (widget.moment == Moment.morning ||
+          widget.moment == Moment.missedDay) {
+        ref.read(momentLauncherProvider).morningSeen();
+      }
     }
     final speaking = _phase == _Phase.speaking;
     final voiceOn = !_muted && !_textOnly;

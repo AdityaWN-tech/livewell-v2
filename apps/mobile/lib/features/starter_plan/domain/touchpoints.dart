@@ -42,6 +42,9 @@ enum TouchpointKind {
 
   /// Evening reflection: what went well, what got in the way.
   reflection,
+
+  /// Weekly review, Sunday mornings (T-DLY-03c, FR-DLY-06).
+  weekly,
 }
 
 class TouchpointTimes {
@@ -55,10 +58,14 @@ class TouchpointTimes {
   final ClockTime midday;
   final ClockTime evening;
 
+  /// The weekly review's time; Sundays only. TODO(T-DLY-03e): a setting.
+  static const weeklyReview = ClockTime(8, 0);
+
   ClockTime of(TouchpointKind k) => switch (k) {
     TouchpointKind.greeting => morning,
     TouchpointKind.nudge => midday,
     TouchpointKind.reflection => evening,
+    TouchpointKind.weekly => weeklyReview,
   };
 
   TouchpointTimes copyWith(TouchpointKind k, ClockTime t) => TouchpointTimes(
@@ -152,6 +159,9 @@ abstract final class TouchpointScheduler {
       for (final k in TouchpointKind.values) {
         // Each category can be turned off (FR-TCH-01).
         if (!enabled.contains(k)) continue;
+        if (k == TouchpointKind.weekly && day.weekday != DateTime.sunday) {
+          continue;
+        }
         final t = times.of(k);
         final when = DateTime(day.year, day.month, day.day, t.hour, t.minute);
         if (!when.isAfter(now) || quiet.contains(t)) continue;

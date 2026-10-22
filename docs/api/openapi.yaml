@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info:
+  title: Live Well API
+  version: "1"
+  description: >
+    Server endpoints (spec 12.1). Every call needs a Firebase ID token
+    (Authorization: Bearer) and an App Check token (X-Firebase-AppCheck).
+    Started in T-AVT-08c with the Media Service's avatar endpoints; other
+    services add theirs here.
+servers:
+  - url: https://media.livewell.example/  # set per environment at deploy
+security:
+  - firebaseIdToken: []
+    appCheck: []
+paths:
+  /v1/avatar:
+    post:
+      summary: Start making the coach's 3D avatar (Media Service, T-AVT-08c)
+      description: >
+        source selfie (From my photo; needs the avatar_from_photo flag and the
+        camera and biometric consents), built (Build my own) or adjust (edit
+        the approved portrait). Options are fixed ids from
+        content/avatar/options.json; free text is refused. At most 3 a day
+        (Remote Config avatar_daily_generations). The selfie is used for this
+        job only and never stored.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: false
+          schema: {type: string, maxLength: 100}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/AvatarRequest"}
+      responses:
+        "202":
+          description: Job started (or the same job again for a repeated Idempotency-Key)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/AvatarJob"}
+        "401": {description: not_authorized}
+        "403": {description: "feature_off | consent_required"}
+        "413": {description: selfie_too_large}
+        "422": {description: "bad_options | selfie_required | selfie_unreadable | selfie_not_jpeg | selfie_only_for_selfie_source"}
+        "429": {description: avatar_daily_limit}
+  /v1/avatar/jobs/{id}:
+    get:
+      summary: An avatar job's status (owner only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: The job
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/AvatarJob"}
+        "401": {description: not_authorized}
+        "404": {description: "not_found (also someone else's job)"}
+components:
+  securitySchemes:
+    firebaseIdToken: {type: http, scheme: bearer}
+    appCheck: {type: apiKey, in: header, name: X-Firebase-AppCheck}
+  schemas:
+    AvatarRequest:
+      type: object
+      required: [source]
+      properties:
+        source: {type: string, enum: [selfie, built, adjust]}
+        options:
+          type: object
+          maxProperties: 20
+          additionalProperties: {type: string}
+          description: category id → option id, from content/avatar/options.json
+        selfie_jpeg_base64:
+          type: string
+          description: The live selfie (JPEG, at most 4 MB), only for source selfie
+    AvatarJob:
+      type: object
+      required: [job_id, source, status]
+      properties:
+        job_id: {type: string}
+        source: {type: string, enum: [selfie, built, adjust]}
+        status: {type: string, enum: [queued, running, succeeded, rejected, failed]}
+        message_id:
+          type: [string, "null"]
+          description: "A kind message for the app to show: avatar_not_made | avatar_no_portrait"
+        portrait_id:
+          type: [string, "null"]
+          description: The approved portrait; the frame set is built from it (T-AVT-08d)

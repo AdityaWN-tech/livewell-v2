@@ -8,3 +8,17 @@ Every image, model and font the coach's avatar uses, with its licence. Nothing g
 | Placeholder frame sets (8 coaches) | `apps/mobile/assets/avatar/frames/coaches/<id>/` | Made in-house by `apps/mobile/tool/make_placeholder_frames.py` (labelled cards, no face) | Ours | Bundled; shown only in dev builds until each coach's art is final |
 | Poppins (placeholder labels) | `apps/mobile/assets/fonts/poppins/` | Indian Type Foundry | SIL Open Font License 1.1 (`OFL.txt`) | Yes (app font) |
 | Ready-made coaches' final art (8) | `apps/mobile/assets/avatar/frames/coaches/<id>/` | To be generated from `avatar-prompts.md` section C | To be recorded with the generator used (AVT-08c) | Not yet |
+
+## Models and vendors (T-AVT-08c)
+
+Every image model, checking model and vendor used to make or check avatars, with its licence and data terms. **None is in use yet**: the Media Service runs with no vendor configured until the scorecard (`avatar-vendor-scorecard.md`) is done and the owner decides.
+
+| Model or vendor | Used for | Licence / terms | Status |
+|---|---|---|---|
+| *(none chosen)* | Portrait and frames (`AvatarStylizer`) | — | Scorecard pending |
+| *(none chosen)* | Safety check (`ImageInspector`) | — | Scorecard pending |
+
+**InsightFace warning:** many face-identity pipelines (for example InstantID, IP-Adapter FaceID and several face-similarity tools) load InsightFace model weights, which are licensed for **non-commercial use only**. They must not be used in prod without a commercial licence for those weights. Check the licence of every weight a pipeline downloads, not only the top-level project.
+
+**Never** send user photos to public demo servers (public Gradio, Hugging Face Spaces, Colab, tunnels); the service refuses them in code.
+

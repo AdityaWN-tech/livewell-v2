@@ -22,6 +22,9 @@ The single source of the prompts used to make the coach's 3D avatar and its 14-f
 
 (Option values come from fixed lists in `/content/avatar/options.json`; no free text from users.)
 
+**Adjust (from options)** (added in T-AVT-08c; not in the task's appendix: needs review)
+> Edit this image. Keep exactly the same person, face, skin, expression, lighting, camera angle, size and position, and the same background. Only change: [CHANGES].
+
 ## B. Frame edit prompts
 
 Base:

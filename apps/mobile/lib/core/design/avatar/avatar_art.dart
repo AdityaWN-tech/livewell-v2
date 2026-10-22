@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../features/avatar/domain/anime_face.dart';
 import '../../../features/avatar/domain/avatar_config.dart';
 
 /// The coach's face and pose (T-UI-02b). Safety replies always use [calm].
@@ -17,6 +18,7 @@ class AvatarView extends StatelessWidget {
     this.semanticLabel,
     this.expression = AvatarExpression.happy,
     this.blink = false,
+    this.mouth,
   });
 
   final AvatarConfig config;
@@ -24,6 +26,18 @@ class AvatarView extends StatelessWidget {
 
   /// Eyes closed for a moment (the Avatar Moment player blinks, T-DLY-03b).
   final bool blink;
+
+  /// The Anime mouth shape while the coach speaks (A, I, U, E, O or closed,
+  /// T-AVT-06b); null shows the expression's own mouth.
+  final AnimeMouth? mouth;
+
+  /// What the Anime coach shows right now (its art comes in T-AVT-06c).
+  AnimeFace animeFace({bool reducedMotion = false}) => AnimeFace.of(
+    expression,
+    blink: blink,
+    speaking: mouth,
+    reducedMotion: reducedMotion,
+  );
   final double size;
   final String? semanticLabel;
 
@@ -38,6 +52,8 @@ class AvatarView extends StatelessWidget {
             key: const Key('avatar-anime-placeholder'),
             config: config,
             size: size,
+            // Only a talking mouth moves the circle.
+            talking: mouth?.openness ?? 0,
           )
         : CustomPaint(
             size: Size.square(size),
@@ -64,14 +80,32 @@ class AvatarInitial extends InheritedWidget {
 /// chosen background with the coach's initial. Anime parts are never drawn
 /// in code; the layered art replaces this circle.
 class AnimePlaceholder extends StatelessWidget {
-  const AnimePlaceholder({super.key, required this.config, required this.size});
+  const AnimePlaceholder({
+    super.key,
+    required this.config,
+    required this.size,
+    this.talking = 0,
+  });
 
   final AvatarConfig config;
   final double size;
 
+  /// How open the talking mouth is (0 to 1): while the coach speaks the
+  /// circle swells a little with each open shape, so talking shows without
+  /// a drawn face.
+  final double talking;
+
   @override
   Widget build(BuildContext context) {
     final initial = AvatarInitial.of(context) ?? '';
+    return AnimatedScale(
+      scale: 1 + 0.05 * talking,
+      duration: const Duration(milliseconds: 120),
+      child: _circle(initial),
+    );
+  }
+
+  Widget _circle(String initial) {
     return Container(
       width: size,
       height: size,

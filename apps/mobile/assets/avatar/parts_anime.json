@@ -1,7 +1,7 @@
 {
   "version": 1,
   "style": "anime",
-  "note": "T-AVT-06a. The Anime style's own full part set, on the same canvas and anchors as the illustrated kit (parts.json). Categories marked shared are the same choice in both styles (kept when the style is switched): skin, hair_colour, outfit_colour (clothing_colour), glasses, head_covering, background. status: placeholder | final. Anime parts are never drawn in code: until final or licensed placeholder art exists (T-AVT-06c, docs/design/asset-licences.md), the app shows a soft circle with the coach's initial. Expression and mouth versions per part come with T-AVT-06b.",
+  "note": "T-AVT-06a. The Anime style's own full part set, on the same canvas and anchors as the illustrated kit (parts.json). Categories marked shared are the same choice in both styles (kept when the style is switched): skin, hair_colour, outfit_colour (clothing_colour), glasses, head_covering, background. status: placeholder | final. Anime parts are never drawn in code: until final or licensed placeholder art exists (T-AVT-06c, docs/design/asset-licences.md), the app shows a soft circle with the coach's initial. T-AVT-06b: eyes, eyebrows and lips each have every version in `variants` (expressions, blink, the A I U E O talking shapes); hair has back and front layers; `extras` and `expression_map` say what each coach expression shows.",
   "canvas": {
     "width": 512,
     "height": 512
@@ -140,32 +140,224 @@
         {
           "id": "round",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "open",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "sparkle",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "half_closed",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "blink",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "almond",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "open",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "sparkle",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "half_closed",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "blink",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "droopy",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "open",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "sparkle",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "half_closed",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "blink",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "upturned",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "open",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "sparkle",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "half_closed",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "blink",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "wide",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "open",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "sparkle",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "half_closed",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "blink",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "gentle",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "open",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "sparkle",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "half_closed",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "blink",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         }
       ]
     },
@@ -207,27 +399,137 @@
         {
           "id": "soft",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "neutral",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "raised",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "caring",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "straight",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "neutral",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "raised",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "caring",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "arched",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "neutral",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "raised",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "caring",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "thick",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "neutral",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "raised",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "caring",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "thin",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "neutral",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "raised",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "soft",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "caring",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         }
       ]
     },
@@ -264,27 +566,237 @@
         {
           "id": "smile",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "open_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "a",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "i",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "u",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "e",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "o",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "soft",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "open_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "a",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "i",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "u",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "e",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "o",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "wide",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "open_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "a",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "i",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "u",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "e",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "o",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "small",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "open_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "a",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "i",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "u",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "e",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "o",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         },
         {
           "id": "full",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "variants": [
+            {
+              "id": "closed_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "open_smile",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "a",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "i",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "u",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "e",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "o",
+              "file": null,
+              "status": "placeholder"
+            },
+            {
+              "id": "closed",
+              "file": null,
+              "status": "placeholder"
+            }
+          ]
         }
       ]
     },
@@ -321,57 +833,101 @@
         {
           "id": "short",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "bob",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "long",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "ponytail",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "twin_tails",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "bun",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "curly",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "coily",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "braids",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "wavy",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "buzz",
           "file": null,
-          "status": "placeholder"
+          "status": "placeholder",
+          "layers": [
+            "back",
+            "front"
+          ]
         },
         {
           "id": "none",
@@ -718,5 +1274,82 @@
     "listening",
     "calm",
     "celebrating"
-  ]
+  ],
+  "extras": [
+    {
+      "id": "blush_celebrate",
+      "when": "celebrating",
+      "file": null,
+      "status": "placeholder"
+    },
+    {
+      "id": "sparkles",
+      "when": "celebrating",
+      "reduced_motion": "skip",
+      "file": null,
+      "status": "placeholder"
+    },
+    {
+      "id": "hearts",
+      "when": "celebrating",
+      "reduced_motion": "skip",
+      "file": null,
+      "status": "placeholder"
+    }
+  ],
+  "expression_map": {
+    "happy": {
+      "eyes": "closed_smile",
+      "eyebrows": "raised",
+      "lips": "closed_smile"
+    },
+    "waving": {
+      "eyes": "open",
+      "eyebrows": "raised",
+      "lips": "open_smile"
+    },
+    "talking": {
+      "eyes": "open",
+      "eyebrows": "neutral",
+      "lips": "closed"
+    },
+    "listening": {
+      "eyes": "half_closed",
+      "eyebrows": "caring",
+      "lips": "closed"
+    },
+    "calm": {
+      "eyes": "soft",
+      "eyebrows": "soft",
+      "lips": "closed_smile"
+    },
+    "celebrating": {
+      "eyes": "sparkle",
+      "eyebrows": "raised",
+      "lips": "open_smile",
+      "extras": [
+        "blush_celebrate",
+        "sparkles"
+      ]
+    }
+  },
+  "animation": {
+    "blink_every_seconds": [
+      3,
+      6
+    ],
+    "blink_ms": 140,
+    "lip_shapes": [
+      "a",
+      "i",
+      "u",
+      "e",
+      "o",
+      "closed"
+    ],
+    "lip_tick_ms": 160,
+    "lip_source": "speech word timing, else the caption pace",
+    "idle_sway_degrees": 1.2,
+    "reduced_motion": "still face, no sway, no sparkles"
+  }
 }

@@ -2784,6 +2784,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeBubbleDone => 'Nice work! Today’s step is done.';
 
   @override
+  String get homeBubbleStep => 'Ready for your small step?';
+
+  @override
+  String homeBubbleStepNamed(String name) {
+    return 'Ready for your small step, $name?';
+  }
+
+  @override
+  String get homeBubbleEvening => 'How did today go?';
+
+  @override
+  String homeBubbleEveningNamed(String name) {
+    return 'How did today go, $name?';
+  }
+
+  @override
+  String get homeBubbleRestart => 'Let\'s restart with a small step.';
+
+  @override
+  String get homeMomentPlay => 'Hear your coach';
+
+  @override
+  String get celebrationDone => 'You did it!';
+
+  @override
+  String get celebrationSkip => 'Tap to close';
+
+  @override
   String get momentClose => 'Close';
 
   @override

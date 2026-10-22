@@ -11,6 +11,7 @@ import '../../voice/domain/voice.dart';
 import '../data/moment_templates_provider.dart';
 import '../domain/coach_message.dart';
 import '../domain/moment_builder.dart';
+import 'coach_state.dart';
 
 /// What the builder may use today: the person's first name and Why, today's
 /// step from the plan, the streak (T-DLY-03a). Nothing from the check-in's
@@ -37,9 +38,9 @@ final momentContextProvider = Provider<MomentContext>((ref) {
     weeklyCount: ref.watch(previewModeProvider)
         ? PreviewSamples.habitsWeek.length
         : null,
-    // TODO(D-22): a red flag today, once safety events are recorded. The
-    // check-in already drops red-flag text and shows the safety card.
-    safetyHold: false,
+    // A red flag in today's check-in (T-DLY-03d); TODO(D-22): from the
+    // recorded safety events, so it survives a restart.
+    safetyHold: ref.watch(safetyHoldTodayProvider),
   );
 });
 

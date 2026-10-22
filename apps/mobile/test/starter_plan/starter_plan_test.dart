@@ -372,15 +372,18 @@ void main() {
       expect(reminders.faces.keys, containsAll(TouchpointKind.values));
     });
 
-    test("played in the app: today's morning reminder leaves the tray", () async {
-      await c.read(planSchedulerProvider).dismissMorning();
-      expect(reminders.dismissed, [
-        TouchpointScheduler.idFor(
-          DateTime(2026, 10, 15),
-          TouchpointKind.greeting,
-        ),
-      ]);
-    });
+    test(
+      "played in the app: today's morning reminder leaves the tray",
+      () async {
+        await c.read(planSchedulerProvider).dismissMorning();
+        expect(reminders.dismissed, [
+          TouchpointScheduler.idFor(
+            DateTime(2026, 10, 15),
+            TouchpointKind.greeting,
+          ),
+        ]);
+      },
+    );
 
     test('without consent: everything is cancelled', () async {
       await consents.record(ConsentType.notifications, granted: false);

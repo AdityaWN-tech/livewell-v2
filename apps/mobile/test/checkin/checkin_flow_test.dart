@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/features/checkin/presentation/checkin_sheet.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
+import 'package:livewell/features/moments/application/coach_state.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
 
 import '../support/app_harness.dart';
@@ -23,6 +25,11 @@ Harness fresh({String? region, String? name}) {
   if (region != null) h.profiles.regions[uid] = region;
   return h;
 }
+
+/// Whether the coach is on today's safety hold (T-DLY-03d).
+bool held(WidgetTester tester) =>
+    ProviderScope.containerOf(tester.element(find.byType(MaterialApp)))
+        .read(safetyHoldTodayProvider);
 
 Finder option(int step, int value) =>
     find.byKey(Key('checkin-option-$step-$value'));
@@ -280,6 +287,8 @@ void main() {
         expect(saved.barrierText, isNull, reason: 'red-flag text not kept');
         expect(saved.gentleDay, isTrue, reason: 'no portal card today');
         expect(saved.mood, 4);
+        // The coach stays quiet for the rest of today (T-DLY-03d).
+        expect(held(tester), isTrue);
       });
     }
 
@@ -311,6 +320,7 @@ void main() {
       await barrier(tester, 'Back-to-back meetings');
       expect(find.byType(SafetyInterruptScreen), findsNothing);
       expect(find.byType(SafetyNoticeSheet), findsNothing);
+      expect(held(tester), isFalse);
     });
   });
 

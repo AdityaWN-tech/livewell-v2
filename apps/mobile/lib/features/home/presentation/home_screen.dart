@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/config/feature_flags.dart';
 import '../../../core/design/avatar/avatar_art.dart' show AvatarView;
+import '../../../core/design/components/speech_bubble.dart';
 import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/illustration/illustration.dart';
@@ -20,7 +21,10 @@ import '../../checkin/domain/checkin.dart';
 import '../../checkin/presentation/checkin_sheet.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../learn/presentation/learn_screen.dart' show LearnScreen;
+import '../../moments/application/coach_state.dart';
+import '../../moments/application/moment_context.dart';
 import '../../moments/application/moment_launcher.dart';
+import '../../moments/presentation/celebration.dart';
 import '../../moments/domain/coach_message.dart';
 import '../../moments/presentation/moment_screen.dart';
 import '../../notifications/presentation/notifications_screen.dart';
@@ -44,7 +48,8 @@ import '../domain/home_models.dart';
 /// Actions (FR-DLY-03, at most 1 primary and 2 secondary): the step card
 /// opens Done (the primary) and "Make it N min" (a secondary); the check-in
 /// tiles are the other secondary (all 4 open the same check-in). The
-/// briefing is media, not an action, and is off until briefings exist.
+/// briefing is media, not an action, and is off until briefings exist; so
+/// are the coach's "Hear your coach" and the morning card (T-DLY-03).
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -96,7 +101,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return true;
   }
 
-  void _playMoment(Moment m) => context.push(MomentScreen.pathFor(m));
+  Future<void> _playMoment(Moment m) async {
+    final action = await context.push<MomentAction>(MomentScreen.pathFor(m));
+    if (action != null && mounted) await _onMomentAction(action);
+  }
+
+  /// What a moment's button leads to (T-DLY-03d).
+  Future<void> _onMomentAction(MomentAction action) async {
+    final step = ref.read(todayStepProvider);
+    switch (action) {
+      case MomentAction.checkIn:
+        await _openCheckIn();
+      case MomentAction.startStep || MomentAction.restart:
+        if (step != null) {
+          await _openStep(step, ref.read(todayCheckInProvider).value);
+        }
+      case MomentAction.makeSmaller:
+        ref.read(stepProgressActionsProvider).makeSmaller();
+      case MomentAction.done:
+        await _done();
+      // The evening reply and the week are on Track.
+      case MomentAction.reply || MomentAction.seeWeek:
+        context.go('/track');
+      case MomentAction.notToday || MomentAction.close:
+        break;
+    }
+  }
+
+  /// Today's step is done: the coach celebrates (T-DLY-03d).
+  Future<void> _done() async {
+    ref.read(stepProgressActionsProvider).markDone();
+    await showCelebration(context);
+  }
 
   @override
   void dispose() {
@@ -172,9 +208,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         reason: _stepReason(AppLocalizations.of(context), step, checkIn),
       ),
     );
-    final progress = ref.read(stepProgressActionsProvider);
-    if (result == 'done') progress.markDone();
-    if (result == 'smaller') progress.makeSmaller();
+    if (!mounted) return;
+    if (result == 'done') await _done();
+    if (result == 'smaller') {
+      ref.read(stepProgressActionsProvider).makeSmaller();
+    }
   }
 
   /// A gentle day always gets the smaller step (FR-DLY-02, T-DLY-02).
@@ -221,7 +259,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final name = ref.watch(firstNameProvider);
     final hour = ref.watch(clockProvider)().hour;
     final step = ref.watch(todayStepProvider);
-    final gentle = checkIn?.gentleDay ?? false;
+    final hero = ref.watch(heroMomentProvider);
     final progress = ref.watch(stepProgressProvider);
     // Ask once, only for a signed-in account whose profile has loaded
     // without a name (Google or Apple names are used without asking).
@@ -283,14 +321,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
         _HeroCard(
           coach: ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,
-          celebrating: progress.done,
-          bubble: progress.done
-              ? l.homeBubbleDone
-              : gentle
-              ? (name == null
-                    ? l.homeBubbleGentle
-                    : l.homeBubbleGentleNamed(name))
-              : (name == null ? l.homeBubble : l.homeBubbleNamed(name)),
+          moment: hero,
+          bubble: switch (hero) {
+            Moment.stepDone => l.homeBubbleDone,
+            Moment.gentle =>
+              name == null ? l.homeBubbleGentle : l.homeBubbleGentleNamed(name),
+            Moment.stepReminder =>
+              name == null ? l.homeBubbleStep : l.homeBubbleStepNamed(name),
+            Moment.evening =>
+              name == null
+                  ? l.homeBubbleEvening
+                  : l.homeBubbleEveningNamed(name),
+            Moment.missedDay => l.homeBubbleRestart,
+            Moment.morning || Moment.weeklyReview =>
+              name == null ? l.homeBubble : l.homeBubbleNamed(name),
+          },
+          // The full message, when there is one to say (T-DLY-03d).
+          onPlay: ref.watch(coachMessageProvider(hero)).value == null
+              ? null
+              : () => _playMoment(hero),
           showBriefing: ref.watch(featureFlagsProvider).briefings,
         ),
         // The Why is shown on Home (FR-ONB-05).
@@ -465,17 +514,22 @@ class _NamePromptState extends State<_NamePrompt> {
 class _HeroCard extends StatelessWidget {
   const _HeroCard({
     required this.coach,
+    required this.moment,
     required this.bubble,
     required this.showBriefing,
-    this.celebrating = false,
+    this.onPlay,
   });
 
   final String coach;
 
-  /// After today's step is done: the celebrating coach (T-UI-02i).
-  final bool celebrating;
+  /// The moment of the day the coach is in: its face, and the short
+  /// version of its message in the bubble (T-DLY-03d).
+  final Moment moment;
   final String bubble;
   final bool showBriefing;
+
+  /// Plays the full moment; null when there is nothing approved to say.
+  final VoidCallback? onPlay;
 
   @override
   Widget build(BuildContext context) {
@@ -504,13 +558,11 @@ class _HeroCard extends StatelessWidget {
                   style: t.labelMedium?.copyWith(color: p.onTintSecondary),
                 ),
                 const SizedBox(height: LwSpacing.xs),
-                // A gentle bounce once on greeting, and again on Done.
+                // A gentle bounce once on greeting, and with each new moment.
                 LwOnceMotion(
-                  key: ValueKey(celebrating),
+                  key: ValueKey(moment),
                   child: CoachAvatar(
-                    expression: celebrating
-                        ? AvatarExpression.celebrating
-                        : AvatarExpression.waving,
+                    expression: faceForMoment(moment),
                     bubble: bubble,
                     size: 104,
                   ),
@@ -519,15 +571,66 @@ class _HeroCard extends StatelessWidget {
                 if (showBriefing)
                   _BriefingRow()
                 else
-                  Text(
-                    l.homeTagline,
-                    key: const Key('home-tagline'),
-                    style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                  // Wraps on small phones and large text.
+                  Wrap(
+                    spacing: LwSpacing.sm,
+                    runSpacing: LwSpacing.xs,
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        l.homeTagline,
+                        key: const Key('home-tagline'),
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                      if (onPlay != null) _PlayPill(onPlay: onPlay!),
+                    ],
                   ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// "Hear your coach": plays the full moment. Media, like the briefing, so
+/// not one of Home's actions (FR-DLY-03).
+class _PlayPill extends StatelessWidget {
+  const _PlayPill({required this.onPlay});
+  final VoidCallback onPlay;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    return Material(
+      color: p.surface,
+      shape: const StadiumBorder(),
+      child: InkWell(
+        key: const Key('home-moment-play'),
+        customBorder: const StadiumBorder(),
+        onTap: onPlay,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: LwSpacing.sm),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.play_circle_fill, color: p.primary),
+                const SizedBox(width: LwSpacing.xxs),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context).homeMomentPlay,
+                    style: t.labelLarge?.copyWith(color: p.textPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -937,15 +1040,22 @@ class _CheckInTiles extends StatelessWidget {
   }
 }
 
-/// The supportive line after today's check-in. On a gentle day it matches
-/// the reason: low mood, high stress, both, or a neutral line (T-UI-02c).
-class _CheckInResponse extends StatelessWidget {
+/// The coach's reaction to today's check-in (T-DLY-03d): a matching face
+/// and one supportive line. On a gentle day the line matches the reason:
+/// low mood, high stress, both, or a neutral line (T-UI-02c).
+class _CheckInResponse extends ConsumerWidget {
   const _CheckInResponse(this.checkIn);
   final CheckIn checkIn;
 
+  /// Calm on a gentle day, celebrating when it's a good day, else happy.
+  static AvatarExpression faceFor(CheckIn c) => c.gentleDay
+      ? AvatarExpression.calm
+      : toneFor(c) == CheckInTone.high
+      ? AvatarExpression.celebrating
+      : AvatarExpression.happy;
+
   @override
-  Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final text = switch (gentleReasonFor(checkIn)) {
       GentleReason.lowMood => l.checkinResponseGentleLowMood,
@@ -957,7 +1067,25 @@ class _CheckInResponse extends StatelessWidget {
             ? l.checkinResponseHigh
             : l.checkinResponseSteady,
     };
-    return Text(text, key: const Key('checkin-response'), style: t.bodyMedium);
+    final face = faceFor(checkIn);
+    return LwOnceMotion(
+      key: ValueKey(face),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AvatarView(
+            key: Key('checkin-reaction-${face.name}'),
+            config: ref.watch(coachAvatarConfigProvider).value ?? defaultCoach,
+            expression: face,
+            size: LwSize.inputHeight,
+          ),
+          const SizedBox(width: LwSpacing.sm),
+          Expanded(
+            child: SpeechBubble(key: const Key('checkin-response'), text: text),
+          ),
+        ],
+      ),
+    );
   }
 }
 

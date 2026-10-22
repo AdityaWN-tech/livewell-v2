@@ -1631,6 +1631,28 @@
     }
   },
   "homeBubbleDone": "Nice work! Today’s step is done.",
+  "homeBubbleStep": "Ready for your small step?",
+  "homeBubbleStepNamed": "Ready for your small step, {name}?",
+  "@homeBubbleStepNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBubbleEvening": "How did today go?",
+  "homeBubbleEveningNamed": "How did today go, {name}?",
+  "@homeBubbleEveningNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeBubbleRestart": "Let's restart with a small step.",
+  "homeMomentPlay": "Hear your coach",
+  "celebrationDone": "You did it!",
+  "celebrationSkip": "Tap to close",
   "momentClose": "Close",
   "momentPause": "Pause",
   "momentPlay": "Play",

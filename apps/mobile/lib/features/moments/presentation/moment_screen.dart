@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../avatar/presentation/coach_avatar.dart'
     show coachAvatarConfigProvider, defaultCoach;
 import '../../voice/presentation/voice_screen.dart' show AiVoiceLabel;
+import '../application/coach_state.dart';
 import '../application/moment_context.dart';
 import '../application/moment_launcher.dart';
 import '../data/coach_speaker.dart';
@@ -74,6 +75,8 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     super.initState();
     // Read now: dispose (which stops the voice) must not use ref.
     _speaker = ref.read(coachSpeakerProvider);
+    // Muted in an earlier moment: text only until the voice is turned on.
+    _muted = ref.read(coachMutedProvider);
   }
 
   bool get _stillAvatar => MediaQuery.of(context).disableAnimations;
@@ -153,6 +156,7 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
   }
 
   Future<void> _toggleMute(CoachMessage m) async {
+    ref.read(coachMutedProvider.notifier).set(!_muted);
     if (_muted) {
       setState(() => _muted = false);
       await _play(m);
@@ -188,6 +192,10 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     final m = async.value;
     if (m != null && _message == null) {
       _message = m;
+      if (_muted) {
+        _phase = _Phase.done;
+        _revealed = m.text.length;
+      }
       // Speaks automatically when the moment opens (setting in T-DLY-03e).
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && !_muted) _play(m);

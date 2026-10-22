@@ -42,6 +42,7 @@ class AvatarFrameManifest {
     this.style = avatarStyle3dAdult,
     this.sizes = const ['2x', '3x'],
     this.canvas = 1024,
+    this.thumbnails = const {},
   });
 
   final String avatarId;
@@ -56,6 +57,10 @@ class AvatarFrameManifest {
 
   /// Frame → size → file name (relative to the manifest).
   final Map<AvatarFrame, Map<String, String>> files;
+
+  /// Small PNG faces per expression (neutral, happy, waving, listening,
+  /// calm, celebrating) for notifications and the widget (T-AVT-08d).
+  final Map<String, String> thumbnails;
 
   /// Frames with no file at some size.
   List<AvatarFrame> get missing => [
@@ -80,6 +85,7 @@ class AvatarFrameManifest {
     'canvas': {'width': canvas, 'height': canvas},
     'sizes': sizes,
     'frames': {for (final e in files.entries) e.key.id: e.value},
+    if (thumbnails.isNotEmpty) 'thumbnails': thumbnails,
   };
 
   /// Reads a manifest; throws [FormatException] when it isn't one.
@@ -94,6 +100,7 @@ class AvatarFrameManifest {
       throw FormatException('Unknown avatar style: ${m['style']}');
     }
     final canvas = m['canvas'];
+    final thumbs = m['thumbnails'];
     return AvatarFrameManifest(
       avatarId: id,
       version: version,
@@ -104,6 +111,12 @@ class AvatarFrameManifest {
       canvas: canvas is Map && canvas['width'] is int
           ? canvas['width'] as int
           : 1024,
+      thumbnails: {
+        if (thumbs is Map)
+          for (final e in thumbs.entries)
+            if (e.value is String && _safe(e.value as String))
+              '${e.key}': e.value as String,
+      },
       files: {
         for (final e in frames.entries)
           if (AvatarFrame.byId('${e.key}') case final f?)

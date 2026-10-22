@@ -44,7 +44,12 @@ class FileCoachFaces implements CoachFaces {
       final out = <TouchpointKind, String>{};
       File? circle;
       for (final k in TouchpointKind.values) {
-        // TODO(T-AVT-08d): the small expression thumbnails, once exported.
+        // The set's small expression thumbnail (T-AVT-08d), else its frame.
+        final thumb = frames?.thumbnail(faceFor(k).name);
+        if (thumb != null) {
+          out[k] = thumb.path;
+          continue;
+        }
         final frame = frames?.file(
           expressionFrame(faceFor(k)),
           devicePixelRatio: 2,

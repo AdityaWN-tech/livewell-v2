@@ -61,6 +61,16 @@ class CachedFrameSet {
     return f.existsSync() ? f : null;
   }
 
+  /// The small face for [expression] (an expression name; talking uses
+  /// neutral), if the set has one on the device.
+  File? thumbnail(String expression) {
+    final name =
+        manifest.thumbnails[expression == 'talking' ? 'neutral' : expression];
+    if (name == null) return null;
+    final f = File('${dir.path}/$name');
+    return f.existsSync() ? f : null;
+  }
+
   /// Every frame is on the device.
   bool get complete =>
       manifest.complete &&
@@ -144,6 +154,7 @@ class AvatarFrameCache {
     final names = <String>{
       ...?manifest.files[AvatarFrame.neutral]?.values,
       for (final f in manifest.files.values) ...f.values,
+      ...manifest.thumbnails.values,
     };
     for (final name in names) {
       final url = urls[name];

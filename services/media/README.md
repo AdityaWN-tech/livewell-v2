@@ -21,6 +21,18 @@ most 3 generations per person per day (Remote Config `avatar_daily_generations`)
 From my photo also needs the `avatar_from_photo` flag and the camera and
 biometric consents, checked here.
 
+**Then the frame set (T-AVT-08d):** from the approved portrait, the neutral
+frame, then every other frame as an edit of the neutral one (Appendix B prompts;
+mouth frames keep the eyes and head). Each frame is cut out (`BackgroundRemover`)
+and aligned so the face sits in one place on a 1024 px canvas (`FaceLocator`); a
+quality check (`FrameChecker`: same face, same position) makes a failed frame
+again once, else it shows the neutral face. Exported as WebP at 2x and 3x plus a
+`thumb`, six PNG expression thumbnails (192 px) for notifications and the
+widget, and `avatar_frames.json` (schema in `packages/schemas`), stored under
+`avatars/{uid}/{version}/` (`FrameStore`). The job's `frames_version` is written
+to `users/{uid}/avatar/current` (`AvatarDocWriter`); Adjust makes a new version
+and keeps the source.
+
 **Not chosen yet:** the image vendor and the checking model (see
 `docs/design/avatar-vendor-scorecard.md`), so by default every call is refused
 and nothing is sent anywhere. Firebase Admin, the consent store, Firestore job

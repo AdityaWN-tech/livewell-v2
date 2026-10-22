@@ -30,10 +30,22 @@ from .auth import (
     NotConfiguredAuthenticator,
     NotConfiguredConsents,
 )
+from .frames import (
+    BackgroundRemover,
+    FaceLocator,
+    FrameBuilder,
+    FrameChecker,
+    FrameStore,
+    InMemoryFrameStore,
+    KeepBackground,
+    NotConfiguredFaces,
+)
 from .jobs import (
+    AvatarDocWriter,
     AvatarSource,
     DailyLimiter,
     DailyLimitReached,
+    InMemoryAvatarDocs,
     InMemoryCosts,
     InMemoryJobs,
     InMemoryPortraits,
@@ -87,7 +99,22 @@ class Services:
     jobs: JobStore = field(default_factory=InMemoryJobs)
     portraits: InMemoryPortraits = field(default_factory=InMemoryPortraits)
     costs: InMemoryCosts = field(default_factory=InMemoryCosts)
+    # The frame set (T-AVT-08d).
+    locator: FaceLocator = field(default_factory=NotConfiguredFaces)
+    remover: BackgroundRemover = field(default_factory=KeepBackground)
+    checker: FrameChecker = field(default_factory=lambda: _NoFrameCheck())
+    frame_store: FrameStore = field(default_factory=InMemoryFrameStore)
+    docs: AvatarDocWriter = field(default_factory=InMemoryAvatarDocs)
+    #: Off only in tests about the HTTP layer alone.
+    build_frames: bool = True
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
+
+
+class _NoFrameCheck:
+    """No frame checker chosen yet: no frame passes (all fall back)."""
+
+    def similarity(self, frame: object, neutral: object) -> float:
+        return 0.0
 
 
 class AvatarRequest(BaseModel):
@@ -112,6 +139,20 @@ def create_app(services: Services | None = None) -> FastAPI:
         costs=s.costs,
         approved_hosts=s.settings.approved_hosts,
         min_similarity=s.settings.min_similarity,
+        frames=FrameBuilder(
+            prompts=prompts,
+            stylizer=s.stylizer,
+            locator=s.locator,
+            remover=s.remover,
+            checker=s.checker,
+            store=s.frame_store,
+            costs=s.costs,
+            approved_hosts=s.settings.approved_hosts,
+            clock=s.clock,
+        )
+        if s.build_frames
+        else None,
+        docs=s.docs,
         clock=s.clock,
     )
     limiter = DailyLimiter(s.jobs, s.settings.daily_limit)

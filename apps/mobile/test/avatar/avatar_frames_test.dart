@@ -13,6 +13,8 @@ import 'package:livewell/features/avatar/domain/avatar_frames.dart';
 import 'package:livewell/features/avatar/domain/coach_face.dart';
 import 'package:livewell/features/avatar/presentation/coach_avatar.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
+import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
+import 'package:livewell/features/moments/data/coach_faces.dart';
 import 'package:livewell/features/moments/domain/coach_message.dart';
 import 'package:livewell/features/moments/presentation/moment_screen.dart';
 
@@ -447,6 +449,40 @@ void main() {
       );
       expect(await cache().load('u1', 2), isNull);
       expect(fetched, isEmpty);
+    });
+
+    test('a set from the Media Service: its expression thumbnails come too, '
+        'and notifications use them (T-AVT-08d)', () async {
+      final m = placeholderManifest();
+      final withThumbs = AvatarFrameManifest.fromJson({
+        ...m.toJson(),
+        'thumbnails': {
+          'neutral': 'thumb_neutral.png',
+          'waving': 'thumb_waving.png',
+          'listening': '../sneaky.png',
+        },
+      });
+      // Unsafe names are dropped, like frame files.
+      expect(withThumbs.thumbnails, {
+        'neutral': 'thumb_neutral.png',
+        'waving': 'thumb_waving.png',
+      });
+      served[url(AvatarFrameCache.manifestName)] = utf8.encode(
+        jsonEncode(withThumbs.toJson()),
+      );
+      for (final n in withThumbs.thumbnails.values) {
+        served[url(n)] = [9];
+        source.urls[n] = url(n);
+      }
+      final set = (await cache().load('u1', 2))!;
+      expect(set.thumbnail('waving')!.path, endsWith('thumb_waving.png'));
+      // Talking uses the neutral face.
+      expect(set.thumbnail('talking')!.path, endsWith('thumb_neutral.png'));
+      expect(set.thumbnail('celebrating'), isNull);
+      final faces = await FileCoachFaces().render(frames: set, initial: 'C');
+      expect(faces[TouchpointKind.greeting], endsWith('thumb_waving.png'));
+      // No thumbnail for listening: the frame itself.
+      expect(faces[TouchpointKind.reflection], endsWith('listening@2x.webp'));
     });
 
     test('Delete my avatar clears the device copy', () async {

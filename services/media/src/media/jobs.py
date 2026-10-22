@@ -57,6 +57,8 @@ class Job(BaseModel):
     rejections: list[str] = Field(default_factory=list)
     message_id: str | None = None
     portrait_id: str | None = None
+    #: The frame set made from the portrait (T-AVT-08d).
+    frames_version: int | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -68,6 +70,7 @@ class Job(BaseModel):
             "status": self.status.value,
             "message_id": self.message_id,
             "portrait_id": self.portrait_id,
+            "frames_version": self.frames_version,
         }
 
 
@@ -152,6 +155,33 @@ class InMemoryCosts:
         self.entries.append(entry)
 
 
+class FrameMaker(Protocol):
+    """Builds the frame set from an approved portrait (frames.FrameBuilder);
+    returns the new frame set version, or raises when no set can be made."""
+
+    def build_version(self, uid: str, portrait: bytes, job_id: str) -> int: ...
+
+
+class AvatarDocWriter(Protocol):
+    """Writes the server-only fields of users/{uid}/avatar/current:
+    `source` (selfie | built) and `frames_version` (Firestore at deploy)."""
+
+    def set_frames(self, uid: str, source: str | None, frames_version: int) -> None:
+        """[source] None keeps the current one (Adjust)."""
+        ...
+
+
+@dataclass
+class InMemoryAvatarDocs:
+    docs: dict[str, dict[str, object]] = field(default_factory=dict)
+
+    def set_frames(self, uid: str, source: str | None, frames_version: int) -> None:
+        doc = self.docs.setdefault(uid, {})
+        doc.update({"type": "3d_adult", "frames_version": frames_version})
+        if source is not None:
+            doc["source"] = source
+
+
 class DailyLimitReached(Exception):
     """Max generations per person per day (Remote Config; default 3)."""
 
@@ -181,6 +211,9 @@ class JobRunner:
     approved_hosts: frozenset[str]
     min_similarity: float = 0.6
     attempts: int = 2
+    #: Builds the frame set once the portrait is approved (T-AVT-08d).
+    frames: FrameMaker | None = None
+    docs: AvatarDocWriter | None = None
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
 
     def prompt_for(self, job: Job) -> str:
@@ -237,7 +270,7 @@ class JobRunner:
             )
             if verdict.ok:
                 job.portrait_id = self.portraits.put(job.uid, made.image)
-                return self._finish(job, JobStatus.SUCCEEDED)
+                return self._frames(job, made.image)
             rejected = True
             job.rejections = sorted({*job.rejections, *(r.value for r in verdict.reasons)})
         return self._finish(
@@ -245,6 +278,20 @@ class JobRunner:
             JobStatus.REJECTED if rejected else JobStatus.FAILED,
             Messages.NOT_MADE,
         )
+
+    def _frames(self, job: Job, portrait: bytes) -> Job:
+        if self.frames is None:
+            return self._finish(job, JobStatus.SUCCEEDED)
+        try:
+            version = self.frames.build_version(job.uid, portrait, job.id)
+        except Exception:  # any failure building frames: a kind message
+            return self._finish(job, JobStatus.FAILED, Messages.NOT_MADE)
+        job.frames_version = version
+        if self.docs is not None:
+            # Adjust keeps where the coach came from (selfie or built).
+            source = None if job.source is AvatarSource.ADJUST else job.source.value
+            self.docs.set_frames(job.uid, source, version)
+        return self._finish(job, JobStatus.SUCCEEDED)
 
 
 def new_job(uid: str, source: AvatarSource, options: dict[str, str], now: datetime) -> Job:

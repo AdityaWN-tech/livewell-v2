@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
 import '../../features/dev/presentation/illustration_gallery.dart';
+import '../../features/dev/presentation/moments_gallery.dart';
+import '../../features/moments/domain/coach_message.dart';
+import '../../features/moments/presentation/moment_screen.dart';
 import '../../features/auth/presentation/email_sign_in_screen.dart';
 import '../../features/auth/presentation/phone_sign_in_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
@@ -150,6 +153,17 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
         ],
       ),
+      // An Avatar Moment, full screen (T-DLY-03b). Notifications open it in
+      // T-DLY-03c; an unknown moment goes Home.
+      GoRoute(
+        path: '/moment/:name',
+        redirect: (context, state) =>
+            Moment.byFile(state.pathParameters['name'] ?? '') == null
+            ? '/home'
+            : null,
+        builder: (context, state) =>
+            MomentScreen(moment: Moment.byFile(state.pathParameters['name']!)!),
+      ),
       // Today's reminders, from the bell on Home (T-UI-02i).
       GoRoute(
         path: NotificationsScreen.path,
@@ -180,6 +194,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: '/dev/tokens',
           builder: (context, state) => const DesignGallery(),
+        ),
+      if (flavor == Flavor.dev)
+        GoRoute(
+          path: MomentsGallery.path,
+          builder: (context, state) => const MomentsGallery(),
         ),
       if (flavor == Flavor.dev)
         GoRoute(

@@ -16,10 +16,14 @@ class AvatarView extends StatelessWidget {
     this.size = 160,
     this.semanticLabel,
     this.expression = AvatarExpression.happy,
+    this.blink = false,
   });
 
   final AvatarConfig config;
   final AvatarExpression expression;
+
+  /// Eyes closed for a moment (the Avatar Moment player blinks, T-DLY-03b).
+  final bool blink;
   final double size;
   final String? semanticLabel;
 
@@ -31,7 +35,7 @@ class AvatarView extends StatelessWidget {
     excludeSemantics: true,
     child: CustomPaint(
       size: Size.square(size),
-      painter: AvatarPainter(config, expression),
+      painter: AvatarPainter(config, expression, blink),
     ),
   );
 }
@@ -118,10 +122,15 @@ abstract final class AvatarColours {
 }
 
 class AvatarPainter extends CustomPainter {
-  AvatarPainter(this.c, [this.expression = AvatarExpression.happy]);
+  AvatarPainter(
+    this.c, [
+    this.expression = AvatarExpression.happy,
+    this.blink = false,
+  ]);
 
   final AvatarConfig c;
   final AvatarExpression expression;
+  final bool blink;
 
   static Paint _fill(Color colour) => Paint()..color = colour;
 
@@ -270,7 +279,7 @@ class AvatarPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.6
       ..strokeCap = StrokeCap.round;
-    if (expression == AvatarExpression.calm) {
+    if (expression == AvatarExpression.calm || blink) {
       // Closed, relaxed eyes.
       for (final x in [43.0, 57.0]) {
         canvas.drawArc(
@@ -452,5 +461,5 @@ class AvatarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(AvatarPainter old) =>
-      old.c != c || old.expression != expression;
+      old.c != c || old.expression != expression || old.blink != blink;
 }

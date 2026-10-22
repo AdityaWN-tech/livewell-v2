@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:livewell/features/moments/data/coach_speaker.dart';
+import 'package:livewell/features/moments/domain/coach_message.dart';
 import 'package:livewell/features/home/data/name_prompt.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
@@ -677,4 +679,42 @@ class FakeNamePromptStore implements NamePromptStore {
 
   @override
   Future<void> markAsked() async => wasAsked = true;
+}
+
+/// The coach's voice in tests (T-DLY-03b): records what was spoken and
+/// lets the test say words and finish.
+class FakeCoachSpeaker implements CoachSpeaker {
+  /// False: speech can't start (the player falls back to text).
+  bool works = true;
+  final spoken = <(CoachMessage, double)>[];
+  int pauses = 0;
+  int stops = 0;
+  void Function(int, int)? _onWord;
+  void Function()? _onDone;
+
+  @override
+  Future<bool> speak(
+    CoachMessage message, {
+    required double speed,
+    void Function(int start, int end)? onWord,
+    void Function()? onDone,
+  }) async {
+    if (!works) return false;
+    spoken.add((message, speed));
+    _onWord = onWord;
+    _onDone = onDone;
+    return true;
+  }
+
+  /// The engine reached the end of character [end].
+  void word(int end) => _onWord?.call(0, end);
+
+  /// The engine finished speaking.
+  void finish() => _onDone?.call();
+
+  @override
+  Future<void> pause() async => pauses++;
+
+  @override
+  Future<void> stop() async => stops++;
 }

@@ -9,6 +9,7 @@ import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/dev/application/preview_mode.dart';
 import 'package:livewell/features/dev/presentation/design_gallery.dart';
 import 'package:livewell/features/dev/presentation/illustration_gallery.dart';
+import 'package:livewell/features/dev/presentation/moments_gallery.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/profile/presentation/profile_screen.dart';
 
@@ -84,6 +85,19 @@ void main() {
       expect(find.text('Developer'), findsNothing);
       expect(find.text('Design tokens'), findsNothing);
       expect(find.byKey(const Key('dev-illustrations')), findsNothing);
+      expect(find.byKey(const Key('dev-moments')), findsNothing);
+    });
+
+    test('${flavor.name}: the Avatar Moments list is not registered', () {
+      final container = ProviderContainer(
+        overrides: [flavorProvider.overrideWithValue(flavor)],
+      );
+      addTearDown(container.dispose);
+      final match = container
+          .read(routerProvider)
+          .configuration
+          .findMatch(Uri.parse(MomentsGallery.path));
+      expect(match.matches, isEmpty);
     });
 
     test('${flavor.name}: the illustrations route is not registered', () {

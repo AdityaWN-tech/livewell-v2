@@ -2770,4 +2770,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeBubbleDone => 'Nice work! Today’s step is done.';
+
+  @override
+  String get momentClose => 'Close';
+
+  @override
+  String get momentPause => 'Pause';
+
+  @override
+  String get momentPlay => 'Play';
+
+  @override
+  String get momentReplay => 'Play again';
+
+  @override
+  String get momentMute => 'Mute: show text only';
+
+  @override
+  String get momentUnmute => 'Turn the voice on';
+
+  @override
+  String get momentSkip => 'Skip';
+
+  @override
+  String get momentTextOnly =>
+      'Your coach’s voice isn’t available right now, so here is the message as text.';
+
+  @override
+  String get momentNone => 'Nothing from your coach right now.';
+
+  @override
+  String get momentActionCheckIn => 'Check in';
+
+  @override
+  String get momentActionStartStep => 'Start my step';
+
+  @override
+  String get momentActionMakeSmaller => 'Make it smaller';
+
+  @override
+  String get momentActionDone => 'Done';
+
+  @override
+  String get momentActionNotToday => 'Not today';
+
+  @override
+  String get momentActionClose => 'Close';
+
+  @override
+  String get momentActionReply => 'Reply';
+
+  @override
+  String get momentActionRestart => 'Restart';
+
+  @override
+  String get momentActionSeeWeek => 'See my week';
+
+  @override
+  String get devMoments => 'Avatar Moments';
 }

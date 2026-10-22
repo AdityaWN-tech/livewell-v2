@@ -1626,5 +1626,24 @@
       }
     }
   },
-  "homeBubbleDone": "Nice work! Today’s step is done."
+  "homeBubbleDone": "Nice work! Today’s step is done.",
+  "momentClose": "Close",
+  "momentPause": "Pause",
+  "momentPlay": "Play",
+  "momentReplay": "Play again",
+  "momentMute": "Mute: show text only",
+  "momentUnmute": "Turn the voice on",
+  "momentSkip": "Skip",
+  "momentTextOnly": "Your coach’s voice isn’t available right now, so here is the message as text.",
+  "momentNone": "Nothing from your coach right now.",
+  "momentActionCheckIn": "Check in",
+  "momentActionStartStep": "Start my step",
+  "momentActionMakeSmaller": "Make it smaller",
+  "momentActionDone": "Done",
+  "momentActionNotToday": "Not today",
+  "momentActionClose": "Close",
+  "momentActionReply": "Reply",
+  "momentActionRestart": "Restart",
+  "momentActionSeeWeek": "See my week",
+  "devMoments": "Avatar Moments"
 }

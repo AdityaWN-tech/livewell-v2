@@ -159,20 +159,49 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
-      // ---------- avatar: client style only, vendor fields server-only ----------
+      // ---------- avatar: the coach the person picks; made-for-you sets server-only ----------
+      // T-AVT-08b: the app writes a ready-made coach (`source: default`,
+      // `coach_id`), the coach's name and the background. Selfie and built
+      // avatars, `frames_version`, vendor ids and thumbnails are written by
+      // the Media Service (T-AVT-08c/d). Older cartoon docs keep `style_config`.
       match /avatar/{docId} {
         function clientAvatarKeys() {
           return ['type', 'style_config', 'raw_media_retained',
-                  'created_at', 'updated_at', 'schema_version'];
+                  'created_at', 'updated_at', 'schema_version',
+                  'source', 'coach_id', 'coach_name', 'background'];
+        }
+        function readyCoaches() {
+          return ['brown_hair', 'long_black_hair', 'green_hijab', 'navy_turban',
+                  'grey_glasses', 'short_curls', 'short_black_hair', 'wheelchair'];
+        }
+        function validAvatar(d) {
+          return d.type in ['stylized', 'photoreal', '3d_adult']
+            && d.get('raw_media_retained', false) == false
+            && (d.type != '3d_adult'
+                || (d.get('source', '') in ['default', 'selfie', 'built']
+                    && d.get('coach_id', 'brown_hair') in readyCoaches()))
+            && (!('coach_name' in d)
+                || (d.coach_name is string
+                    && d.coach_name.size() >= 1 && d.coach_name.size() <= 20))
+            && (!('background' in d)
+                || (d.background is int && d.background >= 0 && d.background <= 5));
         }
         allow read: if isOwner(uid);
         allow create: if isAdultOwner(uid) && docId == 'current'
           && request.resource.data.keys().hasOnly(clientAvatarKeys())
-          && request.resource.data.type in ['stylized', 'photoreal']
+          && validAvatar(request.resource.data)
+          // Only a ready-made coach is made on the phone.
+          && request.resource.data.get('source', 'default') == 'default'
           && hasMeta(request.resource.data);
         allow update: if isAdultOwner(uid) && docId == 'current'
-          && onlyChanges(['type', 'style_config', 'raw_media_retained', 'updated_at'])
-          && request.resource.data.type in ['stylized', 'photoreal'];
+          && onlyChanges(['type', 'style_config', 'raw_media_retained', 'updated_at',
+                          'source', 'coach_id', 'coach_name', 'background'])
+          && validAvatar(request.resource.data)
+          // The app may go back to a ready-made coach, never claim a
+          // made-for-you one.
+          && (request.resource.data.get('source', 'default')
+                == resource.data.get('source', 'default')
+              || request.resource.data.get('source', 'default') == 'default');
         allow delete: if false; // "Delete my avatar" runs on the server (FR-SET-03)
       }
 

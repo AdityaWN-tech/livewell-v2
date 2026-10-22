@@ -70,7 +70,7 @@ class PlanScheduler {
   /// The coach's face per reminder: its frames on the device, else the
   /// initial circle (T-AVT-08a).
   Future<Map<TouchpointKind, String>> _faces() async {
-    await _ref.read(coachAvatarConfigProvider.future);
+    await _ref.read(coachChoiceProvider.future);
     final name = _ref.read(coachNameProvider) ?? 'Coach';
     return _ref
         .read(coachFacesProvider)

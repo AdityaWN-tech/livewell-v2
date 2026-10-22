@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/feature_flags.dart';
+import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/data/avatar_repository.dart';
-import '../../avatar/domain/avatar_config.dart';
-import '../../avatar/presentation/coach_avatar.dart'
-    show coachAvatarConfigProvider, defaultCoach;
+import '../../avatar/domain/coach_choice.dart';
+import '../../avatar/domain/coaches.dart';
+import '../../avatar/presentation/coach_avatar.dart';
 import '../../voice/data/voice_repository.dart';
 import '../../voice/domain/voice.dart';
 import '../../voice/presentation/voice_screen.dart'
@@ -21,13 +22,29 @@ import 'studio_widgets.dart';
 /// TODO(T-VOC-02): read the cloned voice's consent status.
 final clonedVoiceConsentProvider = Provider<bool>((ref) => false);
 
-/// The Avatar & Voice Studio (T-UI-02h), from Profile: the coach's look,
-/// voice and background, each saved with its own button. The look tab shows
-/// the coach until the 3D Avatar Studio replaces it (T-AVT-08b).
+/// The Avatar Studio (T-AVT-08b), from onboarding and Profile > My coach:
+/// a large live preview of the coach (it breathes and blinks) with its name,
+/// then tabs: the 8 ready-made coaches, "Make me from my photo", "Build my
+/// own" and "Adjust" (made by the Media Service, coming with T-AVT-08c to
+/// 08e), the background, and the voice. The look is saved with "Use this
+/// coach"; the voice with its own button.
 class StudioScreen extends ConsumerStatefulWidget {
-  const StudioScreen({super.key, this.initialTab = StudioTab.avatar});
+  const StudioScreen({
+    super.key,
+    this.initialTab = StudioTab.coaches,
+    this.onboarding = false,
+    this.onSaved,
+  });
 
   final StudioTab initialTab;
+
+  /// The first step after sign-up: no Voice tab (the voice step is next),
+  /// "Use this coach" waits for a pick (never a guessed look, D-28), and
+  /// "Skip" takes the default.
+  final bool onboarding;
+
+  /// Called after the look is saved (onboarding moves on).
+  final Future<void> Function()? onSaved;
 
   @override
   ConsumerState<StudioScreen> createState() => _StudioScreenState();
@@ -35,7 +52,13 @@ class StudioScreen extends ConsumerStatefulWidget {
 
 class _StudioScreenState extends ConsumerState<StudioScreen> {
   late StudioTab _tab = widget.initialTab;
-  AvatarConfig _avatar = defaultCoach;
+  CoachChoice _saved = CoachChoice.fallback;
+  CoachChoice _choice = CoachChoice.fallback;
+
+  /// In onboarding, the coach the person picked (null: none yet).
+  ReadyCoach? _picked;
+  final _name = TextEditingController();
+  String? _nameError;
   VoiceChoice _voice = VoiceChoice.fallback;
   bool _busy = false;
 
@@ -43,7 +66,7 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      AvatarConfig? saved;
+      CoachChoice? saved;
       VoiceChoice? voice;
       try {
         saved = await ref.read(avatarRepositoryProvider).load();
@@ -53,10 +76,19 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
       } catch (_) {}
       if (!mounted) return;
       setState(() {
-        if (saved != null) _avatar = saved;
+        if (saved != null) {
+          _saved = _choice = saved;
+          _name.text = saved.coachName ?? '';
+        }
         if (voice != null) _voice = voice;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
   }
 
   @override
@@ -71,13 +103,38 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
       ..showSnackBar(SnackBar(content: Text(text)));
   }
 
-  Future<void> _saveAvatar() async {
+  void _pick(ReadyCoach c) => setState(() {
+    _picked = c;
+    _choice = _choice.copyWith(coach: c);
+  });
+
+  void _rename(String value) {
+    final l = AppLocalizations.of(context);
+    setState(() {
+      _nameError = CoachChoice.validName(value)
+          ? null
+          : l.profileCoachNameError;
+      if (_nameError == null) {
+        final name = CoachChoice.cleanName(value);
+        _choice = name == null
+            ? _choice.copyWith(clearName: true)
+            : _choice.copyWith(coachName: name);
+      }
+    });
+  }
+
+  Future<void> _saveAvatar([CoachChoice? choice]) async {
     final l = AppLocalizations.of(context);
     setState(() => _busy = true);
     try {
-      await ref.read(avatarRepositoryProvider).save(_avatar);
-      ref.invalidate(coachAvatarConfigProvider);
-      if (mounted) _say(l.profileSaved);
+      await ref.read(avatarRepositoryProvider).save(choice ?? _choice);
+      ref.invalidate(coachChoiceProvider);
+      _saved = choice ?? _choice;
+      if (widget.onSaved != null) {
+        await widget.onSaved!();
+      } else if (mounted) {
+        _say(l.profileSaved);
+      }
     } catch (_) {
       if (mounted) _say(l.avatarSaveError);
     } finally {
@@ -103,22 +160,103 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
       .read(voicePreviewPlayerProvider)
       .play(v.previewAsset(_voice.style), speed: _voice.speed);
 
+  /// The coach shown: a made-for-you set while it is still the saved one,
+  /// else the ready-made coach being chosen.
+  AvatarImages? _previewImages() {
+    final own = _choice == _saved && _choice.source != CoachSource.readyMade;
+    return own
+        ? ref.watch(coachImagesProvider).value
+        : ref.watch(readyCoachFramesProvider(_choice.coach)).value;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final flags = ref.watch(featureFlagsProvider);
-    final children = switch (_tab) {
-      // Choosing a coach comes with the Avatar Studio (T-AVT-08b); the
-      // cartoon creator and its selfie suggestion are gone (T-AVT-08a).
-      StudioTab.avatar => [
-        const AvatarStage(),
-        const SizedBox(height: LwSpacing.md),
-        Text(
-          l.avatarMoreSoon,
-          key: const Key('avatar-more-soon'),
-          style: t.bodySmall,
+    final images = _previewImages();
+    final background = AvatarColours.background[_choice.background];
+    final canSave =
+        !_busy && _nameError == null && (!widget.onboarding || _picked != null);
+    final look = [
+      AvatarStage(images: images, background: background),
+      const SizedBox(height: LwSpacing.sm),
+      TextField(
+        key: const Key('studio-coach-name'),
+        controller: _name,
+        maxLength: CoachChoice.maxNameLength,
+        textCapitalization: TextCapitalization.words,
+        decoration: InputDecoration(
+          labelText: l.profileCoachName,
+          hintText: l.homeCoachDefaultName,
+          errorText: _nameError,
         ),
+        onChanged: _rename,
+      ),
+      const SizedBox(height: LwSpacing.xs),
+    ];
+    final save = [
+      const SizedBox(height: LwSpacing.md),
+      FilledButton(
+        key: const Key('studio-save-avatar'),
+        onPressed: canSave ? _saveAvatar : null,
+        child: Text(l.studioUseCoach),
+      ),
+      if (widget.onboarding) ...[
+        const SizedBox(height: LwSpacing.xs),
+        Center(
+          child: TextButton(
+            key: const Key('avatar-skip'),
+            onPressed: _busy
+                ? null
+                : () => _saveAvatar(CoachChoice(coachName: _choice.coachName)),
+            child: Text(l.avatarSkip),
+          ),
+        ),
+      ],
+    ];
+    final children = switch (_tab) {
+      StudioTab.coaches => [
+        Text(l.studioPickCoach, style: t.titleSmall),
+        const SizedBox(height: LwSpacing.xs),
+        CoachGrid(
+          selected: widget.onboarding ? _picked : _choice.coach,
+          onPick: _pick,
+        ),
+        ...save,
+      ],
+      StudioTab.photo => [
+        StudioComingSoon(
+          key: const Key('studio-photo-soon'),
+          title: l.studioPhotoTitle,
+          body: flags.avatarFromPhoto ? l.studioPhotoBodyOn : l.studioPhotoBody,
+        ),
+        ...save,
+      ],
+      StudioTab.build => [
+        StudioComingSoon(
+          key: const Key('studio-build-soon'),
+          title: l.studioBuildTitle,
+          body: l.studioBuildBody,
+        ),
+        ...save,
+      ],
+      StudioTab.adjust => [
+        StudioComingSoon(
+          key: const Key('studio-adjust-soon'),
+          title: l.studioAdjustTitle,
+          body: l.studioAdjustBody,
+        ),
+        ...save,
+      ],
+      StudioTab.background => [
+        BackgroundChoices(
+          selected: _choice.background,
+          images: images,
+          onPick: (i) =>
+              setState(() => _choice = _choice.copyWith(background: i)),
+        ),
+        ...save,
       ],
       StudioTab.voice => [
         const Align(alignment: Alignment.centerLeft, child: AiVoiceLabel()),
@@ -184,48 +322,51 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
           child: Text(l.studioUseVoice),
         ),
       ],
-      StudioTab.background => [
-        AvatarStage(background: _avatar.background),
-        const SizedBox(height: LwSpacing.md),
-        BackgroundChoices(
-          selected: _avatar.background,
-          onPick: (i) =>
-              setState(() => _avatar = _avatar.copyWith(background: i)),
-        ),
-        const SizedBox(height: LwSpacing.md),
-        FilledButton(
-          key: const Key('studio-save-background'),
-          onPressed: _busy ? null : _saveAvatar,
-          child: Text(l.studioUseBackground),
-        ),
-      ],
     };
     return Scaffold(
       // Back arrow only: the title is in the page so it wraps at large text
-      // sizes instead of being cut off.
-      appBar: AppBar(),
+      // sizes instead of being cut off. Onboarding has no way back.
+      appBar: widget.onboarding ? null : AppBar(),
       body: SafeArea(
-        top: false,
-        child: ListView(
-          key: const Key('studio'),
-          padding: const EdgeInsets.all(LwSpacing.screenGutter),
-          children: [
-            LwPageTitle(l.studioTitle),
-            StudioTabs(
-              tab: _tab,
-              onChanged: (x) {
-                ref.read(voicePreviewPlayerProvider).stop();
-                setState(() => _tab = x);
-              },
-            ),
-            const SizedBox(height: LwSpacing.md),
-            ...children,
-            if (_busy)
-              const Padding(
-                padding: EdgeInsets.only(top: LwSpacing.md),
-                child: Center(child: CircularProgressIndicator()),
+        top: widget.onboarding,
+        child: AbsorbPointer(
+          absorbing: _busy,
+          child: ListView(
+            key: const Key('studio'),
+            padding: const EdgeInsets.all(LwSpacing.screenGutter),
+            children: [
+              if (widget.onboarding) ...[
+                Text(l.studioTitle.toUpperCase(), style: t.labelSmall),
+                Semantics(
+                  header: true,
+                  child: Text(l.avatarTitle, style: t.headlineSmall),
+                ),
+                const SizedBox(height: LwSpacing.xs),
+                Text(l.avatarBody, style: t.bodyMedium),
+                const SizedBox(height: LwSpacing.md),
+              ] else
+                LwPageTitle(l.studioTitle),
+              if (_tab != StudioTab.voice) ...look,
+              StudioTabs(
+                tab: _tab,
+                tabs: [
+                  for (final x in StudioTab.values)
+                    if (!widget.onboarding || x != StudioTab.voice) x,
+                ],
+                onChanged: (x) {
+                  ref.read(voicePreviewPlayerProvider).stop();
+                  setState(() => _tab = x);
+                },
               ),
-          ],
+              const SizedBox(height: LwSpacing.md),
+              ...children,
+              if (_busy)
+                const Padding(
+                  padding: EdgeInsets.only(top: LwSpacing.md),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
+          ),
         ),
       ),
     );

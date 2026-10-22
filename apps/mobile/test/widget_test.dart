@@ -7,6 +7,8 @@ import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/firebase/firebase_options.dart';
+import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
+    show avatarIdleMotionProvider;
 
 import 'support/frames.dart';
 
@@ -19,6 +21,8 @@ void main() {
         ProviderScope(
           overrides: [
             flavorProvider.overrideWithValue(flavor),
+            // The coach breathes forever; screens couldn't settle.
+            avatarIdleMotionProvider.overrideWithValue(false),
             splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
             appStartupProvider.overrideWith(
               (ref) async => StartDestination.home,

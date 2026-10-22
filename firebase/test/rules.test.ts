@@ -7,6 +7,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   setDoc,
@@ -188,6 +189,64 @@ describe('avatar', () => {
     await seed(env, { 'users/alice/avatar/current': avatar() });
     await assertFails(updateDoc(doc(as(ALICE), 'users/alice/avatar/current'), { type: 'cartoon' }));
     await assertFails(deleteDoc(doc(as(ALICE), 'users/alice/avatar/current')));
+  });
+
+  // T-AVT-08b: the 3D coach.
+  const coach = (o: Record<string, unknown> = {}) => ({
+    type: '3d_adult',
+    source: 'default',
+    coach_id: 'green_hijab',
+    coach_name: 'Asha',
+    background: 2,
+    raw_media_retained: false,
+    ...meta(),
+    ...o,
+  });
+
+  it('picks a ready-made coach, renames it, changes the background', async () => {
+    await seedAdult(env);
+    const ref = doc(as(ALICE), 'users/alice/avatar/current');
+    await assertSucceeds(setDoc(ref, coach()));
+    await assertSucceeds(updateDoc(ref, { coach_id: 'wheelchair', coach_name: 'Sam', background: 5 }));
+    await assertSucceeds(updateDoc(ref, { coach_name: deleteField() }));
+  });
+
+  it('an older cartoon doc can become a 3D coach', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/avatar/current': avatar() });
+    await assertSucceeds(
+      updateDoc(doc(as(ALICE), 'users/alice/avatar/current'), {
+        type: '3d_adult', source: 'default', coach_id: 'brown_hair', background: 0,
+      }),
+    );
+  });
+
+  it('only known coaches, names of 1 to 20 characters, 6 backgrounds', async () => {
+    await seedAdult(env);
+    const ref = doc(as(ALICE), 'users/alice/avatar/current');
+    await assertFails(setDoc(ref, coach({ coach_id: 'someone_else' })));
+    await assertFails(setDoc(ref, coach({ coach_name: '' })));
+    await assertFails(setDoc(ref, coach({ coach_name: 'x'.repeat(21) })));
+    await assertFails(setDoc(ref, coach({ background: 6 })));
+    await assertFails(setDoc(ref, coach({ raw_media_retained: true })));
+  });
+
+  it('made-for-you avatars and frame sets are server-only', async () => {
+    await seedAdult(env);
+    const ref = doc(as(ALICE), 'users/alice/avatar/current');
+    await assertFails(setDoc(ref, coach({ source: 'selfie' })));
+    await assertFails(setDoc(ref, coach({ frames_version: 3 })));
+    await seed(env, { 'users/alice/avatar/current': coach() });
+    await assertFails(updateDoc(ref, { source: 'built' }));
+    await assertFails(updateDoc(ref, { frames_version: 2 }));
+    // A server-made selfie coach: renaming is fine, and so is going back
+    // to a ready-made coach.
+    await seed(env, {
+      'users/alice/avatar/current': coach({ source: 'selfie', frames_version: 1 }),
+    });
+    await assertSucceeds(updateDoc(ref, { coach_name: 'Mira' }));
+    await assertFails(updateDoc(ref, { frames_version: 9 }));
+    await assertSucceeds(updateDoc(ref, { source: 'default', coach_id: 'short_curls' }));
   });
 });
 

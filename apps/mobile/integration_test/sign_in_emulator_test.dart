@@ -13,7 +13,8 @@ import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/data/firebase_auth_service.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
-import 'package:livewell/features/avatar/domain/avatar_config.dart';
+import 'package:livewell/features/avatar/domain/coach_choice.dart';
+import 'package:livewell/features/avatar/domain/coaches.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
@@ -264,7 +265,9 @@ void main() {
     expect(fb.FirebaseAuth.instance.currentUser, isNull);
   });
 
-  testWidgets('avatar saves through the real rules, then restyles', (_) async {
+  testWidgets('avatar saves through the real rules, then changes coach', (
+    _,
+  ) async {
     final id = DateTime.now().microsecondsSinceEpoch;
     final user = await googleAs(
       'a-$id',
@@ -273,21 +276,26 @@ void main() {
     await container.read(signInCompletionProvider).complete(user);
     final avatars = container.read(avatarRepositoryProvider);
 
-    await avatars.save(AvatarConfig.forLook(AvatarLook.woman));
-    final first = await db.doc('users/${user.uid}/avatar/current').get();
-    expect(first['type'], 'stylized');
-    expect(first['raw_media_retained'], isFalse);
-    expect(first['style_config']['look'], 'woman');
-
-    // A second save is an update the rules allow (created_at untouched).
     await avatars.save(
-      AvatarConfig.fallback.copyWith(skin: 9, headCovering: HeadCovering.hijab),
+      const CoachChoice(coach: ReadyCoach.greenHijab, coachName: 'Asha'),
+    );
+    final first = await db.doc('users/${user.uid}/avatar/current').get();
+    expect(first['type'], '3d_adult');
+    expect(first['source'], 'default');
+    expect(first['coach_id'], 'green_hijab');
+    expect(first['raw_media_retained'], isFalse);
+
+    // A second save is an update the rules allow (created_at untouched);
+    // no name: the field goes ("Coach").
+    await avatars.save(
+      const CoachChoice(coach: ReadyCoach.wheelchair, background: 2),
     );
     final second = await db.doc('users/${user.uid}/avatar/current').get();
-    expect(second['style_config']['skin'], 9);
-    expect(second['style_config']['head_covering'], 'hijab');
+    expect(second['coach_id'], 'wheelchair');
+    expect(second['background'], 2);
+    expect(second.data(), isNot(contains('coach_name')));
     expect(second['created_at'], first['created_at']);
-    expect((await avatars.load())!.skin, 9);
+    expect((await avatars.load())!.coach, ReadyCoach.wheelchair);
   });
 
   testWidgets('library voice: chosen, then switched, one active (rules)', (

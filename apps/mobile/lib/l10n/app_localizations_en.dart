@@ -2381,9 +2381,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studioTitle => 'Avatar & Voice Studio';
 
   @override
-  String get studioTabAvatar => 'Avatar';
-
-  @override
   String get studioTabVoice => 'Voice';
 
   @override
@@ -2438,30 +2435,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studioSceneSoon => 'Coming with the new art';
-
-  @override
-  String get studioUseBackground => 'Use this background';
-
-  @override
-  String get avatarCharacterHoodie => 'Green hoodie';
-
-  @override
-  String get avatarCharacterLongHair => 'Long hair';
-
-  @override
-  String get avatarCharacterGlasses => 'Glasses';
-
-  @override
-  String get avatarCharacterCurly => 'Curly hair';
-
-  @override
-  String get avatarCharacterHijab => 'Hijab';
-
-  @override
-  String get avatarCharacterTurban => 'Turban';
-
-  @override
-  String get avatarCharacterOlder => 'Grey hair';
 
   @override
   String get profileStudio => 'Avatar & Voice Studio';
@@ -2653,15 +2626,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String get devMoments => 'Avatar Moments';
 
   @override
-  String get avatarMoreSoon =>
-      'Soon you can pick from ready-made coaches, make one from your photo, or build your own. For now, meet your coach.';
-
-  @override
-  String get avatarContinue => 'Continue';
-
-  @override
   String get devAvatarFrames => 'Avatar frames';
 
   @override
   String get devAvatarTalk => 'Talk (mouth frames only)';
+
+  @override
+  String get coachReadyBrownHair => 'Brown hair, 30s';
+
+  @override
+  String get coachReadyLongBlackHair => 'Long black hair, 30s';
+
+  @override
+  String get coachReadyGreenHijab => 'Green hijab, 40s';
+
+  @override
+  String get coachReadyNavyTurban => 'Navy turban, 40s';
+
+  @override
+  String get coachReadyGreyGlasses => 'Grey hair, glasses, 60s';
+
+  @override
+  String get coachReadyShortCurls => 'Short curls, 50s';
+
+  @override
+  String get coachReadyShortBlackHair => 'Short black hair, 20s';
+
+  @override
+  String get coachReadyWheelchair => 'Auburn hair, wheelchair, 30s';
+
+  @override
+  String get studioTabCoaches => 'Coaches';
+
+  @override
+  String get studioTabPhoto => 'From my photo';
+
+  @override
+  String get studioTabBuild => 'Build my own';
+
+  @override
+  String get studioTabAdjust => 'Adjust';
+
+  @override
+  String get studioPickCoach => 'Pick a coach';
+
+  @override
+  String get studioUseCoach => 'Use this coach';
+
+  @override
+  String get studioSoon => 'Coming soon';
+
+  @override
+  String get studioPhotoTitle => 'Make me from my photo';
+
+  @override
+  String get studioPhotoBody =>
+      'Take a live selfie and we make a 3D coach that looks like you. Your photo is deleted right after.';
+
+  @override
+  String get studioPhotoBodyOn =>
+      'Take a live selfie and we make a 3D coach that looks like you. You will be asked for permission first, and your photo is deleted right after.';
+
+  @override
+  String get studioBuildTitle => 'Build my own';
+
+  @override
+  String get studioBuildBody =>
+      'Choose the face, skin tone, hair, outfit and more, and we make your coach from your choices.';
+
+  @override
+  String get studioAdjustTitle => 'Adjust your coach';
+
+  @override
+  String get studioAdjustBody =>
+      'Change the hair, outfit, cap, glasses, head covering or accessories on your coach.';
+
+  @override
+  String get avatarSkip => 'Skip, use the default coach';
 }

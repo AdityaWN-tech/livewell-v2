@@ -4209,12 +4209,6 @@ abstract class AppLocalizations {
   /// **'Avatar & Voice Studio'**
   String get studioTitle;
 
-  /// No description provided for @studioTabAvatar.
-  ///
-  /// In en, this message translates to:
-  /// **'Avatar'**
-  String get studioTabAvatar;
-
   /// No description provided for @studioTabVoice.
   ///
   /// In en, this message translates to:
@@ -4316,54 +4310,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Coming with the new art'**
   String get studioSceneSoon;
-
-  /// No description provided for @studioUseBackground.
-  ///
-  /// In en, this message translates to:
-  /// **'Use this background'**
-  String get studioUseBackground;
-
-  /// No description provided for @avatarCharacterHoodie.
-  ///
-  /// In en, this message translates to:
-  /// **'Green hoodie'**
-  String get avatarCharacterHoodie;
-
-  /// No description provided for @avatarCharacterLongHair.
-  ///
-  /// In en, this message translates to:
-  /// **'Long hair'**
-  String get avatarCharacterLongHair;
-
-  /// No description provided for @avatarCharacterGlasses.
-  ///
-  /// In en, this message translates to:
-  /// **'Glasses'**
-  String get avatarCharacterGlasses;
-
-  /// No description provided for @avatarCharacterCurly.
-  ///
-  /// In en, this message translates to:
-  /// **'Curly hair'**
-  String get avatarCharacterCurly;
-
-  /// No description provided for @avatarCharacterHijab.
-  ///
-  /// In en, this message translates to:
-  /// **'Hijab'**
-  String get avatarCharacterHijab;
-
-  /// No description provided for @avatarCharacterTurban.
-  ///
-  /// In en, this message translates to:
-  /// **'Turban'**
-  String get avatarCharacterTurban;
-
-  /// No description provided for @avatarCharacterOlder.
-  ///
-  /// In en, this message translates to:
-  /// **'Grey hair'**
-  String get avatarCharacterOlder;
 
   /// No description provided for @profileStudio.
   ///
@@ -4707,18 +4653,6 @@ abstract class AppLocalizations {
   /// **'Avatar Moments'**
   String get devMoments;
 
-  /// No description provided for @avatarMoreSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon you can pick from ready-made coaches, make one from your photo, or build your own. For now, meet your coach.'**
-  String get avatarMoreSoon;
-
-  /// No description provided for @avatarContinue.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue'**
-  String get avatarContinue;
-
   /// No description provided for @devAvatarFrames.
   ///
   /// In en, this message translates to:
@@ -4730,6 +4664,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Talk (mouth frames only)'**
   String get devAvatarTalk;
+
+  /// No description provided for @coachReadyBrownHair.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown hair, 30s'**
+  String get coachReadyBrownHair;
+
+  /// No description provided for @coachReadyLongBlackHair.
+  ///
+  /// In en, this message translates to:
+  /// **'Long black hair, 30s'**
+  String get coachReadyLongBlackHair;
+
+  /// No description provided for @coachReadyGreenHijab.
+  ///
+  /// In en, this message translates to:
+  /// **'Green hijab, 40s'**
+  String get coachReadyGreenHijab;
+
+  /// No description provided for @coachReadyNavyTurban.
+  ///
+  /// In en, this message translates to:
+  /// **'Navy turban, 40s'**
+  String get coachReadyNavyTurban;
+
+  /// No description provided for @coachReadyGreyGlasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey hair, glasses, 60s'**
+  String get coachReadyGreyGlasses;
+
+  /// No description provided for @coachReadyShortCurls.
+  ///
+  /// In en, this message translates to:
+  /// **'Short curls, 50s'**
+  String get coachReadyShortCurls;
+
+  /// No description provided for @coachReadyShortBlackHair.
+  ///
+  /// In en, this message translates to:
+  /// **'Short black hair, 20s'**
+  String get coachReadyShortBlackHair;
+
+  /// No description provided for @coachReadyWheelchair.
+  ///
+  /// In en, this message translates to:
+  /// **'Auburn hair, wheelchair, 30s'**
+  String get coachReadyWheelchair;
+
+  /// No description provided for @studioTabCoaches.
+  ///
+  /// In en, this message translates to:
+  /// **'Coaches'**
+  String get studioTabCoaches;
+
+  /// No description provided for @studioTabPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'From my photo'**
+  String get studioTabPhoto;
+
+  /// No description provided for @studioTabBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Build my own'**
+  String get studioTabBuild;
+
+  /// No description provided for @studioTabAdjust.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust'**
+  String get studioTabAdjust;
+
+  /// No description provided for @studioPickCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a coach'**
+  String get studioPickCoach;
+
+  /// No description provided for @studioUseCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this coach'**
+  String get studioUseCoach;
+
+  /// No description provided for @studioSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get studioSoon;
+
+  /// No description provided for @studioPhotoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make me from my photo'**
+  String get studioPhotoTitle;
+
+  /// No description provided for @studioPhotoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a live selfie and we make a 3D coach that looks like you. Your photo is deleted right after.'**
+  String get studioPhotoBody;
+
+  /// No description provided for @studioPhotoBodyOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a live selfie and we make a 3D coach that looks like you. You will be asked for permission first, and your photo is deleted right after.'**
+  String get studioPhotoBodyOn;
+
+  /// No description provided for @studioBuildTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Build my own'**
+  String get studioBuildTitle;
+
+  /// No description provided for @studioBuildBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the face, skin tone, hair, outfit and more, and we make your coach from your choices.'**
+  String get studioBuildBody;
+
+  /// No description provided for @studioAdjustTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust your coach'**
+  String get studioAdjustTitle;
+
+  /// No description provided for @studioAdjustBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the hair, outfit, cap, glasses, head covering or accessories on your coach.'**
+  String get studioAdjustBody;
+
+  /// No description provided for @avatarSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip, use the default coach'**
+  String get avatarSkip;
 }
 
 class _AppLocalizationsDelegate

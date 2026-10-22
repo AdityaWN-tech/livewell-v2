@@ -8,7 +8,7 @@ import 'package:livewell/core/design/components/speech_bubble.dart';
 import 'package:livewell/core/design/illustration/illustration.dart';
 import 'package:livewell/core/design/theme.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
-import 'package:livewell/features/avatar/domain/avatar_config.dart';
+import 'package:livewell/features/avatar/domain/coach_choice.dart';
 import 'package:livewell/features/avatar/presentation/coach_avatar.dart';
 import 'package:livewell/l10n/app_localizations.dart';
 
@@ -23,7 +23,7 @@ final catalog = IllustrationCatalog.parse(manifestJson);
 
 class _ThrowingAvatars extends FakeAvatarRepository {
   @override
-  Future<AvatarConfig?> load() async => throw Exception('offline');
+  Future<CoachChoice?> load() async => throw Exception('offline');
 }
 
 Widget app(
@@ -109,8 +109,8 @@ void main() {
     test('covers everything the task lists', () {
       int count(String kind, [String prefix = '']) =>
           items.where((e) => e.kind == kind && e.id.startsWith(prefix)).length;
-      expect(count('character'), greaterThanOrEqualTo(4));
-      expect(catalog['character_wheelchair'], isNotNull);
+      expect(count('character', 'coach_'), 8);
+      expect(catalog['coach_wheelchair'], isNotNull);
       expect(count('scene', 'scene_'), 2);
       expect(count('scene', 'studio_bg_'), greaterThanOrEqualTo(3));
       for (final id in [
@@ -239,7 +239,7 @@ void main() {
     }
 
     testWidgets('uses the saved background (avatar/current)', (tester) async {
-      final saved = AvatarConfig.fallback.copyWith(background: 3);
+      const saved = CoachChoice(background: 3);
       await tester.pumpWidget(
         app(
           const CoachAvatar(),

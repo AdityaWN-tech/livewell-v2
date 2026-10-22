@@ -10,6 +10,7 @@ import '../../account/data/profile_repository.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../domain/home_models.dart';
+import '../../avatar/presentation/coach_avatar.dart' show coachChoiceProvider;
 
 /// True when check-ins can be saved: signed in, or the dev preview.
 final canCheckInProvider = Provider<bool>(
@@ -41,9 +42,12 @@ final dayNumberProvider = Provider<int?>((ref) {
   return dayNumber(created.toLocal(), ref.watch(clockProvider)());
 });
 
-/// The coach's name from Profile > My coach; null means "Coach".
+/// The coach's name, saved with the avatar (T-AVT-08b), else the older
+/// profile setting; null means "Coach".
 final coachNameProvider = Provider<String?>(
-  (ref) => ref.watch(currentProfileProvider).value?.coachName,
+  (ref) =>
+      ref.watch(coachChoiceProvider).value?.coachName ??
+      ref.watch(currentProfileProvider).value?.coachName,
 );
 
 /// Today's planned day: the starter plan (T-ONB-03e) or, later, the

@@ -21,7 +21,8 @@ import '../support/app_harness.dart';
 /// T-AVT-08a: the frame set, the kept face engine, the player, the cache
 /// and the fallback chain.
 
-const placeholder = 'assets/avatar/frames/placeholder';
+/// The default coach's set (placeholder cards until the art is final).
+const placeholder = 'assets/avatar/frames/coaches/brown_hair';
 
 AvatarFrameManifest placeholderManifest() => AvatarFrameManifest.fromJson(
   jsonDecode(File('$placeholder/avatar_frames.json').readAsStringSync())
@@ -147,8 +148,20 @@ void main() {
     test('picks the size nearest the screen', () {
       final m = placeholderManifest();
       expect(m.fileFor(AvatarFrame.calm, devicePixelRatio: 2), 'calm@2x.webp');
+      // Placeholders come in one size: the nearest there is.
       expect(
         m.fileFor(AvatarFrame.calm, devicePixelRatio: 3.5),
+        'calm@2x.webp',
+      );
+      final both = AvatarFrameManifest.fromJson({
+        ...m.toJson(),
+        'sizes': ['2x', '3x'],
+        'frames': {
+          'calm': {'2x': 'calm@2x.webp', '3x': 'calm@3x.webp'},
+        },
+      });
+      expect(
+        both.fileFor(AvatarFrame.calm, devicePixelRatio: 3.5),
         'calm@3x.webp',
       );
     });

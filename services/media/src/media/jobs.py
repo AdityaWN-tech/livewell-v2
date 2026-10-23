@@ -7,6 +7,7 @@ approved portrait in T-AVT-08d.
 
 from __future__ import annotations
 
+import logging
 import secrets
 import threading
 from collections.abc import Callable
@@ -17,9 +18,12 @@ from typing import Protocol
 
 from pydantic import BaseModel, Field
 
+from .audit import AuditEntry, AuditLog, Events
 from .prompts import OptionBook, PromptBook
 from .safety import ImageInspector, Rejection, judge
-from .stylizer import AvatarStylizer, StylizerError, check_endpoint
+from .stylizer import AvatarStylizer, EndpointNotApproved, StylizerError, check_endpoint
+
+log = logging.getLogger("media")
 
 
 class AvatarSource(StrEnum):
@@ -214,6 +218,7 @@ class JobRunner:
     #: Builds the frame set once the portrait is approved (T-AVT-08d).
     frames: FrameMaker | None = None
     docs: AvatarDocWriter | None = None
+    audit: AuditLog | None = None
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
 
     def prompt_for(self, job: Job) -> str:
@@ -228,9 +233,24 @@ class JobRunner:
         """Runs [job]. The selfie is only held for this call: it is never
         stored, and the reference to it is dropped when the job ends."""
         try:
-            return self._run(job, selfie)
+            done = self._run(job, selfie)
+        except Exception:
+            self._audit(job, Events.AVATAR_NOT_MADE, "error")
+            raise
         finally:
-            selfie = None
+            if selfie is not None:
+                # Only ever in memory: nothing to delete but our reference.
+                selfie = None
+                self._audit(job, Events.SELFIE_DISCARDED)
+        if done.status is JobStatus.SUCCEEDED:
+            self._audit(done, Events.AVATAR_CREATED, f"frames_version={done.frames_version}")
+        else:
+            self._audit(done, Events.AVATAR_NOT_MADE, done.status.value)
+        return done
+
+    def _audit(self, job: Job, event: str, detail: str = "") -> None:
+        if self.audit is not None:
+            self.audit.append(AuditEntry(job.uid, event, job.id, self.clock(), detail))
 
     def _finish(self, job: Job, status: JobStatus, message: str | None = None) -> Job:
         job.status = status
@@ -251,8 +271,13 @@ class JobRunner:
         else:
             reference = selfie
         prompt = self.prompt_for(job)
-        # Never send a photo to an endpoint we haven't approved.
-        check_endpoint(self.stylizer.endpoint, self.approved_hosts)
+        # Never send a photo to an endpoint we haven't approved. That is a
+        # setup mistake: logged loudly, and the person gets the kind message.
+        try:
+            check_endpoint(self.stylizer.endpoint, self.approved_hosts)
+        except EndpointNotApproved:
+            log.error("avatar job %s: stylizer endpoint not approved", job.id)
+            return self._finish(job, JobStatus.FAILED, Messages.NOT_MADE)
         rejected = False
         for _ in range(self.attempts):
             job.attempts += 1

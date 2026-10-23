@@ -17,11 +17,12 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
+from .audit import AuditEntry, AuditLog, Events, InMemoryAuditLog
 from .auth import (
     SELFIE_CONSENTS,
     Authenticator,
@@ -105,6 +106,7 @@ class Services:
     checker: FrameChecker = field(default_factory=lambda: _NoFrameCheck())
     frame_store: FrameStore = field(default_factory=InMemoryFrameStore)
     docs: AvatarDocWriter = field(default_factory=InMemoryAvatarDocs)
+    audit: AuditLog = field(default_factory=InMemoryAuditLog)
     #: Off only in tests about the HTTP layer alone.
     build_frames: bool = True
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
@@ -123,6 +125,8 @@ class AvatarRequest(BaseModel):
     options: dict[str, str] = Field(default_factory=dict, max_length=20)
     #: From my photo: the live selfie, base64 JPEG. Held only for the job.
     selfie_jpeg_base64: str | None = Field(default=None, repr=False)
+    #: How the app saw a live person (T-AVT-08e): a blink or a head turn.
+    liveness: Literal["blink", "turn"] | None = None
 
 
 def create_app(services: Services | None = None) -> FastAPI:
@@ -153,6 +157,7 @@ def create_app(services: Services | None = None) -> FastAPI:
         if s.build_frames
         else None,
         docs=s.docs,
+        audit=s.audit,
         clock=s.clock,
     )
     limiter = DailyLimiter(s.jobs, s.settings.daily_limit)
@@ -185,6 +190,8 @@ def create_app(services: Services | None = None) -> FastAPI:
                 raise HTTPException(403, "feature_off")
             if not s.consents.has(uid, SELFIE_CONSENTS):
                 raise HTTPException(403, "consent_required")
+            if body.liveness is None:
+                raise HTTPException(422, "liveness_required")
             selfie = _decode_selfie(body.selfie_jpeg_base64)
         elif body.selfie_jpeg_base64 is not None:
             raise HTTPException(422, "selfie_only_for_selfie_source")
@@ -202,6 +209,10 @@ def create_app(services: Services | None = None) -> FastAPI:
         s.jobs.add(job)
         if idempotency_key:
             s.jobs.remember_key(uid, idempotency_key, job.id)
+        if selfie is not None:
+            s.audit.append(
+                AuditEntry(uid, Events.SELFIE_RECEIVED, job.id, now, f"liveness={body.liveness}")
+            )
         log.info("avatar job %s queued (%s)", job.id, job.source.value)
         background.add_task(runner.run, job, selfie)
         return job.view()

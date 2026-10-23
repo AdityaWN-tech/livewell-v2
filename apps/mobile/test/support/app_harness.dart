@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
+import 'package:livewell/features/avatar/data/selfie_capture.dart';
 import 'package:livewell/features/moments/application/moment_launcher.dart';
 import 'package:livewell/features/moments/data/coach_faces.dart';
 import 'package:livewell/features/moments/data/coach_speaker.dart';
@@ -92,6 +94,8 @@ class Harness {
   final reminders = FakeReminders();
   final reminderZone = FakeReminderZoneStore();
   final faces = FakeCoachFaces();
+  final selfieCapture = FakeSelfieCapture();
+  final avatarMaker = FakeAvatarMaker();
   final momentSeen = FakeMomentSeenStore();
   final appearance = FakeAppearanceStore();
   final photo = FakeProfilePhotoStore();
@@ -151,6 +155,8 @@ class Harness {
           namePromptStoreProvider.overrideWithValue(namePrompt),
           coachSpeakerProvider.overrideWithValue(speaker),
           coachFacesProvider.overrideWithValue(faces),
+          selfieCaptureProvider.overrideWithValue(selfieCapture),
+          avatarMakerApiProvider.overrideWithValue(avatarMaker),
           momentSeenStoreProvider.overrideWithValue(momentSeen),
           avatarIdleMotionProvider.overrideWithValue(idleMotion),
           // The dev preview keeps its sample lessons and offer.

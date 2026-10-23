@@ -17,8 +17,8 @@ Every image model, checking model and vendor used to make or check avatars, with
 |---|---|---|---|
 | *(none chosen)* | Portrait and frames (`AvatarStylizer`) | — | Scorecard pending |
 | *(none chosen)* | Safety check (`ImageInspector`) | — | Scorecard pending |
+| Google ML Kit face detection (`google_mlkit_face_detection`, on device) | Live selfie: one face, tips, blink or head turn (T-AVT-08e) | Plugin: MIT; ML Kit: Google's ML Kit terms (on-device, free) — **verify for commercial use** | In the app (flag off in prod) |
 
 **InsightFace warning:** many face-identity pipelines (for example InstantID, IP-Adapter FaceID and several face-similarity tools) load InsightFace model weights, which are licensed for **non-commercial use only**. They must not be used in prod without a commercial licence for those weights. Check the licence of every weight a pipeline downloads, not only the top-level project.
 
 **Never** send user photos to public demo servers (public Gradio, Hugging Face Spaces, Colab, tunnels); the service refuses them in code.
-

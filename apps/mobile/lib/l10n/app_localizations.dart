@@ -4802,6 +4802,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip, use the default coach'**
   String get avatarSkip;
+
+  /// No description provided for @photoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your live selfie'**
+  String get photoTitle;
+
+  /// No description provided for @photoIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make me from my photo'**
+  String get photoIntroTitle;
+
+  /// No description provided for @photoIntroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a live selfie and we make a 3D coach that looks like you. Your photo is sent securely, used only to make your coach, and deleted right after (at most 7 days). You can delete your coach any time in Profile > My coach.'**
+  String get photoIntroBody;
+
+  /// No description provided for @photoStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a live selfie'**
+  String get photoStart;
+
+  /// No description provided for @photoConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make your coach from your photo?'**
+  String get photoConsentTitle;
+
+  /// No description provided for @photoConsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We need two permissions:\n\n• Camera: to take one live selfie in the app (not from your gallery).\n• Face processing: our service uses your selfie to make a 3D coach that looks like you.\n\nYour photo is sent securely, used only to make your coach, and deleted right after it is made (at most 7 days). It is never used to train AI. You can turn these off, or delete your coach, any time in Profile > My coach.'**
+  String get photoConsentBody;
+
+  /// No description provided for @photoConsentAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get photoConsentAllow;
+
+  /// No description provided for @photoConsentNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get photoConsentNotNow;
+
+  /// No description provided for @photoDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'No problem. You can pick a ready-made coach or build your own instead.'**
+  String get photoDeclined;
+
+  /// No description provided for @photoTipNoFace.
+  ///
+  /// In en, this message translates to:
+  /// **'Put your face in the circle'**
+  String get photoTipNoFace;
+
+  /// No description provided for @photoTipOneFace.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you in the picture, please'**
+  String get photoTipOneFace;
+
+  /// No description provided for @photoTipCloser.
+  ///
+  /// In en, this message translates to:
+  /// **'Come a little closer'**
+  String get photoTipCloser;
+
+  /// No description provided for @photoTipBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Move back a little'**
+  String get photoTipBack;
+
+  /// No description provided for @photoTipCentre.
+  ///
+  /// In en, this message translates to:
+  /// **'Centre your face and look at the camera'**
+  String get photoTipCentre;
+
+  /// No description provided for @photoTipBlink.
+  ///
+  /// In en, this message translates to:
+  /// **'Now blink slowly'**
+  String get photoTipBlink;
+
+  /// No description provided for @photoTipTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn your head a little, then look back'**
+  String get photoTipTurn;
+
+  /// No description provided for @photoTipReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Great! Take your photo'**
+  String get photoTipReady;
+
+  /// No description provided for @photoTake.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get photoTake;
+
+  /// No description provided for @photoUseTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t blink? Turn your head instead'**
+  String get photoUseTurn;
+
+  /// No description provided for @photoUseBlink.
+  ///
+  /// In en, this message translates to:
+  /// **'Blink instead'**
+  String get photoUseBlink;
+
+  /// No description provided for @photoPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Only your own face. The photo is used once to make your coach and deleted right after.'**
+  String get photoPrivacy;
+
+  /// No description provided for @photoMaking.
+  ///
+  /// In en, this message translates to:
+  /// **'Making your coach… This takes about a minute.'**
+  String get photoMaking;
+
+  /// No description provided for @photoReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach is ready.'**
+  String get photoReady;
+
+  /// No description provided for @photoErrNotMade.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t make your coach this time. You can try a different photo, or pick a ready-made coach.'**
+  String get photoErrNotMade;
+
+  /// No description provided for @photoErrLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve made 3 coaches today. You can try again tomorrow, or pick a ready-made coach.'**
+  String get photoErrLimit;
+
+  /// No description provided for @photoErrUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Making a coach from a photo isn\'t available yet.'**
+  String get photoErrUnavailable;
+
+  /// No description provided for @photoErrNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t reach our service. Please check your connection and try again.'**
+  String get photoErrNetwork;
+
+  /// No description provided for @photoErrConsent.
+  ///
+  /// In en, this message translates to:
+  /// **'Please allow the camera and face processing first.'**
+  String get photoErrConsent;
+
+  /// No description provided for @photoErrCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t open the camera.'**
+  String get photoErrCamera;
+
+  /// No description provided for @photoTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get photoTryAgain;
+
+  /// No description provided for @photoPickReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a ready-made coach'**
+  String get photoPickReady;
 }
 
 class _AppLocalizationsDelegate

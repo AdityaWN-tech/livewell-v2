@@ -1,6 +1,12 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/painting.dart' show Color;
+import 'package:flutter/widgets.dart' show Key, SizedBox, Widget;
+import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
+import 'package:livewell/features/avatar/data/selfie_capture.dart';
+import 'package:livewell/features/avatar/domain/liveness.dart';
 import 'package:livewell/features/moments/application/moment_launcher.dart';
 import 'package:livewell/features/moments/data/coach_faces.dart';
 import 'package:livewell/features/moments/data/coach_speaker.dart';
@@ -745,4 +751,101 @@ class FakeCoachSpeaker implements CoachSpeaker {
 
   @override
   Future<void> stop() async => stops++;
+}
+
+/// The live selfie, faked (T-AVT-08e): the test feeds what the face
+/// detector "sees"; the photo is a real temporary file, read and deleted
+/// like the camera's.
+class FakeSelfieCapture implements SelfieCapture {
+  bool works = true;
+  int starts = 0;
+  bool closed = false;
+  String? lastPhotoPath;
+  final _out = StreamController<FaceObservation>.broadcast();
+
+  void see(FaceObservation f) => _out.add(f);
+
+  /// A live person blinking, centred, close enough.
+  void blink() {
+    for (final eyes in [0.9, 0.1, 0.9]) {
+      see(
+        FaceObservation(
+          faces: 1,
+          leftEyeOpen: eyes,
+          rightEyeOpen: eyes,
+          yaw: 0,
+          widthShare: 0.5,
+          offCentre: 0.02,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<void> start() async {
+    starts++;
+    if (!works) throw const SelfieCameraUnavailable();
+  }
+
+  @override
+  Stream<FaceObservation> get observations => _out.stream;
+
+  @override
+  Widget preview() => const SizedBox.expand(key: Key('fake-camera'));
+
+  @override
+  Future<Uint8List> takePhoto() async {
+    final dir = Directory.systemTemp.createTempSync('selfie');
+    final file = File('${dir.path}/photo.jpg')
+      ..writeAsBytesSync([0xFF, 0xD8, 0xFF, 1, 2, 3]);
+    lastPhotoPath = file.path;
+    // Like readAndDelete (tested with real IO on its own), but sync: async
+    // file calls never finish under the widget-test clock.
+    try {
+      return file.readAsBytesSync();
+    } finally {
+      file.deleteSync();
+    }
+  }
+
+  @override
+  Future<void> stop() async {}
+
+  @override
+  Future<void> close() async => closed = true;
+}
+
+/// The Media Service, faked.
+class FakeAvatarMaker implements AvatarMakerApi {
+  final sent = <(Uint8List, LivenessMethod)>[];
+  AvatarMakerError? refuse;
+
+  /// The statuses the job reports, in order (the last one repeats).
+  List<AvatarJobStatus> statuses = [
+    const AvatarJobStatus(status: 'running'),
+    const AvatarJobStatus(status: 'succeeded', framesVersion: 1),
+  ];
+  int polls = 0;
+
+  /// Runs when the job succeeds (the server writes the avatar doc).
+  void Function()? onMade;
+
+  @override
+  Future<String> startFromSelfie({
+    required Uint8List jpeg,
+    required LivenessMethod liveness,
+    required String idempotencyKey,
+  }) async {
+    if (refuse case final e?) throw e;
+    sent.add((jpeg, liveness));
+    return 'job-1';
+  }
+
+  @override
+  Future<AvatarJobStatus> job(String jobId) async {
+    final s = statuses[polls < statuses.length ? polls : statuses.length - 1];
+    polls++;
+    if (s.succeeded) onMade?.call();
+    return s;
+  }
 }

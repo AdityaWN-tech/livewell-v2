@@ -182,9 +182,8 @@ def test_a_demo_host_stays_refused_even_if_approved_by_mistake() -> None:
 def test_runner_refuses_before_sending_a_selfie_to_an_unapproved_endpoint() -> None:
     stylizer = FakeStylizer(endpoint="https://abc.gradio.live/run")
     r, _, _ = runner(stylizer)
-    job = new_job("u1", AvatarSource.SELFIE, {}, NOW)
-    with pytest.raises(EndpointNotApproved):
-        r.run(job, JPEG)
+    job = r.run(new_job("u1", AvatarSource.SELFIE, {}, NOW), JPEG)
+    assert (job.status, job.message_id) == (JobStatus.FAILED, Messages.NOT_MADE)
     assert stylizer.calls == []
 
 
@@ -314,7 +313,11 @@ def headers(uid: str = "u1", **extra: str) -> dict[str, str]:
 
 
 def selfie_body() -> dict[str, object]:
-    return {"source": "selfie", "selfie_jpeg_base64": base64.b64encode(JPEG).decode()}
+    return {
+        "source": "selfie",
+        "liveness": "blink",
+        "selfie_jpeg_base64": base64.b64encode(JPEG).decode(),
+    }
 
 
 def test_needs_a_token_and_app_check() -> None:
@@ -376,10 +379,17 @@ def test_from_my_photo_needs_camera_and_biometric_consent() -> None:
 @pytest.mark.parametrize(
     ("body", "detail"),
     [
-        ({"source": "selfie"}, "selfie_required"),
-        ({"source": "selfie", "selfie_jpeg_base64": "not base64!"}, "selfie_unreadable"),
+        ({"source": "selfie", "liveness": "blink"}, "selfie_required"),
         (
-            {"source": "selfie", "selfie_jpeg_base64": base64.b64encode(b"PNG").decode()},
+            {"source": "selfie", "liveness": "blink", "selfie_jpeg_base64": "not base64!"},
+            "selfie_unreadable",
+        ),
+        (
+            {
+                "source": "selfie",
+                "liveness": "turn",
+                "selfie_jpeg_base64": base64.b64encode(b"PNG").decode(),
+            },
             "selfie_not_jpeg",
         ),
         (

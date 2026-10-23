@@ -31,6 +31,7 @@ from .auth import (
     NotConfiguredAuthenticator,
     NotConfiguredConsents,
 )
+from .comfyui import WORKFLOWS, ComfyUISettings, comfyui_stylizers
 from .frames import (
     BackgroundRemover,
     FaceLocator,
@@ -50,9 +51,11 @@ from .jobs import (
     InMemoryCosts,
     InMemoryJobs,
     InMemoryPortraits,
+    JobNotifier,
     JobRunner,
     JobStore,
     Messages,
+    NoNotifier,
     new_job,
 )
 from .prompts import OptionBook, PromptBook, PromptError
@@ -81,8 +84,11 @@ class Settings:
             os.environ.get("MEDIA_OPTIONS_PATH", REPO / "content" / "avatar" / "options.json")
         )
     )
-    #: Hosts the stylizer may call; empty until a vendor is chosen.
-    approved_hosts: frozenset[str] = frozenset()
+    #: Hosts the stylizer may call (MEDIA_APPROVED_HOSTS, comma-separated):
+    #: the ComfyUI service's host once it is deployed. Empty: nothing is sent.
+    approved_hosts: frozenset[str] = field(
+        default_factory=lambda: _hosts(os.environ.get("MEDIA_APPROVED_HOSTS", ""))
+    )
     min_similarity: float = 0.6
     #: Remote Config `avatar_daily_generations` (default 3).
     daily_limit: Callable[[], int] = lambda: 3
@@ -96,6 +102,8 @@ class Services:
     auth: Authenticator = field(default_factory=NotConfiguredAuthenticator)
     consents: ConsentChecker = field(default_factory=NotConfiguredConsents)
     stylizer: AvatarStylizer = field(default_factory=NotConfiguredStylizer)
+    #: The 14 frames (avatar_frames.json); None: the portrait stylizer.
+    frame_stylizer: AvatarStylizer | None = None
     inspector: ImageInspector = field(default_factory=NotConfiguredInspector)
     jobs: JobStore = field(default_factory=InMemoryJobs)
     portraits: InMemoryPortraits = field(default_factory=InMemoryPortraits)
@@ -107,9 +115,29 @@ class Services:
     frame_store: FrameStore = field(default_factory=InMemoryFrameStore)
     docs: AvatarDocWriter = field(default_factory=InMemoryAvatarDocs)
     audit: AuditLog = field(default_factory=InMemoryAuditLog)
+    notifier: JobNotifier = field(default_factory=NoNotifier)
     #: Off only in tests about the HTTP layer alone.
     build_frames: bool = True
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
+
+    @classmethod
+    def from_env(cls, env: dict[str, str] | None = None) -> "Services":
+        """What the container runs: our ComfyUI server when MEDIA_COMFYUI_URL
+        is set (from Secret Manager); otherwise nothing is configured."""
+        env = dict(os.environ if env is None else env)
+        settings = Settings(approved_hosts=_hosts(env.get("MEDIA_APPROVED_HOSTS", "")))
+        comfy = ComfyUISettings.from_env(env)
+        if comfy is None:
+            return cls(settings=settings)
+        folder = env.get("MEDIA_WORKFLOWS_PATH")
+        portrait, frames = comfyui_stylizers(
+            comfy, settings.approved_hosts, workflows=Path(folder) if folder else WORKFLOWS
+        )
+        return cls(settings=settings, stylizer=portrait, frame_stylizer=frames)
+
+
+def _hosts(value: str) -> frozenset[str]:
+    return frozenset(h.strip().lower() for h in value.split(",") if h.strip())
 
 
 class _NoFrameCheck:
@@ -130,7 +158,7 @@ class AvatarRequest(BaseModel):
 
 
 def create_app(services: Services | None = None) -> FastAPI:
-    s = services or Services()
+    s = services or Services.from_env()
     prompts = PromptBook.load(s.settings.prompts_path)
     options = OptionBook.load(s.settings.options_path)
     runner = JobRunner(
@@ -145,7 +173,7 @@ def create_app(services: Services | None = None) -> FastAPI:
         min_similarity=s.settings.min_similarity,
         frames=FrameBuilder(
             prompts=prompts,
-            stylizer=s.stylizer,
+            stylizer=s.frame_stylizer or s.stylizer,
             locator=s.locator,
             remover=s.remover,
             checker=s.checker,
@@ -158,6 +186,7 @@ def create_app(services: Services | None = None) -> FastAPI:
         else None,
         docs=s.docs,
         audit=s.audit,
+        notifier=s.notifier,
         clock=s.clock,
     )
     limiter = DailyLimiter(s.jobs, s.settings.daily_limit)

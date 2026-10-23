@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../application/coach_job_watcher.dart';
 import '../data/avatar_maker_api.dart';
 import '../data/selfie_capture.dart';
 import '../domain/liveness.dart';
@@ -15,8 +16,10 @@ import '../domain/liveness.dart';
 /// "Make me from my photo" (T-AVT-08e): a live selfie in the app (never the
 /// gallery), one face, a blink (or a head turn) to show it's a live person,
 /// with tips from on-device face detection. The photo is sent once to our
-/// Media Service and only kept in memory until then. Pops with true when the
-/// coach is made.
+/// Media Service and only kept in memory until then. Making the coach takes
+/// minutes, so the screen says "We'll let you know" and can be closed;
+/// [CoachJobWatcher] follows the job. Pops with true when the coach is made
+/// while it is open.
 class SelfieScreen extends ConsumerStatefulWidget {
   const SelfieScreen({super.key});
 
@@ -29,6 +32,9 @@ enum _Stage { camera, making, failed }
 class _SelfieScreenState extends ConsumerState<SelfieScreen> {
   late final SelfieCapture _capture = ref.read(selfieCaptureProvider);
   late final AvatarMakerApi _api = ref.read(avatarMakerApiProvider);
+  late final CoachJobWatcher _watcher = ref.read(
+    coachJobWatcherProvider.notifier,
+  );
   LivenessTracker _tracker = LivenessTracker();
   StreamSubscription<FaceObservation>? _seen;
   SelfieTip _tip = SelfieTip.noFace;
@@ -37,13 +43,10 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen> {
   String? _error;
   final _key = DateTime.now().microsecondsSinceEpoch.toString();
 
-  /// How long to wait for the coach (the job takes 30 to 90 seconds).
-  static const pollEvery = Duration(seconds: 3);
-  static const pollTimes = 60;
-
   @override
   void initState() {
     super.initState();
+    _watcher.onScreen = true;
     _open();
   }
 
@@ -93,7 +96,16 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen> {
 
   Future<void> _take() async {
     final method = _tracker.method;
+    final l = AppLocalizations.of(context);
+    final texts = CoachNoticeTexts(
+      readyTitle: l.coachNoticeReadyTitle,
+      readyBody: l.coachNoticeReadyBody,
+      notMadeTitle: l.coachNoticeNotMadeTitle,
+      notMadeBody: l.coachNoticeNotMadeBody,
+      channelName: l.coachNoticeChannel,
+    );
     setState(() => _stage = _Stage.making);
+    _watcher.clear();
     Uint8List? photo;
     try {
       photo = await _capture.takePhoto();
@@ -105,19 +117,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen> {
       );
       // Sent once: the photo isn't needed on the phone any more.
       photo = null;
-      for (var i = 0; i < pollTimes; i++) {
-        await Future<void>.delayed(pollEvery);
-        if (!mounted) return;
-        final job = await _api.job(jobId);
-        if (!job.done) continue;
-        if (job.succeeded) {
-          if (mounted) Navigator.of(context).pop(true);
-          return;
-        }
-        if (mounted) setState(() => _fail(job.messageId ?? 'avatar_not_made'));
-        return;
-      }
-      if (mounted) setState(() => _fail('avatar_not_made'));
+      unawaited(_watcher.follow(jobId, texts));
     } on SelfieCameraUnavailable {
       if (mounted) setState(() => _fail('camera'));
     } on AvatarMakerError catch (e) {
@@ -129,6 +129,7 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen> {
 
   @override
   void dispose() {
+    _watcher.onScreen = false;
     _seen?.cancel();
     _capture.close();
     super.dispose();
@@ -160,6 +161,14 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen> {
     final t = Theme.of(context).textTheme;
     final p = LwPalette.of(context);
     final ready = _tip == SelfieTip.ready;
+    ref.listen(coachJobWatcherProvider, (_, job) {
+      if (_stage != _Stage.making) return;
+      if (job.stage == CoachJobStage.ready) {
+        Navigator.of(context).pop(true);
+      } else if (job.stage == CoachJobStage.notMade) {
+        setState(() => _fail(job.messageId ?? 'avatar_not_made'));
+      }
+    });
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
@@ -236,11 +245,26 @@ class _SelfieScreenState extends ConsumerState<SelfieScreen> {
               const SizedBox(height: LwSpacing.xl),
               const Center(child: CircularProgressIndicator()),
               const SizedBox(height: LwSpacing.md),
+              Semantics(
+                liveRegion: true,
+                child: Text(
+                  l.photoMaking,
+                  key: const Key('selfie-making'),
+                  textAlign: TextAlign.center,
+                  style: t.titleMedium,
+                ),
+              ),
+              const SizedBox(height: LwSpacing.sm),
               Text(
-                l.photoMaking,
-                key: const Key('selfie-making'),
+                l.photoMakingBody,
                 textAlign: TextAlign.center,
-                style: t.titleMedium,
+                style: t.bodyMedium,
+              ),
+              const SizedBox(height: LwSpacing.lg),
+              FilledButton(
+                key: const Key('selfie-making-ok'),
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l.photoMakingOk),
               ),
             ],
             if (_stage == _Stage.failed) ...[

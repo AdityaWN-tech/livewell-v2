@@ -1,0 +1,23 @@
+# Builds our ComfyUI image in Cloud Build (docs/media/comfyui-setup.md, step 4.5).
+# Run from the repository root:
+#   gcloud builds submit --region us-central1 --config services/media/comfyui/cloudbuild.yaml \
+#     --substitutions _COMFYUI_REF=<commit>,_GGUF_REF=<commit>,_TAG=1 .
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - services/media/comfyui/Dockerfile
+      - --build-arg
+      - COMFYUI_REF=${_COMFYUI_REF}
+      - --build-arg
+      - GGUF_REF=${_GGUF_REF}
+      - -t
+      - us-central1-docker.pkg.dev/$PROJECT_ID/livewell/comfyui:${_TAG}
+      - .
+images:
+  - us-central1-docker.pkg.dev/$PROJECT_ID/livewell/comfyui:${_TAG}
+options:
+  machineType: E2_HIGHCPU_8
+  diskSizeGb: 100
+timeout: 3600s

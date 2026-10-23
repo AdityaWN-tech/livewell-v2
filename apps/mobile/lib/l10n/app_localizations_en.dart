@@ -2772,10 +2772,33 @@ class AppLocalizationsEn extends AppLocalizations {
       'Only your own face. The photo is used once to make your coach and deleted right after.';
 
   @override
-  String get photoMaking => 'Making your coach… This takes about a minute.';
+  String get photoMaking => 'We\'ll let you know when your coach is ready.';
+
+  @override
+  String get photoMakingBody =>
+      'Making your coach takes a few minutes. You can close this and carry on. We\'ll send you a notification when it\'s done.';
+
+  @override
+  String get photoMakingOk => 'OK';
 
   @override
   String get photoReady => 'Your coach is ready.';
+
+  @override
+  String get coachNoticeReadyTitle => 'Your coach is ready';
+
+  @override
+  String get coachNoticeReadyBody => 'Open Live Well to meet your new coach.';
+
+  @override
+  String get coachNoticeNotMadeTitle => 'We couldn\'t make your coach';
+
+  @override
+  String get coachNoticeNotMadeBody =>
+      'Open Live Well to try again or pick a ready-made coach.';
+
+  @override
+  String get coachNoticeChannel => 'Your coach';
 
   @override
   String get photoErrNotMade =>

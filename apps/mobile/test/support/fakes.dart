@@ -602,6 +602,17 @@ class FakeReminders implements Reminders {
 
   @override
   Future<String> timeZone() async => zone;
+
+  /// Notifications shown at once: (id, title, body).
+  final shown = <(int, String, String)>[];
+
+  @override
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+    required String channelName,
+  }) async => shown.add((id, title, body));
 }
 
 class FakeCoachFaces implements CoachFaces {
@@ -841,8 +852,15 @@ class FakeAvatarMaker implements AvatarMakerApi {
     return 'job-1';
   }
 
+  /// How many polls fail with a dropped connection first.
+  int pollErrors = 0;
+
   @override
   Future<AvatarJobStatus> job(String jobId) async {
+    if (pollErrors > 0) {
+      pollErrors--;
+      throw const AvatarMakerError('network');
+    }
     final s = statuses[polls < statuses.length ? polls : statuses.length - 1];
     polls++;
     if (s.succeeded) onMade?.call();

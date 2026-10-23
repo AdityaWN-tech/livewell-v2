@@ -4932,14 +4932,56 @@ abstract class AppLocalizations {
   /// No description provided for @photoMaking.
   ///
   /// In en, this message translates to:
-  /// **'Making your coach… This takes about a minute.'**
+  /// **'We\'ll let you know when your coach is ready.'**
   String get photoMaking;
+
+  /// No description provided for @photoMakingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Making your coach takes a few minutes. You can close this and carry on. We\'ll send you a notification when it\'s done.'**
+  String get photoMakingBody;
+
+  /// No description provided for @photoMakingOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get photoMakingOk;
 
   /// No description provided for @photoReady.
   ///
   /// In en, this message translates to:
   /// **'Your coach is ready.'**
   String get photoReady;
+
+  /// No description provided for @coachNoticeReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach is ready'**
+  String get coachNoticeReadyTitle;
+
+  /// No description provided for @coachNoticeReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Live Well to meet your new coach.'**
+  String get coachNoticeReadyBody;
+
+  /// No description provided for @coachNoticeNotMadeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t make your coach'**
+  String get coachNoticeNotMadeTitle;
+
+  /// No description provided for @coachNoticeNotMadeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Live Well to try again or pick a ready-made coach.'**
+  String get coachNoticeNotMadeBody;
+
+  /// No description provided for @coachNoticeChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach'**
+  String get coachNoticeChannel;
 
   /// No description provided for @photoErrNotMade.
   ///

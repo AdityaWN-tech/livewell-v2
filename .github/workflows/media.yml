@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
-      - run: ruff check src tests
-      - run: ruff format --check src tests
+      - run: ruff check src tests comfyui
+      - run: ruff format --check src tests comfyui
       - run: mypy
       - run: pytest -q

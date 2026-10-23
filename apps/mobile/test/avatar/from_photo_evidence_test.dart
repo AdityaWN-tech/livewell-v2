@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/avatar/application/coach_job_watcher.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 
 import '../studio/studio_test.dart' show openStudio, tapKey;
@@ -53,7 +54,7 @@ void main() {
       await settle(tester);
       await shot('making');
       for (var i = 0; i < 3; i++) {
-        await tester.pump(const Duration(seconds: 3));
+        await tester.pump(CoachJobWatcher.pollEvery);
       }
       await settle(tester);
       await shot('not_made');

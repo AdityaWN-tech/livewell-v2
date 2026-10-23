@@ -4,6 +4,7 @@ import 'package:camera/camera.dart' show XFile;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/config/feature_flags.dart';
+import 'package:livewell/features/avatar/application/coach_job_watcher.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
@@ -60,6 +61,30 @@ Future<void> start(WidgetTester tester, Harness h, {bool allow = true}) async {
   await tester.tap(
     find.byKey(Key(allow ? 'photo-consent-yes' : 'photo-consent-no')),
   );
+  await tester.pumpAndSettle();
+}
+
+/// Lets the job watcher ask [polls] times (every 10 seconds).
+Future<void> waitForJob(WidgetTester tester, {int polls = 3}) async {
+  for (var i = 0; i < polls; i++) {
+    await tester.pump(CoachJobWatcher.pollEvery);
+  }
+  await tester.pumpAndSettle();
+}
+
+/// Blinks and takes the photo (after [start]).
+Future<void> sendSelfie(WidgetTester tester, Harness h) async {
+  h.selfieCapture.blink();
+  await settle(tester);
+  await tester.tap(find.byKey(const Key('selfie-take')));
+  await settle(tester);
+}
+
+/// "OK" on the "We'll let you know" screen.
+Future<void> closeMaking(WidgetTester tester) async {
+  final ok = find.byKey(const Key('selfie-making-ok'));
+  await tester.ensureVisible(ok);
+  await tester.tap(ok);
   await tester.pumpAndSettle();
 }
 
@@ -246,14 +271,87 @@ void main() {
     expect(h.avatarMaker.sent.single.$1.take(3), [0xFF, 0xD8, 0xFF]);
     expect(File(h.selfieCapture.lastPhotoPath!).existsSync(), isFalse);
 
-    // The job runs; then the Studio has the new coach.
-    for (var i = 0; i < 3; i++) {
-      await tester.pump(const Duration(seconds: 3));
-    }
-    await tester.pumpAndSettle();
+    // It takes minutes: the screen says so and can be closed.
+    expect(
+      find.text("We'll let you know when your coach is ready."),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('selfie-making-ok')), findsOneWidget);
+
+    // The job runs; then the Studio has the new coach. The person was
+    // watching, so no notification.
+    await waitForJob(tester);
     expect(find.byType(SelfieScreen), findsNothing);
     expect(find.text('Your coach is ready.'), findsOneWidget);
     expect(h.selfieCapture.closed, isTrue);
+    expect(h.reminders.shown, isEmpty);
+  });
+
+  testWidgets('close it and carry on: a notification says the coach is '
+      'ready, with nothing personal in it', (tester) async {
+    final h = photoOn();
+    await h.consents.record(ConsentType.notifications, granted: true);
+    h.avatarMaker.statuses = [
+      const AvatarJobStatus(status: 'running'),
+      const AvatarJobStatus(status: 'running'),
+      const AvatarJobStatus(status: 'succeeded', framesVersion: 1),
+    ];
+    await start(tester, h);
+    await sendSelfie(tester, h);
+    await closeMaking(tester);
+    expect(find.byType(SelfieScreen), findsNothing);
+    expect(h.reminders.shown, isEmpty);
+    await waitForJob(tester);
+    expect(h.reminders.shown, [
+      (
+        CoachJobWatcher.noticeId,
+        'Your coach is ready',
+        'Open Live Well to meet your new coach.',
+      ),
+    ]);
+    // The Studio is still open: it loads the new coach.
+    expect(find.text('Your coach is ready.'), findsOneWidget);
+  });
+
+  testWidgets('not made after closing: a kind notification', (tester) async {
+    final h = photoOn();
+    await h.consents.record(ConsentType.notifications, granted: true);
+    h.avatarMaker.statuses = [
+      const AvatarJobStatus(status: 'rejected', messageId: 'avatar_not_made'),
+    ];
+    await start(tester, h);
+    await sendSelfie(tester, h);
+    await closeMaking(tester);
+    await waitForJob(tester);
+    expect(h.reminders.shown.single.$2, "We couldn't make your coach");
+    expect(
+      h.reminders.shown.single.$3,
+      'Open Live Well to try again or pick a ready-made coach.',
+    );
+  });
+
+  testWidgets('no notification without the notification consent', (
+    tester,
+  ) async {
+    final h = photoOn();
+    await start(tester, h);
+    await sendSelfie(tester, h);
+    await closeMaking(tester);
+    await waitForJob(tester);
+    expect(h.avatarMaker.polls, greaterThan(0));
+    expect(h.reminders.shown, isEmpty);
+  });
+
+  testWidgets('a dropped connection while waiting: it asks again', (
+    tester,
+  ) async {
+    final h = photoOn();
+    h.avatarMaker.pollErrors = 2;
+    await start(tester, h);
+    await sendSelfie(tester, h);
+    await waitForJob(tester, polls: 5);
+    expect(find.byType(SelfieScreen), findsNothing);
+    expect(find.text('Your coach is ready.'), findsOneWidget);
   });
 
   testWidgets("can't blink: turn the head instead", (tester) async {
@@ -268,8 +366,7 @@ void main() {
     await tester.tap(find.byKey(const Key('selfie-take')));
     await settle(tester);
     expect(h.avatarMaker.sent.single.$2, LivenessMethod.turn);
-    await tester.pump(const Duration(seconds: 10));
-    await tester.pumpAndSettle();
+    await waitForJob(tester);
   });
 
   for (final (refusal, message, retry) in [
@@ -308,7 +405,7 @@ void main() {
     h.selfieCapture.blink();
     await settle(tester);
     await tester.tap(find.byKey(const Key('selfie-take')));
-    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(CoachJobWatcher.pollEvery);
     await settle(tester);
     expect(find.textContaining('try a different photo'), findsOneWidget);
     await tapKey(tester, 'selfie-retry');

@@ -6,6 +6,7 @@ import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../avatar/application/coach_job_watcher.dart';
 import '../../avatar/data/avatar_repository.dart';
 import '../../avatar/domain/coach_choice.dart';
 import '../../avatar/domain/coaches.dart';
@@ -148,20 +149,22 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
   }
 
   /// "Make me from my photo": the two consents first (FR-ONB-03), then the
-  /// live selfie; the Media Service writes the new coach (selfie source,
-  /// frames version), which is loaded here.
+  /// live selfie. The Media Service writes the new coach (selfie source,
+  /// frames version) minutes later; [CoachJobWatcher] says when, and it is
+  /// loaded here ([_loadMade]) if the Studio is still open.
   Future<void> _fromPhoto() async {
-    final l = AppLocalizations.of(context);
     if (!await ensurePhotoConsent(context, ref)) {
       if (mounted) setState(() => _photoDeclined = true);
       return;
     }
     if (!mounted) return;
     setState(() => _photoDeclined = false);
-    final made = await Navigator.of(context)
+    await Navigator.of(context)
         .push<bool>(MaterialPageRoute(builder: (_) => const SelfieScreen()));
-    if (made != true || !mounted) return;
-    ref.invalidate(coachChoiceProvider);
+  }
+
+  Future<void> _loadMade() async {
+    final l = AppLocalizations.of(context);
     try {
       final saved = await ref.read(avatarRepositoryProvider).load();
       if (saved != null && mounted) {
@@ -207,6 +210,9 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final flags = ref.watch(featureFlagsProvider);
+    ref.listen(coachJobWatcherProvider, (_, job) {
+      if (job.stage == CoachJobStage.ready) _loadMade();
+    });
     final images = _previewImages();
     final background = AvatarColours.background[_choice.background];
     final canSave =

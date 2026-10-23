@@ -640,6 +640,16 @@ class FakeMomentSeenStore implements MomentSeenStore {
   Future<void> save(String d) async => date = d;
 }
 
+class FakeFirstHelloStore implements FirstHelloStore {
+  bool due = false;
+
+  @override
+  Future<bool> pending() async => due;
+
+  @override
+  Future<void> setPending(bool pending) async => due = pending;
+}
+
 class FakeReminderZoneStore implements ReminderZoneStore {
   String? zone;
 

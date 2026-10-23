@@ -14,7 +14,7 @@ The work in progress and what comes next, as a checklist. Each item is one PR, s
 
 ## Next
 
-- [ ] **AVT-08f** Everything the avatar does in the app
+- [x] **AVT-08f** Everything the avatar does in the app: first hello, check-in reaction, streak milestones, calm after safety (new lines pending clinical review; routine items wait for T-GOL-03, lesson narration for the lesson reader)
 - [ ] **AVT-08g** The widget with the 3D avatar (replaces T-TCH-02's widget)
 - [ ] **AVT-08h** Settings and deletion (Delete my avatar)
 - [ ] **T-DLY-03e** Daily plan settings

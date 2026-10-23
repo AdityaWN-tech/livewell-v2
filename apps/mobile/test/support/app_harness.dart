@@ -97,6 +97,7 @@ class Harness {
   final selfieCapture = FakeSelfieCapture();
   final avatarMaker = FakeAvatarMaker();
   final momentSeen = FakeMomentSeenStore();
+  final firstHello = FakeFirstHelloStore();
   final appearance = FakeAppearanceStore();
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
@@ -158,6 +159,7 @@ class Harness {
           selfieCaptureProvider.overrideWithValue(selfieCapture),
           avatarMakerApiProvider.overrideWithValue(avatarMaker),
           momentSeenStoreProvider.overrideWithValue(momentSeen),
+          firstHelloStoreProvider.overrideWithValue(firstHello),
           avatarIdleMotionProvider.overrideWithValue(idleMotion),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(

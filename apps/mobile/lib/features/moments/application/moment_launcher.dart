@@ -67,6 +67,30 @@ final momentSeenStoreProvider = Provider<MomentSeenStore>(
   (ref) => SharedPrefsMomentSeenStore(),
 );
 
+/// The coach's first hello (T-AVT-08f) is due once, on Home right after
+/// onboarding: set when onboarding ends, cleared when Home plays it (a
+/// trivial UI flag in SharedPreferences, like the morning one).
+abstract class FirstHelloStore {
+  Future<bool> pending();
+  Future<void> setPending(bool pending);
+}
+
+class SharedPrefsFirstHelloStore implements FirstHelloStore {
+  static const _key = 'moment_first_hello_pending';
+
+  @override
+  Future<bool> pending() async =>
+      (await SharedPreferences.getInstance()).getBool(_key) ?? false;
+
+  @override
+  Future<void> setPending(bool pending) async =>
+      (await SharedPreferences.getInstance()).setBool(_key, pending);
+}
+
+final firstHelloStoreProvider = Provider<FirstHelloStore>(
+  (ref) => SharedPrefsFirstHelloStore(),
+);
+
 final _morningSeenProvider = FutureProvider<String?>((ref) async {
   try {
     return await ref.watch(momentSeenStoreProvider).load();

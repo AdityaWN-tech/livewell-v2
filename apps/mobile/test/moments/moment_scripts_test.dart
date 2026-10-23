@@ -72,7 +72,7 @@ void main() {
       );
     });
 
-    test('all 7 moments, several variants each, all pending review', () {
+    test('every moment, several variants each, all pending review', () {
       final all = templates();
       expect(all.map((t) => t.moment).toSet(), Moment.values.toSet());
       for (final t in all) {
@@ -281,8 +281,10 @@ void main() {
         )!;
         expect(msg.text, isNot(contains('10-min')), reason: msg.messageId);
       }
-      expect(MomentBuilder.afterCheckIn(gentleDay: true), Moment.gentle);
-      expect(MomentBuilder.afterCheckIn(gentleDay: false), isNull);
+      expect(
+        MomentBuilder.afterCheckIn(gentleDay: true, mood: 5),
+        Moment.gentle,
+      );
     });
 
     test('missed day: restart wording, never shaming', () {

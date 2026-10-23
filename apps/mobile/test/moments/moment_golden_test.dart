@@ -18,7 +18,14 @@ import 'moment_screen_test.dart' show finish, open;
 void main() {
   const size = Size(750, 1334);
   const dpr = 2.0;
-  for (final m in [Moment.morning, Moment.stepDone, Moment.gentle]) {
+  for (final m in [
+    Moment.morning,
+    Moment.stepDone,
+    Moment.gentle,
+    // T-AVT-08f
+    Moment.firstHello,
+    Moment.checkInGood,
+  ]) {
     for (final dark in [false, true]) {
       for (final (label, scale) in [
         ('normal', 1.0),

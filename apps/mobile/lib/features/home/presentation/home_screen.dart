@@ -26,6 +26,7 @@ import '../../moments/application/moment_context.dart';
 import '../../moments/application/moment_launcher.dart';
 import '../../moments/presentation/celebration.dart';
 import '../../moments/domain/coach_message.dart';
+import '../../moments/domain/moment_builder.dart';
 import '../../moments/presentation/moment_screen.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../profile/presentation/profile_button.dart';
@@ -90,7 +91,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     if (!mounted) return;
     if (launch != null && await _openReminder(launch)) return;
-    _maybeAsk();
+    await _firstHello();
+    if (mounted) _maybeAsk();
+  }
+
+  /// Right after onboarding the coach says hello once (T-AVT-08f): waving,
+  /// then happy. Nothing when its lines aren't approved yet (prod).
+  Future<void> _firstHello() async {
+    final store = ref.read(firstHelloStoreProvider);
+    try {
+      if (!await store.pending()) return;
+      await store.setPending(false);
+    } catch (_) {
+      return;
+    }
+    final m = await ref.read(coachMessageProvider(Moment.firstHello).future);
+    if (m != null && mounted) await _playMoment(Moment.firstHello);
+  }
+
+  /// The coach reacts to the check-in (T-AVT-08f): a short thank-you that
+  /// fits the mood, or the gentle moment on a gentle day. Nothing after a
+  /// safety response (the safety card has said what matters).
+  Future<void> _reactTo(CheckIn c) async {
+    final moment = MomentBuilder.afterCheckIn(
+      gentleDay: c.gentleDay,
+      mood: c.mood,
+    );
+    final m = await ref.read(coachMessageProvider(moment).future);
+    if (m != null && mounted) await _playMoment(moment);
   }
 
   /// Tapping a reminder opens the coach's moment (T-DLY-03c).
@@ -190,11 +218,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           .timeout(const Duration(seconds: 1), onTimeout: () => null);
     }
     if (!mounted) return;
-    await showCheckInSheet(
+    final checkIn = await showCheckInSheet(
       context,
       date: date ?? _today,
       firstName: ref.read(firstNameProvider),
     );
+    if (checkIn != null && mounted) await _reactTo(checkIn);
   }
 
   Future<void> _openStep(TodayStep step, CheckIn? checkIn) async {
@@ -333,7 +362,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ? l.homeBubbleEvening
                   : l.homeBubbleEveningNamed(name),
             Moment.missedDay => l.homeBubbleRestart,
-            Moment.morning || Moment.weeklyReview =>
+            // Never the Home moment; only played (T-AVT-08f).
+            Moment.morning ||
+            Moment.weeklyReview ||
+            Moment.firstHello ||
+            Moment.checkInGood ||
+            Moment.checkInOkay ||
+            Moment.streakMilestone =>
               name == null ? l.homeBubble : l.homeBubbleNamed(name),
           },
           // The full message, when there is one to say (T-DLY-03d).

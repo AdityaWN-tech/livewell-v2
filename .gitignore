@@ -10,6 +10,13 @@
 *.jks
 key.properties
 service-account*.json
+# Apple signing: certificates, keys and profiles live in Codemagic only
+*.p12
+*.p8
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
 
 # Tooling
 node_modules/

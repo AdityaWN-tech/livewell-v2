@@ -8,8 +8,8 @@ The work in progress and what comes next, as a checklist. Each item is one PR, s
 - [x] **AVT-08b** Ready-made coaches and the Avatar Studio (PR #47)
 - [x] **AVT-08c** Media Service: avatar generation behind adapters (PR #48)
 - [x] **AVT-08d** Media Service: the 14-frame set (PR #49)
-- [x] **AVT-08e** "Make me from my photo": consent, live capture, deletion (flag off in prod)
-- [ ] **ComfyUI stylizer** for AVT-08c/d: our own ComfyUI on a Cloud Run GPU, models from Hugging Face, licences checked
+- [x] **AVT-08e** "Make me from my photo": consent, live capture, deletion (flag off in prod) (PR #50)
+- [x] **ComfyUI stylizer** for AVT-08c/d: our own ComfyUI on a Cloud Run GPU, models from Hugging Face, licences checked; "We'll let you know" and a notification (deploy needs Blaze)
 - [ ] **iOS builds in the cloud**: Codemagic (dev, staging, prod; TestFlight for staging) and a GitHub Actions iOS build check
 
 ## Next
@@ -22,4 +22,6 @@ The work in progress and what comes next, as a checklist. Each item is one PR, s
 
 ## Blocked
 
-- **"Make me from my photo" in prod:** needs commercially licensed face-similarity and age checks, counsel review (T-CMP-02) and the `avatar_from_photo` flag. Build my own and the ready-made coaches don't depend on it.
+- **"Make me from my photo" in prod:** needs commercially licensed face-similarity and age checks (options in `docs/design/asset-licences.md`, none chosen), counsel review (T-CMP-02) and the `avatar_from_photo` flag. Build my own and the ready-made coaches don't depend on it.
+- **Deploying the ComfyUI server and the Media Service:** needs the Blaze plan (billing for Cloud Run GPUs, D-17), then `docs/media/comfyui-setup.md`.
+- **Push for a closed app:** the server's `JobNotifier` needs FCM and device registration in the app (deploy).

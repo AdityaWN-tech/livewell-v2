@@ -15,9 +15,59 @@ Every image model, checking model and vendor used to make or check avatars, with
 
 | Model or vendor | Used for | Licence / terms | Status |
 |---|---|---|---|
-| *(none chosen)* | Portrait and frames (`AvatarStylizer`) | — | Scorecard pending |
+| Our ComfyUI server (open models below) | Portrait and frames (`AvatarStylizer` = `ComfyUIStylizer`) | See "Models on our ComfyUI server" | Built; deployed when Blaze is on (`docs/media/comfyui-setup.md`) |
 | *(none chosen)* | Safety check (`ImageInspector`) | — | Scorecard pending |
 | Google ML Kit face detection (`google_mlkit_face_detection`, on device) | Live selfie: one face, tips, blink or head turn (T-AVT-08e) | Plugin: MIT; ML Kit: Google's ML Kit terms (on-device, free) — **verify for commercial use** | In the app (flag off in prod) |
+
+### Models on our ComfyUI server
+
+Every file `services/media/workflows/*.json` loads. `comfyui/download_models.py` refuses to download any model whose licence isn't Apache-2.0 or MIT, and a test checks that every model in a workflow is listed here. Checked on the model cards on 2026-10-23; check again before launch.
+
+| File | Model | Hugging Face | Licence | Size | Commercial use |
+|---|---|---|---|---|---|
+| `qwen-image-edit-2511-Q5_K_M.gguf` | Qwen-Image-Edit-2511 (Alibaba Qwen, 20B), GGUF 5-bit quantization by Unsloth | [unsloth/Qwen-Image-Edit-2511-GGUF](https://huggingface.co/unsloth/Qwen-Image-Edit-2511-GGUF) (original: [Qwen/Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511)) | Apache-2.0 | 15.0 GB | ✅ Yes |
+| `qwen_2.5_vl_7b_fp8_scaled.safetensors` | Qwen2.5-VL 7B text encoder, fp8, repacked for ComfyUI | [Comfy-Org/Qwen-Image_ComfyUI](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI) | Apache-2.0 | 9.38 GB | ✅ Yes |
+| `qwen_image_vae.safetensors` | Qwen-Image VAE | [Comfy-Org/Qwen-Image_ComfyUI](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI) | Apache-2.0 | 0.25 GB | ✅ Yes |
+| `Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors` | Lightning LoRA: 4 steps instead of 40 (lightx2v) | [lightx2v/Qwen-Image-Edit-2511-Lightning](https://huggingface.co/lightx2v/Qwen-Image-Edit-2511-Lightning) | Apache-2.0 | 0.85 GB | ✅ Yes |
+
+**Other models we looked at:**
+
+| Model | Hugging Face | Licence | Note |
+|---|---|---|---|
+| Qwen-Image (20B, text-to-image) | [Qwen/Qwen-Image](https://huggingface.co/Qwen/Qwen-Image), [Comfy-Org/Qwen-Image_ComfyUI](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI) | Apache-2.0 | ✅ Allowed. Not in the workflows: on one L4 it would have to swap with the Edit model on every Build my own job (see comfyui-setup.md). Build my own uses the Edit model with no input image instead. |
+| Qwen-Image-Edit-2511 fp8 / bf16 (ComfyUI repack) | [Comfy-Org/Qwen-Image-Edit_ComfyUI](https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI), [lightx2v/Qwen-Image-Edit-2511-Lightning](https://huggingface.co/lightx2v/Qwen-Image-Edit-2511-Lightning) (fp8 with Lightning fused) | Apache-2.0 | ✅ Allowed. fp8 is 20.4 GB, bf16 40.9 GB: too large to sit next to the text encoder in 32 GiB of Cloud Run memory. Use it on a bigger GPU (RTX PRO 6000, 96 GB). |
+| Qwen-Image-Lightning (8 steps) | [lightx2v/Qwen-Image-Lightning](https://huggingface.co/lightx2v/Qwen-Image-Lightning) | Apache-2.0 | ✅ Allowed, for Qwen-Image if it is used later. |
+| BiRefNet (background removal) | [ZhengPeng7/BiRefNet](https://huggingface.co/ZhengPeng7/BiRefNet) | MIT | ✅ Candidate for `BackgroundRemover`. Not wired yet. |
+| YuNet (face detection) | [opencv/face_detection_yunet](https://huggingface.co/opencv/face_detection_yunet) | MIT | ✅ Candidate for `FaceLocator`. Not wired yet. |
+| NSFW image classifier | [Falconsai/nsfw_image_detection](https://huggingface.co/Falconsai/nsfw_image_detection) | Apache-2.0 | ✅ Candidate for part of `ImageInspector` (nudity only). Not wired yet. |
+| FLUX.1 [dev], FLUX.1 Kontext [dev] | [black-forest-labs](https://huggingface.co/black-forest-labs) | FLUX.1 [dev] Non-Commercial License | ⛔ **Blocker:** non-commercial. Not used. |
+| InstantID, PuLID, IP-Adapter FaceID, PhotoMaker v2 | (their own repos) | Code is open, but they load **InsightFace** weights (non-commercial) | ⛔ **Blocker** unless the InsightFace weights are licensed commercially. Not used. |
+| BRIA RMBG-1.4 / RMBG-2.0 | [briaai](https://huggingface.co/briaai) | CC BY-NC 4.0 (a commercial licence is sold separately) | ⛔ **Blocker:** non-commercial. Not used; BiRefNet instead. |
+| InsightFace models (buffalo_l, antelopev2, ...) | [deepinsight/insightface](https://github.com/deepinsight/insightface) | Code MIT; **models non-commercial**, commercial licence sold separately | ⛔ **Blocker** for face similarity unless licensed (options below). |
+
+**Software on the ComfyUI server:**
+
+| Software | Licence | Note |
+|---|---|---|
+| [ComfyUI](https://github.com/comfyanonymous/ComfyUI) | GPL-3.0 | Run as our own server and not distributed, so the GPL's source-sharing duty shouldn't apply; our `livewell_forget` add-on loads into it. **Needs legal review.** |
+| [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) (loads the GGUF model) | Apache-2.0 | ✅ |
+| PyTorch (`pytorch/pytorch` image) | BSD-3-Clause; CUDA under NVIDIA's licence | ✅ Standard for servers. |
+
+### Face similarity and age: commercially licensed options (blocker for "From my photo")
+
+"From my photo" needs two checks that no Apache/MIT model above covers well enough: **does the 3D coach look like the person** (face similarity), and an **age check** (the coach must not look under 18; a stronger check of the person's own apparent age may be wanted too). Until one option is chosen and passes legal review, the `avatar_from_photo` flag stays **off**. Build my own and the ready-made coaches don't need these checks and keep working. **No option is chosen here.** Prices and terms were read on 2026-10-23 and must be confirmed with the vendor.
+
+| Option | What it gives | Cost | Data terms | Legal review needed |
+|---|---|---|---|---|
+| **InsightFace commercial model licence** ([insightface.ai](https://www.insightface.ai/services/models-commercial-licensing)) | The same face models InstantID/PuLID use (face embedding for similarity; age and gender heads), run **on our own GPU** | Not published; contact sales (one-off or yearly licence) | Photos never leave our servers: best for privacy | The licence contract (scope, users, term, redistribution), sanctions and export checks, our biometric notice and consent (BIPA, GDPR Art. 9, India DPDP Act), a DPIA |
+| **AWS Rekognition** (`CompareFaces` for similarity, `DetectFaces` AgeRange for age) | Similarity score (0–100) and an age range per face | About **$0.001 per image** for each call for the first 1M images a month (CompareFaces Group 1; DetectFaces Group 2, $0.0008 above 1M); about $0.002 per avatar; free tier 1,000 images a month for 12 months | AWS **may store and use inputs to improve its services unless we opt out** with an AWS Organizations AI services opt-out policy (set before the first call); inputs deleted on request through Support; runs in a chosen AWS region | AWS DPA and service terms (biometric consent duties fall on us), the opt-out set and proven, the region and cross-border transfer for India and EU users, consent wording |
+| **Azure AI Face** (Verify for similarity; age attribute) | Same-person confidence; age is a "limited" capability | Pay per call (about $1 per 1,000 calls at the standard tier; confirm on Azure pricing) | **Limited Access:** Microsoft must approve our use case (intake form); age needs an email request to the Face team; Microsoft says it doesn't train on customer faces; we must give biometric notice, get consent and delete | Microsoft's Limited Access approval and Responsible AI terms, the DPA, the region. **Inclusion concern:** Verify's input guidance asks for no glasses or head coverings, which would fail people who wear a hijab, turban or glasses (all in our ready-made coaches) |
+| **Yoti facial age estimation** | Age estimate only (no similarity) | Not published; per-check pricing, contact sales | Yoti says images are deleted straight after the estimate; certified by third parties | Contract and DPA; still needs a separate similarity option |
+| **FaceTec / other licensed face SDKs** (for example Paravision) | Liveness and face match, licensed SDK or server | Not published; contact sales | Self-hosted options keep photos on our servers | Licence contract, biometric consent, DPIA |
+
+Not an option: **Google Cloud Vision** finds faces and expressions but doesn't compare faces or estimate age.
+
+**Caveat for every option:** face-similarity models are trained on real photos and may score a stylized 3D render low even when it looks like the person. The threshold (default 0.6, `min_similarity`) has to be calibrated in the spike on real selfie → coach pairs, with consent, before any option is accepted.
 
 **InsightFace warning:** many face-identity pipelines (for example InstantID, IP-Adapter FaceID and several face-similarity tools) load InsightFace model weights, which are licensed for **non-commercial use only**. They must not be used in prod without a commercial licence for those weights. Check the licence of every weight a pipeline downloads, not only the top-level project.
 

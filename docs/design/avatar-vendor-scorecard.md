@@ -27,12 +27,13 @@ Every fact below about a vendor or model must be **verified against its current 
 | Kind | Candidates | Notes to check |
 |---|---|---|
 | Commercial image API with reference and editing | Google Vertex AI image generation and editing; OpenAI image editing; Black Forest Labs FLUX Kontext (API); Stability AI API | Reference-image and edit support, enterprise data terms, deletion, regions, price per image |
+| **Self-hosted: our ComfyUI server (built, D-39)** | Qwen-Image-Edit-2511 (GGUF Q5_K_M) + 4-step Lightning on one Cloud Run L4 (`docs/media/comfyui-setup.md`); all Apache-2.0 | Likeness to the selfie without identity adapters; **real seconds per image on the L4** (estimate 30–45 s) and cost per avatar; Build my own quality with the Edit model in text mode (vs Qwen-Image) |
 | Self-hosted on our GPU (Cloud Run GPU or GKE) | Open-weight base models with identity adapters (for example IP-Adapter FaceID, InstantID, PhotoMaker, PuLID) | **Licence of every weight**, especially InsightFace dependencies (non-commercial); GPU cost; who maintains it |
 | Out of scope here | HeyGen, Tavus, D-ID, Synthesia (spec 8.3) | Photo-realistic **video**; Phase 2, not the 3D still frames |
 
 ## The safety check's model (`ImageInspector`)
 
-Needs: one face; looks adult (reject under-18-looking); nudity; violence; text and logos; for From my photo, face similarity to the selfie (threshold `min_similarity`, default 0.6, tuned in the spike). Candidates to verify: Google Cloud Vision (safe search, text and logo detection); a commercially licensed face-similarity and age model (cloud APIs such as AWS Rekognition or Azure Face have their own access and terms). Face-similarity models built on InsightFace weights are non-commercial: same rule as above.
+Needs: one face; looks adult (reject under-18-looking); nudity; violence; text and logos; for From my photo, face similarity to the selfie (threshold `min_similarity`, default 0.6, tuned in the spike). Candidates to verify: Google Cloud Vision (safe search, text and logo detection); a commercially licensed face-similarity and age model (the options, with cost, data terms and the legal review each needs, are listed in `asset-licences.md`; none chosen). Face-similarity models built on InsightFace weights are non-commercial: same rule as above.
 
 ## Spike plan (about one week)
 

@@ -63,6 +63,16 @@ abstract class Reminders {
   /// Removes reminder [id] from the tray (it was opened another way).
   Future<void> dismiss(int id);
 
+  /// Shows a notification now (T-AVT-08: "Your coach is ready"). Generic
+  /// words only, hidden on a locked screen like the reminders; tapping it
+  /// just opens the app.
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+    required String channelName,
+  });
+
   /// The payload (a [TouchpointKind] name) of each reminder tapped while
   /// the app runs.
   Stream<String> get taps;
@@ -182,6 +192,30 @@ class LocalReminders implements Reminders {
   Future<void> dismiss(int id) async {
     await _init();
     await _plugin.cancel(id: id);
+  }
+
+  @override
+  Future<void> showNow({
+    required int id,
+    required String title,
+    required String body,
+    required String channelName,
+  }) async {
+    await _init();
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          'coach',
+          channelName,
+          importance: Importance.defaultImportance,
+          visibility: NotificationVisibility.private,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+    );
   }
 }
 

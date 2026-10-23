@@ -186,6 +186,30 @@ class InMemoryAvatarDocs:
             doc["source"] = source
 
 
+class JobNotifier(Protocol):
+    """Tells the person their coach is ready (or couldn't be made) when a
+    job ends: making one takes minutes on our GPU, so the app doesn't wait
+    on screen. A push through FCM at deploy; the words are generic ("Your
+    coach is ready"), never a name, a photo or anything personal."""
+
+    def job_done(self, uid: str, job_id: str, made: bool) -> None: ...
+
+
+class NoNotifier:
+    """Until FCM is wired: the app finds out by asking (GET /jobs/{id})."""
+
+    def job_done(self, uid: str, job_id: str, made: bool) -> None:
+        return None
+
+
+@dataclass
+class InMemoryNotifier:
+    sent: list[tuple[str, str, bool]] = field(default_factory=list)
+
+    def job_done(self, uid: str, job_id: str, made: bool) -> None:
+        self.sent.append((uid, job_id, made))
+
+
 class DailyLimitReached(Exception):
     """Max generations per person per day (Remote Config; default 3)."""
 
@@ -219,6 +243,7 @@ class JobRunner:
     frames: FrameMaker | None = None
     docs: AvatarDocWriter | None = None
     audit: AuditLog | None = None
+    notifier: JobNotifier | None = None
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
 
     def prompt_for(self, job: Job) -> str:
@@ -246,7 +271,16 @@ class JobRunner:
             self._audit(done, Events.AVATAR_CREATED, f"frames_version={done.frames_version}")
         else:
             self._audit(done, Events.AVATAR_NOT_MADE, done.status.value)
+        self._notify(done)
         return done
+
+    def _notify(self, job: Job) -> None:
+        if self.notifier is None:
+            return
+        try:
+            self.notifier.job_done(job.uid, job.id, job.status is JobStatus.SUCCEEDED)
+        except Exception:  # a failed push never fails the job
+            log.warning("avatar job %s: notification failed", job.id)
 
     def _audit(self, job: Job, event: str, detail: str = "") -> None:
         if self.audit is not None:
@@ -337,11 +371,14 @@ __all__ = [
     "DailyLimiter",
     "InMemoryCosts",
     "InMemoryJobs",
+    "InMemoryNotifier",
     "InMemoryPortraits",
     "Job",
+    "JobNotifier",
     "JobRunner",
     "JobStatus",
     "Messages",
+    "NoNotifier",
     "Rejection",
     "new_job",
 ]

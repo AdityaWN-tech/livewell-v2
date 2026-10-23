@@ -33,11 +33,21 @@ widget, and `avatar_frames.json` (schema in `packages/schemas`), stored under
 to `users/{uid}/avatar/current` (`AvatarDocWriter`); Adjust makes a new version
 and keeps the source.
 
-**Not chosen yet:** the image vendor and the checking model (see
-`docs/design/avatar-vendor-scorecard.md`), so by default every call is refused
-and nothing is sent anywhere. Firebase Admin, the consent store, Firestore job
-storage and Cloud Storage portraits are wired at deploy time behind the same
-interfaces.
+**The images come from our own ComfyUI server** (`src/media/comfyui.py`): the
+`ComfyUIStylizer` uploads the input image, sends a workflow from `workflows/`
+(`avatar_portrait.json`: selfie, Build my own, Adjust; `avatar_frames.json`: each
+frame) to the ComfyUI API, waits, downloads the result and has ComfyUI delete
+the images and the job (`comfyui/livewell_forget`). Models are open
+(Apache-2.0) and downloaded from Hugging Face (`comfyui/download_models.py`);
+the server runs privately on a Cloud Run L4 GPU: **[docs/media/comfyui-setup.md](../../docs/media/comfyui-setup.md)**.
+It is used only when `MEDIA_COMFYUI_URL` is set (Secret Manager) and its host
+is in `MEDIA_APPROVED_HOSTS`; otherwise every job is refused kindly and
+nothing is sent anywhere. Calls carry a Google ID token (main) or an API-key
+header (fallback). When a job ends, `JobNotifier` tells the person (FCM at
+deploy). The checking model, background removal and face location are still
+to be chosen (`docs/design/avatar-vendor-scorecard.md`); Firebase Admin, the
+consent store, Firestore job storage and Cloud Storage are wired at deploy
+behind the same interfaces.
 
 ```
 python -m venv .venv

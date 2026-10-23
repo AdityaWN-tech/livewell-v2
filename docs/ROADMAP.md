@@ -9,8 +9,8 @@ The work in progress and what comes next, as a checklist. Each item is one PR, s
 - [x] **AVT-08c** Media Service: avatar generation behind adapters (PR #48)
 - [x] **AVT-08d** Media Service: the 14-frame set (PR #49)
 - [x] **AVT-08e** "Make me from my photo": consent, live capture, deletion (flag off in prod) (PR #50)
-- [x] **ComfyUI stylizer** for AVT-08c/d: our own ComfyUI on a Cloud Run GPU, models from Hugging Face, licences checked; "We'll let you know" and a notification (deploy needs Blaze)
-- [ ] **iOS builds in the cloud**: Codemagic (dev, staging, prod; TestFlight for staging) and a GitHub Actions iOS build check
+- [x] **ComfyUI stylizer** (PR #51) for AVT-08c/d: our own ComfyUI on a Cloud Run GPU, models from Hugging Face, licences checked; "We'll let you know" and a notification (deploy needs Blaze)
+- [x] **iOS builds in the cloud** (PR #52): Codemagic (dev, staging, prod; TestFlight for staging) and a GitHub Actions iOS build check; Apple account setup in `docs/ios-build-setup.md`
 
 ## Next
 

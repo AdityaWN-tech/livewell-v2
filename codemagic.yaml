@@ -1,0 +1,124 @@
+# iOS builds in the cloud (D-10): Codemagic builds the dev, staging and prod
+# flavours on a Mac and signs them. Staging goes to TestFlight.
+# Setup, step by step: docs/ios-build-setup.md.
+#
+# Signing: certificates and provisioning profiles are uploaded to Codemagic
+# (Team settings > codemagic.yaml settings > Code signing identities) and
+# referred to below by their reference names. They are never in this repo,
+# and the build fails if one is ever committed.
+
+definitions:
+  versions: &versions
+    flutter: 3.47.7 # keep in step with .github/workflows/mobile.yml
+    xcode: latest
+  scripts:
+    - &no_signing_files
+      name: No signing files in the repo
+      script: |
+        if git ls-files | grep -iE '\.(p12|p8|cer|certSigningRequest|mobileprovision|provisionprofile)$'; then
+          echo "Signing files must live in Codemagic, not in the repo." && exit 1
+        fi
+    - &get_packages
+      name: Get packages
+      script: cd apps/mobile && flutter pub get
+    - &use_profiles
+      name: Use the provisioning profiles
+      script: xcode-project use-profiles
+  artifacts: &artifacts
+    - apps/mobile/build/ios/ipa/*.ipa
+    - /tmp/xcodebuild_logs/*.log
+    - apps/mobile/build/ios/archive/Runner.xcarchive/dSYMs/**/*.dSYM.zip
+
+workflows:
+  ios-dev:
+    name: iOS dev (development build)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      <<: *versions
+      ios_signing:
+        certificates:
+          - livewell_apple_development
+        provisioning_profiles:
+          - livewell_dev_development
+    # Manual only: start it from the Codemagic dashboard.
+    scripts:
+      - *no_signing_files
+      - *get_packages
+      - *use_profiles
+      - name: Build the dev .ipa
+        script: |
+          cd apps/mobile
+          flutter build ipa --release --flavor dev -t lib/main_dev.dart \
+            --build-number="$BUILD_NUMBER" \
+            --export-options-plist="$HOME/export_options.plist"
+    artifacts: *artifacts
+
+  ios-staging:
+    name: iOS staging (TestFlight)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      # The App Store Connect API key added in Codemagic (Team integrations).
+      app_store_connect: LiveWell App Store Connect
+    environment:
+      <<: *versions
+      ios_signing:
+        certificates:
+          - livewell_apple_distribution
+        provisioning_profiles:
+          - livewell_staging_appstore
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+      cancel_previous_builds: true
+    when:
+      changeset:
+        includes:
+          - apps/mobile/
+          - codemagic.yaml
+    scripts:
+      - *no_signing_files
+      - *get_packages
+      - *use_profiles
+      - name: Build the staging .ipa
+        script: |
+          cd apps/mobile
+          flutter build ipa --release --flavor staging -t lib/main_staging.dart \
+            --build-number="$BUILD_NUMBER" \
+            --export-options-plist="$HOME/export_options.plist"
+    artifacts: *artifacts
+    publishing:
+      app_store_connect:
+        auth: integration
+        # TestFlight only: internal testers get it; nothing goes to the
+        # App Store from here.
+        submit_to_testflight: true
+
+  ios-prod:
+    name: iOS prod (App Store build, not uploaded)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      <<: *versions
+      ios_signing:
+        certificates:
+          - livewell_apple_distribution
+        provisioning_profiles:
+          - livewell_prod_appstore
+    # Manual only. The .ipa is kept as an artifact; uploading prod to App
+    # Store Connect is a separate, deliberate step before release.
+    scripts:
+      - *no_signing_files
+      - *get_packages
+      - *use_profiles
+      - name: Build the prod .ipa
+        script: |
+          cd apps/mobile
+          flutter build ipa --release --flavor prod -t lib/main_prod.dart \
+            --build-number="$BUILD_NUMBER" \
+            --export-options-plist="$HOME/export_options.plist"
+    artifacts: *artifacts

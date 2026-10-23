@@ -1,0 +1,62 @@
+# iOS build check (D-10): compiles the app for iOS on a macOS runner, without
+# signing, when a pull request changes iOS code (the Runner app, and the
+# WidgetKit extension and App Intents once they are added under ios/), the
+# plugins, or the build setup. Signed builds and TestFlight are Codemagic's
+# job (codemagic.yaml). macOS minutes count 10x on a private repo, so this
+# runs only on these paths and cancels older runs.
+name: ios
+
+on:
+  pull_request:
+    paths:
+      - "apps/mobile/ios/**"
+      - "apps/mobile/pubspec.yaml"
+      - "apps/mobile/pubspec.lock"
+      - "codemagic.yaml"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: apps/mobile
+
+env:
+  FLUTTER_VERSION: "3.47.7"
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: No signing files in the repo
+        run: |
+          if git ls-files | grep -iE '\.(p12|p8|cer|certSigningRequest|mobileprovision|provisionprofile)$'; then
+            echo "Signing files must live in Codemagic, not in the repo." && exit 1
+          fi
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Targets and schemes (app, WidgetKit extension, App Intents)
+        run: xcodebuild -list -project ios/Runner.xcodeproj
+      - name: dev and prod flavours are set up
+        run: |
+          flutter build ios --config-only --no-codesign --flavor dev -t lib/main_dev.dart
+          flutter build ios --config-only --no-codesign --flavor prod -t lib/main_prod.dart
+      - name: Build staging (release, no signing)
+        # Builds every target the app embeds, so a widget extension or App
+        # Intents that don't compile fail here too.
+        run: flutter build ios --release --no-codesign --flavor staging -t lib/main_staging.dart
+      - name: The staging app has its own bundle ID, name and App Group
+        run: |
+          plist=build/ios/iphoneos/Runner.app/Info.plist
+          test "$(plutil -extract CFBundleIdentifier raw "$plist")" = "net.conciergeconnectedcare.livewell.stg"
+          test "$(plutil -extract CFBundleDisplayName raw "$plist")" = "Live Well Staging"
+          test "$(plutil -extract LWAppGroupId raw "$plist")" = "group.net.conciergeconnectedcare.livewell.stg"

@@ -42,7 +42,7 @@ paths:
         "401": {description: not_authorized}
         "403": {description: "feature_off | consent_required"}
         "413": {description: selfie_too_large}
-        "422": {description: "bad_options | selfie_required | selfie_unreadable | selfie_not_jpeg | selfie_only_for_selfie_source"}
+        "422": {description: "bad_options | liveness_required | selfie_required | selfie_unreadable | selfie_not_jpeg | selfie_only_for_selfie_source"}
         "429": {description: avatar_daily_limit}
   /v1/avatar/jobs/{id}:
     get:
@@ -78,6 +78,10 @@ components:
         selfie_jpeg_base64:
           type: string
           description: The live selfie (JPEG, at most 4 MB), only for source selfie
+        liveness:
+          type: string
+          enum: [blink, turn]
+          description: How the app saw a live person (T-AVT-08e); required for source selfie
     AvatarJob:
       type: object
       required: [job_id, source, status]

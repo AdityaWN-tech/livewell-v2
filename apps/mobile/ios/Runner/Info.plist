@@ -69,7 +69,7 @@
 		<key>UIStatusBarHidden</key>
 		<false/>
 		<key>NSCameraUsageDescription</key>
-	<string>Live Well uses the camera only when you choose to take a selfie for your coach avatar. The photo stays on your phone and is deleted right after.</string>
+	<string>Live Well uses the camera only when you choose to make your coach from a live selfie. The photo is sent securely to make your coach and is deleted right after.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Live Well uses the microphone only when you choose to speak, for example to say your Why or talk to your coach.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

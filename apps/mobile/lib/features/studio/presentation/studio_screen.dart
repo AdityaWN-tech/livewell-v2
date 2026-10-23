@@ -10,6 +10,8 @@ import '../../avatar/data/avatar_repository.dart';
 import '../../avatar/domain/coach_choice.dart';
 import '../../avatar/domain/coaches.dart';
 import '../../avatar/presentation/coach_avatar.dart';
+import '../../avatar/presentation/photo_consent.dart';
+import '../../avatar/presentation/selfie_screen.dart';
 import '../../voice/data/voice_repository.dart';
 import '../../voice/domain/voice.dart';
 import '../../voice/presentation/voice_screen.dart'
@@ -57,6 +59,9 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
 
   /// In onboarding, the coach the person picked (null: none yet).
   ReadyCoach? _picked;
+
+  /// "Not now" to the photo consents: offer the other ways.
+  bool _photoDeclined = false;
   final _name = TextEditingController();
   String? _nameError;
   VoiceChoice _voice = VoiceChoice.fallback;
@@ -142,6 +147,34 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
     }
   }
 
+  /// "Make me from my photo": the two consents first (FR-ONB-03), then the
+  /// live selfie; the Media Service writes the new coach (selfie source,
+  /// frames version), which is loaded here.
+  Future<void> _fromPhoto() async {
+    final l = AppLocalizations.of(context);
+    if (!await ensurePhotoConsent(context, ref)) {
+      if (mounted) setState(() => _photoDeclined = true);
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _photoDeclined = false);
+    final made = await Navigator.of(context)
+        .push<bool>(MaterialPageRoute(builder: (_) => const SelfieScreen()));
+    if (made != true || !mounted) return;
+    ref.invalidate(coachChoiceProvider);
+    try {
+      final saved = await ref.read(avatarRepositoryProvider).load();
+      if (saved != null && mounted) {
+        setState(() {
+          _saved = _choice = saved.copyWith(
+            coachName: CoachChoice.cleanName(_name.text),
+          );
+        });
+      }
+    } catch (_) {}
+    if (mounted) _say(l.photoReady);
+  }
+
   Future<void> _saveVoice() async {
     final l = AppLocalizations.of(context);
     setState(() => _busy = true);
@@ -225,13 +258,52 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
         ),
         ...save,
       ],
-      StudioTab.photo => [
+      // Off until counsel review (T-CMP-02); then the live selfie (08e).
+      StudioTab.photo when !flags.avatarFromPhoto => [
         StudioComingSoon(
           key: const Key('studio-photo-soon'),
           title: l.studioPhotoTitle,
-          body: flags.avatarFromPhoto ? l.studioPhotoBodyOn : l.studioPhotoBody,
+          body: l.studioPhotoBody,
         ),
         ...save,
+      ],
+      StudioTab.photo => [
+        LwCard(
+          key: const Key('studio-photo-intro'),
+          title: l.photoIntroTitle,
+          body: l.photoIntroBody,
+        ),
+        const SizedBox(height: LwSpacing.sm),
+        FilledButton.icon(
+          key: const Key('photo-start'),
+          onPressed: _busy ? null : _fromPhoto,
+          icon: const Icon(Icons.photo_camera_front_outlined),
+          label: Text(l.photoStart),
+        ),
+        if (_photoDeclined) ...[
+          const SizedBox(height: LwSpacing.md),
+          Text(
+            l.photoDeclined,
+            key: const Key('photo-declined'),
+            style: t.bodyMedium,
+          ),
+          const SizedBox(height: LwSpacing.xs),
+          Wrap(
+            spacing: LwSpacing.xs,
+            children: [
+              OutlinedButton(
+                key: const Key('photo-declined-coaches'),
+                onPressed: () => setState(() => _tab = StudioTab.coaches),
+                child: Text(l.studioTabCoaches),
+              ),
+              OutlinedButton(
+                key: const Key('photo-declined-build'),
+                onPressed: () => setState(() => _tab = StudioTab.build),
+                child: Text(l.studioTabBuild),
+              ),
+            ],
+          ),
+        ],
       ],
       StudioTab.build => [
         StudioComingSoon(

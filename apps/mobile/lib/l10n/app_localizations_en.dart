@@ -2703,4 +2703,106 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avatarSkip => 'Skip, use the default coach';
+
+  @override
+  String get photoTitle => 'Your live selfie';
+
+  @override
+  String get photoIntroTitle => 'Make me from my photo';
+
+  @override
+  String get photoIntroBody =>
+      'Take a live selfie and we make a 3D coach that looks like you. Your photo is sent securely, used only to make your coach, and deleted right after (at most 7 days). You can delete your coach any time in Profile > My coach.';
+
+  @override
+  String get photoStart => 'Take a live selfie';
+
+  @override
+  String get photoConsentTitle => 'Make your coach from your photo?';
+
+  @override
+  String get photoConsentBody =>
+      'We need two permissions:\n\n• Camera: to take one live selfie in the app (not from your gallery).\n• Face processing: our service uses your selfie to make a 3D coach that looks like you.\n\nYour photo is sent securely, used only to make your coach, and deleted right after it is made (at most 7 days). It is never used to train AI. You can turn these off, or delete your coach, any time in Profile > My coach.';
+
+  @override
+  String get photoConsentAllow => 'Allow';
+
+  @override
+  String get photoConsentNotNow => 'Not now';
+
+  @override
+  String get photoDeclined =>
+      'No problem. You can pick a ready-made coach or build your own instead.';
+
+  @override
+  String get photoTipNoFace => 'Put your face in the circle';
+
+  @override
+  String get photoTipOneFace => 'Only you in the picture, please';
+
+  @override
+  String get photoTipCloser => 'Come a little closer';
+
+  @override
+  String get photoTipBack => 'Move back a little';
+
+  @override
+  String get photoTipCentre => 'Centre your face and look at the camera';
+
+  @override
+  String get photoTipBlink => 'Now blink slowly';
+
+  @override
+  String get photoTipTurn => 'Turn your head a little, then look back';
+
+  @override
+  String get photoTipReady => 'Great! Take your photo';
+
+  @override
+  String get photoTake => 'Take photo';
+
+  @override
+  String get photoUseTurn => 'Can\'t blink? Turn your head instead';
+
+  @override
+  String get photoUseBlink => 'Blink instead';
+
+  @override
+  String get photoPrivacy =>
+      'Only your own face. The photo is used once to make your coach and deleted right after.';
+
+  @override
+  String get photoMaking => 'Making your coach… This takes about a minute.';
+
+  @override
+  String get photoReady => 'Your coach is ready.';
+
+  @override
+  String get photoErrNotMade =>
+      'We couldn\'t make your coach this time. You can try a different photo, or pick a ready-made coach.';
+
+  @override
+  String get photoErrLimit =>
+      'You\'ve made 3 coaches today. You can try again tomorrow, or pick a ready-made coach.';
+
+  @override
+  String get photoErrUnavailable =>
+      'Making a coach from a photo isn\'t available yet.';
+
+  @override
+  String get photoErrNetwork =>
+      'We couldn\'t reach our service. Please check your connection and try again.';
+
+  @override
+  String get photoErrConsent =>
+      'Please allow the camera and face processing first.';
+
+  @override
+  String get photoErrCamera => 'We couldn\'t open the camera.';
+
+  @override
+  String get photoTryAgain => 'Try again';
+
+  @override
+  String get photoPickReady => 'Pick a ready-made coach';
 }

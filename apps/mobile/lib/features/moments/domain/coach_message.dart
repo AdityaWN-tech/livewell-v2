@@ -9,7 +9,12 @@ enum Moment {
   evening,
   gentle,
   missedDay,
-  weeklyReview;
+  weeklyReview,
+  // T-AVT-08f
+  firstHello,
+  checkInGood,
+  checkInOkay,
+  streakMilestone;
 
   /// The template file name in content/coach/moments.
   String get file => switch (this) {
@@ -20,6 +25,10 @@ enum Moment {
     Moment.gentle => 'gentle',
     Moment.missedDay => 'missed_day',
     Moment.weeklyReview => 'weekly_review',
+    Moment.firstHello => 'first_hello',
+    Moment.checkInGood => 'checkin_good',
+    Moment.checkInOkay => 'checkin_okay',
+    Moment.streakMilestone => 'streak_milestone',
   };
 
   static Moment? byFile(String name) =>
@@ -63,6 +72,7 @@ class CoachMessage {
     required this.moment,
     required this.text,
     required this.emotion,
+    this.thenEmotion,
     required this.primaryAction,
     required this.secondaryActions,
     required this.containsUserText,
@@ -76,6 +86,10 @@ class CoachMessage {
   final Moment moment;
   final String text;
   final CoachEmotion emotion;
+
+  /// The face once the coach has finished speaking, when it changes (the
+  /// first hello: waving, then happy).
+  final CoachEmotion? thenEmotion;
   final MomentAction primaryAction;
   final List<MomentAction> secondaryActions;
 

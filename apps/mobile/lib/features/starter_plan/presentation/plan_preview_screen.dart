@@ -18,6 +18,8 @@ import '../data/plan_repository.dart';
 import '../data/reminders.dart';
 import '../domain/starter_plan.dart';
 import '../domain/touchpoints.dart';
+import '../../moments/application/moment_launcher.dart'
+    show firstHelloStoreProvider;
 
 /// Reminder texts in the coach's voice, generic on purpose (no name,
 /// personal or health details on the lock screen, AGENTS.md).
@@ -167,6 +169,7 @@ class _PlanPreviewScreenState extends ConsumerState<PlanPreviewScreen> {
       await ref
           .read(profileRepositoryProvider)
           .setStep(uid, ProfileStep.assessment);
+      await _helloOnHome();
       if (mounted) context.go('/home');
     } catch (_) {
       if (mounted) {
@@ -182,7 +185,17 @@ class _PlanPreviewScreenState extends ConsumerState<PlanPreviewScreen> {
     await ref
         .read(profileRepositoryProvider)
         .setStep(uid, ProfileStep.assessment);
+    await _helloOnHome();
     if (mounted) context.go('/home');
+  }
+
+  /// Onboarding is done: the coach says hello on Home (T-AVT-08f).
+  Future<void> _helloOnHome() async {
+    try {
+      await ref.read(firstHelloStoreProvider).setPending(true);
+    } catch (_) {
+      // A nicety; never block the way to Home over it.
+    }
   }
 
   @override

@@ -13,14 +13,16 @@ import 'moment_launcher.dart';
 /// The coach's resting face for each moment, as in its script file. Also
 /// used where there is no message to read it from (prod before review).
 AvatarExpression faceForMoment(Moment m) => switch (m) {
-  Moment.morning => AvatarExpression.waving,
-  Moment.stepDone => AvatarExpression.celebrating,
+  Moment.morning || Moment.firstHello => AvatarExpression.waving,
+  Moment.stepDone || Moment.streakMilestone => AvatarExpression.celebrating,
   Moment.evening => AvatarExpression.listening,
   Moment.gentle => AvatarExpression.calm,
   // Encouraging uses the happy face until the art kit has its own.
   Moment.stepReminder ||
   Moment.missedDay ||
-  Moment.weeklyReview => AvatarExpression.happy,
+  Moment.weeklyReview ||
+  Moment.checkInGood ||
+  Moment.checkInOkay => AvatarExpression.happy,
 };
 
 /// Voice off: the moments show text only and celebrations are silent.
@@ -60,6 +62,9 @@ final safetyHoldTodayProvider = Provider<bool>(
 /// gentle one on a gentle day, else by the time of day (morning until the
 /// step reminder, the step until the evening, then the evening).
 final heroMomentProvider = Provider<Moment>((ref) {
+  // After a safety response the coach on Home stays calm: never smiling
+  // or celebrating near safety content (T-AVT-08f).
+  if (ref.watch(safetyHoldTodayProvider)) return Moment.gentle;
   if (ref.watch(stepProgressProvider).done) return Moment.stepDone;
   if (ref.watch(todayCheckInProvider).value?.gentleDay ?? false) {
     return Moment.gentle;

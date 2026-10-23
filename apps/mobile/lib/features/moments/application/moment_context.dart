@@ -24,6 +24,7 @@ final momentContextProvider = Provider<MomentContext>((ref) {
   return MomentContext(
     now: ref.watch(clockProvider)(),
     firstName: ref.watch(firstNameProvider),
+    coachName: ref.watch(coachNameProvider),
     why: why,
     step: step == null
         ? null

@@ -14,9 +14,11 @@ import '../application/coach_state.dart';
 import '../application/moment_context.dart';
 import '../data/coach_speaker.dart';
 import '../domain/coach_message.dart';
+import '../domain/moment_builder.dart';
 
 /// The Done celebration (T-DLY-03d): the coach celebrates for about 3
-/// seconds with falling leaves and says the step-done line. A tap skips
+/// seconds with falling leaves and says the step-done line, or the
+/// milestone line on 7, 14 and 30 days in a row (T-AVT-08f). A tap skips
 /// it; silent when the coach is muted, on a safety hold, or before the
 /// lines are approved (then it just shows "You did it!").
 Future<void> showCelebration(BuildContext context) => showGeneralDialog<void>(
@@ -77,7 +79,10 @@ class _CelebrationState extends ConsumerState<Celebration>
   Future<void> _start() async {
     CoachMessage? m;
     try {
-      m = await ref.read(coachMessageProvider(Moment.stepDone).future);
+      final moment = MomentBuilder.afterDone(
+        streakDays: ref.read(momentContextProvider).streakDays,
+      );
+      m = await ref.read(coachMessageProvider(moment).future);
     } catch (_) {
       m = null;
     }

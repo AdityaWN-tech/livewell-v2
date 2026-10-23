@@ -6,6 +6,9 @@ import 'coach_message.dart';
 /// the person's profile or plan. Anything else is rejected (tested).
 abstract final class MomentPlaceholders {
   static const firstName = 'first_name';
+
+  /// The name the person gave their coach (T-AVT-08f first hello).
+  static const coachName = 'coach_name';
   static const why = 'why';
   static const stepTitle = 'step_title';
   static const stepMinutes = 'step_minutes';
@@ -16,6 +19,7 @@ abstract final class MomentPlaceholders {
 
   static const all = {
     firstName,
+    coachName,
     why,
     stepTitle,
     stepMinutes,
@@ -26,7 +30,7 @@ abstract final class MomentPlaceholders {
   };
 
   /// Typed by the person: never spoken by a cloned voice (FR-VOC-05).
-  static const userText = {firstName, why};
+  static const userText = {firstName, coachName, why};
 
   static final pattern = RegExp(r'\{([a-z_]+)\}');
 
@@ -51,6 +55,7 @@ class MomentTemplate {
     required this.version,
     required this.approved,
     required this.emotion,
+    this.thenEmotion,
     required this.primaryAction,
     required this.secondaryActions,
     required this.variants,
@@ -60,6 +65,7 @@ class MomentTemplate {
   final int version;
   final bool approved;
   final CoachEmotion emotion;
+  final CoachEmotion? thenEmotion;
   final MomentAction primaryAction;
   final List<MomentAction> secondaryActions;
   final List<MomentVariant> variants;
@@ -76,6 +82,13 @@ class MomentTemplate {
     if (moment == null || emotion == null || primary == null) {
       throw const FormatException('moment, emotion or primary_action');
     }
+    final then = m['then_emotion'] as String?;
+    final thenEmotion = then == null
+        ? null
+        : CoachEmotion.values.where((e) => e.name == then).firstOrNull;
+    if (then != null && thenEmotion == null) {
+      throw FormatException('then_emotion $then');
+    }
     final variants = [
       for (final v in (m['variants'] as List).cast<Map<String, dynamic>>())
         MomentVariant(v['id'] as String, v['text'] as String),
@@ -91,6 +104,7 @@ class MomentTemplate {
       version: m['version'] as int,
       approved: m['review_status'] == 'approved',
       emotion: emotion,
+      thenEmotion: thenEmotion,
       primaryAction: primary,
       secondaryActions: [
         for (final a in (m['secondary_actions'] as List).cast<String>())

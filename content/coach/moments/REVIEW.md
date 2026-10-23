@@ -1,6 +1,6 @@
 # Avatar Moment scripts: clinical review (T-DLY-03)
 
-Every line the coach can say in an Avatar Moment. All are `pending` until approved; the app uses only approved lines outside the dev build. Placeholders in `{braces}` are filled from the person's own data (first name, Why) or their plan (step, minutes); nothing else.
+Every line the coach can say in an Avatar Moment. All are `pending` until approved; the app uses only approved lines outside the dev build. Placeholders in `{braces}` are filled from the person's own data (first name, Why, the name they gave their coach) or their plan (step, minutes); nothing else.
 
 Rules the lines follow: invitations, never orders or guilt; about an 8th-grade reading level; one step plus a smaller option; steps come only from the person's plan; no portal or course mentions; safety, crisis and medical messages are never Avatar Moments (they use the safety cards and the neutral voice).
 
@@ -81,3 +81,51 @@ When: Sunday 08:00. Expression: happy. Buttons: see_week.
 | `weekly_review.w1` | This week you completed {weekly_count} steps. Great work, {first_name}! Want to see your week? | ☐ |
 | `weekly_review.w2` | Look at your week: {weekly_count} steps done. Every one counts. Shall we look at it together? | ☐ |
 | `weekly_review.w3` | A new week is a fresh start. Want to look back at your week together? | ☐ |
+
+## first_hello
+
+When: Once, on Home right after onboarding (avatar, voice and Why chosen). Expression: waving, then happy. Buttons: start_step (also: close).
+
+| id | Line | Approved? |
+|---|---|---|
+| `first_hello.h1` | Hi {first_name}, I'm {coach_name}, your Live Well coach. You told me your why: {why}. Let's start with one small step: {step_title}. | ☐ |
+| `first_hello.h2` | Hi {first_name}, I'm {coach_name}, your Live Well coach. Let's start with one small step: {step_title}. | ☐ |
+| `first_hello.h3` | Hi {first_name}, I'm {coach_name}, your Live Well coach. I'm here to help you take one small step at a time. | ☐ |
+| `first_hello.h4` | Hi, I'm {coach_name}, your Live Well coach. I'm here to help you take one small step at a time. | ☐ |
+| `first_hello.h5` | Hi, I'm your Live Well coach. I'm here to help you take one small step at a time. | ☐ |
+| `first_hello.h6` | Hello! I'm your Live Well coach. Let's take one small step at a time, together. | ☐ |
+| `first_hello.h7` | Hi {first_name}, I'm your Live Well coach. You told me your why: {why}. Let's start with one small step: {step_title}. | ☐ |
+| `first_hello.h8` | Hi {first_name}, I'm your Live Well coach. Let's start with one small step: {step_title}. | ☐ |
+
+## checkin_good
+
+When: Right after a check-in with a good mood (4 or 5) and no gentle day. Expression: happy. Buttons: close (also: start_step).
+
+| id | Line | Approved? |
+|---|---|---|
+| `checkin_good.c1` | Love that energy, {first_name}! Thanks for checking in. | ☐ |
+| `checkin_good.c2` | Love that energy! Thanks for checking in. | ☐ |
+| `checkin_good.c3` | Great to hear you feel good, {first_name}. Your step is ready when you are: {step_title}. | ☐ |
+| `checkin_good.c4` | Great to hear! Your step is ready when you are: {step_title}. | ☐ |
+
+## checkin_okay
+
+When: Right after a check-in with an okay mood (3) and no gentle day. Expression: happy. Buttons: close (also: start_step).
+
+| id | Line | Approved? |
+|---|---|---|
+| `checkin_okay.o1` | Thanks for checking in, {first_name}. | ☐ |
+| `checkin_okay.o2` | Thanks for checking in. One small step at a time. | ☐ |
+| `checkin_okay.o3` | Thanks for checking in, {first_name}. Want to try today's step? It's this one: {step_title}. | ☐ |
+| `checkin_okay.o4` | Thanks for checking in. Today's step is ready when you are: {step_title}. | ☐ |
+
+## streak_milestone
+
+When: Instead of step_done when the streak reaches 7, 14 or 30 days. Expression: celebrating. Buttons: close.
+
+| id | Line | Approved? |
+|---|---|---|
+| `streak_milestone.s1` | That's {streak_days} days in a row, {first_name}! That's a real habit now. | ☐ |
+| `streak_milestone.s2` | {streak_days} days in a row! Every small step adds up. | ☐ |
+| `streak_milestone.s3` | Wow, {first_name}, {streak_days} days in a row! I'm proud of you. | ☐ |
+| `streak_milestone.s4` | {streak_days} days in a row. That's a real habit now! | ☐ |

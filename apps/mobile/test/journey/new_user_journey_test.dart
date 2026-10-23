@@ -12,6 +12,8 @@ import 'package:livewell/features/starter_plan/presentation/plan_preview_screen.
 import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/voice/presentation/voice_screen.dart';
 import 'package:livewell/features/welcome/presentation/welcome_screen.dart';
+import 'package:livewell/features/moments/domain/coach_message.dart';
+import 'package:livewell/features/moments/presentation/moment_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
@@ -157,7 +159,20 @@ Future<Harness> runJourney(WidgetTester tester, {double scale = 1}) async {
   expect(h.plans.days, hasLength(7));
   expect(h.reminders.scheduled, isNotEmpty);
 
-  // 8. Home, right after the first sign-up, with today's step
+  // 8. On Home the coach says hello once (T-AVT-08f), then Home.
+  for (var i = 0; i < 8; i++) {
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  expect(
+    tester.widget<MomentScreen>(find.byType(MomentScreen)).moment,
+    Moment.firstHello,
+  );
+  h.speaker.finish();
+  await tester.pumpAndSettle();
+  await tapKey(tester, 'moment-close');
+  await tester.pumpAndSettle();
+
+  // 9. Home, right after the first sign-up, with today's step
   // from the plan and the Why (it used to stay "signed out" until a
   // restart: signedInUidProvider).
   expect(find.byType(HomeScreen), findsOneWidget);

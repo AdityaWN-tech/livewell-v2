@@ -134,15 +134,17 @@ void main() {
   });
 
   group('Done celebration', () {
-    testWidgets('the coach celebrates and says the step-done line, then '
-        'closes; Home shows the step-done moment', (tester) async {
+    testWidgets('the coach celebrates and says the Done line (the '
+        "preview's 14 days in a row: the milestone line), then closes; Home "
+        'shows the step-done moment', (tester) async {
       final h = await bootPreview(tester);
       await tapDone(tester);
       expect(celebration, findsOneWidget);
       expect(find.byKey(const Key('celebration-avatar')), findsOneWidget);
       final said = h.speaker.spoken.single.$1;
-      expect(said.moment, Moment.stepDone);
-      expect(said.messageId, startsWith('step_done.'));
+      expect(said.moment, Moment.streakMilestone);
+      expect(said.messageId, startsWith('streak_milestone.'));
+      expect(said.text, contains('14 days in a row'));
       // About 3 seconds, and it waits for the voice to finish.
       await tester.pump(Celebration.length);
       expect(celebration, findsOneWidget);

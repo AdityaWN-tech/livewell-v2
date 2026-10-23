@@ -8,6 +8,8 @@ import 'package:livewell/features/consent/domain/consent.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/starter_plan/presentation/plan_preview_screen.dart';
+import 'package:livewell/features/moments/domain/coach_message.dart';
+import 'package:livewell/features/moments/presentation/moment_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
@@ -36,6 +38,19 @@ Future<void> tapKey(WidgetTester tester, String key) async {
   await tester.ensureVisible(find.byKey(Key(key)));
   await tester.tap(find.byKey(Key(key)));
   await tester.pumpAndSettle();
+}
+
+/// Onboarding is done: on Home the coach says hello once (T-AVT-08f).
+Future<void> meetCoach(WidgetTester tester, Harness h) async {
+  expect(
+    tester.widget<MomentScreen>(find.byType(MomentScreen)).moment,
+    Moment.firstHello,
+  );
+  h.speaker.finish();
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('moment-close')));
+  await tester.pumpAndSettle();
+  expect(h.firstHello.due, isFalse);
 }
 
 void main() {
@@ -90,6 +105,7 @@ void main() {
     // Lock-screen safe: generic texts only.
     expect(h.reminders.texts!.nudgeBody, 'Your coach has a message for you.');
     expect(h.profiles.existing[uid], ProfileStep.assessment);
+    await meetCoach(tester, h);
     expect(find.byType(HomeScreen), findsOneWidget);
     // Home's step now comes from the plan (5 min: the check-in was skipped).
     expect(find.text('Walk for 5 minutes after lunch'), findsOneWidget);
@@ -107,6 +123,7 @@ void main() {
     expect(h.reminders.permissionAsks, 0);
     expect(h.plans.days, hasLength(7));
     expect(h.reminders.scheduled, isEmpty);
+    await meetCoach(tester, h);
     expect(find.byType(HomeScreen), findsOneWidget);
   });
 

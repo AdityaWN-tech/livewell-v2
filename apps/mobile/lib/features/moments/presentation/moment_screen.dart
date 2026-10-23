@@ -220,7 +220,11 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
         ? AvatarExpression.talking
         : m == null
         ? AvatarExpression.happy
-        : expressionFor(m.emotion);
+        // Some moments change face once said (the first hello waves, then
+        // smiles).
+        : expressionFor(
+            _phase == _Phase.done ? m.thenEmotion ?? m.emotion : m.emotion,
+          );
     return Scaffold(
       backgroundColor: background,
       body: SafeArea(

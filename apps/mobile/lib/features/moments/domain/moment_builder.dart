@@ -23,6 +23,7 @@ class MomentContext {
   const MomentContext({
     required this.now,
     this.firstName,
+    this.coachName,
     this.why,
     this.step,
     this.streakDays,
@@ -34,6 +35,9 @@ class MomentContext {
   /// variant.
   final DateTime now;
   final String? firstName;
+
+  /// The name the person gave their coach (they may have kept the default).
+  final String? coachName;
   final String? why;
   final MomentStep? step;
   final int? streakDays;
@@ -64,10 +68,23 @@ class MomentBuilder {
   static Moment morningFor({required bool missedYesterday}) =>
       missedYesterday ? Moment.missedDay : Moment.morning;
 
-  /// After the check-in: the gentle moment on a gentle day (low mood or
-  /// high stress), else none (Home goes on as usual).
-  static Moment? afterCheckIn({required bool gentleDay}) =>
-      gentleDay ? Moment.gentle : null;
+  /// The coach's reaction to a check-in (T-AVT-08f): the gentle moment on a
+  /// gentle day (low mood or high stress), else a short thank-you that
+  /// fits the mood. Nothing from the answers goes into the words.
+  static Moment afterCheckIn({required bool gentleDay, required int mood}) =>
+      gentleDay
+      ? Moment.gentle
+      : mood >= 4
+      ? Moment.checkInGood
+      : Moment.checkInOkay;
+
+  /// Streak days that get their own celebration (T-AVT-08f).
+  static const milestones = {7, 14, 30};
+
+  /// What the coach says after Done: the milestone on 7, 14 and 30 days.
+  static Moment afterDone({int? streakDays}) => milestones.contains(streakDays)
+      ? Moment.streakMilestone
+      : Moment.stepDone;
 
   static String timeOfDay(DateTime t) => switch (t.hour) {
     >= 5 && < 12 => 'morning',
@@ -87,11 +104,12 @@ class MomentBuilder {
       for (final v in t.variants)
         if (v.placeholders.every(values.containsKey)) v,
     ];
-    // Prefer the personal versions: with the step, the week's count, the
-    // streak and the name, when those are known (the plain ones are for
-    // when they aren't).
+    // Prefer the personal versions: with the step, the coach's name, the
+    // week's count, the streak and the name, when those are known (the
+    // plain ones are for when they aren't).
     for (final key in [
       MomentPlaceholders.stepTitle,
+      MomentPlaceholders.coachName,
       MomentPlaceholders.weeklyCount,
       MomentPlaceholders.streakDays,
       MomentPlaceholders.firstName,
@@ -125,6 +143,7 @@ class MomentBuilder {
       moment: moment,
       text: text,
       emotion: t.emotion,
+      thenEmotion: t.thenEmotion,
       primaryAction: t.primaryAction,
       secondaryActions: t.secondaryActions,
       containsUserText: variant.placeholders.any(
@@ -139,10 +158,13 @@ class MomentBuilder {
     // On a gentle day the step is always the smaller one.
     final gentle = moment == Moment.gentle;
     final name = c.firstName?.trim();
+    final coach = c.coachName?.trim();
     final why = _sentence(c.why);
     return {
       MomentPlaceholders.timeOfDay: timeOfDay(c.now),
       if (name != null && name.isNotEmpty) MomentPlaceholders.firstName: name,
+      if (coach != null && coach.isNotEmpty)
+        MomentPlaceholders.coachName: coach,
       MomentPlaceholders.why: ?why,
       if (step != null) ...{
         MomentPlaceholders.stepTitle: _lower(

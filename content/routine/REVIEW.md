@@ -138,3 +138,14 @@ Icon: bed. Kind: sleep. Movement: no. Default: 22:30, 5 min.
 |---|---|---|
 | `custom.c1` | Hi {first_name}, it's time for your next routine step. | ☐ |
 | `custom.c2` | It's {time}. Time for your next routine step. | ☐ |
+
+## Quick-start templates
+
+The person picks one and edits it. Movement items are left out for people whose activity is limited.
+
+| Template | Days | Items |
+|---|---|---|
+| Morning starter (`morning_starter`) | everyDay | 07:00 Wake up, 07:10 Drink water, 07:20 Morning stretch, 07:45 Healthy breakfast |
+| Workday (`workday`) | weekdays | 06:45 Wake up, 07:00 Drink water, 07:30 Healthy breakfast, 11:00 Work break, 13:30 Walk after a meal, 16:00 Breathing break, 21:30 Screen off, 22:30 Bedtime |
+| Weekend (`weekend`) | weekend | 08:00 Wake up, 08:10 Drink water, 09:00 Morning walk, 17:00 Family time, 21:00 Read, 23:00 Bedtime |
+| Travel day (`travel_day`) | oneDay | 08:00 Drink water, 12:00 Breathing break, 13:30 Walk after a meal, 22:00 Sleep wind-down |

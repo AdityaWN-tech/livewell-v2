@@ -5144,6 +5144,432 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Evening'**
   String get widgetRoutineEvening;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'My Daily Routine'**
+  String get routinePlanTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Your own small steps for each day'**
+  String get routinePlanBody;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done today'**
+  String routinePlanProgress(int done, int total);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Open My Daily Routine'**
+  String get routinePlanOpenLabel;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'My Daily Routine'**
+  String get routineTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Your own steps for each day, beside your coach\'s plan.'**
+  String get routineIntro;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Show {day}'**
+  String routineDayLabel(String day);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'From your coach'**
+  String get routineFromCoach;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {label} done'**
+  String routineMarkDone(String label);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get routineDone;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped today'**
+  String get routineSkipped;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Resting today'**
+  String get routineResting;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Options for {label}'**
+  String routineItemMenu(String label);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get routineEdit;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Skip today'**
+  String get routineSkipToday;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from {day}'**
+  String routineRemoveFromDay(String day);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get routineDelete;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'{label} deleted'**
+  String routineDeleted(String label);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'{label} removed from {day}'**
+  String routineRemovedFromDay(String label, String day);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get routineUndo;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my routine'**
+  String get routineAdd;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'This day has 12 steps, the most it can hold.'**
+  String get routineDayFull;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Two things at {time}. Want to move one?'**
+  String routineClash(String time);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Build your day, one small step at a time'**
+  String get routineEmptyTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Start from a template and make it yours, or add steps one by one.'**
+  String get routineEmptyBody;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Quick-start templates'**
+  String get routineTemplatesTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Templates'**
+  String get routineTemplates;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added. Change anything you like.'**
+  String routineTemplateApplied(String name);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 step didn\'t fit (12 a day).} other{{count} steps didn\'t fit (12 a day).}}'**
+  String routineTemplateSkipped(int count);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Copy this day to…'**
+  String get routineCopyDay;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Copy {day} to…'**
+  String routineCopyTitle(String day);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get routineCopyAction;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Copied.'**
+  String get routineCopied;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'{days} already full (12 steps), so left out.'**
+  String routineCopyFull(String days);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'More options'**
+  String get routineMoreMenu;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel, sick day or busy week'**
+  String get routineModesMenu;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Life happens'**
+  String get routineModesTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Shrink or pause your routine for a while. Your streak is safe.'**
+  String get routineModesBody;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Travelling'**
+  String get routineModeTravel;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep just your first 3 steps for 7 days.'**
+  String get routineModeTravelBody;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Sick day'**
+  String get routineModeSick;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Rest today. Your routine pauses until tomorrow.'**
+  String get routineModeSickBody;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Busy week'**
+  String get routineModeBusy;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep just your first 3 steps for 7 days.'**
+  String get routineModeBusyBody;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Back to my full routine'**
+  String get routineModeOff;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel mode until {date}: just your first 3 steps.'**
+  String routineModeBannerTravel(String date);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Sick day: your routine is resting today. Take care.'**
+  String get routineModeBannerSick;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Busy week until {date}: just your first 3 steps.'**
+  String routineModeBannerBusy(String date);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get routineModeEnd;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my routine'**
+  String get routineAddTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get routineCustom;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Your own step'**
+  String get routineCustomBody;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Check with your clinician first'**
+  String get routineClinicianFirst;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Edit step'**
+  String get routineEditTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'New step'**
+  String get routineNewTitle;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'What is it?'**
+  String get routineLabelField;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'For example: Call a friend'**
+  String get routineLabelHint;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get routineIconField;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Icon {number} of {count}'**
+  String routineIconOption(int number, int count);
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get routineTimeField;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'How long'**
+  String get routineDurationField;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Repeats on'**
+  String get routineDaysField;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get routineReminder;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Coach announces it'**
+  String get routineAnnounce;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach says “time for your next routine step”. Your own words show as text only.'**
+  String get routineAnnounceCustom;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Movement can help, but check with your clinician first. Reminders stay off until you turn them on.'**
+  String get routineClinicianNote;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get routineSave;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least one day.'**
+  String get routineDaysNone;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Add a few words.'**
+  String get routineLabelEmpty;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'That wasn\'t saved. You can try different words.'**
+  String get routineLabelNotSaved;
+
+  /// My Daily Routine (T-GOL-03b).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Please try again.'**
+  String get routineSaveError;
 }
 
 class _AppLocalizationsDelegate

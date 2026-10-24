@@ -2893,4 +2893,262 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetRoutineEvening => 'Evening';
+
+  @override
+  String get routinePlanTitle => 'My Daily Routine';
+
+  @override
+  String get routinePlanBody => 'Your own small steps for each day';
+
+  @override
+  String routinePlanProgress(int done, int total) {
+    return '$done of $total done today';
+  }
+
+  @override
+  String get routinePlanOpenLabel => 'Open My Daily Routine';
+
+  @override
+  String get routineTitle => 'My Daily Routine';
+
+  @override
+  String get routineIntro =>
+      'Your own steps for each day, beside your coach\'s plan.';
+
+  @override
+  String routineDayLabel(String day) {
+    return 'Show $day';
+  }
+
+  @override
+  String get routineFromCoach => 'From your coach';
+
+  @override
+  String routineMarkDone(String label) {
+    return 'Mark $label done';
+  }
+
+  @override
+  String get routineDone => 'Done';
+
+  @override
+  String get routineSkipped => 'Skipped today';
+
+  @override
+  String get routineResting => 'Resting today';
+
+  @override
+  String routineItemMenu(String label) {
+    return 'Options for $label';
+  }
+
+  @override
+  String get routineEdit => 'Edit';
+
+  @override
+  String get routineSkipToday => 'Skip today';
+
+  @override
+  String routineRemoveFromDay(String day) {
+    return 'Remove from $day';
+  }
+
+  @override
+  String get routineDelete => 'Delete';
+
+  @override
+  String routineDeleted(String label) {
+    return '$label deleted';
+  }
+
+  @override
+  String routineRemovedFromDay(String label, String day) {
+    return '$label removed from $day';
+  }
+
+  @override
+  String get routineUndo => 'Undo';
+
+  @override
+  String get routineAdd => 'Add to my routine';
+
+  @override
+  String get routineDayFull => 'This day has 12 steps, the most it can hold.';
+
+  @override
+  String routineClash(String time) {
+    return 'Two things at $time. Want to move one?';
+  }
+
+  @override
+  String get routineEmptyTitle => 'Build your day, one small step at a time';
+
+  @override
+  String get routineEmptyBody =>
+      'Start from a template and make it yours, or add steps one by one.';
+
+  @override
+  String get routineTemplatesTitle => 'Quick-start templates';
+
+  @override
+  String get routineTemplates => 'Templates';
+
+  @override
+  String routineTemplateApplied(String name) {
+    return '$name added. Change anything you like.';
+  }
+
+  @override
+  String routineTemplateSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count steps didn\'t fit (12 a day).',
+      one: '1 step didn\'t fit (12 a day).',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get routineCopyDay => 'Copy this day to…';
+
+  @override
+  String routineCopyTitle(String day) {
+    return 'Copy $day to…';
+  }
+
+  @override
+  String get routineCopyAction => 'Copy';
+
+  @override
+  String get routineCopied => 'Copied.';
+
+  @override
+  String routineCopyFull(String days) {
+    return '$days already full (12 steps), so left out.';
+  }
+
+  @override
+  String get routineMoreMenu => 'More options';
+
+  @override
+  String get routineModesMenu => 'Travel, sick day or busy week';
+
+  @override
+  String get routineModesTitle => 'Life happens';
+
+  @override
+  String get routineModesBody =>
+      'Shrink or pause your routine for a while. Your streak is safe.';
+
+  @override
+  String get routineModeTravel => 'Travelling';
+
+  @override
+  String get routineModeTravelBody =>
+      'Keep just your first 3 steps for 7 days.';
+
+  @override
+  String get routineModeSick => 'Sick day';
+
+  @override
+  String get routineModeSickBody =>
+      'Rest today. Your routine pauses until tomorrow.';
+
+  @override
+  String get routineModeBusy => 'Busy week';
+
+  @override
+  String get routineModeBusyBody => 'Keep just your first 3 steps for 7 days.';
+
+  @override
+  String get routineModeOff => 'Back to my full routine';
+
+  @override
+  String routineModeBannerTravel(String date) {
+    return 'Travel mode until $date: just your first 3 steps.';
+  }
+
+  @override
+  String get routineModeBannerSick =>
+      'Sick day: your routine is resting today. Take care.';
+
+  @override
+  String routineModeBannerBusy(String date) {
+    return 'Busy week until $date: just your first 3 steps.';
+  }
+
+  @override
+  String get routineModeEnd => 'End';
+
+  @override
+  String get routineAddTitle => 'Add to my routine';
+
+  @override
+  String get routineCustom => 'Custom';
+
+  @override
+  String get routineCustomBody => 'Your own step';
+
+  @override
+  String get routineClinicianFirst => 'Check with your clinician first';
+
+  @override
+  String get routineEditTitle => 'Edit step';
+
+  @override
+  String get routineNewTitle => 'New step';
+
+  @override
+  String get routineLabelField => 'What is it?';
+
+  @override
+  String get routineLabelHint => 'For example: Call a friend';
+
+  @override
+  String get routineIconField => 'Icon';
+
+  @override
+  String routineIconOption(int number, int count) {
+    return 'Icon $number of $count';
+  }
+
+  @override
+  String get routineTimeField => 'Time';
+
+  @override
+  String get routineDurationField => 'How long';
+
+  @override
+  String get routineDaysField => 'Repeats on';
+
+  @override
+  String get routineReminder => 'Remind me';
+
+  @override
+  String get routineAnnounce => 'Coach announces it';
+
+  @override
+  String get routineAnnounceCustom =>
+      'Your coach says “time for your next routine step”. Your own words show as text only.';
+
+  @override
+  String get routineClinicianNote =>
+      'Movement can help, but check with your clinician first. Reminders stay off until you turn them on.';
+
+  @override
+  String get routineSave => 'Save';
+
+  @override
+  String get routineDaysNone => 'Pick at least one day.';
+
+  @override
+  String get routineLabelEmpty => 'Add a few words.';
+
+  @override
+  String get routineLabelNotSaved =>
+      'That wasn\'t saved. You can try different words.';
+
+  @override
+  String get routineSaveError => 'Couldn\'t save. Please try again.';
 }

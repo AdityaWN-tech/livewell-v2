@@ -9,6 +9,8 @@ import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../home/application/home_data.dart';
+import '../../routine/application/routine_data.dart';
+import '../../routine/presentation/routine_screen.dart';
 import '../../profile/presentation/profile_button.dart';
 import '../application/plan_data.dart';
 import '../domain/plan_models.dart';
@@ -205,6 +207,8 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
             ),
           ),
         const SizedBox(height: LwSpacing.sectionGap),
+        const _RoutineRow(),
+        const SizedBox(height: LwSpacing.sm),
         const _FrameworkRow(),
         const SizedBox(height: LwSpacing.sm),
         _AffirmationCard(now),
@@ -424,6 +428,67 @@ class _HabitRow extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// My Daily Routine (T-GOL-03b): today's progress, opens the routine.
+class _RoutineRow extends ConsumerWidget {
+  const _RoutineRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final today = ref.watch(todayRoutineProvider);
+    return Semantics(
+      button: true,
+      container: true,
+      label: l.routinePlanOpenLabel,
+      child: Material(
+        key: const Key('plan-routine'),
+        color: p.mint,
+        borderRadius: LwRadius.lgAll,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.push(RoutineScreen.path),
+          child: Padding(
+            padding: const EdgeInsets.all(LwSpacing.cardPadding),
+            child: Row(
+              children: [
+                ExcludeSemantics(
+                  child: Icon(
+                    Icons.wb_sunny_outlined,
+                    color: p.primaryDark,
+                    size: LwSize.iconMd,
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.routinePlanTitle,
+                        style: t.titleSmall?.copyWith(color: p.onTint),
+                      ),
+                      Text(
+                        today.total == 0
+                            ? l.routinePlanBody
+                            : l.routinePlanProgress(today.done, today.total),
+                        key: const Key('plan-routine-progress'),
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: p.onTint),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

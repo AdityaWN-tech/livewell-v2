@@ -1,0 +1,341 @@
+{
+  "version": "0.1-draft",
+  "note": "T-GOL-03c. Short custom-label cases for label_rules.json. expected: a kind, or null for a label that must be saved. critical: must be right 100% of the time (eating-disorder signs caught; everyday steps never blocked).",
+  "cases": [
+    {
+      "text": "Skip dinner",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "skip breakfast",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "No lunch",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Don't eat after 6",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "No food after 7pm",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Only water today",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Stop eating",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Eat 500 calories",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "800 cal max",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Purge after dinner",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Throw up after meals",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Laxatives",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Diet pills",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Starve",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Burn off dinner",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Earn my dinner",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Walk off the cake",
+      "expected": "disordered_eating",
+      "critical": true
+    },
+    {
+      "text": "Take my pills",
+      "expected": "medication",
+      "critical": false
+    },
+    {
+      "text": "Blood pressure meds",
+      "expected": "medication",
+      "critical": false
+    },
+    {
+      "text": "Insulin",
+      "expected": "medication",
+      "critical": false
+    },
+    {
+      "text": "Vitamin D",
+      "expected": "medication",
+      "critical": false
+    },
+    {
+      "text": "Fish oil",
+      "expected": "medication",
+      "critical": false
+    },
+    {
+      "text": "Protein shake",
+      "expected": "medication",
+      "critical": false
+    },
+    {
+      "text": "Melatonin",
+      "expected": "medication",
+      "critical": false
+    },
+    {
+      "text": "Weigh myself",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Weigh in",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Lose 2 kg",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Lose weight",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Intermittent fasting",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Fast until noon",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "16:8",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Keto lunch",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Detox tea",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Juice cleanse",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "No sugar",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Count calories",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Diet",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Cheat day",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "Check BMI",
+      "expected": "not_allowed",
+      "critical": false
+    },
+    {
+      "text": "No excuses",
+      "expected": "unkind",
+      "critical": false
+    },
+    {
+      "text": "Don't be lazy",
+      "expected": "unkind",
+      "critical": false
+    },
+    {
+      "text": "I'm fat",
+      "expected": "unkind",
+      "critical": false
+    },
+    {
+      "text": "Punish myself",
+      "expected": "unkind",
+      "critical": false
+    },
+    {
+      "text": "Drink water",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Call mom",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Family dinner",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Eat breakfast",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Breakfast with kids",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Walk the dog",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Fast walk",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Lift weights",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Low-fat yogurt",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Walk under 20 min",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Less than 30 min of screens",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Stretch",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Pray",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Read 10 pages",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Cold shower",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Tea with a friend",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Cook dinner together",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Lunch break",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Meal prep",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Water the plants",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Light the candles",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Healthy fats at lunch",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Weekly fruit shopping",
+      "expected": null,
+      "critical": true
+    },
+    {
+      "text": "Coffee with Sam",
+      "expected": null,
+      "critical": true
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/presentation/safety_screens.dart';
 import '../application/routine_data.dart';
 import '../data/routine_repository.dart';
+import '../domain/label_check.dart';
 import '../domain/routine.dart';
 import '../domain/routine_catalog.dart';
 import '../domain/routine_editing.dart';
@@ -108,10 +109,10 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
         days: days ?? daysOf(item, routines),
         isNew: isNew,
         clinicianNote: clinicianNote,
+        checkLabel: _checkLabel,
       ),
     );
     if (edited == null || !mounted) return;
-    if (edited.custom && !await _labelIsSafe(edited.label)) return;
     try {
       await _actions.save(edited);
     } catch (_) {
@@ -119,21 +120,36 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
     }
   }
 
-  /// Custom labels go through the red-flag rules before they are saved
-  /// (FR-SAF-01/02/04). Anything flagged shows its safety card and is not
-  /// kept. More checks for routine labels come in GOL-03c.
-  Future<bool> _labelIsSafe(String label) async {
+  /// Custom labels are checked before they are saved (T-GOL-03c): the
+  /// red-flag rules first, then the short-label rules. A red flag (or an
+  /// eating-disorder sign) shows its safety response and closes the sheet;
+  /// medicines, weight and diet goals, and unkind words get a kind message
+  /// and can be reworded. Nothing flagged is kept.
+  Future<LabelOutcome> _checkLabel(String label) async {
+    final l = AppLocalizations.of(context);
     final rules = await ref.read(safetyRulesProvider.future);
-    final result = rules.check(label);
-    if (result.isClear) return true;
-    final uid = ref.read(authServiceProvider).currentUser?.uid;
-    final region = uid == null
-        ? null
-        : (await ref.read(profileRepositoryProvider).get(uid))?.region;
-    if (!mounted) return false;
-    await showSafetyResponse(context, result, rules.contactsFor(region));
-    if (mounted) _snack(AppLocalizations.of(context).routineLabelNotSaved);
-    return false;
+    final labels = await ref.read(labelRulesProvider.future);
+    switch (checkLabel(label, rules, labels)) {
+      case LabelOk():
+        return const LabelAccepted();
+      case LabelBlocked(:final kind):
+        return LabelTryAgain(switch (kind) {
+          LabelKind.medication => l.routineLabelMedication,
+          LabelKind.notAllowed => l.routineLabelNotAllowed,
+          LabelKind.unkind => l.routineLabelUnkind,
+          // Never blocked this way (it is a red flag), kept for the switch.
+          LabelKind.disorderedEating => l.routineLabelNotSaved,
+        });
+      case LabelRedFlag(:final result):
+        final uid = ref.read(authServiceProvider).currentUser?.uid;
+        final region = uid == null
+            ? null
+            : (await ref.read(profileRepositoryProvider).get(uid))?.region;
+        if (!mounted) return const LabelStopped();
+        await showSafetyResponse(context, result, rules.contactsFor(region));
+        if (mounted) _snack(l.routineLabelNotSaved);
+        return const LabelStopped();
+    }
   }
 
   Future<void> _delete(RoutineItem item) async {

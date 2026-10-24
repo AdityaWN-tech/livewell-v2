@@ -5570,6 +5570,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t save. Please try again.'**
   String get routineSaveError;
+
+  /// My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review.
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines and supplements can\'t go in your routine yet. Please keep following your care team\'s plan for them.'**
+  String get routineLabelMedication;
+
+  /// My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review.
+  ///
+  /// In en, this message translates to:
+  /// **'Your routine is for kind, everyday steps, not weight, calories or diets. Want to try a different step?'**
+  String get routineLabelNotAllowed;
+
+  /// My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s word it kindly. You deserve the same kindness you\'d give a friend.'**
+  String get routineLabelUnkind;
 }
 
 class _AppLocalizationsDelegate

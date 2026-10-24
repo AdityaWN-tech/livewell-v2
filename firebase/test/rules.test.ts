@@ -575,6 +575,169 @@ describe('reflections (FR-DLY-05, T-UI-01d: one per local date)', () => {
   });
 });
 
+describe('routines (T-GOL-03a: My Daily Routine)', () => {
+  const routine = (o: Record<string, unknown> = {}) => ({
+    name: 'Weekdays', days: ['mon', 'tue', 'wed', 'thu', 'fri'], active: true, ...meta(), ...o,
+  });
+  const ref = () => doc(as(ALICE), 'users/alice/routines/r1');
+
+  it('owner creates, renames and pauses; nobody else; never deleted', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), routine()));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), routine({ name: 'Workdays', active: false, created_at: saved.created_at, updated_at: meta().updated_at })),
+    );
+    await assertFails(deleteDoc(ref()));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/routines/r1')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/routines/r2'), routine()));
+  });
+  it('rejects bad names, days, ids, unknown fields and missing meta', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), routine({ name: '' })));
+    await assertFails(setDoc(ref(), routine({ name: 'x'.repeat(41) })));
+    await assertFails(setDoc(ref(), routine({ days: [] })));
+    await assertFails(setDoc(ref(), routine({ days: ['mon', 'mon'] })));
+    await assertFails(setDoc(ref(), routine({ days: ['funday'] })));
+    await assertFails(setDoc(ref(), routine({ active: 'yes' })));
+    await assertFails(setDoc(ref(), routine({ items: [] })));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/routines/bad_id'), routine()));
+    const { schema_version: _, ...noMeta } = routine();
+    await assertFails(setDoc(ref(), noMeta));
+    await assertSucceeds(setDoc(ref(), routine({ days: ['sat', 'sun'] })));
+  });
+  it('created_at never changes on update', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/routines/r1': routine() });
+    await assertFails(setDoc(ref(), routine({ created_at: meta().created_at, updated_at: meta().updated_at })));
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), routine()));
+  });
+});
+
+describe('routine_items (T-GOL-03a: one document per item, D-44)', () => {
+  const water = (o: Record<string, unknown> = {}) => ({
+    routine_id: 'r1', catalog_id: 'drink_water', label: 'Drink water', icon: 'water',
+    time: '07:15', duration_min: 2, reminder: true, avatar_announce: true, order: 0, ...meta(), ...o,
+  });
+  const custom = (o: Record<string, unknown> = {}): Record<string, unknown> => {
+    const { catalog_id: _, ...rest } = water({ label: 'Call mom', icon: 'heart', custom: true, ...o });
+    return rest;
+  };
+  const ref = (id = 'i1') => doc(as(ALICE), `users/alice/routine_items/${id}`);
+
+  it('owner adds, edits and deletes items; nobody else can', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), water()));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), water({ time: '07:30', reminder: false, created_at: saved.created_at, updated_at: meta().updated_at })),
+    );
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/routine_items/i1')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/routine_items/i2'), water()));
+    await assertFails(deleteDoc(doc(as(BOB), 'users/alice/routine_items/i1')));
+    await assertSucceeds(deleteDoc(ref()));
+  });
+  it('custom items: label 1 to 40 characters, never also a catalog item', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref('c1'), custom()));
+    await assertFails(setDoc(ref('c2'), custom({ label: '' })));
+    await assertFails(setDoc(ref('c2'), custom({ label: 'x'.repeat(41) })));
+    await assertFails(setDoc(ref('c2'), custom({ custom: false })));
+    await assertFails(setDoc(ref('c2'), water({ custom: true })));
+    const { catalog_id: _, ...neither } = water();
+    await assertFails(setDoc(ref('c2'), neither));
+  });
+  it('an item never switches between catalog and custom', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/routine_items/c1': custom(), 'users/alice/routine_items/i1': water() });
+    const c = (await getDoc(ref('c1'))).data()!;
+    const i = (await getDoc(ref('i1'))).data()!;
+    const { custom: _c, ...toCatalog } = custom({ catalog_id: 'drink_water', created_at: c.created_at, updated_at: meta().updated_at });
+    await assertFails(setDoc(ref('c1'), toCatalog));
+    await assertFails(setDoc(ref('i1'), custom({ created_at: i.created_at, updated_at: meta().updated_at })));
+    await assertFails(
+      setDoc(ref('i1'), water({ catalog_id: 'bedtime', created_at: i.created_at, updated_at: meta().updated_at })),
+    );
+  });
+  it('catalog items only from the approved list (no fasting, calories, weight or medication)', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), water({ catalog_id: 'fasting' })));
+    await assertFails(setDoc(ref(), water({ catalog_id: 'take_medication' })));
+    await assertFails(setDoc(ref(), water({ icon: 'pill' })));
+    await assertSucceeds(setDoc(ref(), water({ catalog_id: 'bedtime', label: 'Bedtime', icon: 'bed' })));
+  });
+  it('checks time, duration, days, ids and fields', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), water({ time: '7:15' })));
+    await assertFails(setDoc(ref(), water({ time: '24:00' })));
+    await assertFails(setDoc(ref(), water({ duration_min: 0 })));
+    await assertFails(setDoc(ref(), water({ duration_min: 181 })));
+    await assertFails(setDoc(ref(), water({ duration_min: 2.5 })));
+    await assertFails(setDoc(ref(), water({ reminder: 'yes' })));
+    await assertFails(setDoc(ref(), water({ avatar_announce: 1 })));
+    await assertFails(setDoc(ref(), water({ order: 'first' })));
+    await assertFails(setDoc(ref(), water({ note: 'extra' })));
+    await assertFails(setDoc(ref(), water({ routine_id: 'bad_id' })));
+    await assertFails(setDoc(ref('bad_id'), water()));
+    await assertFails(setDoc(ref(), water({ days: [] })));
+    await assertFails(setDoc(ref(), water({ days: ['monday'] })));
+    await assertSucceeds(setDoc(ref(), water({ days: ['sat', 'sun'], duration_min: 180 })));
+    const { schema_version: _, ...noMeta } = water();
+    await assertFails(setDoc(ref('i2'), noMeta));
+  });
+  it('created_at never changes on update', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/routine_items/i1': water() });
+    await assertFails(setDoc(ref(), water({ created_at: meta().created_at, updated_at: meta().updated_at })));
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), water()));
+  });
+});
+
+describe('routine_logs (T-GOL-03a: idempotent date_itemId)', () => {
+  const log = (o: Record<string, unknown> = {}) => ({
+    date: '2026-10-24', item_id: 'i1', status: 'done', source: 'app', ...meta(), ...o,
+  });
+  const ref = () => doc(as(ALICE), 'users/alice/routine_logs/2026-10-24_i1');
+
+  it('owner logs and changes the status; nobody else; never deleted', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), log()));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), log({ status: 'skipped', source: 'widget', created_at: saved.created_at, updated_at: meta().updated_at })),
+    );
+    await assertFails(deleteDoc(ref()));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/routine_logs/2026-10-24_i1')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/routine_logs/2026-10-24_i1'), log()));
+  });
+  it('id must be date_itemId; date and item never change', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/routine_logs/random'), log()));
+    await assertFails(setDoc(ref(), log({ date: '2026-10-25' })));
+    await assertFails(setDoc(ref(), log({ item_id: 'i2' })));
+    await seed(env, { 'users/alice/routine_logs/2026-10-24_i1': log() });
+    await assertFails(updateDoc(ref(), { date: '2026-10-25', updated_at: meta().updated_at }));
+  });
+  it('status, source and fields are fixed values; meta required', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), log({ status: 'missed' })));
+    await assertFails(setDoc(ref(), log({ source: 'watch' })));
+    await assertFails(setDoc(ref(), log({ note: 'tired' })));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/routine_logs/today_i1'), log({ date: 'today' })));
+    const { schema_version: _, ...noMeta } = log();
+    await assertFails(setDoc(ref(), noMeta));
+    await seed(env, { 'users/alice/routine_logs/2026-10-24_i1': log() });
+    await assertFails(setDoc(ref(), log({ created_at: meta().created_at, updated_at: meta().updated_at })));
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), log()));
+  });
+});
+
 describe('memory_facts (user approves or deletes, FR-CNV-05)', () => {
   beforeEach(async () => {
     await seedAdult(env);

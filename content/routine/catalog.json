@@ -1,0 +1,207 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "note": "T-GOL-03a. The approved activities a person can add to My Daily Routine. Placeholders only: {first_name}, {time}. A line is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level. Movement stays beginner or moderate; items marked movement are off by default, with 'Check with your clinician first', for people who said an activity limits them (FR-GOL-03). Not allowed in v2: fasting, calorie targets, weight loss, medication or supplements. Custom items (typed by the person) are never spoken: the coach says one of custom_lines and the label is shown as text only (FR-VOC-05). review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Listed for review in REVIEW.md.",
+  "activities": [
+    {
+      "id": "wake_up",
+      "label": "Wake up",
+      "spoken_name": "wake up",
+      "icon": "sunrise",
+      "kind": "rest",
+      "movement": false,
+      "default_time": "07:00",
+      "default_duration_min": 5,
+      "lines": [
+        { "id": "w1", "text": "Good morning, {first_name}! Time to wake up and start your day gently." },
+        { "id": "w2", "text": "Good morning! It's {time}. Time to wake up and stretch your arms." }
+      ]
+    },
+    {
+      "id": "drink_water",
+      "label": "Drink water",
+      "spoken_name": "a glass of water",
+      "icon": "water",
+      "kind": "nourish",
+      "movement": false,
+      "default_time": "07:15",
+      "default_duration_min": 2,
+      "lines": [
+        { "id": "d1", "text": "Hi {first_name}! Time for a glass of water." },
+        { "id": "d2", "text": "It's {time}. A glass of water is a nice way to look after yourself." }
+      ]
+    },
+    {
+      "id": "morning_stretch",
+      "label": "Morning stretch",
+      "spoken_name": "a morning stretch",
+      "icon": "stretch",
+      "kind": "move",
+      "movement": true,
+      "default_time": "07:30",
+      "default_duration_min": 5,
+      "lines": [
+        { "id": "s1", "text": "Hi {first_name}! It's {time}, time for a little stretch. Go slowly and only as far as feels good." },
+        { "id": "s2", "text": "Ready for a gentle stretch? A few easy minutes is plenty." }
+      ]
+    },
+    {
+      "id": "morning_walk",
+      "label": "Morning walk",
+      "spoken_name": "a morning walk",
+      "icon": "walk",
+      "kind": "move",
+      "movement": true,
+      "default_time": "07:45",
+      "default_duration_min": 10,
+      "lines": [
+        { "id": "m1", "text": "Good morning, {first_name}! How about a short walk at an easy pace?" },
+        { "id": "m2", "text": "It's {time}. A short, easy walk is a nice way to start the day." }
+      ]
+    },
+    {
+      "id": "breathing_break",
+      "label": "Breathing break",
+      "spoken_name": "a breathing break",
+      "icon": "breathe",
+      "kind": "mind",
+      "movement": false,
+      "default_time": "11:00",
+      "default_duration_min": 2,
+      "lines": [
+        { "id": "b1", "text": "Hi {first_name}, let's take a short breathing break. Breathe in slowly, and out even slower." },
+        { "id": "b2", "text": "Time for a breathing break. Two calm minutes, just for you." }
+      ]
+    },
+    {
+      "id": "healthy_breakfast",
+      "label": "Healthy breakfast",
+      "spoken_name": "breakfast",
+      "icon": "breakfast",
+      "kind": "nourish",
+      "movement": false,
+      "default_time": "08:00",
+      "default_duration_min": 15,
+      "lines": [
+        { "id": "h1", "text": "Good morning, {first_name}! Time for breakfast. Enjoy it, there's no rush." },
+        { "id": "h2", "text": "It's {time}, a good time for breakfast. Sit down and enjoy it." }
+      ]
+    },
+    {
+      "id": "work_break",
+      "label": "Work break",
+      "spoken_name": "a short break",
+      "icon": "pause",
+      "kind": "rest",
+      "movement": false,
+      "default_time": "15:00",
+      "default_duration_min": 5,
+      "lines": [
+        { "id": "k1", "text": "Hi {first_name}, time for a short break. Stand up, look away from the screen and relax your shoulders." },
+        { "id": "k2", "text": "You've been at it a while. How about a five-minute break?" }
+      ]
+    },
+    {
+      "id": "walk_after_meal",
+      "label": "Walk after a meal",
+      "spoken_name": "a walk after your meal",
+      "icon": "walk",
+      "kind": "move",
+      "movement": true,
+      "default_time": "13:30",
+      "default_duration_min": 10,
+      "lines": [
+        { "id": "a1", "text": "Hi {first_name}! How about a short, easy walk after your meal?" },
+        { "id": "a2", "text": "It's {time}. A gentle walk after eating can feel really good." }
+      ]
+    },
+    {
+      "id": "family_time",
+      "label": "Family time",
+      "spoken_name": "family time",
+      "icon": "family",
+      "kind": "social",
+      "movement": false,
+      "default_time": "19:00",
+      "default_duration_min": 30,
+      "lines": [
+        { "id": "f1", "text": "Hi {first_name}, it's time for family time. Enjoy being together." },
+        { "id": "f2", "text": "It's {time}. A good moment to spend time with the people you love." }
+      ]
+    },
+    {
+      "id": "read",
+      "label": "Read",
+      "spoken_name": "some reading",
+      "icon": "book",
+      "kind": "mind",
+      "movement": false,
+      "default_time": "20:30",
+      "default_duration_min": 15,
+      "lines": [
+        { "id": "r1", "text": "Hi {first_name}! Time to relax with something to read." },
+        { "id": "r2", "text": "It's {time}. How about a few pages of a good book?" }
+      ]
+    },
+    {
+      "id": "quiet_time",
+      "label": "Prayer or quiet time",
+      "spoken_name": "some quiet time",
+      "icon": "quiet",
+      "kind": "mind",
+      "movement": false,
+      "default_time": "06:45",
+      "default_duration_min": 10,
+      "lines": [
+        { "id": "q1", "text": "Hi {first_name}, it's time for a few quiet minutes, just for you." },
+        { "id": "q2", "text": "It's {time}. Time for your quiet time." }
+      ]
+    },
+    {
+      "id": "screen_off",
+      "label": "Screen off",
+      "spoken_name": "screens off",
+      "icon": "screen_off",
+      "kind": "sleep",
+      "movement": false,
+      "default_time": "21:30",
+      "default_duration_min": 5,
+      "lines": [
+        { "id": "o1", "text": "Hi {first_name}, it's time to put the screens away for the night." },
+        { "id": "o2", "text": "It's {time}. Screens off helps your mind slow down for sleep." }
+      ]
+    },
+    {
+      "id": "sleep_wind_down",
+      "label": "Sleep wind-down",
+      "spoken_name": "your wind-down",
+      "icon": "moon",
+      "kind": "sleep",
+      "movement": false,
+      "default_time": "22:00",
+      "default_duration_min": 15,
+      "lines": [
+        { "id": "n1", "text": "Hi {first_name}, time to wind down. Dim the lights and take it slow." },
+        { "id": "n2", "text": "It's {time}. A calm wind-down helps you sleep well." }
+      ]
+    },
+    {
+      "id": "bedtime",
+      "label": "Bedtime",
+      "spoken_name": "bedtime",
+      "icon": "bed",
+      "kind": "sleep",
+      "movement": false,
+      "default_time": "22:30",
+      "default_duration_min": 5,
+      "lines": [
+        { "id": "t1", "text": "Good night, {first_name}. It's bedtime. Sleep well." },
+        { "id": "t2", "text": "It's {time}, bedtime. You did well today. Sleep well." }
+      ]
+    }
+  ],
+  "custom_lines": [
+    { "id": "c1", "text": "Hi {first_name}, it's time for your next routine step." },
+    { "id": "c2", "text": "It's {time}. Time for your next routine step." }
+  ]
+}

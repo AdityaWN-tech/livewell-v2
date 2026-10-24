@@ -91,6 +91,8 @@ flutter:
     - assets/plan/templates/
     # Avatar Moment scripts (copy of content/coach/moments, checked by a test).
     - assets/coach/moments/
+    # My Daily Routine activity catalog (copy of content/routine, checked by a test).
+    - assets/routine/
     # Legal texts users accept (copies of content/legal, checked by a test).
     - assets/legal/
     # Red-flag rules (copy of packages/safety-rules/rules.json, checked by a test).

@@ -348,6 +348,119 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // ---------- My Daily Routine (T-GOL-03a) ----------
+      // Routines the person builds for each weekday. Items come from the
+      // approved catalog (content/routine/catalog.json) or are custom labels
+      // (the app runs them through the red-flag rules first, GOL-03c; they
+      // are never spoken, FR-VOC-05).
+      // Each item is its own document (D-44): a list of 12 items can't be
+      // checked in one document within the 1000-expression limit.
+      function validWeekdays(v) {
+        return v is list && v.size() >= 1 && v.size() <= 7
+          && v.toSet().size() == v.size()
+          && v.toSet().hasOnly(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+      }
+      function routineId(v) {
+        return v is string && v.matches('^[A-Za-z0-9-]{1,40}$');
+      }
+
+      // A named set of days ("Weekdays", "Weekend"). Never deleted: paused
+      // with active, like habits.
+      match /routines/{rid} {
+        function validRoutine(d) {
+          return d.keys().hasOnly(['name', 'days', 'active',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.name is string && d.name.size() > 0 && d.name.size() <= 40
+            && validWeekdays(d.days)
+            && d.active is bool;
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && routineId(rid)
+          && validRoutine(request.resource.data)
+          && hasMeta(request.resource.data);
+        // created_at never changes.
+        allow update: if isAdultOwner(uid)
+          && validRoutine(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
+      // One step of a routine. The person may delete an item (with undo in
+      // the app). Up to 12 a day is the app's limit; rules can't count.
+      match /routine_items/{itemId} {
+        // Same lists as the app (a test keeps them in sync).
+        function routineCatalogIds() {
+          return ['wake_up', 'drink_water', 'morning_stretch', 'morning_walk',
+                  'breathing_break', 'healthy_breakfast', 'work_break',
+                  'walk_after_meal', 'family_time', 'read', 'quiet_time',
+                  'screen_off', 'sleep_wind_down', 'bedtime'];
+        }
+        function routineIcons() {
+          return ['sunrise', 'water', 'stretch', 'walk', 'breathe', 'breakfast',
+                  'pause', 'family', 'book', 'quiet', 'screen_off', 'moon',
+                  'bed', 'star', 'heart', 'music'];
+        }
+        function validItem(d) {
+          return d.keys().hasOnly(['routine_id', 'catalog_id', 'custom',
+                   'label', 'icon', 'time', 'duration_min', 'days', 'reminder',
+                   'avatar_announce', 'order',
+                   'created_at', 'updated_at', 'schema_version'])
+            && routineId(d.routine_id)
+            // Either an approved activity or a custom one, never both.
+            && (('catalog_id' in d && !('custom' in d)
+                  && d.catalog_id in routineCatalogIds())
+                || (!('catalog_id' in d) && 'custom' in d && d.custom == true))
+            && d.label is string && d.label.size() > 0 && d.label.size() <= 40
+            && d.icon in routineIcons()
+            && hhmm(d.time)
+            && d.duration_min is int && d.duration_min >= 1 && d.duration_min <= 180
+            && (!('days' in d) || validWeekdays(d.days))
+            && d.reminder is bool
+            && d.avatar_announce is bool
+            && d.order is int;
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && routineId(itemId)
+          && validItem(request.resource.data)
+          && hasMeta(request.resource.data);
+        // created_at never changes; an item can't switch between catalog
+        // and custom (that would let a custom label take a catalog line).
+        allow update: if isAdultOwner(uid)
+          && validItem(request.resource.data)
+          && request.resource.data.get('catalog_id', null) == resource.data.get('catalog_id', null)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if isOwner(uid);
+      }
+
+      // One log per item per local day, id date_itemId, so marking the same
+      // item from the app, the widget and the notification (offline too)
+      // stays one log.
+      match /routine_logs/{logId} {
+        function validRoutineLog(d) {
+          return d.keys().hasOnly(['date', 'item_id', 'status', 'source',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.date is string && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+            && routineId(d.item_id)
+            && logId == d.date + '_' + d.item_id
+            && d.status in ['done', 'skipped']
+            && d.source in ['app', 'widget', 'notification'];
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && validRoutineLog(request.resource.data)
+          && hasMeta(request.resource.data);
+        // The id fixes date and item; only the status and source change.
+        allow update: if isAdultOwner(uid)
+          && validRoutineLog(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
       // ---------- memory facts: user approves or deletes (FR-CNV-05) ----------
       match /memory_facts/{factId} {
         allow read: if isOwner(uid);

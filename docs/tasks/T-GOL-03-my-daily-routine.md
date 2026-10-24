@@ -29,7 +29,7 @@ Coach steps are pinned on the timeline with a "From your coach" label. The user 
 
 ## PR GOL-03a: Data model and activity catalog
 
-- `users/{uid}/routines/{routine_id}`: `name`, `days` (Mon–Sun), `items[]`, `active`, `schema_version`.
+- `users/{uid}/routines/{routine_id}`: `name`, `days` (Mon–Sun), `items[]`, `active`, `schema_version`. **Built (D-44):** items are their own documents, `users/{uid}/routine_items/{item_id}` with `routine_id`, because 12 items in one document can't be checked within Firestore's rule limits.
 - Item fields: `item_id`, `catalog_id` or `custom`, `label`, `icon`, `time`, `duration_min`, `days` (override), `reminder` (bool), `avatar_announce` (bool), `order`.
 - `users/{uid}/routine_logs/{date_itemId}`: `status` (done | skipped), `source` (app | widget | notification), idempotent for offline.
 - **Activity catalog** `/content/routine/catalog.json` (approved list, each with icon, default duration, spoken name and avatar line templates), e.g.: Wake up, Drink water, Morning stretch, Morning walk, Breathing break, Healthy breakfast, Work break, Walk after a meal, Family time, Read, Prayer or quiet time, Screen off, Sleep wind-down, Bedtime.

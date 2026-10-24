@@ -2828,4 +2828,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get photoPickReady => 'Pick a ready-made coach';
+
+  @override
+  String get widgetCheckInSub => 'Start with a 30-second check-in';
+
+  @override
+  String widgetShorter(String smaller) {
+    return 'Short on time? $smaller';
+  }
+
+  @override
+  String widgetTimeFor(String step) {
+    return 'Time for your $step';
+  }
+
+  @override
+  String widgetDayN(int days) {
+    return 'Day $days!';
+  }
+
+  @override
+  String get widgetDoneHeadline => 'Nice work!';
+
+  @override
+  String get widgetDoneSub => 'Your step is done for today.';
+
+  @override
+  String get widgetEvening => 'How did today go?';
+
+  @override
+  String get widgetGentleSub => 'Let\'s keep today gentle.';
+
+  @override
+  String get widgetNoPlan => 'Open Live Well to start your plan';
+
+  @override
+  String get widgetSignedOut => 'Open Live Well to sign in';
+
+  @override
+  String widgetLockNext(String step) {
+    return 'Next: $step';
+  }
+
+  @override
+  String get widgetLockReady => 'Your next step is ready';
+
+  @override
+  String get widgetLockDone => 'Done for today';
+
+  @override
+  String get widgetStart => 'Start';
+
+  @override
+  String get widgetReflect => 'Reflect';
+
+  @override
+  String get widgetOpen => 'Open';
 }

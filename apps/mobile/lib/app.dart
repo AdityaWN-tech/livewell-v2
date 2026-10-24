@@ -7,6 +7,7 @@ import 'core/design/theme.dart';
 import 'core/routing/router.dart';
 import 'features/home/application/home_data.dart' show coachNameProvider;
 import 'features/profile/data/appearance.dart';
+import 'features/widget/application/widget_sync.dart';
 import 'l10n/app_localizations.dart';
 
 class LiveWellApp extends ConsumerWidget {
@@ -15,6 +16,8 @@ class LiveWellApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final flavor = ref.watch(flavorProvider);
+    // The home-screen widget follows the day (T-AVT-08g).
+    ref.watch(widgetSyncProvider);
     final appearance = ref.watch(appearanceProvider);
     final app = MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,

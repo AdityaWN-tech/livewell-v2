@@ -12,9 +12,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/brown_hair.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Adult man in his 30s, messy brown hair, light stubble, fair skin with freckles (the style reference, docs/design/avatar-style-3d-reference.png). The default coach. The 14-frame set goes in assets/avatar/frames/coaches/brown_hair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Adult man in his 30s, messy brown hair, light stubble, fair skin with freckles (the style reference, docs/design/avatar-style-3d-reference.png). The default coach. Frame set in assets/avatar/frames/coaches/brown_hair/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "coach_long_black_hair",
@@ -26,9 +26,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/long_black_hair.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): South Asian woman in her 30s, long black hair, warm brown skin. The 14-frame set goes in assets/avatar/frames/coaches/long_black_hair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): South Asian woman in her 30s, long black hair, warm brown skin. Frame set in assets/avatar/frames/coaches/long_black_hair/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "coach_green_hijab",
@@ -40,9 +40,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/green_hijab.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Woman in her 40s wearing a soft green hijab, medium brown skin. The 14-frame set goes in assets/avatar/frames/coaches/green_hijab/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Woman in her 40s wearing a soft green hijab, medium brown skin. Frame set in assets/avatar/frames/coaches/green_hijab/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "coach_navy_turban",
@@ -54,9 +54,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/navy_turban.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Sikh man in his 40s with a navy turban and neat black beard. The 14-frame set goes in assets/avatar/frames/coaches/navy_turban/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Sikh man in his 40s with a navy turban and neat black beard. Frame set in assets/avatar/frames/coaches/navy_turban/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "coach_grey_glasses",
@@ -68,9 +68,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/grey_glasses.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Man in his 60s with short grey hair, round glasses and a kind smile. The 14-frame set goes in assets/avatar/frames/coaches/grey_glasses/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Man in his 60s with short grey hair, round glasses and a kind smile. Frame set in assets/avatar/frames/coaches/grey_glasses/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "coach_short_curls",
@@ -82,9 +82,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/short_curls.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Black woman in her 50s with short natural curly hair. The 14-frame set goes in assets/avatar/frames/coaches/short_curls/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Black woman in her 50s with short natural curly hair. Frame set in assets/avatar/frames/coaches/short_curls/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "coach_short_black_hair",
@@ -96,9 +96,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/short_black_hair.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): East Asian man in his 20s with short black hair. The 14-frame set goes in assets/avatar/frames/coaches/short_black_hair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): East Asian man in his 20s with short black hair. Frame set in assets/avatar/frames/coaches/short_black_hair/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "coach_wheelchair",
@@ -110,9 +110,9 @@
       "tint": "mint",
       "fallback_icon": "person",
       "status": "placeholder",
-      "source": null,
+      "source": "Owner's Gemini portrait (2026-10-24), docs/design/coaches/wheelchair.webp; frames by tool/make_coach_frames.py",
       "licence": null,
-      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Woman in her 30s using a wheelchair, shoulder-length auburn hair (wheelchair visible at the bottom edge). The 14-frame set goes in assets/avatar/frames/coaches/wheelchair/ with avatar_frames.json (placeholder cards until the art is final; shown only in dev builds until then)."
+      "brief": "Ready-made 3D coach (T-AVT-08b, docs/design/avatar-prompts.md section C): Woman in her 30s using a wheelchair, shoulder-length auburn hair (wheelchair visible at the bottom edge). Frame set in assets/avatar/frames/coaches/wheelchair/ made from the owner's portrait: blink and mouth shapes generated, expressions move in code (hand-made frames: docs/design/coach-frames-gemini.md). Shown in dev builds only until the art is final (licence review of the generator's terms)."
     },
     {
       "id": "scene_home_hero",

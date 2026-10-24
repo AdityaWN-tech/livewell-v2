@@ -89,8 +89,7 @@ class AvatarView extends StatefulWidget {
   State<AvatarView> createState() => _AvatarViewState();
 }
 
-class _AvatarViewState extends State<AvatarView>
-    with SingleTickerProviderStateMixin {
+class _AvatarViewState extends State<AvatarView> with TickerProviderStateMixin {
   final _random = math.Random();
   Timer? _blinkTimer;
   Timer? _blinkEnd;
@@ -102,6 +101,14 @@ class _AvatarViewState extends State<AvatarView>
   late final AnimationController _breath = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 2),
+  );
+
+  /// The expression's movement (T-AVT-08b art): the ready-made coaches have
+  /// one picture per expression for now, so cheering, waving and listening
+  /// show in how the coach moves. One loop is 1.6 seconds.
+  late final AnimationController _gesture = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1600),
   );
 
   bool get _still => MediaQuery.of(context).disableAnimations;
@@ -143,6 +150,13 @@ class _AvatarViewState extends State<AvatarView>
       _breath.stop();
       _breath.value = 0;
     }
+    final moves = on && gestureFor(widget.expression) != AvatarGesture.none;
+    if (moves && !_gesture.isAnimating) {
+      _gesture.repeat();
+    } else if (!moves && _gesture.isAnimating) {
+      _gesture.stop();
+      _gesture.value = 0;
+    }
   }
 
   /// Every 3 to 6 seconds, for 140 ms (kept from T-AVT-06b).
@@ -171,6 +185,7 @@ class _AvatarViewState extends State<AvatarView>
   void dispose() {
     _stopBlinking();
     _breath.dispose();
+    _gesture.dispose();
     super.dispose();
   }
 
@@ -231,6 +246,35 @@ class _AvatarViewState extends State<AvatarView>
           );
         },
       );
+      final gesture = gestureFor(widget.expression);
+      if (gesture != AvatarGesture.none) {
+        face = AnimatedBuilder(
+          animation: _gesture,
+          child: face,
+          builder: (context, child) {
+            final pose = poseFor(gesture, _gesture.value);
+            final moved = Transform.translate(
+              offset: Offset(0, -size * pose.lift),
+              child: Transform.rotate(
+                angle: pose.tilt,
+                child: Transform.scale(scale: 1 + pose.grow, child: child),
+              ),
+            );
+            if (gesture != AvatarGesture.cheer) return moved;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                moved,
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: CustomPaint(painter: _Sparkles(_gesture.value)),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
     return Semantics(
       image: true,
@@ -240,6 +284,77 @@ class _AvatarViewState extends State<AvatarView>
       child: SizedBox.square(dimension: size, child: face),
     );
   }
+}
+
+/// How the coach moves for an expression (T-AVT-08b art).
+enum AvatarGesture { none, cheer, wave, lean }
+
+AvatarGesture gestureFor(AvatarExpression e) => switch (e) {
+  AvatarExpression.celebrating => AvatarGesture.cheer,
+  AvatarExpression.waving => AvatarGesture.wave,
+  AvatarExpression.listening => AvatarGesture.lean,
+  // Happy, calm and talking: only the breathing (calm stays still and
+  // quiet; never a cheer near safety content).
+  _ => AvatarGesture.none,
+};
+
+/// Where the coach is in its movement at [t] (0 to 1 over one loop): how
+/// far it rises (share of its size), tilts (radians) and grows.
+({double lift, double tilt, double grow}) poseFor(AvatarGesture g, double t) {
+  final s = math.sin(2 * math.pi * t);
+  return switch (g) {
+    // Two little hops a loop.
+    AvatarGesture.cheer => (
+      lift: 0.05 * math.max(0.0, math.sin(4 * math.pi * t)),
+      tilt: 0.0,
+      grow: 0.03 * math.max(0.0, math.sin(4 * math.pi * t)),
+    ),
+    // A friendly side-to-side sway, like a wave.
+    AvatarGesture.wave => (
+      lift: 0.0,
+      tilt: 0.06 * math.sin(4 * math.pi * t),
+      grow: 0.0,
+    ),
+    // Leaning in to listen.
+    AvatarGesture.lean => (lift: 0.0, tilt: 0.05 + 0.012 * s, grow: 0.0),
+    AvatarGesture.none => (lift: 0.0, tilt: 0.0, grow: 0.0),
+  };
+}
+
+/// Little stars around the coach while it cheers.
+class _Sparkles extends CustomPainter {
+  _Sparkles(this.t);
+
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const n = 7;
+    final c = size.center(Offset.zero);
+    for (var i = 0; i < n; i++) {
+      final phase = (t + i / n) % 1.0;
+      final angle = -math.pi / 2 + (i - (n - 1) / 2) * 0.42;
+      final r = size.width * (0.5 + 0.08 * phase);
+      final p = c + Offset(math.cos(angle) * r, math.sin(angle) * r);
+      final alpha = math.sin(math.pi * phase);
+      final star = size.width * 0.035 * (0.6 + 0.4 * alpha);
+      final paint = Paint()
+        ..color =
+            (i.isEven ? AvatarColours.sparkle : AvatarColours.sparkleLight)
+                .withValues(alpha: alpha);
+      final path = Path()
+        ..moveTo(p.dx, p.dy - star)
+        ..quadraticBezierTo(p.dx, p.dy, p.dx + star, p.dy)
+        ..quadraticBezierTo(p.dx, p.dy, p.dx, p.dy + star)
+        ..quadraticBezierTo(p.dx, p.dy, p.dx - star, p.dy)
+        ..quadraticBezierTo(p.dx, p.dy, p.dx, p.dy - star)
+        ..close();
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_Sparkles old) => old.t != t;
 }
 
 /// Colours for the avatar's background. Avatar art, not UI colours, so they
@@ -258,6 +373,10 @@ abstract final class AvatarColours {
   static const ring = Color(0xFF2E8B62);
 
   static const ink = Color(0xFF2B2420);
+
+  /// The stars around a cheering coach.
+  static const sparkle = Color(0xFFFFC94D);
+  static const sparkleLight = Color(0xFFFFF1C2);
 }
 
 /// The coach's initial (from the coach's name), for the initial circle.

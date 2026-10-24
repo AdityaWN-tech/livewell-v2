@@ -58,6 +58,47 @@ class CatalogActivity {
   final List<RoutineLine> lines;
 }
 
+/// Which days a template is for.
+enum TemplateDays {
+  everyDay,
+  weekdays,
+  weekend,
+
+  /// Just the day being edited (e.g. a travel day).
+  oneDay;
+
+  Set<Weekday> resolve(Weekday selected) => switch (this) {
+    everyDay => Weekday.values.toSet(),
+    weekdays => {
+      Weekday.mon,
+      Weekday.tue,
+      Weekday.wed,
+      Weekday.thu,
+      Weekday.fri,
+    },
+    weekend => {Weekday.sat, Weekday.sun},
+    oneDay => {selected},
+  };
+}
+
+/// A quick-start template (content/routine/catalog.json): catalog
+/// activities at set times. The person picks one and edits it.
+class RoutineTemplate {
+  const RoutineTemplate({
+    required this.id,
+    required this.label,
+    required this.days,
+    required this.items,
+  });
+
+  final String id;
+  final String label;
+  final TemplateDays days;
+
+  /// (catalog id, "HH:MM").
+  final List<(String, String)> items;
+}
+
 /// The approved activity list and the coach's lines for routine items.
 class RoutineCatalog {
   const RoutineCatalog({
@@ -65,6 +106,7 @@ class RoutineCatalog {
     required this.approved,
     required this.activities,
     required this.customLines,
+    this.templates = const [],
   });
 
   final int version;
@@ -75,6 +117,9 @@ class RoutineCatalog {
 
   /// General lines for custom items, which never say the custom label.
   final List<RoutineLine> customLines;
+
+  /// Quick-start templates (Morning starter, Workday, Weekend, Travel day).
+  final List<RoutineTemplate> templates;
 
   CatalogActivity? byId(String? id) =>
       activities.where((a) => a.id == id).firstOrNull;
@@ -108,6 +153,23 @@ class RoutineCatalog {
       approved: d['review_status'] == 'approved',
       activities: activities,
       customLines: lines(d['custom_lines'], 'custom'),
+      templates: [
+        for (final t
+            in (d['templates'] as List? ?? const [])
+                .cast<Map<String, dynamic>>())
+          RoutineTemplate(
+            id: t['id'] as String,
+            label: t['label'] as String,
+            days: TemplateDays.values.byName(t['days'] as String),
+            items: [
+              for (final i in (t['items'] as List).cast<Map<String, dynamic>>())
+                (
+                  _known(i['catalog_id'] as String, activities),
+                  _time(i['time'] as String),
+                ),
+            ],
+          ),
+      ],
     );
   }
 
@@ -118,6 +180,11 @@ class RoutineCatalog {
     }
     return l;
   }
+
+  static String _known(String id, List<CatalogActivity> activities) =>
+      activities.any((a) => a.id == id)
+      ? id
+      : throw FormatException('template uses unknown activity $id');
 
   static String _icon(String icon) => routineIcons.contains(icon)
       ? icon

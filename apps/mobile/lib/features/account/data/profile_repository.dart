@@ -92,6 +92,9 @@ abstract final class ProfileSettings {
   static const quietHours = 'quiet_hours';
   static const notificationCategories = 'notification_categories';
   static const touchpoints = 'touchpoints';
+
+  /// My Daily Routine's life-event mode (T-GOL-03b): {kind, until}.
+  static const routineMode = 'routine_mode';
   static const displayName = 'display_name';
 
   static const keys = [
@@ -100,6 +103,7 @@ abstract final class ProfileSettings {
     quietHours,
     notificationCategories,
     touchpoints,
+    routineMode,
   ];
 }
 

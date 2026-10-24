@@ -31,6 +31,7 @@ import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
+import '../../features/routine/presentation/routine_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
@@ -137,6 +138,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'framework',
                         builder: (context, state) => const FrameworkScreen(),
+                      ),
+                    // My Daily Routine under Plan (T-GOL-03b).
+                    if (path == '/plan')
+                      GoRoute(
+                        path: 'routine',
+                        builder: (context, state) => const RoutineScreen(),
                       ),
                     if (path == '/learn')
                       GoRoute(

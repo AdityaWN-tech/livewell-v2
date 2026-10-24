@@ -362,6 +362,28 @@ describe('profile settings (T-ONB-03f)', () => {
   });
 });
 
+describe('routine mode (T-GOL-03b: travel, sick day, busy week)', () => {
+  const upd = (o: Record<string, unknown>) =>
+    updateDoc(doc(as(ALICE), 'users/alice'), { ...o, updated_at: meta().updated_at });
+
+  it('turns a mode on until a date, and off again', async () => {
+    await seedAdult(env);
+    await assertSucceeds(upd({ routine_mode: { kind: 'travel', until: '2026-10-30' } }));
+    await assertSucceeds(upd({ routine_mode: { kind: 'sick', until: '2026-10-24' } }));
+    await assertSucceeds(upd({ routine_mode: { kind: 'busy', until: '2026-10-30' } }));
+    await assertSucceeds(upd({ routine_mode: { kind: 'none' } }));
+  });
+  it('rejects other kinds, bad dates and extra fields', async () => {
+    await seedAdult(env);
+    await assertFails(upd({ routine_mode: { kind: 'holiday', until: '2026-10-30' } }));
+    await assertFails(upd({ routine_mode: { kind: 'travel' } }));
+    await assertFails(upd({ routine_mode: { kind: 'travel', until: 'next week' } }));
+    await assertFails(upd({ routine_mode: { kind: 'none', until: '2026-10-30' } }));
+    await assertFails(upd({ routine_mode: { kind: 'sick', until: '2026-10-24', streak_pause: true } }));
+    await assertFails(upd({ routine_mode: 'sick' }));
+  });
+});
+
 describe('library voices (T-ONB-03c: chosen in the app)', () => {
   const lib = (o: Record<string, unknown> = {}) => ({
     kind: 'library', vendor_voice_id: 'kokoro:af_heart', status: 'active', speed: 1, style: 'calm', ...meta(), ...o,

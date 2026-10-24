@@ -62,7 +62,7 @@ service cloud.firestore {
                 'age_confirmed', 'onboarding_step', 'focus_driver',
                 'focus_choices', 'activity_limited', 'touchpoints',
                 'coach_name', 'appearance', 'quiet_hours',
-                'notification_categories',
+                'notification_categories', 'routine_mode',
                 'why_statement', 'created_at', 'updated_at', 'schema_version'];
       }
 
@@ -107,7 +107,17 @@ service cloud.firestore {
                        .hasOnly(['greeting', 'nudge', 'reflection'])
                   && d.notification_categories.greeting is bool
                   && d.notification_categories.nudge is bool
-                  && d.notification_categories.reflection is bool));
+                  && d.notification_categories.reflection is bool))
+          // Life-event mode for My Daily Routine (T-GOL-03b, FR-DLY-09):
+          // travel / sick / busy until a date, or none.
+          && (!('routine_mode' in d)
+              || (d.routine_mode is map
+                  && ((d.routine_mode.keys().hasOnly(['kind'])
+                       && d.routine_mode.kind == 'none')
+                      || (d.routine_mode.keys().hasOnly(['kind', 'until'])
+                          && d.routine_mode.kind in ['travel', 'sick', 'busy']
+                          && d.routine_mode.until is string
+                          && d.routine_mode.until.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))));
       }
 
       // Morning / midday / evening touchpoint times, "HH:MM" (T-ONB-03e).

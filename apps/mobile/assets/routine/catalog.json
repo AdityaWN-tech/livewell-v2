@@ -1,7 +1,7 @@
 {
   "version": 1,
   "review_status": "pending",
-  "note": "T-GOL-03a. The approved activities a person can add to My Daily Routine. Placeholders only: {first_name}, {time}. A line is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level. Movement stays beginner or moderate; items marked movement are off by default, with 'Check with your clinician first', for people who said an activity limits them (FR-GOL-03). Not allowed in v2: fasting, calorie targets, weight loss, medication or supplements. Custom items (typed by the person) are never spoken: the coach says one of custom_lines and the label is shown as text only (FR-VOC-05). review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Listed for review in REVIEW.md.",
+  "note": "T-GOL-03a. The approved activities a person can add to My Daily Routine. Placeholders only: {first_name}, {time}. A line is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level. Movement stays beginner or moderate; items marked movement are off by default, with 'Check with your clinician first', for people who said an activity limits them (FR-GOL-03). Not allowed in v2: fasting, calorie targets, weight loss, medication or supplements. Custom items (typed by the person) are never spoken: the coach says one of custom_lines and the label is shown as text only (FR-VOC-05). review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Templates: quick starts the person picks and then edits (movement items are left out for people whose activity is limited). Listed for review in REVIEW.md.",
   "activities": [
     {
       "id": "wake_up",
@@ -203,5 +203,57 @@
   "custom_lines": [
     { "id": "c1", "text": "Hi {first_name}, it's time for your next routine step." },
     { "id": "c2", "text": "It's {time}. Time for your next routine step." }
+  ],
+  "templates": [
+    {
+      "id": "morning_starter",
+      "label": "Morning starter",
+      "days": "everyDay",
+      "items": [
+        { "catalog_id": "wake_up", "time": "07:00" },
+        { "catalog_id": "drink_water", "time": "07:10" },
+        { "catalog_id": "morning_stretch", "time": "07:20" },
+        { "catalog_id": "healthy_breakfast", "time": "07:45" }
+      ]
+    },
+    {
+      "id": "workday",
+      "label": "Workday",
+      "days": "weekdays",
+      "items": [
+        { "catalog_id": "wake_up", "time": "06:45" },
+        { "catalog_id": "drink_water", "time": "07:00" },
+        { "catalog_id": "healthy_breakfast", "time": "07:30" },
+        { "catalog_id": "work_break", "time": "11:00" },
+        { "catalog_id": "walk_after_meal", "time": "13:30" },
+        { "catalog_id": "breathing_break", "time": "16:00" },
+        { "catalog_id": "screen_off", "time": "21:30" },
+        { "catalog_id": "bedtime", "time": "22:30" }
+      ]
+    },
+    {
+      "id": "weekend",
+      "label": "Weekend",
+      "days": "weekend",
+      "items": [
+        { "catalog_id": "wake_up", "time": "08:00" },
+        { "catalog_id": "drink_water", "time": "08:10" },
+        { "catalog_id": "morning_walk", "time": "09:00" },
+        { "catalog_id": "family_time", "time": "17:00" },
+        { "catalog_id": "read", "time": "21:00" },
+        { "catalog_id": "bedtime", "time": "23:00" }
+      ]
+    },
+    {
+      "id": "travel_day",
+      "label": "Travel day",
+      "days": "oneDay",
+      "items": [
+        { "catalog_id": "drink_water", "time": "08:00" },
+        { "catalog_id": "breathing_break", "time": "12:00" },
+        { "catalog_id": "walk_after_meal", "time": "13:30" },
+        { "catalog_id": "sleep_wind_down", "time": "22:00" }
+      ]
+    }
   ]
 }

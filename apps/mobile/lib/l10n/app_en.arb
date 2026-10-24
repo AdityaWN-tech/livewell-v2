@@ -1661,5 +1661,11 @@
   "widgetReflect": "Reflect",
   "@widgetReflect": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
   "widgetOpen": "Open",
-  "@widgetOpen": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."}
+  "@widgetOpen": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "widgetRoutineMorning": "Morning",
+  "@widgetRoutineMorning": {"description": "Home-screen widget routine row (T-AVT-08g)."},
+  "widgetRoutineStep": "Step",
+  "@widgetRoutineStep": {"description": "Home-screen widget routine row (T-AVT-08g)."},
+  "widgetRoutineEvening": "Evening",
+  "@widgetRoutineEvening": {"description": "Home-screen widget routine row (T-AVT-08g)."}
 }

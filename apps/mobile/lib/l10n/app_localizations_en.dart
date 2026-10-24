@@ -2884,4 +2884,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetOpen => 'Open';
+
+  @override
+  String get widgetRoutineMorning => 'Morning';
+
+  @override
+  String get widgetRoutineStep => 'Step';
+
+  @override
+  String get widgetRoutineEvening => 'Evening';
 }

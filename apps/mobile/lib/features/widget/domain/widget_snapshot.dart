@@ -96,6 +96,8 @@ class WidgetSnapshot {
     required this.streakDays,
     required this.routine,
     required this.entries,
+    required this.afterDone,
+    required this.routineLabels,
     required this.hideDetails,
     required this.updatedAt,
   });
@@ -114,6 +116,14 @@ class WidgetSnapshot {
   /// changes on time without the app running.
   final List<WidgetEntry> entries;
 
+  /// What to show right after Done is tapped on the widget itself (iOS
+  /// 17+, Android 12+), until the app has caught up; null when Done isn't
+  /// offered today.
+  final WidgetEntry? afterDone;
+
+  /// The routine row's words: morning, step, evening.
+  final Map<String, String> routineLabels;
+
   /// "Hide details on lock screen" (on by default).
   final bool hideDetails;
   final DateTime updatedAt;
@@ -129,6 +139,8 @@ class WidgetSnapshot {
     'streak_days': streakDays,
     'routine': {for (final e in routine.entries) e.key: e.value.name},
     'entries': [for (final e in entries) e.toJson()],
+    'after_done': afterDone?.toJson(),
+    'routine_labels': routineLabels,
     'hide_details': hideDetails,
     'updated_at': updatedAt.toIso8601String(),
   };

@@ -37,6 +37,7 @@ import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
 import 'package:livewell/core/design/avatar/avatar_art.dart'
     show AvatarExpression;
+import 'package:livewell/features/widget/data/widget_inbox.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 import 'package:livewell/features/widget/domain/widget_snapshot.dart';
 
@@ -905,4 +906,29 @@ class FakeWidgetPublisher implements WidgetPublisher {
   @override
   Future<void> publish(WidgetSnapshot snapshot) async =>
       published.add(snapshot);
+}
+
+class FakeWidgetInbox implements WidgetInbox {
+  WidgetLink? launch;
+  String? done;
+  final _links = StreamController<WidgetLink>.broadcast();
+
+  void tap(WidgetLink link) => _links.add(link);
+
+  @override
+  Future<WidgetLink?> launchLink() async {
+    final l = launch;
+    launch = null;
+    return l;
+  }
+
+  @override
+  Stream<WidgetLink> get links => _links.stream;
+
+  @override
+  Future<String?> takeDone() async {
+    final d = done;
+    done = null;
+    return d;
+  }
 }

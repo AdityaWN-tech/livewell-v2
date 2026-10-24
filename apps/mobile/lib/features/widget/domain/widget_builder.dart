@@ -25,6 +25,9 @@ class WidgetTexts {
     required this.done,
     required this.reflect,
     required this.open,
+    required this.routineMorning,
+    required this.routineStep,
+    required this.routineEvening,
   });
 
   final String goodMorning;
@@ -48,6 +51,9 @@ class WidgetTexts {
   final String done;
   final String reflect;
   final String open;
+  final String routineMorning;
+  final String routineStep;
+  final String routineEvening;
 }
 
 /// Builds the widget snapshot: one recommendation now, and what it turns
@@ -99,10 +105,38 @@ class WidgetSnapshotBuilder {
         'evening': i.reflected ? RoutineStatus.done : RoutineStatus.todo,
       },
       entries: entries,
+      afterDone: !i.signedIn || i.stepTitle == null || i.stepDone
+          ? null
+          : _entry(_doneNow(i), i.now),
+      routineLabels: {
+        'morning': t.routineMorning,
+        'step': t.routineStep,
+        'evening': t.routineEvening,
+      },
       hideDetails: i.hideDetails,
       updatedAt: i.now,
     );
   }
+
+  /// Today's state once Done is tapped: the streak counts today.
+  static WidgetInputs _doneNow(WidgetInputs i) => WidgetInputs(
+    now: i.now,
+    signedIn: i.signedIn,
+    firstName: i.firstName,
+    stepTitle: i.stepTitle,
+    smallerTitle: i.smallerTitle,
+    checkedIn: i.checkedIn,
+    gentleDay: i.gentleDay,
+    safetyHold: i.safetyHold,
+    stepDone: true,
+    smaller: i.smaller,
+    // Before the evening; in the evening the widget still asks to reflect.
+    reflected: true,
+    times: i.times,
+    streakDays: (i.streakDays ?? 0) + 1,
+    avatarThumbs: i.avatarThumbs,
+    hideDetails: i.hideDetails,
+  );
 
   /// Which slot it is at [when], given today's state.
   static WidgetSlot slotAt(WidgetInputs i, DateTime when) {

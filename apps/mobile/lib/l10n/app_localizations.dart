@@ -5126,6 +5126,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open'**
   String get widgetOpen;
+
+  /// Home-screen widget routine row (T-AVT-08g).
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get widgetRoutineMorning;
+
+  /// Home-screen widget routine row (T-AVT-08g).
+  ///
+  /// In en, this message translates to:
+  /// **'Step'**
+  String get widgetRoutineStep;
+
+  /// Home-screen widget routine row (T-AVT-08g).
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get widgetRoutineEvening;
 }
 
 class _AppLocalizationsDelegate

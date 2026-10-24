@@ -60,3 +60,10 @@ jobs:
           test "$(plutil -extract CFBundleIdentifier raw "$plist")" = "net.conciergeconnectedcare.livewell.stg"
           test "$(plutil -extract CFBundleDisplayName raw "$plist")" = "Live Well Staging"
           test "$(plutil -extract LWAppGroupId raw "$plist")" = "group.net.conciergeconnectedcare.livewell.stg"
+      - name: The widget is embedded, with its own bundle ID and the same App Group
+        run: |
+          appex=build/ios/iphoneos/Runner.app/PlugIns/LiveWellWidgetExtension.appex
+          test -d "$appex"
+          test "$(plutil -extract CFBundleIdentifier raw "$appex/Info.plist")" = "net.conciergeconnectedcare.livewell.stg.widget"
+          test "$(plutil -extract LWAppGroupId raw "$appex/Info.plist")" = "group.net.conciergeconnectedcare.livewell.stg"
+          test "$(plutil -extract NSExtension.NSExtensionPointIdentifier raw "$appex/Info.plist")" = "com.apple.widgetkit-extension"

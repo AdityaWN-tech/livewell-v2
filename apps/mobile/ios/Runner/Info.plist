@@ -85,5 +85,19 @@
 	<false/>
 	<key>GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>widget</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>livewell</string>
+			</array>
+		</dict>
+	</array>
+	<!-- Widget links (livewell://) are handled by home_widget, not the router. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 </dict>
 </plist>

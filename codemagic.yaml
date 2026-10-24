@@ -30,6 +30,54 @@ definitions:
     - apps/mobile/build/ios/archive/Runner.xcarchive/dSYMs/**/*.dSYM.zip
 
 workflows:
+  # The iOS build check without signing (no Apple account needed), the same
+  # as .github/workflows/ios.yml. Uses the personal plan's free macOS
+  # minutes (500 a month, no card), so it runs only when iOS code changes.
+  ios-check:
+    name: iOS build check (no signing)
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    environment:
+      <<: *versions
+    triggering:
+      events:
+        - pull_request
+      cancel_previous_builds: true
+    when:
+      changeset:
+        includes:
+          - apps/mobile/ios/
+          - apps/mobile/pubspec.yaml
+          - apps/mobile/pubspec.lock
+          - codemagic.yaml
+    scripts:
+      - *no_signing_files
+      - *get_packages
+      - name: Targets and schemes (app, WidgetKit extension)
+        script: xcodebuild -list -project apps/mobile/ios/Runner.xcodeproj
+      - name: dev and prod flavours are set up
+        script: |
+          cd apps/mobile
+          flutter build ios --config-only --no-codesign --flavor dev -t lib/main_dev.dart
+          flutter build ios --config-only --no-codesign --flavor prod -t lib/main_prod.dart
+      - name: Build staging (release, no signing)
+        script: |
+          cd apps/mobile
+          flutter build ios --release --no-codesign --flavor staging -t lib/main_staging.dart
+      - name: Bundle IDs, name, App Group, and the embedded widget
+        script: |
+          cd apps/mobile
+          app=build/ios/iphoneos/Runner.app
+          appex=$app/PlugIns/LiveWellWidgetExtension.appex
+          test "$(plutil -extract CFBundleIdentifier raw "$app/Info.plist")" = "net.conciergeconnectedcare.livewell.stg"
+          test "$(plutil -extract CFBundleDisplayName raw "$app/Info.plist")" = "Live Well Staging"
+          test "$(plutil -extract LWAppGroupId raw "$app/Info.plist")" = "group.net.conciergeconnectedcare.livewell.stg"
+          test -d "$appex"
+          test "$(plutil -extract CFBundleIdentifier raw "$appex/Info.plist")" = "net.conciergeconnectedcare.livewell.stg.widget"
+          test "$(plutil -extract LWAppGroupId raw "$appex/Info.plist")" = "group.net.conciergeconnectedcare.livewell.stg"
+    artifacts:
+      - /tmp/xcodebuild_logs/*.log
+
   ios-dev:
     name: iOS dev (development build)
     instance_type: mac_mini_m2
@@ -41,6 +89,8 @@ workflows:
           - livewell_apple_development
         provisioning_profiles:
           - livewell_dev_development
+          # The home-screen widget (its own bundle ID, T-AVT-08g-b).
+          - livewell_dev_widget_development
     # Manual only: start it from the Codemagic dashboard.
     scripts:
       - *no_signing_files
@@ -68,6 +118,8 @@ workflows:
           - livewell_apple_distribution
         provisioning_profiles:
           - livewell_staging_appstore
+          # The home-screen widget (its own bundle ID, T-AVT-08g-b).
+          - livewell_staging_widget_appstore
     triggering:
       events:
         - push
@@ -109,6 +161,8 @@ workflows:
           - livewell_apple_distribution
         provisioning_profiles:
           - livewell_prod_appstore
+          # The home-screen widget (its own bundle ID, T-AVT-08g-b).
+          - livewell_prod_widget_appstore
     # Manual only. The .ipa is kept as an artifact; uploading prod to App
     # Store Connect is a separate, deliberate step before release.
     scripts:

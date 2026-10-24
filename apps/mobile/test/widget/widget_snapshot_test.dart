@@ -199,6 +199,8 @@ void main() {
         'streak_days',
         'routine',
         'entries',
+        'after_done',
+        'routine_labels',
         'hide_details',
         'updated_at',
       });

@@ -94,6 +94,9 @@ WidgetTexts widgetTexts(AppLocalizations l) => WidgetTexts(
   done: l.momentActionDone,
   reflect: l.widgetReflect,
   open: l.widgetOpen,
+  routineMorning: l.widgetRoutineMorning,
+  routineStep: l.widgetRoutineStep,
+  routineEvening: l.widgetRoutineEvening,
 );
 
 final widgetSnapshotProvider = Provider<WidgetSnapshot>(

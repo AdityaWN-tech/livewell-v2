@@ -35,6 +35,7 @@ import '../../starter_plan/data/reminders.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
     show reminderTexts;
 import '../../track/presentation/track_screen.dart' show streakProvider;
+import '../../widget/data/widget_inbox.dart';
 import '../application/home_data.dart';
 
 export '../application/home_data.dart'
@@ -61,6 +62,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late final AppLifecycleListener _lifecycle;
   StreamSubscription<String>? _reminderTaps;
+  StreamSubscription<WidgetLink>? _widgetLinks;
   bool _asking = false;
 
   @override
@@ -73,6 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ref.invalidate(morningMomentProvider);
         _maybeAsk();
         _followTimeZone();
+        _widgetDone();
       },
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _start());
@@ -91,6 +94,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     if (!mounted) return;
     if (launch != null && await _openReminder(launch)) return;
+    // The home-screen widget: a Done tapped there, and the button that
+    // opened the app (T-AVT-08g-b).
+    await _widgetDone();
+    final inbox = ref.read(widgetInboxProvider);
+    _widgetLinks = inbox.links.listen(_openWidgetLink);
+    final link = await inbox.launchLink();
+    if (!mounted) return;
+    if (link != null && link != WidgetLink.home) {
+      await _openWidgetLink(link);
+      return;
+    }
     await _firstHello();
     if (mounted) _maybeAsk();
   }
@@ -162,9 +176,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await showCelebration(context);
   }
 
+  /// Done tapped on the widget (iOS 17+, Android 12+): applied once, quietly
+  /// (the widget already celebrated), only for today.
+  /// TODO(T-GOL-01): written to habit_logs, idempotent by date + habit.
+  Future<void> _widgetDone() async {
+    final date = await ref.read(widgetInboxProvider).takeDone();
+    if (!mounted || date != _today) return;
+    if (!ref.read(stepProgressProvider).done) {
+      ref.read(stepProgressActionsProvider).markDone();
+    }
+  }
+
+  /// A widget button opened the app (T-AVT-08g-b).
+  Future<void> _openWidgetLink(WidgetLink link) async {
+    if (!mounted) return;
+    final step = ref.read(todayStepProvider);
+    switch (link) {
+      case WidgetLink.checkIn:
+        await _openCheckIn();
+      case WidgetLink.step:
+        if (step != null) {
+          await _openStep(step, ref.read(todayCheckInProvider).value);
+        }
+      case WidgetLink.makeSmaller:
+        ref.read(stepProgressActionsProvider).makeSmaller();
+      case WidgetLink.done:
+        // iOS 16 / older Android: Done opens the app. Once only.
+        if (step != null && !ref.read(stepProgressProvider).done) {
+          await _done();
+        }
+      case WidgetLink.reflect:
+        context.go('/track');
+      case WidgetLink.home:
+        break;
+    }
+  }
+
   @override
   void dispose() {
     _reminderTaps?.cancel();
+    _widgetLinks?.cancel();
     _lifecycle.dispose();
     super.dispose();
   }

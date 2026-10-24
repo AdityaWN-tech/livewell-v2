@@ -41,6 +41,8 @@ workflows:
           - livewell_apple_development
         provisioning_profiles:
           - livewell_dev_development
+          # The home-screen widget (its own bundle ID, T-AVT-08g-b).
+          - livewell_dev_widget_development
     # Manual only: start it from the Codemagic dashboard.
     scripts:
       - *no_signing_files
@@ -68,6 +70,8 @@ workflows:
           - livewell_apple_distribution
         provisioning_profiles:
           - livewell_staging_appstore
+          # The home-screen widget (its own bundle ID, T-AVT-08g-b).
+          - livewell_staging_widget_appstore
     triggering:
       events:
         - push
@@ -109,6 +113,8 @@ workflows:
           - livewell_apple_distribution
         provisioning_profiles:
           - livewell_prod_appstore
+          # The home-screen widget (its own bundle ID, T-AVT-08g-b).
+          - livewell_prod_widget_appstore
     # Manual only. The .ipa is kept as an artifact; uploading prod to App
     # Store Connect is a separate, deliberate step before release.
     scripts:

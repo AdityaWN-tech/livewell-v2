@@ -150,7 +150,17 @@ If a build fails at "Use the provisioning profiles", a certificate or profile re
 
 **Dev builds on an iPhone** (not through TestFlight): download the dev `.ipa` from Codemagic's artifacts and install it on a registered device. The easiest ways are Codemagic's install link on the phone's browser, or Apple Configurator on a Mac.
 
-## 9. The GitHub iOS check
+## 9. The free iOS check on Codemagic (no Apple account needed)
+
+`codemagic.yaml` has an `ios-check` workflow: the same build check as GitHub's, without signing. It runs on pull requests that change iOS code. It uses Codemagic's **free personal plan: 500 macOS M2 minutes a month, no card needed**, reset on the 1st; one check takes about 15–20 minutes.
+
+1. Sign up at **codemagic.io** with **GitHub** (a personal account, not a Team: free minutes are for personal accounts only).
+2. **Add application** > GitHub > allow access to **AdityaWN-tech/livewell-v2** only > Flutter > **codemagic.yaml**.
+3. Open a pull request (or press **Start new build > ios-check** on a branch). The result shows on the pull request.
+
+Steps 1–8 are only needed later, for signed builds and TestFlight.
+
+## 10. The GitHub iOS check
 
 `.github/workflows/ios.yml` runs on a macOS runner for pull requests that change `apps/mobile/ios/**` (the app, and later the WidgetKit extension and App Intents), `pubspec.yaml`/`pubspec.lock` (plugins), `codemagic.yaml` or the workflow itself. It:
 

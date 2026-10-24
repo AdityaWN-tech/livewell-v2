@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/data/firestore.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../dev/application/preview_mode.dart';
+import '../domain/label_check.dart';
 import '../domain/routine.dart';
 import '../domain/routine_catalog.dart';
 
@@ -15,6 +17,20 @@ import '../domain/routine_catalog.dart';
 final routineCatalogProvider = FutureProvider<RoutineCatalog>(
   (ref) async => RoutineCatalog.parse(
     await rootBundle.loadString('assets/routine/catalog.json', cache: false),
+  ),
+);
+
+/// Short-label rules for custom items (copy of
+/// packages/safety-rules/label_rules.json, T-GOL-03c). Bundled, like the
+/// red-flag rules, so they work offline.
+final labelRulesProvider = FutureProvider<LabelRules>(
+  (ref) async => LabelRules.fromJson(
+    jsonDecode(
+      await rootBundle.loadString(
+        'assets/safety/label_rules.json',
+        cache: false,
+      ),
+    ) as Map<String, dynamic>,
   ),
 );
 

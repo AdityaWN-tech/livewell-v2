@@ -4,6 +4,7 @@ import 'package:livewell/features/routine/domain/routine.dart';
 import 'package:livewell/features/routine/domain/routine_editing.dart';
 import 'package:livewell/features/routine/presentation/routine_screen.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
+import 'package:livewell/features/routine/presentation/routine_sheets.dart';
 
 import '../home/home_screen_test.dart' show signedIn, uid;
 import '../plan/plan_screen_test.dart' show openPlan, scrollTo;
@@ -214,6 +215,66 @@ void main() {
         'Stop my blood pressure pills',
       );
       await tapKey(tester, 'routine-item-save');
+      expect(await saved(h), isEmpty);
+    });
+
+    Future<void> customLabel(WidgetTester tester, String label) async {
+      await tapKey(tester, 'routine-add');
+      await tapKey(tester, 'routine-add-custom');
+      await tester.enterText(
+        find.byKey(const Key('routine-item-label')),
+        label,
+      );
+      await tapKey(tester, 'routine-item-save');
+    }
+
+    testWidgets('an eating-disorder label shows its card, not saved', (
+      tester,
+    ) async {
+      final h = await boot(tester);
+      await openRoutine(tester);
+      await customLabel(tester, 'Skip dinner');
+      expect(find.byType(SafetyNoticeSheet), findsOneWidget);
+      expect(await saved(h), isEmpty);
+    });
+
+    testWidgets('weight goals: a kind message, reword, then it saves', (
+      tester,
+    ) async {
+      final h = await boot(tester);
+      await openRoutine(tester);
+      await customLabel(tester, 'Weigh myself');
+      // The sheet stays open with a kind message.
+      expect(find.byType(ItemSheet), findsOneWidget);
+      expect(
+        find.textContaining('not weight, calories or diets'),
+        findsOneWidget,
+      );
+      expect(await saved(h), isEmpty);
+      await tester.enterText(
+        find.byKey(const Key('routine-item-label')),
+        'Walk the dog',
+      );
+      await tapKey(tester, 'routine-item-save');
+      expect((await saved(h)).single.label, 'Walk the dog');
+    });
+
+    testWidgets('supplements and unkind words get their own message', (
+      tester,
+    ) async {
+      final h = await boot(tester);
+      await openRoutine(tester);
+      await customLabel(tester, 'Fish oil');
+      expect(
+        find.textContaining("can't go in your routine yet"),
+        findsOneWidget,
+      );
+      await tester.enterText(
+        find.byKey(const Key('routine-item-label')),
+        'No excuses',
+      );
+      await tapKey(tester, 'routine-item-save');
+      expect(find.textContaining("Let's word it kindly"), findsOneWidget);
       expect(await saved(h), isEmpty);
     });
 

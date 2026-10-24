@@ -1,0 +1,88 @@
+{
+  "version": "0.1-draft",
+  "status": "draft: needs Clinical Content and Safety Committee review",
+  "note": "T-GOL-03c. Short-label rules for custom My Daily Routine items, checked AFTER the shared red-flag rules (rules.json). Labels are short commands ('Skip dinner'), which the sentence patterns in rules.json don't catch. Same normalisation as rules.json (check_cases.py). Kinds by priority: disordered_eating (shows the disordered-eating card, FR-SAF-04), medication (medicines and supplements are not routine items in v2), not_allowed (weight, calories, fasting, diets: spec 4.1 and 14.1, standing in for the Blueprint 7.5 banned-phrase list, which is not in this repo), unkind (shaming words). Nothing that matches is saved. Cases: label_cases.json; runner: check_label_cases.py.",
+  "kinds": [
+    "disordered_eating",
+    "medication",
+    "not_allowed",
+    "unkind"
+  ],
+  "rules": [
+    {
+      "id": "LBL-ED-SKIP",
+      "kind": "disordered_eating",
+      "patterns": [
+        "\\b(?:skip|skipping|skipped|no|cut out|miss|missing) (?:breakfast|lunch|dinner|supper|meals?|food|eating|snacks?)\\b",
+        "\\bdon't eat\\b",
+        "\\bdont eat\\b",
+        "\\b(?:stop|stopped|quit|avoid) eating\\b",
+        "\\bno (?:food|eating) (?:after|before|until|till)\\b",
+        "\\bonly (?:water|liquids|coffee|black coffee|tea)\\b"
+      ]
+    },
+    {
+      "id": "LBL-ED-COUNT",
+      "kind": "disordered_eating",
+      "patterns": [
+        "\\b[0-9]{2,4} ?(?:calories|calorie|cals?|kcals?)\\b"
+      ]
+    },
+    {
+      "id": "LBL-ED-PURGE",
+      "kind": "disordered_eating",
+      "patterns": [
+        "\\bpurg\\w*",
+        "\\bthrow (?:it )?up\\b",
+        "\\bvomit\\w*",
+        "\\blaxatives?\\b",
+        "\\bdiuretics?\\b",
+        "\\bdiet pills?\\b"
+      ]
+    },
+    {
+      "id": "LBL-ED-RESTRICT",
+      "kind": "disordered_eating",
+      "patterns": [
+        "\\bstarv\\w*",
+        "\\b(?:burn|work|walk|run) off (?:dinner|lunch|breakfast|food|meals?|calories|what i ate|the cake|dessert)\\b",
+        "\\bearn (?:my |the )?(?:food|dinner|lunch|breakfast|meals?|dessert|snacks?)\\b"
+      ]
+    },
+    {
+      "id": "LBL-MED",
+      "kind": "medication",
+      "patterns": [
+        "\\b(?:pills?|tablets?|capsules?|meds|medication|medications|medicine|medicines|insulin|metformin|statins?|inhaler|dose|doses|dosage|injection|injections|jab)\\b",
+        "\\b(?:supplements?|vitamins?|fish oil|omega 3|probiotics?|melatonin|magnesium|creatine|protein powder|protein shakes?)\\b"
+      ]
+    },
+    {
+      "id": "LBL-NOT-ALLOWED",
+      "kind": "not_allowed",
+      "patterns": [
+        "\\bweigh(?:ing)?(?: my ?self| in| ins)?\\b",
+        "\\bweight\\b",
+        "\\b(?:lose|losing|drop|dropping|shed) (?:[0-9]+ ?)?(?:kg|kgs|kilos?|pounds|lbs?|weight|fat)\\b",
+        "\\b(?:intermittent )?fasting\\b",
+        "\\bfast (?:until|till|for|day|today|tomorrow|all day)\\b",
+        "\\b(?:16|18|20) (?:8|6|4)\\b",
+        "\\bdiet(?:ing|s)?\\b",
+        "\\b(?:keto|detox|cleanse|juice cleanse|low carb|no carbs?|cut carbs|carb free|sugar free|no sugar|cheat day|cheat meal)\\b",
+        "\\bcalories?\\b",
+        "\\bmacros\\b",
+        "\\bbmi\\b"
+      ]
+    },
+    {
+      "id": "LBL-UNKIND",
+      "kind": "unkind",
+      "patterns": [
+        "\\b(?:lazy|ugly|disgusting|pathetic|worthless|failure|loser)\\b",
+        "\\b(?:i'?m|im|so|too|feel|feeling|getting) fat\\b",
+        "\\bno excuses?\\b",
+        "\\bpunish\\w*"
+      ]
+    }
+  ]
+}

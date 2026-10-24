@@ -1809,5 +1809,11 @@
   "routineLabelNotSaved": "That wasn't saved. You can try different words.",
   "@routineLabelNotSaved": {"description": "My Daily Routine (T-GOL-03b)."},
   "routineSaveError": "Couldn't save. Please try again.",
-  "@routineSaveError": {"description": "My Daily Routine (T-GOL-03b)."}
+  "@routineSaveError": {"description": "My Daily Routine (T-GOL-03b)."},
+  "routineLabelMedication": "Medicines and supplements can't go in your routine yet. Please keep following your care team's plan for them.",
+  "@routineLabelMedication": {"description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."},
+  "routineLabelNotAllowed": "Your routine is for kind, everyday steps, not weight, calories or diets. Want to try a different step?",
+  "@routineLabelNotAllowed": {"description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."},
+  "routineLabelUnkind": "Let's word it kindly. You deserve the same kindness you'd give a friend.",
+  "@routineLabelUnkind": {"description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."}
 }

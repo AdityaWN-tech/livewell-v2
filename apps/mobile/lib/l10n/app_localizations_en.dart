@@ -3151,4 +3151,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get routineSaveError => 'Couldn\'t save. Please try again.';
+
+  @override
+  String get routineLabelMedication =>
+      'Medicines and supplements can\'t go in your routine yet. Please keep following your care team\'s plan for them.';
+
+  @override
+  String get routineLabelNotAllowed =>
+      'Your routine is for kind, everyday steps, not weight, calories or diets. Want to try a different step?';
+
+  @override
+  String get routineLabelUnkind =>
+      'Let\'s word it kindly. You deserve the same kindness you\'d give a friend.';
 }

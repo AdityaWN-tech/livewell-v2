@@ -228,16 +228,40 @@ class _Tile extends StatelessWidget {
   }
 }
 
+/// What the label check says before a custom item is saved (T-GOL-03c).
+sealed class LabelOutcome {
+  const LabelOutcome();
+}
+
+class LabelAccepted extends LabelOutcome {
+  const LabelAccepted();
+}
+
+/// Not saved; [message] shows in the sheet and the words can be changed.
+class LabelTryAgain extends LabelOutcome {
+  const LabelTryAgain(this.message);
+  final String message;
+}
+
+/// A safety response was shown: the sheet closes without saving.
+class LabelStopped extends LabelOutcome {
+  const LabelStopped();
+}
+
 /// Add or edit one step: label and icon (custom only), time, length, days,
-/// reminder and the coach's announcement. Pops the edited item.
+/// reminder and the coach's announcement. Pops the edited item. A custom
+/// label goes through [checkLabel] first.
 class ItemSheet extends StatefulWidget {
   const ItemSheet({
     super.key,
     required this.item,
     required this.days,
     required this.isNew,
+    required this.checkLabel,
     this.clinicianNote = false,
   });
+
+  final Future<LabelOutcome> Function(String label) checkLabel;
 
   final RoutineItem item;
 
@@ -261,6 +285,7 @@ class _ItemSheetState extends State<ItemSheet> {
   late bool _reminder = widget.item.reminder;
   late bool _announce = widget.item.avatarAnnounce;
   String? _error;
+  bool _checking = false;
 
   static const _lengths = [2, 5, 10, 15, 20, 30, 45, 60];
 
@@ -281,7 +306,7 @@ class _ItemSheetState extends State<ItemSheet> {
     setState(() => _time = '${two(picked.hour)}:${two(picked.minute)}');
   }
 
-  void _save() {
+  Future<void> _save() async {
     final l = AppLocalizations.of(context);
     final label = widget.item.custom ? _label.text.trim() : widget.item.label;
     if (label.isEmpty) {
@@ -291,6 +316,21 @@ class _ItemSheetState extends State<ItemSheet> {
     if (_days.isEmpty) {
       setState(() => _error = l.routineDaysNone);
       return;
+    }
+    if (widget.item.custom) {
+      setState(() => _checking = true);
+      final outcome = await widget.checkLabel(label);
+      if (!mounted) return;
+      setState(() => _checking = false);
+      switch (outcome) {
+        case LabelTryAgain(:final message):
+          setState(() => _error = message);
+          return;
+        case LabelStopped():
+          Navigator.of(context).pop();
+          return;
+        case LabelAccepted():
+      }
     }
     final item = widget.item.copyWith(
       label: label,
@@ -319,7 +359,7 @@ class _ItemSheetState extends State<ItemSheet> {
           : l.routineEditTitle,
       footer: FilledButton(
         key: const Key('routine-item-save'),
-        onPressed: _save,
+        onPressed: _checking ? null : _save,
         child: Text(l.routineSave),
       ),
       children: [

@@ -19,6 +19,8 @@ A test fails if a field is added. **Never** mood, energy, sleep, stress, health 
 | `streak_days` | int or null | |
 | `routine` | object | `morning` (check-in), `step`, `evening` (reflection): `todo` or `done`. Never "missed", never red. |
 | `entries` | array | The first entry is **now**. Then one at each touchpoint time where it changes (default 13:00 and 20:30), then the **next midnight** (a new day: the morning check-in). The widget shows the last entry whose `at` has passed. |
+| `after_done` | entry or null | What to show right after Done is tapped on the widget itself, until the app catches up: celebrating (calm after a safety response), the streak counting today. Null when Done isn't offered. |
+| `routine_labels` | object | The routine row's words: `morning`, `step`, `evening`. |
 | `hide_details` | bool | "Hide details on lock screen" (default on; setting in 08g-e). |
 | `updated_at` | ISO time | |
 
@@ -40,5 +42,11 @@ Each entry has:
 | `signed_out` | signed out | happy | Open Live Well to sign in | Open | |
 
 **Done:** on iOS 17+ and Android 12+ the native PRs log Done from the widget itself (offline, idempotent by date). Elsewhere the button opens the link. There are no portal or course suggestions on the widget.
+
+**Faces on iOS:** the widget can't read the app's own files, so the app also writes each face PNG as base64 to `lw_face_<expression>` in the App Group's shared defaults, only when it changes. Android's widget runs in the app and reads `avatar_thumbs` paths directly.
+
+**Back to the app:**
+- **Links:** widget links open the app with `homeWidget=1` added (home_widget). The app maps them: check-in → the check-in, step → the step, `?smaller=1` → make it smaller, `?done=1` → Done with the celebration (iOS 16), reflection → Track, home → Home. Unknown links are ignored, and the app's router doesn't take `livewell://` links (`FlutterDeepLinkingEnabled` off).
+- **Done on the widget (iOS 17+, App Intent):** writes today's date to `lw_done_date` and reloads the widget, which shows `after_done`. The app applies it once, quietly, the next time it starts or comes back, and only for that day; then it clears the key. (Done is kept in memory until habit logs exist, T-GOL-01.)
 
 **When it is rewritten:** whenever the plan, check-in, step, reflection, coach, name or sign-in changes (a 300 ms pause groups changes), when the app comes back to the foreground, and at midnight. The timeline covers the touchpoint times in between, so the widget changes on time without the app running.

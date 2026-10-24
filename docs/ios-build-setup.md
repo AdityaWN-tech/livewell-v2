@@ -45,7 +45,11 @@ On **developer.apple.com > Certificates, Identifiers & Profiles**:
    - **Sign In with Apple** → "Enable as a primary App ID".
 4. Continue > Register. Do the same for staging (`.stg`, staging group) and prod (no suffix, prod group).
 
-The home-screen widget (AVT-08g) will need its own App ID per flavour (for example `net.conciergeconnectedcare.livewell.dev.widget`) with the same App Group. That step is added to this guide with the widget.
+**The home-screen widget (AVT-08g-b)** is its own small app inside Live Well, so it needs its own App ID per flavour too:
+1. Identifiers > **+** > App IDs > App.
+2. Description `Live Well Dev widget`, explicit bundle ID `net.conciergeconnectedcare.livewell.dev.widget`.
+3. Tick **App Groups** only, and pick the **same** dev group as the app.
+4. Do the same for staging (`...livewell.stg.widget`, staging group) and prod (`...livewell.widget`, prod group).
 
 ## 3. Sign in with Apple
 
@@ -80,7 +84,7 @@ Push in the app itself (FCM registration) comes later. The key just needs to be 
 
 ## 5. Certificates and provisioning profiles (kept in Codemagic)
 
-You need two certificates and three profiles. Codemagic can make the certificates for you, so no Mac is needed.
+You need two certificates and six profiles (the app and its widget, for each flavour). Codemagic can make the certificates for you, so no Mac is needed.
 
 1. Do step 6.2 (the App Store Connect API key) first.
 2. In Codemagic, go to **Team settings > codemagic.yaml settings > Code signing identities > iOS certificates**. Choose **Generate certificate** with the API key, once for each type:
@@ -99,6 +103,9 @@ You need two certificates and three profiles. Codemagic can make the certificate
    | iOS App Development | `...livewell.dev` | the development one | your iPhone(s) | `livewell_dev_development` |
    | App Store Connect | `...livewell.stg` | the distribution one | — | `livewell_staging_appstore` |
    | App Store Connect | `...livewell` | the distribution one | — | `livewell_prod_appstore` |
+   | iOS App Development | `...livewell.dev.widget` | the development one | your iPhone(s) | `livewell_dev_widget_development` |
+   | App Store Connect | `...livewell.stg.widget` | the distribution one | — | `livewell_staging_widget_appstore` |
+   | App Store Connect | `...livewell.widget` | the distribution one | — | `livewell_prod_widget_appstore` |
 
 5. In Codemagic > Code signing identities > **iOS provisioning profiles**, choose **Fetch profiles** (with the API key) or upload each `.mobileprovision`. Give each one the reference name above.
 
@@ -162,6 +169,7 @@ If a build fails at "Use the provisioning profiles", a certificate or profile re
 | Flavour settings (bundle ID, name, App Group, entitlements) | `ios/Runner.xcodeproj/project.pbxproj`: configurations `Debug-<flavour>`, `Release-<flavour>`, `Profile-<flavour>` |
 | One scheme per flavour (Flutter uses it for `--flavor`) | `ios/Runner.xcodeproj/xcshareddata/xcschemes/{dev,staging,prod}.xcscheme` |
 | Capabilities | `ios/Runner/Runner-Debug.entitlements` (push: development), `Runner-Release.entitlements` (push: production) |
+| The home-screen widget | `ios/LiveWellWidget/` (SwiftUI, WidgetKit; target `LiveWellWidgetExtension`, iOS 16+; Done from the widget on iOS 17+) |
 | Cloud builds | `codemagic.yaml` |
 | PR check | `.github/workflows/ios.yml` |
 

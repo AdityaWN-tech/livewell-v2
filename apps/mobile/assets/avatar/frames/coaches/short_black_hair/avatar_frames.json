@@ -1,6 +1,6 @@
 {
   "avatar_id": "short_black_hair",
-  "version": 1,
+  "version": 2,
   "style": "3d_adult",
   "canvas": {
     "width": 1024,
@@ -9,7 +9,7 @@
   "sizes": [
     "2x"
   ],
-  "note": "Placeholder cards, not a face (T-AVT-08b). Dev builds only until the final art exists.",
+  "note": "Ready-made coach from the owner's portrait (Gemini, docs/design). Blink and mouth shapes made by tool/make_coach_frames.py until hand-made frames replace them; expressions move in code. Dev builds only until the art is final (licence review).",
   "frames": {
     "neutral": {
       "2x": "neutral@2x.webp"

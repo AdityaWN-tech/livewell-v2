@@ -37,3 +37,9 @@ firestore-debug.log
 
 # Golden-test failure images
 apps/mobile/test/**/failures/
+
+# The owner's original generated portraits (58 MB); clean copies are in docs/design/coaches/
+docs/design/Gemini_Generated_Image_*
+
+# Kotlin compiler cache
+apps/mobile/android/.kotlin/

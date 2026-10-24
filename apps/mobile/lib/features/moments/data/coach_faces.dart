@@ -29,6 +29,14 @@ abstract class CoachFaces {
     String initial = '',
     Color? background,
   });
+
+  /// The same, by expression name, for the home-screen widget (T-AVT-08g).
+  Future<Map<String, String>> byExpression(
+    List<AvatarExpression> expressions, {
+    CachedFrameSet? frames,
+    String initial = '',
+    Color? background,
+  });
 }
 
 class FileCoachFaces implements CoachFaces {
@@ -63,6 +71,36 @@ class FileCoachFaces implements CoachFaces {
           background ?? AvatarColours.background.first,
         );
         out[k] = circle.path;
+      }
+      return out;
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  @override
+  Future<Map<String, String>> byExpression(
+    List<AvatarExpression> expressions, {
+    CachedFrameSet? frames,
+    String initial = '',
+    Color? background,
+  }) async {
+    try {
+      final out = <String, String>{};
+      File? circle;
+      for (final e in expressions) {
+        final found =
+            frames?.thumbnail(e.name) ??
+            frames?.file(expressionFrame(e), devicePixelRatio: 2);
+        if (found != null) {
+          out[e.name] = found.path;
+          continue;
+        }
+        circle ??= await _circleFile(
+          initial,
+          background ?? AvatarColours.background.first,
+        );
+        out[e.name] = circle.path;
       }
       return out;
     } catch (_) {

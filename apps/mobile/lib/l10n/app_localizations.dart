@@ -5030,6 +5030,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a ready-made coach'**
   String get photoPickReady;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with a 30-second check-in'**
+  String get widgetCheckInSub;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Short on time? {smaller}'**
+  String widgetShorter(String smaller);
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for your {step}'**
+  String widgetTimeFor(String step);
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {days}!'**
+  String widgetDayN(int days);
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice work!'**
+  String get widgetDoneHeadline;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Your step is done for today.'**
+  String get widgetDoneSub;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'How did today go?'**
+  String get widgetEvening;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s keep today gentle.'**
+  String get widgetGentleSub;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Live Well to start your plan'**
+  String get widgetNoPlan;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Live Well to sign in'**
+  String get widgetSignedOut;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {step}'**
+  String widgetLockNext(String step);
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next step is ready'**
+  String get widgetLockReady;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Done for today'**
+  String get widgetLockDone;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get widgetStart;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflect'**
+  String get widgetReflect;
+
+  /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get widgetOpen;
 }
 
 class _AppLocalizationsDelegate

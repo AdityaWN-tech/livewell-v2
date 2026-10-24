@@ -35,6 +35,10 @@ import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
+import 'package:livewell/core/design/avatar/avatar_art.dart'
+    show AvatarExpression;
+import 'package:livewell/features/widget/data/widget_publisher.dart';
+import 'package:livewell/features/widget/domain/widget_snapshot.dart';
 
 /// In-memory sign-in for widget tests.
 class FakeAuthService implements AuthService {
@@ -529,6 +533,7 @@ class FakePlanRepository implements PlanRepository {
     }
     supporting = plan.supporting;
     times = t;
+    _changes.add(null);
   }
 
   @override
@@ -537,8 +542,14 @@ class FakePlanRepository implements PlanRepository {
   @override
   Future<TouchpointTimes> loadTimes() async => times;
 
+  /// Live like Firestore: a save reaches anyone already watching.
+  final _changes = StreamController<void>.broadcast();
+
   @override
-  Stream<PlanDay?> watchDay(String date) => Stream.value(days[date]);
+  Stream<PlanDay?> watchDay(String date) async* {
+    yield days[date];
+    yield* _changes.stream.map((_) => days[date]);
+  }
 
   @override
   Future<List<String>> datesFrom(String from) async =>
@@ -628,6 +639,14 @@ class FakeCoachFaces implements CoachFaces {
     drawn.add(initial);
     return {for (final k in TouchpointKind.values) k: 'faces/${k.name}.png'};
   }
+
+  @override
+  Future<Map<String, String>> byExpression(
+    List<AvatarExpression> expressions, {
+    CachedFrameSet? frames,
+    String initial = '',
+    Color? background,
+  }) async => {for (final e in expressions) e.name: '/faces/${e.name}.png'};
 }
 
 class FakeMomentSeenStore implements MomentSeenStore {
@@ -876,4 +895,14 @@ class FakeAvatarMaker implements AvatarMakerApi {
     if (s.succeeded) onMade?.call();
     return s;
   }
+}
+
+class FakeWidgetPublisher implements WidgetPublisher {
+  final published = <WidgetSnapshot>[];
+
+  WidgetSnapshot? get last => published.isEmpty ? null : published.last;
+
+  @override
+  Future<void> publish(WidgetSnapshot snapshot) async =>
+      published.add(snapshot);
 }

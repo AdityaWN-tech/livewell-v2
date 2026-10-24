@@ -33,6 +33,7 @@ import 'package:livewell/features/profile/data/appearance.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
+import 'package:livewell/features/widget/data/widget_publisher.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
 import 'fake_onboarding_store.dart';
@@ -98,6 +99,7 @@ class Harness {
   final avatarMaker = FakeAvatarMaker();
   final momentSeen = FakeMomentSeenStore();
   final firstHello = FakeFirstHelloStore();
+  final widget = FakeWidgetPublisher();
   final appearance = FakeAppearanceStore();
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
@@ -160,6 +162,7 @@ class Harness {
           avatarMakerApiProvider.overrideWithValue(avatarMaker),
           momentSeenStoreProvider.overrideWithValue(momentSeen),
           firstHelloStoreProvider.overrideWithValue(firstHello),
+          widgetPublisherProvider.overrideWithValue(widget),
           avatarIdleMotionProvider.overrideWithValue(idleMotion),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(

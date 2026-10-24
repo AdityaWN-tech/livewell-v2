@@ -15,7 +15,12 @@ The work in progress and what comes next, as a checklist. Each item is one PR, s
 ## Next
 
 - [x] **AVT-08f** Everything the avatar does in the app: first hello, check-in reaction, streak milestones, calm after safety (new lines pending clinical review; routine items wait for T-GOL-03, lesson narration for the lesson reader)
-- [ ] **AVT-08g** The widget with the 3D avatar (replaces T-TCH-02's widget)
+- [ ] **AVT-08g** The widget with the 3D avatar (replaces T-TCH-02's widget), in five PRs:
+  - [x] **08g-a** Shared widget data: the snapshot and its timeline (no native widget yet)
+  - [ ] **08g-b** iOS widgets (WidgetKit, SwiftUI), Done with App Intents on iOS 17+
+  - [ ] **08g-c** Android widgets (Glance), Done on Android 12+
+  - [ ] **08g-d** Look and feel, "Add the widget" card
+  - [ ] **08g-e** Hide details on lock screen, sign-out, analytics
 - [ ] **AVT-08h** Settings and deletion (Delete my avatar)
 - [ ] **T-DLY-03e** Daily plan settings
 - [ ] **T-GOL-03** My Daily Routine (its reminders use the 3D avatar)

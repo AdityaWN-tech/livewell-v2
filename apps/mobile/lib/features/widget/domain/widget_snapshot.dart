@@ -9,6 +9,10 @@ enum WidgetSlot {
   done('done'),
   evening('evening'),
   gentle('gentle'),
+
+  /// My Daily Routine's next item (T-GOL-03e), when the coach's step is
+  /// done or there is no plan: the coach's step always comes first.
+  routineItem('routine_item'),
   none('none'),
   signedOut('signed_out');
 
@@ -25,7 +29,10 @@ enum WidgetActionId {
   makeSmaller('make_smaller', 'livewell://step?smaller=1'),
   done('done', 'livewell://step?done=1'),
   reflect('reflect', 'livewell://reflection'),
-  openHome('open_home', 'livewell://home');
+  openHome('open_home', 'livewell://home'),
+  // T-GOL-03e: the link also names the item (see WidgetAction.link).
+  routineDone('routine_done', 'livewell://routine?done=1'),
+  openRoutine('open_routine', 'livewell://routine');
 
   const WidgetActionId(this.id, this.link);
   final String id;
@@ -33,16 +40,34 @@ enum WidgetActionId {
 }
 
 class WidgetAction {
-  const WidgetAction(this.id, this.label);
+  const WidgetAction(this.id, this.label, {this.linkOverride});
 
   final WidgetActionId id;
   final String label;
 
-  Map<String, Object?> toJson() => {
-    'id': id.id,
-    'label': label,
-    'link': id.link,
-  };
+  /// The action's own link when it carries more (a routine item's Done).
+  final String? linkOverride;
+
+  String get link => linkOverride ?? id.link;
+
+  Map<String, Object?> toJson() => {'id': id.id, 'label': label, 'link': link};
+}
+
+/// The routine item the widget can show (T-GOL-03e). [label] is null for a
+/// custom item: the person's own words never go to the widget.
+class WidgetRoutineItem {
+  const WidgetRoutineItem({
+    required this.payload,
+    required this.time,
+    this.label,
+  });
+
+  /// "routine:date:itemId", carried by the Done link.
+  final String payload;
+
+  /// The time to show, already formatted ("9:00 AM").
+  final String time;
+  final String? label;
 }
 
 enum RoutineStatus { todo, done }
@@ -166,6 +191,7 @@ class WidgetInputs {
     this.streakDays,
     this.avatarThumbs = const {},
     this.hideDetails = true,
+    this.nextRoutine,
   });
 
   final DateTime now;
@@ -187,4 +213,7 @@ class WidgetInputs {
   final int? streakDays;
   final Map<String, String> avatarThumbs;
   final bool hideDetails;
+
+  /// Today's next routine item, if any (T-GOL-03e).
+  final WidgetRoutineItem? nextRoutine;
 }

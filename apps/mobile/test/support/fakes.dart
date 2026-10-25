@@ -930,6 +930,16 @@ class FakeWidgetInbox implements WidgetInbox {
   @override
   Stream<WidgetLink> get links => _links.stream;
 
+  /// The routine item a routine Done link carried (T-GOL-03e).
+  String? routinePayload;
+
+  @override
+  String? takeRoutinePayload() {
+    final p = routinePayload;
+    routinePayload = null;
+    return p;
+  }
+
   @override
   Future<String?> takeDone() async {
     final d = done;

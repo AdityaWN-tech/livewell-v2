@@ -5666,6 +5666,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off'**
   String get profileRoutineRemindersOff;
+
+  /// T-GOL-03e: Home row.
+  ///
+  /// In en, this message translates to:
+  /// **'Next in your routine'**
+  String get homeRoutineNext;
+
+  /// T-GOL-03e
+  ///
+  /// In en, this message translates to:
+  /// **'Next in your routine: {label} at {time}. Open My Daily Routine.'**
+  String homeRoutineNextLabel(String label, String time);
+
+  /// T-GOL-03e: Track chip.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine'**
+  String get trackChipRoutine;
+
+  /// T-GOL-03e
+  ///
+  /// In en, this message translates to:
+  /// **'Build your routine on the Plan tab to see it here.'**
+  String get trackChartRoutineEmpty;
+
+  /// T-GOL-03e: never a 'missed' word.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Nothing yet} =1{1 done} other{{count} done}}'**
+  String trackRoutineDone(int count);
+
+  /// T-GOL-03e: widget subline.
+  ///
+  /// In en, this message translates to:
+  /// **'Next in your routine'**
+  String get widgetRoutineNext;
+
+  /// T-GOL-03e: a custom item's words never go to the widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next routine step'**
+  String get widgetRoutineCustom;
+
+  /// T-GOL-03e
+  ///
+  /// In en, this message translates to:
+  /// **'At {time}'**
+  String widgetRoutineAt(String time);
+
+  /// T-GOL-03e: lock screen, generic.
+  ///
+  /// In en, this message translates to:
+  /// **'A small step from your routine'**
+  String get widgetLockRoutine;
+
+  /// T-GOL-03e: widget button.
+  ///
+  /// In en, this message translates to:
+  /// **'My routine'**
+  String get widgetRoutineOpen;
 }
 
 class _AppLocalizationsDelegate

@@ -2,13 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../avatar/presentation/coach_avatar.dart';
 import '../../dev/application/preview_mode.dart';
+import '../../checkin/domain/checkin.dart';
 import '../../home/application/home_data.dart';
+import '../../routine/application/routine_week_data.dart';
+import '../../routine/domain/routine.dart' show minutesOf;
+import '../../routine/domain/routine_reminders.dart' show routinePayload;
 import '../../moments/application/coach_state.dart';
 import '../../moments/data/coach_faces.dart';
 import '../../notifications/presentation/notifications_screen.dart'
@@ -50,6 +55,8 @@ final widgetInputsProvider = Provider<WidgetInputs>((ref) {
   final checkIn = ref.watch(todayCheckInProvider).value;
   final step = ref.watch(todayStepProvider);
   final progress = ref.watch(stepProgressProvider);
+  final now = ref.watch(clockProvider)();
+  final next = ref.watch(nextRoutineProvider);
   return WidgetInputs(
     now: ref.watch(clockProvider)(),
     signedIn:
@@ -68,6 +75,23 @@ final widgetInputsProvider = Provider<WidgetInputs>((ref) {
     streakDays: ref.watch(streakProvider)?.length,
     avatarThumbs: ref.watch(widgetFacesProvider).value ?? const {},
     // TODO(T-AVT-08g-e): the "Hide details on lock screen" setting.
+    // My Daily Routine's next item (T-GOL-03e). A custom item's words
+    // never go to the widget: it shows the generic line instead.
+    nextRoutine: next == null
+        ? null
+        : WidgetRoutineItem(
+            payload: routinePayload(localDateKey(now), [next.itemId]),
+            time: DateFormat.jm('en').format(
+              DateTime(
+                now.year,
+                now.month,
+                now.day,
+                minutesOf(next.time) ~/ 60,
+                minutesOf(next.time) % 60,
+              ),
+            ),
+            label: next.custom ? null : next.label,
+          ),
   );
 });
 
@@ -97,6 +121,11 @@ WidgetTexts widgetTexts(AppLocalizations l) => WidgetTexts(
   routineMorning: l.widgetRoutineMorning,
   routineStep: l.widgetRoutineStep,
   routineEvening: l.widgetRoutineEvening,
+  routineNext: l.widgetRoutineNext,
+  routineCustom: l.widgetRoutineCustom,
+  routineAt: l.widgetRoutineAt,
+  lockRoutine: l.widgetLockRoutine,
+  routineOpen: l.widgetRoutineOpen,
 );
 
 final widgetSnapshotProvider = Provider<WidgetSnapshot>(

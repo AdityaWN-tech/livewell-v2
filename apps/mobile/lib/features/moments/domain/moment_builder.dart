@@ -28,6 +28,8 @@ class MomentContext {
     this.step,
     this.streakDays,
     this.weeklyCount,
+    this.routineWin,
+    this.routineWinDays,
     this.safetyHold = false,
   });
 
@@ -42,6 +44,11 @@ class MomentContext {
   final MomentStep? step;
   final int? streakDays;
   final int? weeklyCount;
+
+  /// The week's routine win (T-GOL-03e): a catalog spoken name, never the
+  /// person's own words, and its days.
+  final String? routineWin;
+  final int? routineWinDays;
 
   /// A red flag today (or a safety card shown): no Avatar Moment at all.
   /// Safety, crisis and medical messages use the safety cards and the
@@ -108,6 +115,7 @@ class MomentBuilder {
     // week's count, the streak and the name, when those are known (the
     // plain ones are for when they aren't).
     for (final key in [
+      MomentPlaceholders.routineWin,
       MomentPlaceholders.stepTitle,
       MomentPlaceholders.coachName,
       MomentPlaceholders.weeklyCount,
@@ -180,6 +188,10 @@ class MomentBuilder {
         MomentPlaceholders.streakDays: '${c.streakDays}',
       if ((c.weeklyCount ?? 0) > 0)
         MomentPlaceholders.weeklyCount: '${c.weeklyCount}',
+      if (c.routineWin != null && (c.routineWinDays ?? 0) > 0) ...{
+        MomentPlaceholders.routineWin: c.routineWin!,
+        MomentPlaceholders.routineWinDays: '${c.routineWinDays}',
+      },
     };
   }
 

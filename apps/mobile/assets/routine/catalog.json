@@ -1,12 +1,12 @@
 {
   "version": 1,
   "review_status": "pending",
-  "note": "T-GOL-03a. The approved activities a person can add to My Daily Routine. Placeholders only: {first_name}, {time}. A line is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level. Movement stays beginner or moderate; items marked movement are off by default, with 'Check with your clinician first', for people who said an activity limits them (FR-GOL-03). Not allowed in v2: fasting, calorie targets, weight loss, medication or supplements. Custom items (typed by the person) are never spoken: the coach says one of custom_lines and the label is shown as text only (FR-VOC-05). review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Templates: quick starts the person picks and then edits (movement items are left out for people whose activity is limited). Listed for review in REVIEW.md.",
+  "note": "T-GOL-03a. The approved activities a person can add to My Daily Routine. Placeholders only: {first_name}, {time}. A line is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level. Movement stays beginner or moderate; items marked movement are off by default, with 'Check with your clinician first', for people who said an activity limits them (FR-GOL-03). Not allowed in v2: fasting, calorie targets, weight loss, medication or supplements. Custom items (typed by the person) are never spoken: the coach says one of custom_lines and the label is shown as text only (FR-VOC-05). review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Templates: quick starts the person picks and then edits (movement items are left out for people whose activity is limited). Listed for review in REVIEW.md. spoken_name is said in the weekly review's routine win (\"you made time for {spoken_name}\").",
   "activities": [
     {
       "id": "wake_up",
       "label": "Wake up",
-      "spoken_name": "wake up",
+      "spoken_name": "an easy start to your day",
       "icon": "sunrise",
       "kind": "rest",
       "movement": false,
@@ -76,7 +76,7 @@
     {
       "id": "healthy_breakfast",
       "label": "Healthy breakfast",
-      "spoken_name": "breakfast",
+      "spoken_name": "a good breakfast",
       "icon": "breakfast",
       "kind": "nourish",
       "movement": false,
@@ -160,7 +160,7 @@
     {
       "id": "screen_off",
       "label": "Screen off",
-      "spoken_name": "screens off",
+      "spoken_name": "a screen-free evening",
       "icon": "screen_off",
       "kind": "sleep",
       "movement": false,
@@ -174,7 +174,7 @@
     {
       "id": "sleep_wind_down",
       "label": "Sleep wind-down",
-      "spoken_name": "your wind-down",
+      "spoken_name": "a calm wind-down",
       "icon": "moon",
       "kind": "sleep",
       "movement": false,
@@ -188,7 +188,7 @@
     {
       "id": "bedtime",
       "label": "Bedtime",
-      "spoken_name": "bedtime",
+      "spoken_name": "a regular bedtime",
       "icon": "bed",
       "kind": "sleep",
       "movement": false,

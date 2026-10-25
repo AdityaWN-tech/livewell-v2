@@ -149,3 +149,24 @@ The person picks one and edits it. Movement items are left out for people whose 
 | Workday (`workday`) | weekdays | 06:45 Wake up, 07:00 Drink water, 07:30 Healthy breakfast, 11:00 Work break, 13:30 Walk after a meal, 16:00 Breathing break, 21:30 Screen off, 22:30 Bedtime |
 | Weekend (`weekend`) | weekend | 08:00 Wake up, 08:10 Drink water, 09:00 Morning walk, 17:00 Family time, 21:00 Read, 23:00 Bedtime |
 | Travel day (`travel_day`) | oneDay | 08:00 Drink water, 12:00 Breathing break, 13:30 Walk after a meal, 22:00 Sleep wind-down |
+
+## Weekly review names
+
+The coach's weekly review can say "you made time for {name} on {days} days this week" for a catalog activity done on at least 4 days (never a custom item).
+
+| Activity | Spoken name |
+|---|---|
+| Wake up (`wake_up`) | an easy start to your day |
+| Drink water (`drink_water`) | a glass of water |
+| Morning stretch (`morning_stretch`) | a morning stretch |
+| Morning walk (`morning_walk`) | a morning walk |
+| Breathing break (`breathing_break`) | a breathing break |
+| Healthy breakfast (`healthy_breakfast`) | a good breakfast |
+| Work break (`work_break`) | a short break |
+| Walk after a meal (`walk_after_meal`) | a walk after your meal |
+| Family time (`family_time`) | family time |
+| Read (`read`) | some reading |
+| Prayer or quiet time (`quiet_time`) | some quiet time |
+| Screen off (`screen_off`) | a screen-free evening |
+| Sleep wind-down (`sleep_wind_down`) | a calm wind-down |
+| Bedtime (`bedtime`) | a regular bedtime |

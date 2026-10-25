@@ -38,6 +38,7 @@ Each entry has:
 | `gentle` | gentle day, or a safety response today | calm | the smaller step | Start | |
 | `done` | step done | celebrating (calm after a safety response) | Day {N}! | Open → `livewell://home` | |
 | `evening` | from the evening time, until reflected | listening (calm after a safety response) | How did today go? | Reflect → `livewell://reflection` | |
+| `routine_item` | instead of `done` or `none` when My Daily Routine has an item still due today (never after a safety response; T-GOL-03e) | happy | the catalog activity's name, or **"Your next routine step" for a custom item** (the person's own words never go to the widget); subline "Next in your routine · At 9:00 AM"; lock screen "A small step from your routine" unless details are on and it's a catalog item | **Done** → `livewell://routine?done=1&r=<routine payload>` | My routine → `livewell://routine` |
 | `none` | no plan | happy | Open Live Well to start your plan | Open | |
 | `signed_out` | signed out | happy | Open Live Well to sign in | Open | |
 
@@ -46,7 +47,7 @@ Each entry has:
 **Faces on iOS:** the widget can't read the app's own files, so the app also writes each face PNG as base64 to `lw_face_<expression>` in the App Group's shared defaults, only when it changes. Android's widget runs in the app and reads `avatar_thumbs` paths directly.
 
 **Back to the app:**
-- **Links:** widget links open the app with `homeWidget=1` added (home_widget). The app maps them: check-in → the check-in, step → the step, `?smaller=1` → make it smaller, `?done=1` → Done with the celebration (iOS 16), reflection → Track, home → Home. Unknown links are ignored, and the app's router doesn't take `livewell://` links (`FlutterDeepLinkingEnabled` off).
+- **Links:** widget links open the app with `homeWidget=1` added (home_widget). The app maps them: check-in → the check-in, step → the step, `?smaller=1` → make it smaller, `?done=1` → Done with the celebration (iOS 16), reflection → Track, home → Home, routine → My Daily Routine, `routine?done=1&r=…` → that routine item logged done with source `widget` (T-GOL-03e; it opens the app on every iOS version: the App Intent is for the coach's step only). Unknown links are ignored, and the app's router doesn't take `livewell://` links (`FlutterDeepLinkingEnabled` off).
 - **Done on the widget (iOS 17+, App Intent):** writes today's date to `lw_done_date` and reloads the widget, which shows `after_done`. The app applies it once, quietly, the next time it starts or comes back, and only for that day; then it clears the key. (Done is kept in memory until habit logs exist, T-GOL-01.)
 
 **When it is rewritten:** whenever the plan, check-in, step, reflection, coach, name or sign-in changes (a 300 ms pause groups changes), when the app comes back to the foreground, and at midnight. The timeline covers the touchpoint times in between, so the widget changes on time without the app running.

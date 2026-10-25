@@ -5,6 +5,7 @@ import '../../account/data/profile_repository.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../../home/application/home_data.dart';
+import '../../routine/application/routine_week_data.dart';
 import '../../track/presentation/track_screen.dart' show streakProvider;
 import '../../voice/data/voice_repository.dart';
 import '../../voice/domain/voice.dart';
@@ -21,6 +22,8 @@ final momentContextProvider = Provider<MomentContext>((ref) {
   final why = ref.watch(previewModeProvider)
       ? 'I want energy to travel with my family.'
       : ref.watch(currentProfileProvider).value?.whyStatement;
+  final routineDone = ref.watch(routineWeeklyDoneProvider);
+  final win = ref.watch(routineWinProvider);
   return MomentContext(
     now: ref.watch(clockProvider)(),
     firstName: ref.watch(firstNameProvider),
@@ -35,10 +38,13 @@ final momentContextProvider = Provider<MomentContext>((ref) {
             smallerMinutes: step.smallerMinutes,
           ),
     streakDays: ref.watch(streakProvider)?.length,
-    // TODO(T-GOL-01): steps done this week, from habit_logs.
+    // Weekly healthy actions: routine items done this week (T-GOL-03e).
+    // TODO(T-GOL-01): plus the plan's steps done, from habit_logs.
     weeklyCount: ref.watch(previewModeProvider)
-        ? PreviewSamples.habitsWeek.length
-        : null,
+        ? PreviewSamples.habitsWeek.length + routineDone
+        : (routineDone > 0 ? routineDone : null),
+    routineWin: win?.spokenName,
+    routineWinDays: win?.days,
     // A red flag in today's check-in (T-DLY-03d); TODO(D-22): from the
     // recorded safety events, so it survives a restart.
     safetyHold: ref.watch(safetyHoldTodayProvider),

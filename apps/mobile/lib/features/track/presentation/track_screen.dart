@@ -22,6 +22,7 @@ import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';
 import '../../profile/presentation/profile_button.dart';
+import '../../routine/application/routine_week_data.dart';
 import '../application/track_data.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
@@ -367,6 +368,7 @@ class _ProgressChartState extends ConsumerState<_ProgressChart> {
     };
     final health = ref.watch(healthSummaryProvider);
     final habits = ref.watch(habitsWeekProvider);
+    final routine = ref.watch(routineWeekProvider);
     final number = NumberFormat.decimalPattern(
       Localizations.localeOf(context).toString(),
     );
@@ -412,6 +414,21 @@ class _ProgressChartState extends ConsumerState<_ProgressChart> {
                   : (habits[i] / 3, l.trackHabitsKept(habits[i])),
           ];
         }
+      case TrackMetric.routine:
+        // Items done per day (T-GOL-03e). A day with none simply has no
+        // bar: never red, never "missed" (spec 4.1).
+        if (routine == null) {
+          days = List.filled(7, null);
+          empty = l.trackChartRoutineEmpty;
+        } else {
+          final top = routine.fold(3, (a, b) => a > b ? a : b);
+          days = [
+            for (var i = 0; i < 7; i++)
+              i > todayIndex || routine[i] == 0
+                  ? null
+                  : (routine[i] / top, l.trackRoutineDone(routine[i])),
+          ];
+        }
       case TrackMetric.sleep:
       case TrackMetric.mood:
         days = [
@@ -439,6 +456,7 @@ class _ProgressChartState extends ConsumerState<_ProgressChart> {
       (TrackMetric.sleep, l.trackSleep),
       (TrackMetric.mood, l.trackMood),
       (TrackMetric.habits, l.trackChipHabits),
+      (TrackMetric.routine, l.trackChipRoutine),
     ];
     const chartHeight = 140.0;
     final bar = LwPalette.richer(p.mint);

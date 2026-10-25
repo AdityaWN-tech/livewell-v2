@@ -42,9 +42,11 @@ final routineMessageProvider = FutureProvider.family<CoachMessage?, String>((
   final approvedOnly = ref.watch(flavorProvider) != Flavor.dev;
   final now = ref.watch(clockProvider)();
   // A different line each day, so the coach doesn't repeat itself.
-  final day = DateTime(now.year, now.month, now.day)
-      .difference(DateTime(now.year))
-      .inDays;
+  final day = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  ).difference(DateTime(now.year)).inDays;
   final ids = <String>[];
   final texts = <String>[];
   var usedName = false;
@@ -87,8 +89,9 @@ class SharedPrefsRoutineAskStore implements RoutineAskStore {
   static const _key = 'routine_ignored_asked';
 
   @override
-  Future<Set<String>> asked() async =>
-      {...?(await SharedPreferences.getInstance()).getStringList(_key)};
+  Future<Set<String>> asked() async => {
+    ...?(await SharedPreferences.getInstance()).getStringList(_key),
+  };
 
   @override
   Future<void> markAsked(String itemId) async {
@@ -173,23 +176,19 @@ Future<List<RoutineReminder>> routineRemindersFor(
 }
 
 /// Marks the items of a routine reminder done or skipped from its moment
-/// (source: notification). Idempotent by date and item.
+/// (source: notification) or the widget. Idempotent by date and item.
 Future<void> markFromReminder(
   Ref ref,
   String payload,
-  RoutineStatus status,
-) async {
+  RoutineStatus status, {
+  RoutineSource source = RoutineSource.notification,
+}) async {
   final p = parseRoutinePayload(payload);
   if (p == null) return;
   final repo = ref.read(routineRepositoryProvider);
   for (final id in p.itemIds) {
     await repo.saveLog(
-      RoutineLog(
-        date: p.date,
-        itemId: id,
-        status: status,
-        source: RoutineSource.notification,
-      ),
+      RoutineLog(date: p.date, itemId: id, status: status, source: source),
     );
   }
 }
@@ -204,6 +203,9 @@ class RoutineReminderActions {
 
   final Ref _ref;
 
-  Future<void> mark(String payload, RoutineStatus status) =>
-      markFromReminder(_ref, payload, status);
+  Future<void> mark(
+    String payload,
+    RoutineStatus status, {
+    RoutineSource source = RoutineSource.notification,
+  }) => markFromReminder(_ref, payload, status, source: source);
 }

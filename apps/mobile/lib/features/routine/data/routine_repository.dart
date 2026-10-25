@@ -304,7 +304,8 @@ class InMemoryRoutineRepository implements RoutineRepository {
   Future<void> saveItem(RoutineItem item) async {
     if (!item.isValid) throw ArgumentError('invalid item ${item.itemId}');
     // Like created_at: set on the first save, kept after.
-    final added = _items[item.itemId]?.addedAt ?? item.addedAt ?? DateTime.now();
+    final added =
+        _items[item.itemId]?.addedAt ?? item.addedAt ?? DateTime.now();
     _items[item.itemId] = RoutineItem(
       itemId: item.itemId,
       routineId: item.routineId,

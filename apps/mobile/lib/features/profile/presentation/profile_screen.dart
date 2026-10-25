@@ -611,7 +611,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           settings[ProfileSettings.routineRemindersPerDay],
                         ),
                         underline: const SizedBox.shrink(),
-                        onChanged: (n) => n == null ? null : _setRoutinePerDay(n),
+                        onChanged: (n) =>
+                            n == null ? null : _setRoutinePerDay(n),
                         items: [
                           for (var n = 0; n <= routineRemindersMax; n++)
                             DropdownMenuItem(

@@ -49,9 +49,8 @@ String routinePayload(String date, List<String> itemIds) =>
 
 /// The date and items of a routine payload, or null for another payload.
 ({String date, List<String> itemIds})? parseRoutinePayload(String payload) {
-  final m = RegExp(
-    r'^routine:(\d{4}-\d{2}-\d{2}):([A-Za-z0-9,-]+)$',
-  ).firstMatch(payload);
+  final m = RegExp(r'^routine:(\d{4}-\d{2}-\d{2}):([A-Za-z0-9,-]+)$')
+      .firstMatch(payload);
   if (m == null) return null;
   final ids = m.group(2)!.split(',').where(isValidItemId).toList();
   return ids.isEmpty ? null : (date: m.group(1)!, itemIds: ids);

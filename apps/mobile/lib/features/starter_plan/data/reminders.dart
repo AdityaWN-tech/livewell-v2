@@ -172,20 +172,20 @@ class LocalReminders implements Reminders {
     await _plugin.cancelAll();
     NotificationDetails details(String? face, {bool isRoutine = false}) =>
         NotificationDetails(
-      android: AndroidNotificationDetails(
-        // Its own channel, so routine reminders can be muted on their own.
-        isRoutine ? 'routine' : 'daily_plan',
-        isRoutine ? t.routineChannelName : t.channelName,
-        importance: Importance.defaultImportance,
-        // Even the generic text stays hidden on a locked screen, and the
-        // coach's face with it.
-        visibility: NotificationVisibility.private,
-        largeIcon: face == null ? null : FilePathAndroidBitmap(face),
-      ),
-      // No face on iOS: an attachment can show on the lock screen, and the
-      // avatar may be drawn from the person's selfie (AGENTS.md).
-      iOS: const DarwinNotificationDetails(),
-    );
+          android: AndroidNotificationDetails(
+            // Its own channel, so routine reminders can be muted on their own.
+            isRoutine ? 'routine' : 'daily_plan',
+            isRoutine ? t.routineChannelName : t.channelName,
+            importance: Importance.defaultImportance,
+            // Even the generic text stays hidden on a locked screen, and the
+            // coach's face with it.
+            visibility: NotificationVisibility.private,
+            largeIcon: face == null ? null : FilePathAndroidBitmap(face),
+          ),
+          // No face on iOS: an attachment can show on the lock screen, and the
+          // avatar may be drawn from the person's selfie (AGENTS.md).
+          iOS: const DarwinNotificationDetails(),
+        );
     for (final i in items) {
       final (title, body) = t.of(i.kind);
       await _plugin.zonedSchedule(

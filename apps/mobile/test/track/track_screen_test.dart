@@ -226,6 +226,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.bySemanticsLabel('Monday: Good. Selected.'), findsOneWidget);
       // Sleep uses the sleep words; a new chip starts on today again.
+      await tester.ensureVisible(find.byKey(const Key('track-chip-sleep')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('track-chip-sleep')));
       await tester.pumpAndSettle();
       expect(

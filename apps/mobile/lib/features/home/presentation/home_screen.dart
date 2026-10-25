@@ -30,9 +30,13 @@ import '../../moments/domain/moment_builder.dart';
 import '../../moments/presentation/moment_screen.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../profile/presentation/profile_button.dart';
+import '../../routine/application/routine_data.dart';
 import '../../routine/application/routine_moment.dart';
+import '../../routine/application/routine_week_data.dart';
+import '../../routine/presentation/routine_sheets.dart' show iconFor, timeLabel;
 import '../../routine/data/routine_repository.dart';
-import '../../routine/domain/routine.dart' show RoutineStatus;
+import '../../routine/domain/routine.dart'
+    show RoutineItem, RoutineSource, RoutineStatus;
 import '../../routine/domain/routine_reminders.dart';
 import '../../routine/presentation/routine_screen.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
@@ -251,6 +255,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         context.go('/track');
       case WidgetLink.home:
         break;
+      // My Daily Routine (T-GOL-03e).
+      case WidgetLink.routine:
+        await context.push(RoutineScreen.path);
+      case WidgetLink.routineDone:
+        final payload = ref.read(widgetInboxProvider).takeRoutinePayload();
+        if (payload != null) {
+          await ref
+              .read(routineReminderActionsProvider)
+              .mark(payload, RoutineStatus.done, source: RoutineSource.widget);
+        }
     }
   }
 
@@ -272,7 +286,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (ref.read(authServiceProvider).currentUser == null) return;
     final texts = reminderTexts(AppLocalizations.of(context));
     try {
-      final items = await ref.read(routineRepositoryProvider).watchItems().first;
+      final items = await ref
+          .read(routineRepositoryProvider)
+          .watchItems()
+          .first;
       if (!items.any((i) => i.reminder)) return;
       await ref.read(planSchedulerProvider).reschedule(texts);
     } catch (_) {
@@ -500,6 +517,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           reason: step == null ? null : _stepReason(l, step, checkIn),
           onOpen: step == null ? null : () => _openStep(step, checkIn),
         ),
+        // My Daily Routine (T-GOL-03e): secondary, so Home keeps one
+        // primary action (FR-DLY-03).
+        if (ref.watch(nextRoutineProvider) case final next?) ...[
+          const SizedBox(height: LwSpacing.sm),
+          _NextRoutineRow(
+            item: next,
+            onOpen: () => context.push(RoutineScreen.path),
+            onDone: () =>
+                ref.read(routineActionsProvider).mark(next, RoutineStatus.done),
+          ),
+        ],
         if (ref.watch(canCheckInProvider)) ...[
           LwSectionHeader(l.homeCheckInTitle),
           _CheckInTiles(checkIn: checkIn, onTap: _openCheckIn),
@@ -1296,6 +1324,87 @@ class _MilestoneCard extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Next in your routine" (T-GOL-03e): the person's next own step today.
+/// Tap to open the routine; the circle marks it done.
+class _NextRoutineRow extends StatelessWidget {
+  const _NextRoutineRow({
+    required this.item,
+    required this.onOpen,
+    required this.onDone,
+  });
+
+  final RoutineItem item;
+  final VoidCallback onOpen;
+  final VoidCallback onDone;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final time = timeLabel(context, item.time);
+    return Material(
+      key: const Key('home-routine-next'),
+      color: p.mint,
+      borderRadius: LwRadius.lgAll,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onOpen,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            LwSpacing.xs,
+            LwSpacing.xs,
+            LwSpacing.md,
+            LwSpacing.xs,
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                key: const Key('home-routine-done'),
+                tooltip: l.routineMarkDone(item.label),
+                onPressed: onDone,
+                icon: Icon(
+                  Icons.radio_button_unchecked,
+                  color: p.onTintSecondary,
+                ),
+              ),
+              ExcludeSemantics(
+                child: Icon(iconFor(item.icon), color: p.primaryDark),
+              ),
+              const SizedBox(width: LwSpacing.sm),
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  label: l.homeRoutineNextLabel(item.label, time),
+                  excludeSemantics: true,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.homeRoutineNext.toUpperCase(),
+                        style: t.labelSmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                      Text(
+                        item.label,
+                        style: t.titleSmall?.copyWith(color: p.onTint),
+                      ),
+                      Text(
+                        time,
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: p.onTint),
+            ],
+          ),
         ),
       ),
     );

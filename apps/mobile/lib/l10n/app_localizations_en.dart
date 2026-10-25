@@ -3206,4 +3206,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileRoutineRemindersOff => 'Off';
+
+  @override
+  String get homeRoutineNext => 'Next in your routine';
+
+  @override
+  String homeRoutineNextLabel(String label, String time) {
+    return 'Next in your routine: $label at $time. Open My Daily Routine.';
+  }
+
+  @override
+  String get trackChipRoutine => 'Routine';
+
+  @override
+  String get trackChartRoutineEmpty =>
+      'Build your routine on the Plan tab to see it here.';
+
+  @override
+  String trackRoutineDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count done',
+      one: '1 done',
+      zero: 'Nothing yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get widgetRoutineNext => 'Next in your routine';
+
+  @override
+  String get widgetRoutineCustom => 'Your next routine step';
+
+  @override
+  String widgetRoutineAt(String time) {
+    return 'At $time';
+  }
+
+  @override
+  String get widgetLockRoutine => 'A small step from your routine';
+
+  @override
+  String get widgetRoutineOpen => 'My routine';
 }

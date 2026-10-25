@@ -17,6 +17,11 @@ abstract final class MomentPlaceholders {
   static const timeOfDay = 'time_of_day';
   static const weeklyCount = 'weekly_count';
 
+  /// The week's routine win (T-GOL-03e): a catalog activity's approved
+  /// spoken name, never a custom label, and on how many days.
+  static const routineWin = 'routine_win';
+  static const routineWinDays = 'routine_win_days';
+
   static const all = {
     firstName,
     coachName,
@@ -27,6 +32,8 @@ abstract final class MomentPlaceholders {
     streakDays,
     timeOfDay,
     weeklyCount,
+    routineWin,
+    routineWinDays,
   };
 
   /// Typed by the person: never spoken by a cloned voice (FR-VOC-05).

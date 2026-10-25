@@ -28,6 +28,11 @@ class WidgetTexts {
     required this.routineMorning,
     required this.routineStep,
     required this.routineEvening,
+    required this.routineNext,
+    required this.routineCustom,
+    required this.routineAt,
+    required this.lockRoutine,
+    required this.routineOpen,
   });
 
   final String goodMorning;
@@ -54,6 +59,13 @@ class WidgetTexts {
   final String routineMorning;
   final String routineStep;
   final String routineEvening;
+
+  // My Daily Routine (T-GOL-03e).
+  final String routineNext;
+  final String routineCustom;
+  final String Function(String time) routineAt;
+  final String lockRoutine;
+  final String routineOpen;
 }
 
 /// Builds the widget snapshot: one recommendation now, and what it turns
@@ -136,10 +148,23 @@ class WidgetSnapshotBuilder {
     streakDays: (i.streakDays ?? 0) + 1,
     avatarThumbs: i.avatarThumbs,
     hideDetails: i.hideDetails,
+    nextRoutine: i.nextRoutine,
   );
 
   /// Which slot it is at [when], given today's state.
   static WidgetSlot slotAt(WidgetInputs i, DateTime when) {
+    final slot = _coachSlotAt(i, when);
+    // The routine's next item fills a quiet moment (T-GOL-03e); never
+    // after a safety response, when the widget stays calm and simple.
+    if ((slot == WidgetSlot.done || slot == WidgetSlot.none) &&
+        i.nextRoutine != null &&
+        !i.safetyHold) {
+      return WidgetSlot.routineItem;
+    }
+    return slot;
+  }
+
+  static WidgetSlot _coachSlotAt(WidgetInputs i, DateTime when) {
     if (!i.signedIn) return WidgetSlot.signedOut;
     if (i.stepTitle == null) return WidgetSlot.none;
     final t = ClockTime(when.hour, when.minute);
@@ -225,6 +250,24 @@ class WidgetSnapshotBuilder {
         t.evening,
         a(WidgetActionId.reflect, t.reflect),
         null,
+      ),
+      WidgetSlot.routineItem => (
+        'happy',
+        i.nextRoutine!.label ?? t.routineCustom,
+        '${t.routineNext} · ${t.routineAt(i.nextRoutine!.time)}',
+        // Generic on the lock screen when details are hidden, and always
+        // for a custom item.
+        i.hideDetails || i.nextRoutine!.label == null
+            ? t.lockRoutine
+            : i.nextRoutine!.label!,
+        WidgetAction(
+          WidgetActionId.routineDone,
+          t.done,
+          linkOverride:
+              '${WidgetActionId.routineDone.link}'
+              '&r=${Uri.encodeQueryComponent(i.nextRoutine!.payload)}',
+        ),
+        a(WidgetActionId.openRoutine, t.routineOpen),
       ),
       WidgetSlot.none => (
         'happy',

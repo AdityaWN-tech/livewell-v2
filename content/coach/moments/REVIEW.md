@@ -1,6 +1,6 @@
 # Avatar Moment scripts: clinical review (T-DLY-03)
 
-Every line the coach can say in an Avatar Moment. All are `pending` until approved; the app uses only approved lines outside the dev build. Placeholders in `{braces}` are filled from the person's own data (first name, Why, the name they gave their coach) or their plan (step, minutes); nothing else.
+Every line the coach can say in an Avatar Moment. All are `pending` until approved; the app uses only approved lines outside the dev build. Placeholders in `{braces}` are filled from the person's own data (first name, Why, the name they gave their coach), their plan (step, minutes), or an activity's approved name from the routine catalog (T-GOL-03e); nothing else.
 
 Rules the lines follow: invitations, never orders or guilt; about an 8th-grade reading level; one step plus a smaller option; steps come only from the person's plan; no portal or course mentions; safety, crisis and medical messages are never Avatar Moments (they use the safety cards and the neutral voice).
 
@@ -81,6 +81,8 @@ When: Sunday 08:00. Expression: happy. Buttons: see_week.
 | `weekly_review.w1` | This week you completed {weekly_count} steps. Great work, {first_name}! Want to see your week? | ☐ |
 | `weekly_review.w2` | Look at your week: {weekly_count} steps done. Every one counts. Shall we look at it together? | ☐ |
 | `weekly_review.w3` | A new week is a fresh start. Want to look back at your week together? | ☐ |
+| `weekly_review.w4` | You made time for {routine_win} on {routine_win_days} days this week, {first_name}! Small steps add up. Want to see your week? | ☐ |
+| `weekly_review.w5` | This week you made time for {routine_win} on {routine_win_days} days. That's a habit taking root. Want to see your week? | ☐ |
 
 ## first_hello
 

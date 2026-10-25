@@ -30,6 +30,11 @@ import '../../moments/domain/moment_builder.dart';
 import '../../moments/presentation/moment_screen.dart';
 import '../../notifications/presentation/notifications_screen.dart';
 import '../../profile/presentation/profile_button.dart';
+import '../../routine/application/routine_moment.dart';
+import '../../routine/data/routine_repository.dart';
+import '../../routine/domain/routine.dart' show RoutineStatus;
+import '../../routine/domain/routine_reminders.dart';
+import '../../routine/presentation/routine_screen.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
 import '../../starter_plan/data/reminders.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
@@ -75,6 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ref.invalidate(morningMomentProvider);
         _maybeAsk();
         _followTimeZone();
+        _routineReminders();
         _widgetDone();
       },
     );
@@ -93,6 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // No notifications on this device: Home as usual.
     }
     if (!mounted) return;
+    unawaited(_routineReminders());
     if (launch != null && await _openReminder(launch)) return;
     // The home-screen widget: a Done tapped there, and the button that
     // opened the app (T-AVT-08g-b).
@@ -135,12 +142,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (m != null && mounted) await _playMoment(moment);
   }
 
-  /// Tapping a reminder opens the coach's moment (T-DLY-03c).
+  /// Tapping a reminder opens the coach's moment (T-DLY-03c); a routine
+  /// reminder opens its own (T-GOL-03d).
   Future<bool> _openReminder(String payload) async {
+    if (parseRoutinePayload(payload) != null) {
+      await _playRoutine(payload);
+      return true;
+    }
     final m = await ref.read(momentLauncherProvider).forPayload(payload);
     if (!mounted || m == null) return false;
     _playMoment(m);
     return true;
+  }
+
+  /// A routine reminder (T-GOL-03d): the coach says its approved lines and
+  /// the items show by name; Done or Not today marks them (from the
+  /// notification), which also cancels what was still pending for them.
+  /// With nothing the coach may say (lines not approved yet, or "Coach
+  /// announces it" off), the routine opens instead.
+  Future<void> _playRoutine(String payload) async {
+    final m = await ref.read(routineMessageProvider(payload).future);
+    if (!mounted) return;
+    if (m == null) {
+      await context.push(RoutineScreen.path);
+      return;
+    }
+    final action = await context.push<MomentAction>(
+      MomentScreen.routinePath(payload),
+    );
+    final status = switch (action) {
+      MomentAction.done => RoutineStatus.done,
+      MomentAction.notToday => RoutineStatus.skipped,
+      _ => null,
+    };
+    if (status == null || !mounted) return;
+    final texts = reminderTexts(AppLocalizations.of(context));
+    await ref.read(routineReminderActionsProvider).mark(payload, status);
+    try {
+      await ref.read(planSchedulerProvider).reschedule(texts);
+    } catch (_) {
+      // Reminders are best effort; the log is saved.
+    }
   }
 
   Future<void> _playMoment(Moment m) async {
@@ -223,6 +265,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String get _today => localDateKey(ref.read(clockProvider)());
 
   /// After travel, move the plan's reminders to the new time zone.
+  /// Routine reminders are scheduled a week ahead (T-GOL-03d); opening the
+  /// app moves that week on. Only for people with routine reminders, so
+  /// nothing else is rescheduled.
+  Future<void> _routineReminders() async {
+    if (ref.read(authServiceProvider).currentUser == null) return;
+    final texts = reminderTexts(AppLocalizations.of(context));
+    try {
+      final items = await ref.read(routineRepositoryProvider).watchItems().first;
+      if (!items.any((i) => i.reminder)) return;
+      await ref.read(planSchedulerProvider).reschedule(texts);
+    } catch (_) {
+      // Reminders are a nice-to-have; never break Home over them.
+    }
+  }
+
   Future<void> _followTimeZone() async {
     if (ref.read(authServiceProvider).currentUser == null) return;
     try {
@@ -419,7 +476,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Moment.firstHello ||
             Moment.checkInGood ||
             Moment.checkInOkay ||
-            Moment.streakMilestone =>
+            Moment.streakMilestone ||
+            Moment.routineItem =>
               name == null ? l.homeBubble : l.homeBubbleNamed(name),
           },
           // The full message, when there is one to say (T-DLY-03d).

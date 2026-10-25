@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +15,10 @@ import '../../home/application/home_data.dart';
 import '../../home/domain/home_models.dart';
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/presentation/safety_screens.dart';
+import '../../starter_plan/application/plan_scheduler.dart';
+import '../../starter_plan/presentation/plan_preview_screen.dart'
+    show reminderTexts;
+import '../application/routine_moment.dart';
 import '../application/routine_data.dart';
 import '../data/routine_repository.dart';
 import '../domain/label_check.dart';
@@ -37,6 +43,43 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
   late Weekday _day = Weekday.of(ref.read(clockProvider)());
 
   RoutineActions get _actions => ref.read(routineActionsProvider);
+
+  bool _reschedulePending = false;
+
+  /// Routine reminders follow every change (T-GOL-03d): an edit, a new or
+  /// deleted item, a mode, or an item marked done (which cancels its
+  /// pending reminder). Changes in the same moment share one reschedule.
+  void _rescheduleSoon() {
+    if (_reschedulePending) return;
+    _reschedulePending = true;
+    scheduleMicrotask(() async {
+      _reschedulePending = false;
+      if (!mounted) return;
+      final texts = reminderTexts(AppLocalizations.of(context));
+      try {
+        await ref.read(planSchedulerProvider).reschedule(texts);
+      } catch (_) {
+        // Reminders are best effort; the routine is saved.
+      }
+    });
+  }
+
+  /// "Want to move or pause this one?", asked once (T-GOL-03d).
+  Future<void> _answerIgnored(RoutineItem item, String answer) async {
+    final l = AppLocalizations.of(context);
+    try {
+      await ref.read(routineAskStoreProvider).markAsked(item.itemId);
+    } catch (_) {}
+    ref.invalidate(ignoredItemProvider);
+    if (!mounted) return;
+    switch (answer) {
+      case 'move':
+        await _edit(item);
+      case 'pause':
+        await _actions.save(item.copyWith(reminder: false));
+        if (mounted) _snack(l.routineReminderPaused(item.label));
+    }
+  }
 
   Future<T?> _sheet<T>(Widget child) => showModalBottomSheet<T>(
     context: context,
@@ -231,6 +274,16 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
         ? ref.watch(routineLogsProvider(todayKey)).value ?? const {}
         : const <String, RoutineLog>{};
     final step = isToday ? ref.watch(todayStepProvider) : null;
+    final ignored = isToday ? ref.watch(ignoredItemProvider).value : null;
+    for (final p in [routineItemsProvider, routinesProvider]) {
+      ref.listen(p, (before, next) {
+        if (before?.hasValue ?? false) _rescheduleSoon();
+      });
+    }
+    ref.listen(routineModeProvider, (_, _) => _rescheduleSoon());
+    ref.listen(routineLogsProvider(todayKey), (before, next) {
+      if (before?.hasValue ?? false) _rescheduleSoon();
+    });
     final full = day.length >= maxItemsPerDay;
 
     return Scaffold(
@@ -300,6 +353,13 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
           const SizedBox(height: LwSpacing.md),
           if (step != null) ...[
             _CoachStepRow(step: step),
+            const SizedBox(height: LwSpacing.xs),
+          ],
+          if (ignored != null) ...[
+            _IgnoredCard(
+              item: ignored,
+              onAnswer: (a) => _answerIgnored(ignored, a),
+            ),
             const SizedBox(height: LwSpacing.xs),
           ],
           for (final time in clashes(day))
@@ -756,6 +816,63 @@ class _Empty extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// The coach asks once about an item whose reminder went unanswered
+/// several days in a row (T-GOL-03d). Kind, no guilt.
+class _IgnoredCard extends StatelessWidget {
+  const _IgnoredCard({required this.item, required this.onAnswer});
+
+  final RoutineItem item;
+  final ValueChanged<String> onAnswer;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    return Container(
+      key: const Key('routine-ignored'),
+      padding: const EdgeInsets.all(LwSpacing.md),
+      decoration: BoxDecoration(color: p.peach, borderRadius: LwRadius.lgAll),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.routineIgnoredTitle,
+            style: t.titleSmall?.copyWith(color: p.onTint),
+          ),
+          const SizedBox(height: LwSpacing.xxs),
+          Text(
+            l.routineIgnoredBody(item.label),
+            style: t.bodyMedium?.copyWith(color: p.onTint),
+          ),
+          const SizedBox(height: LwSpacing.xs),
+          Wrap(
+            spacing: LwSpacing.xs,
+            runSpacing: LwSpacing.xxs,
+            children: [
+              FilledButton.tonal(
+                key: const Key('routine-ignored-move'),
+                onPressed: () => onAnswer('move'),
+                child: Text(l.routineIgnoredMove),
+              ),
+              FilledButton.tonal(
+                key: const Key('routine-ignored-pause'),
+                onPressed: () => onAnswer('pause'),
+                child: Text(l.routineIgnoredPause),
+              ),
+              TextButton(
+                key: const Key('routine-ignored-keep'),
+                onPressed: () => onAnswer('keep'),
+                child: Text(l.routineIgnoredKeep),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

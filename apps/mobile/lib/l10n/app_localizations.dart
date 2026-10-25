@@ -5588,6 +5588,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Let\'s word it kindly. You deserve the same kindness you\'d give a friend.'**
   String get routineLabelUnkind;
+
+  /// My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Your routine'**
+  String get reminderRoutineTitle;
+
+  /// My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for your next step.'**
+  String get reminderRoutineBody;
+
+  /// My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen.
+  ///
+  /// In en, this message translates to:
+  /// **'A few things from your routine now.'**
+  String get reminderRoutineBundleBody;
+
+  /// My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen.
+  ///
+  /// In en, this message translates to:
+  /// **'My Daily Routine'**
+  String get reminderRoutineChannel;
+
+  /// T-GOL-03d: asked once after 5 days of ignored reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Want to move or pause this one?'**
+  String get routineIgnoredTitle;
+
+  /// T-GOL-03d.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} hasn\'t fit your day lately. That\'s okay. A new time might help, or we can pause its reminder.'**
+  String routineIgnoredBody(String label);
+
+  /// T-GOL-03d.
+  ///
+  /// In en, this message translates to:
+  /// **'Move it'**
+  String get routineIgnoredMove;
+
+  /// T-GOL-03d.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause reminder'**
+  String get routineIgnoredPause;
+
+  /// T-GOL-03d.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it'**
+  String get routineIgnoredKeep;
+
+  /// T-GOL-03d.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder paused for {label}.'**
+  String routineReminderPaused(String label);
+
+  /// T-GOL-03d: heading over the item names (text only) in a routine moment.
+  ///
+  /// In en, this message translates to:
+  /// **'In your routine now'**
+  String get routineMomentItems;
+
+  /// T-GOL-03d, Profile > Daily plan.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine reminders per day'**
+  String get profileRoutineReminders;
+
+  /// T-GOL-03d.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get profileRoutineRemindersOff;
 }
 
 class _AppLocalizationsDelegate

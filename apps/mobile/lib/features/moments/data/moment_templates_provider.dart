@@ -11,7 +11,7 @@ import '../domain/moment_templates.dart';
 /// scripts only; the dev build may use pending ones (T-DLY-03a).
 final momentBuilderProvider = FutureProvider<MomentBuilder>((ref) async {
   final templates = [
-    for (final m in Moment.values)
+    for (final m in Moment.scripted)
       MomentTemplate.parse(
         await rootBundle.loadString(
           'assets/coach/moments/${m.file}.json',

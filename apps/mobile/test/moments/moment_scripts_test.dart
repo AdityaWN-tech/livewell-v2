@@ -12,7 +12,7 @@ import 'package:livewell/features/safety/domain/safety_rules.dart';
 final contentDir = Directory('../../content/coach/moments');
 
 List<MomentTemplate> templates() => [
-  for (final m in Moment.values)
+  for (final m in Moment.scripted)
     MomentTemplate.parse(
       File('${contentDir.path}/${m.file}.json').readAsStringSync(),
     ),
@@ -59,7 +59,7 @@ double grade(String text) {
 void main() {
   group('the script files (content/coach/moments)', () {
     test('the app copy matches content/coach/moments', () {
-      for (final m in Moment.values) {
+      for (final m in Moment.scripted) {
         expect(
           File('assets/coach/moments/${m.file}.json').readAsStringSync(),
           File('${contentDir.path}/${m.file}.json').readAsStringSync(),
@@ -74,7 +74,7 @@ void main() {
 
     test('every moment, several variants each, all pending review', () {
       final all = templates();
-      expect(all.map((t) => t.moment).toSet(), Moment.values.toSet());
+      expect(all.map((t) => t.moment).toSet(), Moment.scripted.toSet());
       for (final t in all) {
         expect(
           t.variants.length,
@@ -178,7 +178,7 @@ void main() {
 
   group('the builder', () {
     test('every moment renders with all its data filled in', () {
-      for (final m in Moment.values) {
+      for (final m in Moment.scripted) {
         final msg = builder().build(m, full())!;
         expect(msg.text, isNot(contains('{')), reason: m.file);
         expect(msg.text, isNot(contains('}')), reason: m.file);
@@ -213,7 +213,7 @@ void main() {
     });
 
     test('a different line each day: never the same two days in a row', () {
-      for (final m in Moment.values) {
+      for (final m in Moment.scripted) {
         String? yesterday;
         for (var d = 0; d < 30; d++) {
           final id = builder()
@@ -302,13 +302,13 @@ void main() {
         step: walk,
         safetyHold: true,
       );
-      for (final m in Moment.values) {
+      for (final m in Moment.scripted) {
         expect(builder().build(m, held), isNull, reason: m.file);
       }
     });
 
     test('prod: approved scripts only (all are pending today)', () {
-      for (final m in Moment.values) {
+      for (final m in Moment.scripted) {
         expect(builder(approvedOnly: true).build(m, full()), isNull);
       }
     });

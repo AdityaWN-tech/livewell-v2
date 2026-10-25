@@ -95,6 +95,9 @@ abstract final class ProfileSettings {
 
   /// My Daily Routine's life-event mode (T-GOL-03b): {kind, until}.
   static const routineMode = 'routine_mode';
+
+  /// "Routine reminders per day" (T-GOL-03d): 0 (off) to 10, default 6.
+  static const routineRemindersPerDay = 'routine_reminders_per_day';
   static const displayName = 'display_name';
 
   static const keys = [
@@ -104,6 +107,7 @@ abstract final class ProfileSettings {
     notificationCategories,
     touchpoints,
     routineMode,
+    routineRemindersPerDay,
   ];
 }
 

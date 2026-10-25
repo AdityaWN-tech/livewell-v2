@@ -3163,4 +3163,47 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get routineLabelUnkind =>
       'Let\'s word it kindly. You deserve the same kindness you\'d give a friend.';
+
+  @override
+  String get reminderRoutineTitle => 'Your routine';
+
+  @override
+  String get reminderRoutineBody => 'Time for your next step.';
+
+  @override
+  String get reminderRoutineBundleBody => 'A few things from your routine now.';
+
+  @override
+  String get reminderRoutineChannel => 'My Daily Routine';
+
+  @override
+  String get routineIgnoredTitle => 'Want to move or pause this one?';
+
+  @override
+  String routineIgnoredBody(String label) {
+    return '$label hasn\'t fit your day lately. That\'s okay. A new time might help, or we can pause its reminder.';
+  }
+
+  @override
+  String get routineIgnoredMove => 'Move it';
+
+  @override
+  String get routineIgnoredPause => 'Pause reminder';
+
+  @override
+  String get routineIgnoredKeep => 'Keep it';
+
+  @override
+  String routineReminderPaused(String label) {
+    return 'Reminder paused for $label.';
+  }
+
+  @override
+  String get routineMomentItems => 'In your routine now';
+
+  @override
+  String get profileRoutineReminders => 'Routine reminders per day';
+
+  @override
+  String get profileRoutineRemindersOff => 'Off';
 }

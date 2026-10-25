@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../routine/domain/routine_reminders.dart';
 import '../domain/touchpoints.dart';
 
 /// What a reminder says, in the coach's voice. Generic on purpose: nothing
@@ -24,6 +25,10 @@ class ReminderTexts {
     required this.weeklyTitle,
     required this.weeklyBody,
     required this.channelName,
+    required this.routineTitle,
+    required this.routineBody,
+    required this.routineBundleBody,
+    required this.routineChannelName,
   });
 
   final String greetingTitle;
@@ -35,6 +40,15 @@ class ReminderTexts {
   final String weeklyTitle;
   final String weeklyBody;
   final String channelName;
+
+  /// Routine reminders (T-GOL-03d): generic too, never an item's name
+  /// (custom labels are the person's own words).
+  final String routineTitle;
+  final String routineBody;
+
+  /// Two or more items close together.
+  final String routineBundleBody;
+  final String routineChannelName;
 
   (String, String) of(TouchpointKind k) => switch (k) {
     TouchpointKind.greeting => (greetingTitle, greetingBody),
@@ -49,13 +63,14 @@ abstract class Reminders {
   /// Asks the OS for permission (Android 13+, iOS). True when allowed.
   Future<bool> requestPermission();
 
-  /// Replaces every scheduled reminder with [items]. [faces] are the
-  /// coach's face for each kind (PNG files), shown beside the text where
-  /// the lock screen can't show it.
+  /// Replaces every scheduled reminder with [items] and the routine's
+  /// [routine] reminders. [faces] are the coach's face for each kind (PNG
+  /// files), shown beside the text where the lock screen can't show it.
   Future<void> replaceAll(
     List<ScheduledTouchpoint> items,
     ReminderTexts t, {
     Map<TouchpointKind, String> faces = const {},
+    List<RoutineReminder> routine = const [],
   });
 
   Future<void> cancelAll();
@@ -73,8 +88,8 @@ abstract class Reminders {
     required String channelName,
   });
 
-  /// The payload (a [TouchpointKind] name) of each reminder tapped while
-  /// the app runs.
+  /// The payload (a [TouchpointKind] name, or a routine payload) of each
+  /// reminder tapped while the app runs.
   Stream<String> get taps;
 
   /// The payload of the reminder that started the app, once; then null.
@@ -151,13 +166,16 @@ class LocalReminders implements Reminders {
     List<ScheduledTouchpoint> items,
     ReminderTexts t, {
     Map<TouchpointKind, String> faces = const {},
+    List<RoutineReminder> routine = const [],
   }) async {
     await _init();
     await _plugin.cancelAll();
-    NotificationDetails details(String? face) => NotificationDetails(
+    NotificationDetails details(String? face, {bool isRoutine = false}) =>
+        NotificationDetails(
       android: AndroidNotificationDetails(
-        'daily_plan',
-        t.channelName,
+        // Its own channel, so routine reminders can be muted on their own.
+        isRoutine ? 'routine' : 'daily_plan',
+        isRoutine ? t.routineChannelName : t.channelName,
         importance: Importance.defaultImportance,
         // Even the generic text stays hidden on a locked screen, and the
         // coach's face with it.
@@ -178,6 +196,20 @@ class LocalReminders implements Reminders {
         notificationDetails: details(faces[i.kind]),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         payload: i.kind.name,
+      );
+    }
+    for (final r in routine) {
+      await _plugin.zonedSchedule(
+        id: r.id,
+        title: t.routineTitle,
+        body: r.itemIds.length > 1 ? t.routineBundleBody : t.routineBody,
+        scheduledDate: tz.TZDateTime.from(r.when, tz.local),
+        notificationDetails: details(
+          faces[TouchpointKind.nudge],
+          isRoutine: true,
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: r.payload,
       );
     }
   }

@@ -14,6 +14,7 @@ import '../../auth/data/firebase_auth_service.dart';
 import '../../auth/domain/auth.dart';
 import '../../auth/presentation/auth_copy.dart';
 import '../../home/application/home_data.dart';
+import '../../routine/domain/routine_reminders.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
 import '../../starter_plan/data/plan_repository.dart';
 import '../../starter_plan/domain/touchpoints.dart';
@@ -276,6 +277,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         : QuietHours(start: quiet.start, end: t);
     await ref.read(profileRepositoryProvider).updateSettings(_uid, {
       ProfileSettings.quietHours: next.toMap(),
+    });
+    ref.invalidate(currentProfileProvider);
+    await _reschedule();
+  }
+
+  /// "Routine reminders per day" (T-GOL-03d): 0 (off) to 10.
+  Future<void> _setRoutinePerDay(int n) async {
+    if (!_signedIn) return;
+    await ref.read(profileRepositoryProvider).updateSettings(_uid, {
+      ProfileSettings.routineRemindersPerDay: n,
     });
     ref.invalidate(currentProfileProvider);
     await _reschedule();
@@ -590,6 +601,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       title: Text(l.profileQuietEnd),
                       trailing: Text(_fmt(quiet.end), style: t.labelLarge),
                       onTap: () => _editQuiet(quiet, start: false),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.wb_sunny_outlined),
+                      title: Text(l.profileRoutineReminders),
+                      trailing: DropdownButton<int>(
+                        key: const Key('profile-routine-reminders'),
+                        value: routineRemindersPerDay(
+                          settings[ProfileSettings.routineRemindersPerDay],
+                        ),
+                        underline: const SizedBox.shrink(),
+                        onChanged: (n) => n == null ? null : _setRoutinePerDay(n),
+                        items: [
+                          for (var n = 0; n <= routineRemindersMax; n++)
+                            DropdownMenuItem(
+                              value: n,
+                              child: Text(
+                                n == 0 ? l.profileRoutineRemindersOff : '$n',
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ],
                 );

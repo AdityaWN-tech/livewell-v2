@@ -169,8 +169,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             Moment.byFile(state.pathParameters['name'] ?? '') == null
             ? '/home'
             : null,
-        builder: (context, state) =>
-            MomentScreen(moment: Moment.byFile(state.pathParameters['name']!)!),
+        builder: (context, state) => MomentScreen(
+          moment: Moment.byFile(state.pathParameters['name']!)!,
+          // A routine reminder's payload (T-GOL-03d).
+          routine: state.uri.queryParameters['r'],
+        ),
       ),
       // Today's reminders, from the bell on Home (T-UI-02i).
       GoRoute(

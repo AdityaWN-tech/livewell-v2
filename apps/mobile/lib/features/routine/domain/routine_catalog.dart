@@ -241,6 +241,22 @@ class RoutineCatalog {
     required String time,
     required bool approvedOnly,
     int pick = 0,
+  }) => pickLine(
+    item,
+    firstName: firstName,
+    time: time,
+    approvedOnly: approvedOnly,
+    pick: pick,
+  )?.text;
+
+  /// [spokenLine] with the id of the line it used ("drink_water.d1" or
+  /// "custom.c1"), for the message_id the voice layer checks (FR-VOC-05).
+  ({String id, String text, bool usedName})? pickLine(
+    RoutineItem item, {
+    String? firstName,
+    required String time,
+    required bool approvedOnly,
+    int pick = 0,
   }) {
     if (approvedOnly && !approved) return null;
     final candidates = item.custom
@@ -256,11 +272,16 @@ class RoutineCatalog {
         if (values.keys.toSet().containsAll(l.placeholders)) l,
     ];
     if (usable.isEmpty) return null;
-    var text = usable[pick % usable.length].text;
+    final line = usable[pick % usable.length];
+    var text = line.text;
     for (final e in values.entries) {
       text = text.replaceAll('{${e.key}}', e.value);
     }
-    return text;
+    return (
+      id: '${item.custom ? 'custom' : item.catalogId}.${line.id}',
+      text: text,
+      usedName: line.placeholders.contains(RoutinePlaceholders.firstName),
+    );
   }
 }
 

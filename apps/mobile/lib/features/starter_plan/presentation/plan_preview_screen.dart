@@ -33,6 +33,10 @@ ReminderTexts reminderTexts(AppLocalizations l) => ReminderTexts(
   weeklyTitle: l.reminderWeeklyTitle,
   weeklyBody: l.reminderWeeklyBody,
   channelName: l.reminderChannel,
+  routineTitle: l.reminderRoutineTitle,
+  routineBody: l.reminderRoutineBody,
+  routineBundleBody: l.reminderRoutineBundleBody,
+  routineChannelName: l.reminderRoutineChannel,
 );
 
 /// "Your 7 days" (T-ONB-03e): the rule-based starter plan with its 3 daily

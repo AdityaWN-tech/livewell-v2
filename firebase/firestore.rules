@@ -63,6 +63,7 @@ service cloud.firestore {
                 'focus_choices', 'activity_limited', 'touchpoints',
                 'coach_name', 'appearance', 'quiet_hours',
                 'notification_categories', 'routine_mode',
+                'routine_reminders_per_day',
                 'why_statement', 'created_at', 'updated_at', 'schema_version'];
       }
 
@@ -117,7 +118,12 @@ service cloud.firestore {
                       || (d.routine_mode.keys().hasOnly(['kind', 'until'])
                           && d.routine_mode.kind in ['travel', 'sick', 'busy']
                           && d.routine_mode.until is string
-                          && d.routine_mode.until.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))));
+                          && d.routine_mode.until.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))))
+          // Routine reminders per day (T-GOL-03d): 0 (off) to 10.
+          && (!('routine_reminders_per_day' in d)
+              || (d.routine_reminders_per_day is int
+                  && d.routine_reminders_per_day >= 0
+                  && d.routine_reminders_per_day <= 10));
       }
 
       // Morning / midday / evening touchpoint times, "HH:MM" (T-ONB-03e).

@@ -9,6 +9,8 @@ import '../../../l10n/app_localizations.dart';
 import '../../avatar/domain/coach_face.dart';
 import '../../avatar/presentation/coach_avatar.dart'
     show avatarIdleMotionProvider, coachBackgroundProvider, coachImagesProvider;
+import '../../routine/application/routine_moment.dart';
+import '../../routine/presentation/routine_sheets.dart' show iconFor;
 import '../../voice/presentation/voice_screen.dart' show AiVoiceLabel;
 import '../application/coach_state.dart';
 import '../application/moment_context.dart';
@@ -46,11 +48,18 @@ String actionLabel(AppLocalizations l, MomentAction a) => switch (a) {
 /// Fallbacks (FR-AVT-05): voice + moving avatar → still avatar + voice
 /// (reduced motion) → text only (muted, or the voice can't start).
 class MomentScreen extends ConsumerStatefulWidget {
-  const MomentScreen({super.key, required this.moment});
+  const MomentScreen({super.key, required this.moment, this.routine});
 
   final Moment moment;
 
+  /// A routine reminder's payload, for [Moment.routineItem] (T-GOL-03d).
+  final String? routine;
+
   static String pathFor(Moment m) => '/moment/${m.file}';
+
+  /// The moment of a routine reminder (T-GOL-03d).
+  static String routinePath(String payload) =>
+      '/moment/${Moment.routineItem.file}?r=${Uri.encodeQueryComponent(payload)}';
 
   @override
   ConsumerState<MomentScreen> createState() => _MomentScreenState();
@@ -193,7 +202,10 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
-    final async = ref.watch(coachMessageProvider(widget.moment));
+    final routine = widget.moment == Moment.routineItem;
+    final async = routine
+        ? ref.watch(routineMessageProvider(widget.routine ?? ''))
+        : ref.watch(coachMessageProvider(widget.moment));
     final background = ref.watch(coachBackgroundProvider);
     final m = async.value;
     if (m != null && _message == null) {
@@ -265,6 +277,12 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
                         )
                       else ...[
                         _Bubble(text: m.text, revealed: _revealed),
+                        // The items by name, as text only: a custom label
+                        // is never spoken (FR-VOC-05).
+                        if (routine) ...[
+                          const SizedBox(height: LwSpacing.xs),
+                          _RoutineItems(payload: widget.routine ?? ''),
+                        ],
                         if (_textOnly) ...[
                           const SizedBox(height: LwSpacing.xs),
                           Text(
@@ -469,6 +487,57 @@ class _Controls extends StatelessWidget {
             child: Text(l.momentSkip),
           ),
       ],
+    );
+  }
+}
+
+/// The items of a routine reminder, by name (T-GOL-03d).
+class _RoutineItems extends ConsumerWidget {
+  const _RoutineItems({required this.payload});
+
+  final String payload;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = Theme.of(context).textTheme;
+    final ink = LwPalette.light;
+    final items = ref.watch(routineReminderItemsProvider(payload)).value;
+    if (items == null || items.isEmpty) return const SizedBox.shrink();
+    return Container(
+      key: const Key('moment-routine-items'),
+      padding: const EdgeInsets.all(LwSpacing.sm),
+      decoration: BoxDecoration(
+        color: ink.surface.withValues(alpha: 0.9),
+        borderRadius: LwRadius.mdAll,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.routineMomentItems,
+            style: t.labelMedium?.copyWith(color: ink.textSecondary),
+          ),
+          for (final i in items)
+            Padding(
+              padding: const EdgeInsets.only(top: LwSpacing.xxs),
+              child: Row(
+                children: [
+                  ExcludeSemantics(
+                    child: Icon(iconFor(i.icon), color: ink.primaryDark),
+                  ),
+                  const SizedBox(width: LwSpacing.xs),
+                  Expanded(
+                    child: Text(
+                      i.label,
+                      style: t.titleSmall?.copyWith(color: ink.textPrimary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

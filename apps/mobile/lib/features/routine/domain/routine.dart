@@ -60,6 +60,7 @@ class RoutineItem {
     this.reminder = true,
     this.avatarAnnounce = true,
     this.order = 0,
+    this.addedAt,
   });
 
   final String itemId;
@@ -89,6 +90,9 @@ class RoutineItem {
 
   /// Position among items at the same time (drag to reorder).
   final int order;
+
+  /// When it was first saved (the document's created_at); null until then.
+  final DateTime? addedAt;
 
   bool get custom => catalogId == null;
 
@@ -128,6 +132,7 @@ class RoutineItem {
     reminder: reminder ?? this.reminder,
     avatarAnnounce: avatarAnnounce ?? this.avatarAnnounce,
     order: order ?? this.order,
+    addedAt: addedAt,
   );
 }
 

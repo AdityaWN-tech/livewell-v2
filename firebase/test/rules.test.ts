@@ -384,6 +384,22 @@ describe('routine mode (T-GOL-03b: travel, sick day, busy week)', () => {
   });
 });
 
+describe('routine reminders per day (T-GOL-03d)', () => {
+  const upd = (o: Record<string, unknown>) =>
+    updateDoc(doc(as(ALICE), 'users/alice'), { ...o, updated_at: meta().updated_at });
+
+  it('0 (off) to 10', async () => {
+    await seedAdult(env);
+    await assertSucceeds(upd({ routine_reminders_per_day: 0 }));
+    await assertSucceeds(upd({ routine_reminders_per_day: 6 }));
+    await assertSucceeds(upd({ routine_reminders_per_day: 10 }));
+    await assertFails(upd({ routine_reminders_per_day: 11 }));
+    await assertFails(upd({ routine_reminders_per_day: -1 }));
+    await assertFails(upd({ routine_reminders_per_day: 2.5 }));
+    await assertFails(upd({ routine_reminders_per_day: '6' }));
+  });
+});
+
 describe('library voices (T-ONB-03c: chosen in the app)', () => {
   const lib = (o: Record<string, unknown> = {}) => ({
     kind: 'library', vendor_voice_id: 'kokoro:af_heart', status: 'active', speed: 1, style: 'calm', ...meta(), ...o,

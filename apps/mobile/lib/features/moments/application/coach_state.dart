@@ -22,7 +22,8 @@ AvatarExpression faceForMoment(Moment m) => switch (m) {
   Moment.missedDay ||
   Moment.weeklyReview ||
   Moment.checkInGood ||
-  Moment.checkInOkay => AvatarExpression.happy,
+  Moment.checkInOkay ||
+  Moment.routineItem => AvatarExpression.happy,
 };
 
 /// Voice off: the moments show text only and celebrations are silent.

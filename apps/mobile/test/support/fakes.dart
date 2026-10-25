@@ -20,6 +20,8 @@ import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
+import 'package:livewell/features/routine/application/routine_moment.dart';
+import 'package:livewell/features/routine/domain/routine_reminders.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
 import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
@@ -562,6 +564,7 @@ class FakeReminders implements Reminders {
   bool allow = true;
   int permissionAsks = 0;
   List<ScheduledTouchpoint> scheduled = [];
+  List<RoutineReminder> routine = [];
   ReminderTexts? texts;
   Map<TouchpointKind, String> faces = const {};
   int cancels = 0;
@@ -587,8 +590,10 @@ class FakeReminders implements Reminders {
     List<ScheduledTouchpoint> items,
     ReminderTexts t, {
     Map<TouchpointKind, String> faces = const {},
+    List<RoutineReminder> routine = const [],
   }) async {
     scheduled = items;
+    this.routine = routine;
     texts = t;
     this.faces = faces;
   }
@@ -931,4 +936,15 @@ class FakeWidgetInbox implements WidgetInbox {
     done = null;
     return d;
   }
+}
+
+/// "Want to move or pause this one?" answered, in memory (T-GOL-03d).
+class FakeRoutineAskStore implements RoutineAskStore {
+  final ids = <String>{};
+
+  @override
+  Future<Set<String>> asked() async => {...ids};
+
+  @override
+  Future<void> markAsked(String itemId) async => ids.add(itemId);
 }

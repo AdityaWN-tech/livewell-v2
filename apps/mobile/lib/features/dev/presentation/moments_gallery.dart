@@ -19,7 +19,7 @@ class MomentsGallery extends StatelessWidget {
     body: ListView(
       padding: const EdgeInsets.all(LwSpacing.screenGutter),
       children: [
-        for (final m in Moment.values)
+        for (final m in Moment.scripted)
           Card(
             child: ListTile(
               key: Key('dev-moment-${m.file}'),

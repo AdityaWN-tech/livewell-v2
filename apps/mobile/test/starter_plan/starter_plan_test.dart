@@ -51,6 +51,10 @@ const texts = ReminderTexts(
   weeklyTitle: 'Your week',
   weeklyBody: 'A look back.',
   channelName: 'Daily plan',
+  routineTitle: 'Your routine',
+  routineBody: 'Time for your next step.',
+  routineBundleBody: 'A few things from your routine now.',
+  routineChannelName: 'My Daily Routine',
 );
 
 void main() {

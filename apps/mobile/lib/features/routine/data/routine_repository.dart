@@ -54,6 +54,10 @@ abstract class RoutineRepository {
   /// The day's logs (yyyy-mm-dd), live.
   Stream<List<RoutineLog>> watchLogs(String date);
 
+  /// Logs from [from] to [to] (yyyy-mm-dd, inclusive). Offline: what the
+  /// phone has.
+  Future<List<RoutineLog>> logsBetween(String from, String to);
+
   /// Marks an item done or skipped for a day. Idempotent: the log's id is
   /// date_itemId, so the same item marked twice is one log.
   Future<void> saveLog(RoutineLog log);
@@ -118,6 +122,20 @@ class FirestoreRoutineRepository implements RoutineRepository {
       .where('date', isEqualTo: date)
       .snapshots()
       .map((s) => [for (final d in s.docs) ?logFrom(d.data())]);
+
+  @override
+  Future<List<RoutineLog>> logsBetween(String from, String to) async {
+    final query = _logs
+        .where('date', isGreaterThanOrEqualTo: from)
+        .where('date', isLessThanOrEqualTo: to);
+    QuerySnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await query.get().timeout(serverWait);
+    } catch (_) {
+      snap = await query.get(const GetOptions(source: Source.cache));
+    }
+    return [for (final d in snap.docs) ?logFrom(d.data())];
+  }
 
   @override
   Future<void> saveLog(RoutineLog log) {
@@ -223,6 +241,7 @@ class FirestoreRoutineRepository implements RoutineRepository {
         reminder: d['reminder'] as bool? ?? false,
         avatarAnnounce: d['avatar_announce'] as bool? ?? false,
         order: d['order'] as int? ?? 0,
+        addedAt: (d['created_at'] as Timestamp?)?.toDate(),
       );
     } on TypeError {
       return null;
@@ -284,7 +303,22 @@ class InMemoryRoutineRepository implements RoutineRepository {
   @override
   Future<void> saveItem(RoutineItem item) async {
     if (!item.isValid) throw ArgumentError('invalid item ${item.itemId}');
-    _items[item.itemId] = item;
+    // Like created_at: set on the first save, kept after.
+    final added = _items[item.itemId]?.addedAt ?? item.addedAt ?? DateTime.now();
+    _items[item.itemId] = RoutineItem(
+      itemId: item.itemId,
+      routineId: item.routineId,
+      catalogId: item.catalogId,
+      label: item.label,
+      icon: item.icon,
+      time: item.time,
+      durationMin: item.durationMin,
+      days: item.days,
+      reminder: item.reminder,
+      avatarAnnounce: item.avatarAnnounce,
+      order: item.order,
+      addedAt: added,
+    );
     _changes.add(null);
   }
 
@@ -302,6 +336,12 @@ class InMemoryRoutineRepository implements RoutineRepository {
     yield _day(date);
     yield* _changes.stream.map((_) => _day(date));
   }
+
+  @override
+  Future<List<RoutineLog>> logsBetween(String from, String to) async => [
+    for (final l in _logs.values)
+      if (l.date.compareTo(from) >= 0 && l.date.compareTo(to) <= 0) l,
+  ];
 
   @override
   Future<void> saveLog(RoutineLog log) async {

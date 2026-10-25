@@ -14,7 +14,14 @@ enum Moment {
   firstHello,
   checkInGood,
   checkInOkay,
-  streakMilestone;
+  streakMilestone,
+  // T-GOL-03d: a My Daily Routine reminder. Its lines come from the
+  // routine catalog (content/routine/catalog.json), not a script file.
+  routineItem;
+
+  /// The moments with a script file in content/coach/moments.
+  static List<Moment> get scripted =>
+      values.where((m) => m != routineItem).toList();
 
   /// The template file name in content/coach/moments.
   String get file => switch (this) {
@@ -29,6 +36,7 @@ enum Moment {
     Moment.checkInGood => 'checkin_good',
     Moment.checkInOkay => 'checkin_okay',
     Moment.streakMilestone => 'streak_milestone',
+    Moment.routineItem => 'routine_item',
   };
 
   static Moment? byFile(String name) =>

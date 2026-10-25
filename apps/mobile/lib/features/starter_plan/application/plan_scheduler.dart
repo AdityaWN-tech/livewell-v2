@@ -10,6 +10,7 @@ import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
 import '../../home/application/home_data.dart' show coachNameProvider;
 import '../../moments/data/coach_faces.dart';
+import '../../routine/application/routine_moment.dart';
 import '../data/plan_repository.dart';
 import '../data/reminders.dart';
 import '../domain/touchpoints.dart';
@@ -47,12 +48,13 @@ class PlanScheduler {
         ? const <String, dynamic>{}
         : (await _ref.read(profileRepositoryProvider).get(uid))?.settings ??
               const <String, dynamic>{};
+    final quiet = QuietHours.fromMap(
+      settings[ProfileSettings.quietHours] as Map<String, dynamic>?,
+    );
     final items = TouchpointScheduler.build(
       days: [for (final d in dates) DateTime.parse(d)],
       times: await plans.loadTimes(),
-      quiet: QuietHours.fromMap(
-        settings[ProfileSettings.quietHours] as Map<String, dynamic>?,
-      ),
+      quiet: quiet,
       consent: true,
       now: now,
       enabled: enabledFromMap(
@@ -60,10 +62,18 @@ class PlanScheduler {
             as Map<String, dynamic>?,
       ),
     );
-    final faces = items.isEmpty
+    // My Daily Routine (T-GOL-03d): its own category and cap, same quiet
+    // hours, scheduled in the same pass so neither wipes the other.
+    final routine = await routineRemindersFor(
+      _ref,
+      now: now,
+      settings: settings,
+      quiet: quiet,
+    );
+    final faces = items.isEmpty && routine.isEmpty
         ? const <TouchpointKind, String>{}
         : await _faces();
-    await reminders.replaceAll(items, texts, faces: faces);
+    await reminders.replaceAll(items, texts, faces: faces, routine: routine);
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());
   }
 

@@ -139,6 +139,16 @@ def test_inclusive_options_are_there() -> None:
     assert {"hijab", "turban", "kippah"} <= ids("head_covering")
     assert {"hearing_aid", "wheelchair"} <= ids("accessories")
     assert {"grey", "white"} <= ids("hair_colour")
+    # FR-AVT-02 minimums (spec 7.2).
+    assert len(ids("hairstyle")) >= 20
+    assert len(ids("body_type")) >= 6
+
+
+def test_body_type_reaches_the_build_prompt() -> None:
+    text = OPTIONS.fill(PROMPTS.build, {**BUILT, "body_type": "broad"}, PROMPTS.master)
+    assert "Build: broad-shouldered build." in text
+    # Not chosen: a neutral default, never a missing placeholder.
+    assert "Build: average build." in OPTIONS.fill(PROMPTS.build, BUILT, PROMPTS.master)
 
 
 def test_selfie_and_adjust_prompts() -> None:

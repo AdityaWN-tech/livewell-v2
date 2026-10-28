@@ -18,7 +18,7 @@ The single source of the prompts used to make the coach's 3D avatar and its 14-f
 > Using the attached photo as the identity reference, create a portrait of the same adult person in this style: [MASTER STYLE]. Keep their face shape, skin tone, eye shape, nose, eyebrows, facial hair, hair colour and hairstyle so they are clearly recognizable, and keep their real age. Expression: warm happy smile, eyes open, looking at the camera. Pose: shoulders straight, hands not visible. Clothing: [OUTFIT]. Head covering or accessories only if requested: [ACCESSORIES].
 
 **Build my own (from options)**
-> Create an original adult character in this style: [MASTER STYLE]. Age: [AGE RANGE]. Face shape: [FACE]. Skin tone: [SKIN]. Eyes: [EYES]. Eyebrows: [EYEBROWS]. Nose: [NOSE]. Lips: [LIPS]. Hair: [HAIRSTYLE], [HAIR COLOUR]. Facial hair: [FACIAL HAIR]. Clothing: [OUTFIT] in [OUTFIT COLOUR]. Head covering, hat or accessories: [ACCESSORIES]. Expression: warm happy smile, eyes open, looking at the camera. Pose: shoulders straight, hands not visible.
+> Create an original adult character in this style: [MASTER STYLE]. Age: [AGE RANGE]. Face shape: [FACE]. Build: [BODY TYPE]. Skin tone: [SKIN]. Eyes: [EYES]. Eyebrows: [EYEBROWS]. Nose: [NOSE]. Lips: [LIPS]. Hair: [HAIRSTYLE], [HAIR COLOUR]. Facial hair: [FACIAL HAIR]. Clothing: [OUTFIT] in [OUTFIT COLOUR]. Head covering, hat or accessories: [ACCESSORIES]. Expression: warm happy smile, eyes open, looking at the camera. Pose: shoulders straight, hands not visible.
 
 (Option values come from fixed lists in `/content/avatar/options.json`; no free text from users.)
 

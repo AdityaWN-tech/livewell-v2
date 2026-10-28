@@ -32,6 +32,8 @@ Future<void> tapKey(WidgetTester tester, String key) async {
     );
   }
   await tester.ensureVisible(f);
+  // Lay out the scrolled position before tapping it.
+  await tester.pump();
   await tester.tap(f);
   await tester.pumpAndSettle();
 }

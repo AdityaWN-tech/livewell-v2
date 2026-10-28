@@ -10,6 +10,7 @@ class FeatureFlags {
     this.voiceClone = false,
     this.drGokulaVoice = false,
     this.avatarFromPhoto = false,
+    this.avatarMaker = false,
   });
 
   /// Morning briefing player (FR-DLY-01). Off until briefings are generated.
@@ -30,6 +31,12 @@ class FeatureFlags {
   /// "Make me from my photo" in the Avatar Studio (T-AVT-08e). Off in prod
   /// until counsel review (T-CMP-02).
   final bool avatarFromPhoto;
+
+  /// "Build my own" and "Adjust" in the Avatar Studio (T-AVT-08c). Off
+  /// until the Media Service is deployed (GPU on Blaze, D-39) and its
+  /// prompts and options are reviewed; also hidden while the service isn't
+  /// set up in the app.
+  final bool avatarMaker;
 }
 
 final featureFlagsProvider = Provider<FeatureFlags>(

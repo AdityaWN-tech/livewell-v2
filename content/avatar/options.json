@@ -1,7 +1,7 @@
 {
   "version": 1,
   "review_status": "pending",
-  "note": "T-AVT-08c. The fixed option lists for Build my own and Adjust. Only these values ever reach an image prompt (docs/design/avatar-prompts.md); users never type into a prompt. Adults only: age ranges start at the 20s. Labels are what the app shows; prompt is the words used in the prompt. Needs design and inclusion review.",
+  "note": "T-AVT-08c. The fixed option lists for Build my own and Adjust. Only these values ever reach an image prompt (docs/design/avatar-prompts.md); users never type into a prompt. Adults only: age ranges start at the 20s. Labels are what the app shows; prompt is the words used in the prompt. Step 1 (2026-10-25): 20 hairstyles and 6 body types to meet FR-AVT-02 (8+ skin tones, 20 hairstyles, 6 body types, ages, glasses, head coverings incl. hijab, turban and kippah, a wheelchair and hearing aids). Needs design and inclusion review.",
   "categories": [
     {
       "id": "age_range",
@@ -72,6 +72,42 @@
           "id": "soft",
           "label": "Soft",
           "prompt": "soft rounded features"
+        }
+      ]
+    },
+    {
+      "id": "body_type",
+      "placeholder": "BODY TYPE",
+      "options": [
+        {
+          "id": "slim",
+          "label": "Slim",
+          "prompt": "slim build"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "prompt": "average build"
+        },
+        {
+          "id": "athletic",
+          "label": "Athletic",
+          "prompt": "athletic build"
+        },
+        {
+          "id": "broad",
+          "label": "Broad",
+          "prompt": "broad-shouldered build"
+        },
+        {
+          "id": "curvy",
+          "label": "Curvy",
+          "prompt": "curvy build"
+        },
+        {
+          "id": "larger",
+          "label": "Larger",
+          "prompt": "larger, fuller build"
         }
       ]
     },
@@ -323,6 +359,46 @@
           "id": "ponytail",
           "label": "Ponytail",
           "prompt": "hair in a ponytail"
+        },
+        {
+          "id": "pixie",
+          "label": "Pixie cut",
+          "prompt": "short pixie-cut hair"
+        },
+        {
+          "id": "bob",
+          "label": "Bob",
+          "prompt": "chin-length bob haircut"
+        },
+        {
+          "id": "side_part",
+          "label": "Side part",
+          "prompt": "short hair with a neat side part"
+        },
+        {
+          "id": "slicked_back",
+          "label": "Slicked back",
+          "prompt": "slicked-back hair"
+        },
+        {
+          "id": "afro",
+          "label": "Afro",
+          "prompt": "a rounded natural afro"
+        },
+        {
+          "id": "locs",
+          "label": "Locs",
+          "prompt": "shoulder-length locs"
+        },
+        {
+          "id": "cornrows",
+          "label": "Cornrows",
+          "prompt": "neat cornrows"
+        },
+        {
+          "id": "top_knot",
+          "label": "Top knot",
+          "prompt": "hair tied in a top knot"
         }
       ]
     },

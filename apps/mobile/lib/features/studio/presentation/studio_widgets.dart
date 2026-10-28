@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/feature_flags.dart';
 import '../../../core/design/avatar/avatar_art.dart';
-import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/domain/coaches.dart';
@@ -197,21 +196,6 @@ class CoachGrid extends ConsumerWidget {
         );
       },
     );
-  }
-}
-
-/// A tab whose work needs the Media Service, which isn't built yet
-/// (T-AVT-08c to 08e): what it will do, and that it is coming.
-class StudioComingSoon extends StatelessWidget {
-  const StudioComingSoon({super.key, required this.title, required this.body});
-
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    return LwCard(title: title, body: body, eyebrow: l.studioSoon);
   }
 }
 
@@ -514,13 +498,6 @@ class BackgroundChoices extends StatelessWidget {
       l.avatarBgLavender,
       l.avatarBgSunshine,
     ];
-    // Scene art comes with the art kit (studio_bg_* in the asset brief).
-    final scenes = [
-      ('garden', l.studioSceneGarden, l.studioSceneSoon),
-      ('sunrise', l.studioSceneSunrise, l.studioSceneSoon),
-      ('room', l.studioSceneRoom, l.studioSceneSoon),
-      ('beach', l.studioSceneBeach, l.studioLocked(7)),
-    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -566,21 +543,6 @@ class BackgroundChoices extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: LwSpacing.lg),
-        Semantics(
-          header: true,
-          child: Text(l.studioScenes, style: t.titleMedium),
-        ),
-        const SizedBox(height: LwSpacing.xs),
-        for (final (id, name, note) in scenes) ...[
-          VoiceRow(
-            key: Key('studio-scene-$id'),
-            icon: Icons.landscape_outlined,
-            name: name,
-            detail: note,
-          ),
-          const SizedBox(height: LwSpacing.xs),
-        ],
       ],
     );
   }

@@ -165,6 +165,7 @@ class OptionBook:
             "OUTFIT COLOUR": "soft green",
             "ACCESSORIES": "none",
             "FACIAL HAIR": "none",
+            "BODY TYPE": "average build",
         }
         for ph in re.findall(r"\[([A-Z ]+)\]", text):
             values = by_placeholder.get(ph)

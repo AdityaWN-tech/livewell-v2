@@ -202,6 +202,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+        routes: [
+          // Add a phone number to this account (Step 4c).
+          GoRoute(
+            path: 'phone',
+            builder: (context, state) => const PhoneSignInScreen(linking: true),
+          ),
+        ],
       ),
       GoRoute(
         path: '/settings',

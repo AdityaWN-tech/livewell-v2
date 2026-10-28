@@ -39,6 +39,13 @@ enum AuthFailure {
   /// The only sign-in method left can't be removed.
   lastMethod,
 
+  /// Adding a phone number that another Live Well account already uses
+  /// (Firebase credential-already-in-use).
+  phoneInUse,
+
+  /// This account already has a phone number.
+  alreadyLinked,
+
   /// Google or Apple found a Live Well account with the same email that
   /// was made another way (Firebase account-exists-with-different-credential).
   accountExists,
@@ -64,6 +71,8 @@ AuthFailure authFailureFromCode(String code) => switch (code) {
   'invalid-credential' ||
   'INVALID_LOGIN_CREDENTIALS' => AuthFailure.wrongCredentials,
   'email-already-in-use' => AuthFailure.emailInUse,
+  'credential-already-in-use' => AuthFailure.phoneInUse,
+  'provider-already-linked' => AuthFailure.alreadyLinked,
   'account-exists-with-different-credential' => AuthFailure.accountExists,
   'weak-password' => AuthFailure.weakPassword,
   'invalid-phone-number' || 'missing-phone-number' => AuthFailure.invalidPhone,
@@ -216,6 +225,23 @@ abstract class AuthService {
 
   /// Removes Google or Apple; refuses to remove the last sign-in method.
   Future<AuthUser> unlink(SocialProvider provider);
+
+  /// Adds a phone number to the signed-in account (Profile, Step 4c):
+  /// sends a code like [startPhoneSignIn], but a code the phone reads by
+  /// itself is added to this account, never used to sign in.
+  Future<PhoneVerification> startPhoneLink(
+    String phoneE164, {
+    int? resendToken,
+  });
+
+  /// Adds the verified number to the signed-in account.
+  Future<AuthUser> confirmPhoneLink(
+    PhoneVerification verification,
+    String code,
+  );
+
+  /// Removes the phone number; refuses to remove the last sign-in method.
+  Future<AuthUser> unlinkPhone();
 
   Future<void> signOut();
 

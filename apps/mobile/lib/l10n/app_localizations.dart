@@ -2146,12 +2146,6 @@ abstract class AppLocalizations {
   /// **'Talk to your coach'**
   String get careTitle;
 
-  /// No description provided for @careStatusSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get careStatusSoon;
-
   /// No description provided for @careStatusAiVoice.
   ///
   /// In en, this message translates to:
@@ -2169,18 +2163,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get help now'**
   String get careHelpNow;
-
-  /// No description provided for @careSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your coach is coming soon'**
-  String get careSoonTitle;
-
-  /// No description provided for @careSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon you can talk or type to your coach here, any time of day. If you need help right now, tap \"Get help now\".'**
-  String get careSoonBody;
 
   /// No description provided for @careNotSent.
   ///
@@ -2433,12 +2415,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use my own voice'**
   String get voiceOwnTitle;
-
-  /// No description provided for @voiceOwnSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get voiceOwnSoon;
 
   /// No description provided for @voiceOwnBody.
   ///
@@ -3183,12 +3159,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export my data'**
   String get profileExport;
-
-  /// No description provided for @profileSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get profileSoon;
 
   /// No description provided for @profileDeleteAvatar.
   ///
@@ -4077,12 +4047,6 @@ abstract class AppLocalizations {
   /// **'Tap to speak'**
   String get careTapToSpeak;
 
-  /// No description provided for @careTalkSoonLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Talking to your coach is coming soon'**
-  String get careTalkSoonLabel;
-
   /// No description provided for @careResourcesTitle.
   ///
   /// In en, this message translates to:
@@ -4184,12 +4148,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active'**
   String get studioVoiceActive;
-
-  /// No description provided for @studioVoiceSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get studioVoiceSoon;
 
   /// No description provided for @studioVoiceRowLabel.
   ///
@@ -4700,12 +4658,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use this coach'**
   String get studioUseCoach;
-
-  /// No description provided for @studioSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get studioSoon;
 
   /// No description provided for @studioPhotoTitle.
   ///
@@ -6206,6 +6158,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You won\'t be able to sign in with {phone} any more. You can add it again later.'**
   String profileRemovePhoneBody(String phone);
+
+  /// Step 4d hide/flag sweep (D-56).
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m here for you. Here are some things that can help right now.'**
+  String get careSupportBubble;
+
+  /// Step 4d hide/flag sweep (D-56).
+  ///
+  /// In en, this message translates to:
+  /// **'Request a copy of my data'**
+  String get profileRequestData;
+
+  /// Step 4d hide/flag sweep (D-56).
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll email it to you within 72 hours.'**
+  String get profileRequestDataNote;
+
+  /// Step 4d hide/flag sweep (D-56).
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well: a copy of my data'**
+  String get profileRequestDataSubject;
+
+  /// Step 4d hide/flag sweep (D-56).
+  ///
+  /// In en, this message translates to:
+  /// **'No email app found. Please write to us from your email.'**
+  String get profileRequestDataNoMail;
+
+  /// Step 4d hide/flag sweep (D-56).
+  ///
+  /// In en, this message translates to:
+  /// **'Please send me a copy of my Live Well data. My account id is {uid}.'**
+  String profileRequestDataBody(String uid);
 }
 
 class _AppLocalizationsDelegate

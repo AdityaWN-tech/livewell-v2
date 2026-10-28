@@ -1188,9 +1188,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get careTitle => 'Talk to your coach';
 
   @override
-  String get careStatusSoon => 'Coming soon';
-
-  @override
   String get careStatusAiVoice => 'AI voice';
 
   @override
@@ -1198,13 +1195,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get careHelpNow => 'Get help now';
-
-  @override
-  String get careSoonTitle => 'Your coach is coming soon';
-
-  @override
-  String get careSoonBody =>
-      'Soon you can talk or type to your coach here, any time of day. If you need help right now, tap \"Get help now\".';
 
   @override
   String get careNotSent =>
@@ -1351,9 +1341,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceOwnTitle => 'Use my own voice';
-
-  @override
-  String get voiceOwnSoon => 'Coming soon';
 
   @override
   String get voiceOwnBody =>
@@ -1763,9 +1750,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileExport => 'Export my data';
-
-  @override
-  String get profileSoon => 'Coming soon';
 
   @override
   String get profileDeleteAvatar => 'Delete my avatar';
@@ -2306,9 +2290,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get careTapToSpeak => 'Tap to speak';
 
   @override
-  String get careTalkSoonLabel => 'Talking to your coach is coming soon';
-
-  @override
   String get careResourcesTitle => 'Helpful resources';
 
   @override
@@ -2366,9 +2347,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studioVoiceActive => 'Active';
-
-  @override
-  String get studioVoiceSoon => 'Coming soon';
 
   @override
   String studioVoiceRowLabel(String name, String detail, String state) {
@@ -2647,9 +2625,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studioUseCoach => 'Use this coach';
-
-  @override
-  String get studioSoon => 'Coming soon';
 
   @override
   String get studioPhotoTitle => 'Make me from my photo';
@@ -3545,5 +3520,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String profileRemovePhoneBody(String phone) {
     return 'You won\'t be able to sign in with $phone any more. You can add it again later.';
+  }
+
+  @override
+  String get careSupportBubble =>
+      'I\'m here for you. Here are some things that can help right now.';
+
+  @override
+  String get profileRequestData => 'Request a copy of my data';
+
+  @override
+  String get profileRequestDataNote =>
+      'We\'ll email it to you within 72 hours.';
+
+  @override
+  String get profileRequestDataSubject => 'Live Well: a copy of my data';
+
+  @override
+  String get profileRequestDataNoMail =>
+      'No email app found. Please write to us from your email.';
+
+  @override
+  String profileRequestDataBody(String uid) {
+    return 'Please send me a copy of my Live Well data. My account id is $uid.';
   }
 }

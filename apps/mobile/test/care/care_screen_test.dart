@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/core/config/feature_flags.dart';
 import 'package:livewell/features/avatar/presentation/coach_avatar.dart';
 import 'package:livewell/features/care/presentation/care_screen.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
@@ -8,6 +9,11 @@ import 'package:livewell/features/safety/presentation/safety_screens.dart';
 
 import '../home/home_screen_test.dart' show bootPreview, signedIn;
 import '../support/app_harness.dart';
+
+/// A real account with the coach's chat and voice switched on (their
+/// flags; Step 4d): every typed word is still safety-checked first.
+Harness chatOn() =>
+    signedIn(flags: const FeatureFlags(coachChat: true, coachVoice: true));
 
 Future<void> openCare(WidgetTester tester) async {
   await tester.tap(
@@ -58,9 +64,9 @@ AvatarExpression heroExpression(WidgetTester tester) => tester
     .expression;
 
 void main() {
-  group('real account (prod): coach not built', () {
+  group('coach chat switched on (flags): coach not answering yet', () {
     testWidgets('the illustrated Chat tab, no made-up answers', (tester) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       expect(find.text('DIRECT SUPPORT'), findsOneWidget);
       for (final tab in ['chat', 'voice', 'saved', 'safety']) {
@@ -73,8 +79,8 @@ void main() {
       expect(heroExpression(tester), AvatarExpression.listening);
       expect(find.text('I feel stressed'), findsOneWidget);
       expect(find.text('Plan my day'), findsOneWidget);
-      expect(find.byKey(const Key('care-status')), findsOneWidget);
-      expect(find.text('AI voice'), findsNothing);
+      // The status pill shows only while the coach speaks (AI voice).
+      expect(find.byKey(const Key('care-status')), findsNothing);
       expect(find.byKey(const Key('care-sources')), findsNothing);
       expect(find.byKey(const Key('care-help-now')), findsOneWidget);
       await scrollTo(tester, find.byKey(const Key('care-disclaimer')));
@@ -88,21 +94,18 @@ void main() {
       expect(find.text('Helpful resources'), findsNothing);
     });
 
-    // Phone bug: "Hold to talk" is "Coming soon" until the coach is built.
-    testWidgets('Tap to speak says "Coming soon" and does nothing', (
+    // Phone bug: "Hold to talk" became "Tap to speak"; no "Coming soon".
+    testWidgets('Tap to speak, with the voice flag, asks for nothing yet', (
       tester,
     ) async {
       final handle = tester.ensureSemantics();
-      final h = signedIn();
+      final h = chatOn();
       await h.boot(tester);
       await openCare(tester);
-      await scrollTo(tester, find.byKey(const Key('care-talk-soon')));
+      await scrollTo(tester, find.byKey(const Key('care-talk')));
       expect(find.text('Hold to talk'), findsNothing);
       expect(find.text('Tap to speak'), findsOneWidget);
-      expect(
-        find.bySemanticsLabel('Talking to your coach is coming soon'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('oming soon'), findsNothing);
       await tester.tap(find.byKey(const Key('care-talk')));
       await tester.pumpAndSettle();
       expect(find.text('Use your microphone?'), findsNothing);
@@ -114,7 +117,7 @@ void main() {
     testWidgets('typing works (FR-CNV-07); "coming soon", nothing sent', (
       tester,
     ) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await send(tester, 'How do I sleep better?');
       expect(find.text('How do I sleep better?'), findsOneWidget);
@@ -122,7 +125,7 @@ void main() {
     });
 
     testWidgets('a quick prompt is asked the same way', (tester) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await tester.tap(find.byKey(const Key('care-prompt-2')));
       await tester.pumpAndSettle();
@@ -133,7 +136,7 @@ void main() {
     testWidgets('crisis text: the crisis card first, dropped, coach calm', (
       tester,
     ) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await send(tester, 'I want to end my life');
       expect(find.byType(SafetyInterruptScreen), findsOneWidget);
@@ -149,7 +152,7 @@ void main() {
     });
 
     testWidgets('emergency text shows the emergency card', (tester) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await send(tester, 'I have crushing chest pain');
       expect(find.text('This could be an emergency'), findsOneWidget);
@@ -158,7 +161,7 @@ void main() {
     testWidgets('medication question: the note, then it may continue', (
       tester,
     ) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await send(tester, 'Should I stop my metformin?');
       expect(find.byType(SafetyNoticeSheet), findsOneWidget);
@@ -175,7 +178,7 @@ void main() {
     testWidgets('Get help now: region numbers with one-tap calls', (
       tester,
     ) async {
-      final h = signedIn();
+      final h = chatOn();
       h.profiles.regions['u1'] = 'US';
       await h.boot(tester);
       await openCare(tester);
@@ -193,7 +196,7 @@ void main() {
     testWidgets(
       'Safety tab: region numbers, a clinician note, still dialable',
       (tester) async {
-        final h = signedIn();
+        final h = chatOn();
         h.profiles.regions['u1'] = 'IN';
         await h.boot(tester);
         await openCare(tester);
@@ -211,7 +214,7 @@ void main() {
     testWidgets('unknown region: both countries, never guessed', (
       tester,
     ) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await openTab(tester, 'safety');
       expect(find.byKey(const Key('help-emergency-US')), findsOneWidget);
@@ -219,7 +222,7 @@ void main() {
     });
 
     testWidgets('Voice and Saved say kindly what is coming', (tester) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await openTab(tester, 'voice');
       expect(find.text('Voice conversations are coming soon'), findsOneWidget);
@@ -230,7 +233,7 @@ void main() {
     });
 
     testWidgets('history: kind note until the coach is ready', (tester) async {
-      await signedIn().boot(tester);
+      await chatOn().boot(tester);
       await openCare(tester);
       await tester.tap(find.byKey(const Key('care-history')));
       await tester.pumpAndSettle();
@@ -243,7 +246,7 @@ void main() {
     });
 
     testWidgets('approved lessons show as helpful resources', (tester) async {
-      final h = signedIn();
+      final h = chatOn();
       h.learn.lessons = [
         const Lesson(id: 'a', category: 'Driver 4', title: 'Calm breathing'),
       ];
@@ -255,6 +258,50 @@ void main() {
       await tester.tap(find.byKey(const Key('care-resource-a')));
       await tester.pumpAndSettle();
       expect(find.text('Lessons open here soon'), findsOneWidget);
+    });
+  });
+
+  group('prod today: the coach isn\'t built (Step 4d, D-56)', () {
+    testWidgets('help, the coach, resources and contacts; no chat', (
+      tester,
+    ) async {
+      final h = signedIn();
+      h.profiles.regions['u1'] = 'IN';
+      h.learn.lessons = [
+        const Lesson(id: 'a', category: 'Driver 4', title: 'Calm breathing'),
+      ];
+      await h.boot(tester);
+      await openCare(tester);
+      expect(find.byKey(const Key('care-help-now')), findsOneWidget);
+      expect(heroExpression(tester), AvatarExpression.calm);
+      expect(
+        find.text(
+          "I'm here for you. Here are some things that can help right now.",
+        ),
+        findsOneWidget,
+      );
+      // Nothing that can't answer: no tabs, prompts, box, mic or history.
+      for (final key in [
+        'care-tab-chat',
+        'care-tab-voice',
+        'care-tab-saved',
+        'care-input',
+        'care-prompt-0',
+        'care-talk',
+        'care-history',
+        'care-status',
+      ]) {
+        expect(find.byKey(Key(key)), findsNothing, reason: key);
+      }
+      await scrollTo(tester, find.byKey(const Key('care-resource-a')));
+      expect(find.text('Helpful resources'), findsOneWidget);
+      await scrollTo(tester, find.byKey(const Key('help-emergency-IN')));
+      await tester.tap(find.byKey(const Key('help-emergency-IN')));
+      await tester.pumpAndSettle();
+      expect(h.phone.calls, ['112']);
+      await scrollTo(tester, find.byKey(const Key('care-clinician')));
+      await scrollTo(tester, find.byKey(const Key('care-disclaimer')));
+      expect(find.textContaining('oming soon'), findsNothing);
     });
   });
 
@@ -324,7 +371,7 @@ void main() {
         for (final key in [
           'care-hero',
           'care-prompt-3',
-          'care-talk-soon',
+          'care-talk',
           'care-input',
           'care-disclaimer',
         ]) {

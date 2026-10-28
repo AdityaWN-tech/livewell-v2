@@ -661,12 +661,9 @@
   "learnLibraryTitle": "Library",
   "careEyebrow": "Direct support",
   "careTitle": "Talk to your coach",
-  "careStatusSoon": "Coming soon",
   "careStatusAiVoice": "AI voice",
   "careStatusAiVoiceLabel": "Your coach speaks with an AI voice",
   "careHelpNow": "Get help now",
-  "careSoonTitle": "Your coach is coming soon",
-  "careSoonBody": "Soon you can talk or type to your coach here, any time of day. If you need help right now, tap \"Get help now\".",
   "careNotSent": "Your coach isn’t available yet, so this message wasn’t sent. It stays on this screen only.",
   "careSources": "Sources: {sources}",
   "@careSources": {
@@ -758,7 +755,6 @@
   "voiceChooseAnother": "Choose another voice",
   "voiceSkip": "Skip, use default",
   "voiceOwnTitle": "Use my own voice",
-  "voiceOwnSoon": "Coming soon",
   "voiceOwnBody": "Recording your own voice will need your consent, a short live recording in the app and a check that it’s really you. It isn’t available yet.",
   "voiceGotIt": "Got it",
   "voiceLibraryTitle": "Voice library",
@@ -969,7 +965,6 @@
   "profileConsents": "Privacy & consents",
   "profileMemory": "What my coach remembers",
   "profileExport": "Export my data",
-  "profileSoon": "Coming soon",
   "profileDeleteAvatar": "Delete my avatar",
   "profileDeleteVoice": "Delete my voice",
   "profileDeleteAccount": "Delete my account",
@@ -1380,7 +1375,6 @@
   "carePromptsLabel": "Things you can ask",
   "careReplySoon": "Your coach is coming soon, so there’s no answer yet. Your message stays on this screen only.",
   "careTapToSpeak": "Tap to speak",
-  "careTalkSoonLabel": "Talking to your coach is coming soon",
   "careResourcesTitle": "Helpful resources",
   "careResourceFrom": "From {source}",
   "@careResourceFrom": {
@@ -1415,7 +1409,6 @@
   "studioTabBackground": "Background",
   "studioChooseVoice": "Choose Your Voice",
   "studioVoiceActive": "Active",
-  "studioVoiceSoon": "Coming soon",
   "studioVoiceRowLabel": "{name}, {detail}. {state}",
   "@studioVoiceRowLabel": {
     "placeholders": {
@@ -1584,7 +1577,6 @@
   "studioTabAdjust": "Adjust",
   "studioPickCoach": "Pick a coach",
   "studioUseCoach": "Use this coach",
-  "studioSoon": "Coming soon",
   "studioPhotoTitle": "Make me from my photo",
   "studioPhotoBody": "Take a live selfie and we make a 3D coach that looks like you. Your photo is deleted right after.",
   "studioPhotoBodyOn": "Take a live selfie and we make a 3D coach that looks like you. You will be asked for permission first, and your photo is deleted right after.",
@@ -2038,5 +2030,17 @@
   "profilePhoneRemoved": "Phone number removed.",
   "@profilePhoneRemoved": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
   "profileRemovePhoneBody": "You won't be able to sign in with {phone} any more. You can add it again later.",
-  "@profileRemovePhoneBody": {"description": "Profile: add or remove a phone number (Step 4c, D-55).", "placeholders": {"phone": {"type": "String"}}}
+  "@profileRemovePhoneBody": {"description": "Profile: add or remove a phone number (Step 4c, D-55).", "placeholders": {"phone": {"type": "String"}}},
+  "careSupportBubble": "I'm here for you. Here are some things that can help right now.",
+  "@careSupportBubble": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "profileRequestData": "Request a copy of my data",
+  "@profileRequestData": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "profileRequestDataNote": "We'll email it to you within 72 hours.",
+  "@profileRequestDataNote": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "profileRequestDataSubject": "Live Well: a copy of my data",
+  "@profileRequestDataSubject": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "profileRequestDataNoMail": "No email app found. Please write to us from your email.",
+  "@profileRequestDataNoMail": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "profileRequestDataBody": "Please send me a copy of my Live Well data. My account id is {uid}.",
+  "@profileRequestDataBody": {"description": "Step 4d hide/flag sweep (D-56).", "placeholders": {"uid": {"type": "String"}}}
 }

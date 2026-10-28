@@ -345,17 +345,18 @@ void main() {
       expect(h.localData.clears, 0);
     });
 
-    testWidgets('export and memory say "Coming soon"', (tester) async {
+    testWidgets('no Memory, and no Export without a data-request address '
+        '(Step 4d): never a greyed-out "Coming soon" row', (tester) async {
       await signedIn().boot(tester);
       await openProfile(tester);
-      for (final k in ['profile-export', 'profile-memory']) {
-        await tester.scrollUntilVisible(
-          find.byKey(Key(k)),
-          300,
-          scrollable: find.byType(Scrollable).first,
-        );
-        expect(tester.widget<ListTile>(find.byKey(Key(k))).enabled, isFalse);
-      }
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('profile-delete-avatar')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const Key('profile-export')), findsNothing);
+      expect(find.byKey(const Key('profile-memory')), findsNothing);
+      expect(find.textContaining('oming soon'), findsNothing);
     });
   });
 

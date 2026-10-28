@@ -165,21 +165,22 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                 onPressed: () => _openLibrary(VoiceChoice.fallback),
                 child: Text(l.voiceChooseAnother),
               ),
-              const SizedBox(height: LwSpacing.sm),
-              Card(
-                child: ListTile(
-                  key: const Key('voice-own'),
-                  enabled: cloneOn,
-                  leading: Icon(
-                    Icons.record_voice_over_outlined,
-                    color: p.textSecondary,
+              // Only with the clone flag on (FR-VOC-02; Step 4d, D-56).
+              if (cloneOn) ...[
+                const SizedBox(height: LwSpacing.sm),
+                Card(
+                  child: ListTile(
+                    key: const Key('voice-own'),
+                    leading: Icon(
+                      Icons.record_voice_over_outlined,
+                      color: p.textSecondary,
+                    ),
+                    title: Text(l.voiceOwnTitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: _ownVoice,
                   ),
-                  title: Text(l.voiceOwnTitle),
-                  subtitle: cloneOn ? null : Text(l.voiceOwnSoon),
-                  trailing: cloneOn ? const Icon(Icons.chevron_right) : null,
-                  onTap: cloneOn ? _ownVoice : null,
                 ),
-              ),
+              ],
               const SizedBox(height: LwSpacing.sm),
               Center(
                 child: TextButton(

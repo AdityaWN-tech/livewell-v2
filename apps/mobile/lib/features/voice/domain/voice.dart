@@ -19,6 +19,9 @@ class LibraryVoice {
       'assets/voices/${id}_${style.name}.m4a';
 }
 
+/// Dr. Gokula's licensed voice (FR-VOC-04), once it is in the library.
+const drGokulaVoiceId = 'lw-dr-gokula';
+
 abstract final class VoiceLibrary {
   static const warm = LibraryVoice(
     'lw-warm',

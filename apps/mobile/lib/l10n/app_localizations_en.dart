@@ -901,13 +901,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'You have 1 daily habit and 2 supporting habits. That is plenty, so each one gets your attention. When one feels easy and automatic, you can swap it for something new.';
 
   @override
-  String get planAddSoonTitle => 'Adding habits is coming soon';
-
-  @override
-  String get planAddSoonBody =>
-      'Soon you can add your own habits here. You can have 1 daily habit and up to 2 supporting habits.';
-
-  @override
   String get planGotIt => 'Got it';
 
   @override
@@ -2032,14 +2025,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planGoalEmpty =>
-      'Your 30-day goal is set after your 10-minute check.';
-
-  @override
-  String get planGoalEditSoonTitle => 'Changing your goal is coming soon';
-
-  @override
-  String get planGoalEditSoonBody =>
-      'Soon you can change your 30-day goal here. Your coach will help you keep it small and doable.';
+      'Choose one small goal for the next 30 days. You can change it any time.';
 
   @override
   String get planHabitsTitle => 'Daily Microhabits';
@@ -3328,4 +3314,127 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get studioErrNotMade =>
       'We couldn\'t make your coach this time. You can try different choices, or pick a ready-made coach.';
+
+  @override
+  String get goalSetCta => 'Set my goal';
+
+  @override
+  String get goalSheetNewTitle => 'Set your 30-day goal';
+
+  @override
+  String get goalSheetEditTitle => 'Your 30-day goal';
+
+  @override
+  String get goalActionField => 'What will you do?';
+
+  @override
+  String get goalActionHint => 'For example: Walk after dinner';
+
+  @override
+  String get goalDaysField => 'How many days a week?';
+
+  @override
+  String get goalMinutesField => 'For how long?';
+
+  @override
+  String get goalAnchorField => 'When in your day?';
+
+  @override
+  String get goalBarrierField => 'If something gets in the way, I will…';
+
+  @override
+  String get goalBarrierHint => 'For example: walk indoors if it rains';
+
+  @override
+  String get goalLinkWhy => 'Show my Why with this goal';
+
+  @override
+  String get goalSave => 'Save';
+
+  @override
+  String get goalPause => 'Pause this goal';
+
+  @override
+  String get goalRestart => 'Restart from day 1';
+
+  @override
+  String get goalPausedNote => 'Paused. Restart it when you\'re ready.';
+
+  @override
+  String get goalSaved => 'Your goal is saved.';
+
+  @override
+  String get goalPausedSnack => 'Your goal is paused. Nothing is lost.';
+
+  @override
+  String get goalRestartedSnack => 'Day 1 again. You\'ve got this.';
+
+  @override
+  String get goalLabelMedication =>
+      'Medicines and supplements can\'t be a goal or habit here yet. Please keep following your care team\'s plan for them.';
+
+  @override
+  String get goalLabelNotAllowed =>
+      'Goals and habits here are kind, everyday steps, not weight, calories or diets. Want to try a different one?';
+
+  @override
+  String get anchorWakeUp => 'After waking up';
+
+  @override
+  String get anchorBreakfast => 'After breakfast';
+
+  @override
+  String get anchorLunch => 'After lunch';
+
+  @override
+  String get anchorDinner => 'After dinner';
+
+  @override
+  String get anchorBedtime => 'Before bed';
+
+  @override
+  String get habitSheetNewTitle => 'New habit';
+
+  @override
+  String get habitSheetEditTitle => 'Change this habit';
+
+  @override
+  String get habitSheetBody =>
+      'A supporting habit is a small step that helps your goal. Keep it tiny, so it\'s easy on busy days.';
+
+  @override
+  String get habitTitleField => 'What is the habit?';
+
+  @override
+  String get habitTitleHint => 'For example: Drink a glass of water';
+
+  @override
+  String get habitAdd => 'Add habit';
+
+  @override
+  String get habitStop => 'Stop this habit';
+
+  @override
+  String get habitChange => 'Change';
+
+  @override
+  String goalDaysValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days a week',
+      one: '1 day a week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String habitAdded(String title) {
+    return '$title is in your plan.';
+  }
+
+  @override
+  String habitStoppedSnack(String title) {
+    return '$title stopped. You can add a new habit any time.';
+  }
 }

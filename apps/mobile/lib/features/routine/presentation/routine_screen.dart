@@ -9,12 +9,9 @@ import '../../../core/design/tokens.dart';
 import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
-import '../../auth/data/firebase_auth_service.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../home/application/home_data.dart';
 import '../../home/domain/home_models.dart';
-import '../../safety/data/safety_rules_provider.dart';
-import '../../safety/presentation/safety_screens.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
     show reminderTexts;
@@ -25,6 +22,7 @@ import '../domain/label_check.dart';
 import '../domain/routine.dart';
 import '../domain/routine_catalog.dart';
 import '../domain/routine_editing.dart';
+import 'label_check_flow.dart';
 import 'routine_sheets.dart';
 
 /// My Daily Routine (T-GOL-03b), from the Plan tab: the person's own steps
@@ -168,31 +166,21 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
   /// eating-disorder sign) shows its safety response and closes the sheet;
   /// medicines, weight and diet goals, and unkind words get a kind message
   /// and can be reworded. Nothing flagged is kept.
-  Future<LabelOutcome> _checkLabel(String label) async {
+  Future<LabelOutcome> _checkLabel(String label) {
     final l = AppLocalizations.of(context);
-    final rules = await ref.read(safetyRulesProvider.future);
-    final labels = await ref.read(labelRulesProvider.future);
-    switch (checkLabel(label, rules, labels)) {
-      case LabelOk():
-        return const LabelAccepted();
-      case LabelBlocked(:final kind):
-        return LabelTryAgain(switch (kind) {
-          LabelKind.medication => l.routineLabelMedication,
-          LabelKind.notAllowed => l.routineLabelNotAllowed,
-          LabelKind.unkind => l.routineLabelUnkind,
-          // Never blocked this way (it is a red flag), kept for the switch.
-          LabelKind.disorderedEating => l.routineLabelNotSaved,
-        });
-      case LabelRedFlag(:final result):
-        final uid = ref.read(authServiceProvider).currentUser?.uid;
-        final region = uid == null
-            ? null
-            : (await ref.read(profileRepositoryProvider).get(uid))?.region;
-        if (!mounted) return const LabelStopped();
-        await showSafetyResponse(context, result, rules.contactsFor(region));
-        if (mounted) _snack(l.routineLabelNotSaved);
-        return const LabelStopped();
-    }
+    return runLabelCheck(
+      context,
+      ref,
+      label,
+      blocked: (kind) => switch (kind) {
+        LabelKind.medication => l.routineLabelMedication,
+        LabelKind.notAllowed => l.routineLabelNotAllowed,
+        LabelKind.unkind => l.routineLabelUnkind,
+        // Never blocked this way (it is a red flag), kept for the switch.
+        LabelKind.disorderedEating => l.routineLabelNotSaved,
+      },
+      notSaved: () => _snack(l.routineLabelNotSaved),
+    );
   }
 
   Future<void> _delete(RoutineItem item) async {

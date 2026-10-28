@@ -114,9 +114,13 @@ void main() {
       );
       await scrollTo(tester, find.byKey(const Key('plan-affirmation')));
       expect(
-        find.text('Your 30-day goal is set after your 10-minute check.'),
+        find.text(
+          'Choose one small goal for the next 30 days. You can change it '
+          'any time.',
+        ),
         findsOneWidget,
       );
+      expect(find.byKey(const Key('plan-goal-set')), findsOneWidget);
       expect(find.text('No habits yet'), findsOneWidget);
       // No sample data outside the dev preview.
       expect(find.textContaining('walk after lunch'), findsNothing);
@@ -258,15 +262,13 @@ void main() {
       expect(find.text('“Small steps still count.”'), findsOneWidget);
     });
 
-    testWidgets('New habit with room: kind "coming soon" note', (tester) async {
+    testWidgets('New habit with room opens the habit sheet', (tester) async {
       await signedIn().boot(tester);
       await openPlan(tester);
       await tester.tap(find.byKey(const Key('plan-new-habit')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('plan-add-soon')), findsOneWidget);
-      await tester.tap(find.text('Got it'));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('plan-add-soon')), findsNothing);
+      expect(find.byKey(const Key('habit-sheet')), findsOneWidget);
+      expect(find.textContaining('coming soon'), findsNothing);
     });
 
     testWidgets('MY GOAL DO IT opens from Plan with all 10 letters', (
@@ -321,13 +323,13 @@ void main() {
       expect(done.style?.decoration, TextDecoration.lineThrough);
     });
 
-    testWidgets('Edit goal: "coming soon", nothing changes', (tester) async {
+    testWidgets('the sample goal has no Edit button (nothing to change)', (
+      tester,
+    ) async {
       await bootPreview(tester);
       await openPlan(tester);
-      await scrollTo(tester, find.byKey(const Key('plan-goal-edit')));
-      await tester.tap(find.byKey(const Key('plan-goal-edit')));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('plan-goal-edit-soon')), findsOneWidget);
+      await scrollTo(tester, find.byKey(const Key('plan-goal')));
+      expect(find.byKey(const Key('plan-goal-edit')), findsNothing);
     });
 
     testWidgets('ticking a supporting habit marks it done with the time', (

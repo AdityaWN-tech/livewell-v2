@@ -452,25 +452,68 @@ describe('assessments (saveable until completed)', () => {
   });
 });
 
-describe('goals and habits', () => {
-  it('owner creates and edits; no deletes (pause instead)', async () => {
+describe('goals and habits (Step 4a: one goal, two own habits)', () => {
+  const goalData = (o: Record<string, unknown> = {}) => ({
+    action: 'Walk after dinner', days_per_week: 5, minutes: 10, anchor: 'dinner',
+    barrier_plan: 'Walk indoors if it rains', link_why: true, status: 'active',
+    start_date: '2026-10-14', ...meta(), ...o,
+  });
+  const habitData = (o: Record<string, unknown> = {}) => ({
+    title: 'Glass of water', anchor: 'wakeUp', minutes: 2, active: true, ...meta(), ...o,
+  });
+  it('owner creates and edits; pause and stop instead of delete', async () => {
     await seedAdult(env);
-    const goal = doc(as(ALICE), 'users/alice/goals/g1');
-    await assertSucceeds(setDoc(goal, { action: 'walk', status: 'active', ...meta() }));
+    const goal = doc(as(ALICE), 'users/alice/goals/primary');
+    await assertSucceeds(setDoc(goal, goalData()));
     await assertSucceeds(updateDoc(goal, { status: 'paused' }));
+    await assertSucceeds(updateDoc(goal, { status: 'active', start_date: '2026-10-20' }));
     await assertFails(deleteDoc(goal));
     await assertSucceeds(getDoc(goal));
-    const habit = doc(as(ALICE), 'users/alice/habits/h1');
-    await assertSucceeds(setDoc(habit, { title: '10-min walk after lunch', ...meta() }));
+    const habit = doc(as(ALICE), 'users/alice/habits/support_1');
+    await assertSucceeds(setDoc(habit, habitData()));
     await assertSucceeds(updateDoc(habit, { active: false }));
     await assertFails(deleteDoc(habit));
     await assertSucceeds(getDoc(habit));
   });
-  it('habit needs a title; others cannot write', async () => {
+  it('only one goal and two own habits (fixed ids, FR-GOL-01)', async () => {
     await seedAdult(env);
-    await assertFails(setDoc(doc(as(ALICE), 'users/alice/habits/h1'), { ...meta() }));
-    await assertFails(setDoc(doc(as(BOB), 'users/alice/goals/g1'), { ...meta() }));
-    await assertFails(setDoc(doc(as(ALICE), 'users/alice/goals/g1'), { action: 'walk' }));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/goals/g2'), goalData()));
+    await assertSucceeds(setDoc(doc(as(ALICE), 'users/alice/habits/support_2'), habitData()));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/habits/support_3'), habitData()));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/habits/h1'), habitData()));
+  });
+  it('fixed shape: sizes, choices, no extra fields, created_at kept', async () => {
+    await seedAdult(env);
+    const goal = doc(as(ALICE), 'users/alice/goals/primary');
+    await assertFails(setDoc(goal, goalData({ action: '' })));
+    await assertFails(setDoc(goal, goalData({ action: 'x'.repeat(61) })));
+    await assertFails(setDoc(goal, goalData({ days_per_week: 8 })));
+    await assertFails(setDoc(goal, goalData({ minutes: 7 })));
+    await assertFails(setDoc(goal, goalData({ anchor: 'noon' })));
+    await assertFails(setDoc(goal, goalData({ status: 'done' })));
+    await assertFails(setDoc(goal, goalData({ start_date: 'today' })));
+    await assertFails(setDoc(goal, goalData({ weight_kg: 70 })));
+    const habit = doc(as(ALICE), 'users/alice/habits/support_1');
+    await assertFails(setDoc(habit, habitData({ title: '' })));
+    await assertFails(setDoc(habit, habitData({ title: 'x'.repeat(41) })));
+    await assertFails(setDoc(habit, habitData({ minutes: 30 })));
+    await assertFails(setDoc(habit, habitData({ notes: 'free text' })));
+    await seed(env, {
+      'users/alice/goals/primary': goalData(),
+      'users/alice/habits/support_1': habitData(),
+    });
+    const later = { created_at: new Date('2030-01-01') };
+    await assertFails(updateDoc(goal, later));
+    await assertFails(updateDoc(habit, later));
+    await assertFails(updateDoc(habit, { minutes: 3 }));
+  });
+  it('others cannot read or write; the 18+ gate applies', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/goals/primary'), goalData()));
+    await seed(env, { 'users/alice/goals/primary': goalData() });
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/goals/primary')));
+    await seed(env, { 'users/alice': profile({ age_confirmed: false }) });
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/habits/support_1'), habitData()));
   });
 });
 

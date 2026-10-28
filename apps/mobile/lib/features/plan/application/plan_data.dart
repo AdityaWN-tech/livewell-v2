@@ -6,14 +6,16 @@ import '../../auth/data/firebase_auth_service.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
+import '../../goals/data/goal_repository.dart';
+import '../../goals/domain/goal.dart';
 import '../../home/application/home_data.dart';
 import '../../starter_plan/data/plan_repository.dart';
 import '../domain/plan_models.dart';
 
 /// Today's habits for the Plan tab: today's step (the same one Home shows,
 /// in the same Done / smaller state) as the daily microhabit, then the
-/// plan's supporting habits (at most 2, FR-GOL-01).
-/// TODO(T-GOL-01): read users/{uid}/habits and today's habit_logs.
+/// plan's supporting habits, then the person's own (2 in all, FR-GOL-01).
+/// Done marks come from today's habit_logs.
 final planHabitsProvider = Provider<List<PlanHabit>>((ref) {
   final preview = ref.watch(previewModeProvider);
   final step = ref.watch(todayStepProvider);
@@ -26,6 +28,16 @@ final planHabitsProvider = Provider<List<PlanHabit>>((ref) {
       ? PreviewSamples.habits.firstWhere((h) => h.role == HabitRole.microhabit)
       : null;
   final done = progress.doneAt;
+  final logged = {
+    for (final log in ref.watch(todayHabitLogsProvider).value ?? const [])
+      log.habitId: log.doneAt,
+  };
+  HabitStatus statusOf(String id) =>
+      logged.containsKey(id) ? HabitStatus.done : HabitStatus.scheduled;
+  TimeOfDay? doneAt(String id) => switch (logged[id]) {
+    final at? => TimeOfDay.fromDateTime(at),
+    null => null,
+  };
   return [
     if (step != null)
       PlanHabit(
@@ -46,8 +58,13 @@ final planHabitsProvider = Provider<List<PlanHabit>>((ref) {
         completedAt: done == null ? null : TimeOfDay.fromDateTime(done),
       ),
     if (preview)
-      ...PreviewSamples.habits.where((h) => h.role == HabitRole.supporting)
-    else
+      for (final h in PreviewSamples.habits.where(
+        (h) => h.role == HabitRole.supporting,
+      ))
+        logged.containsKey(h.id)
+            ? h.copyWith(status: HabitStatus.done, completedAt: doneAt(h.id))
+            : h,
+    if (!preview)
       for (final s
           in ref.watch(todayPlanProvider).value?.supporting ?? const [])
         PlanHabit(
@@ -55,10 +72,41 @@ final planHabitsProvider = Provider<List<PlanHabit>>((ref) {
           role: HabitRole.supporting,
           driver: s.anchor,
           title: s.title,
-          status: HabitStatus.scheduled,
+          status: statusOf('support-${s.id}'),
+          completedAt: doneAt('support-${s.id}'),
         ),
+    if (!preview)
+      for (final h in ref.watch(userHabitsProvider).value ?? const [])
+        if (h.active)
+          PlanHabit(
+            id: h.id,
+            role: HabitRole.supporting,
+            driver: '',
+            title: h.title,
+            status: statusOf(h.id),
+            completedAt: doneAt(h.id),
+            anchor: h.anchor,
+            minutes: h.minutes,
+            own: true,
+          ),
   ];
 });
+
+/// The person's own habits (Step 4a), active or stopped.
+final userHabitsProvider = StreamProvider<List<UserHabit>>(
+  (ref) => ref.watch(goalRepositoryProvider).watchHabits(),
+);
+
+/// Today's habit Done marks.
+final todayHabitLogsProvider = StreamProvider<List<HabitLog>>((ref) {
+  final today = localDateKey(ref.watch(clockProvider)());
+  return ref.watch(goalRepositoryProvider).watchLogs(today);
+});
+
+/// The saved 30-day goal (Step 4a), or null before one is set.
+final goalProvider = StreamProvider<Goal?>(
+  (ref) => ref.watch(goalRepositoryProvider).watchGoal(),
+);
 
 /// The 8 drivers, in their fixed order.
 /// needs-product: Dr. Gokula's driver names and order aren't in the content
@@ -78,10 +126,19 @@ final driverCompletionProvider = Provider<List<double>?>(
       ref.watch(previewModeProvider) ? PreviewSamples.driverCompletion : null,
 );
 
-/// The 30-day goal, or null until goals exist (T-GOL-01).
-final planGoalProvider = Provider<PlanGoal?>(
-  (ref) => ref.watch(previewModeProvider) ? PreviewSamples.goal : null,
-);
+/// The 30-day goal card, or null before a goal is set.
+final planGoalProvider = Provider<PlanGoal?>((ref) {
+  if (ref.watch(previewModeProvider)) return PreviewSamples.goal;
+  final g = ref.watch(goalProvider).value;
+  if (g == null) return null;
+  final today = localDateKey(ref.watch(clockProvider)());
+  return PlanGoal(
+    title: g.action,
+    day: g.dayOn(today),
+    progress: g.progressOn(today),
+    paused: g.status == GoalStatus.paused,
+  );
+});
 
 /// The plan's days from today on (calendar button).
 final weekPlanProvider = FutureProvider<List<WeekDay>>((ref) async {

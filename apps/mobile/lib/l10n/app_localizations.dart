@@ -1636,18 +1636,6 @@ abstract class AppLocalizations {
   /// **'You have 1 daily habit and 2 supporting habits. That is plenty, so each one gets your attention. When one feels easy and automatic, you can swap it for something new.'**
   String get planFullBody;
 
-  /// No description provided for @planAddSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Adding habits is coming soon'**
-  String get planAddSoonTitle;
-
-  /// No description provided for @planAddSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon you can add your own habits here. You can have 1 daily habit and up to 2 supporting habits.'**
-  String get planAddSoonBody;
-
   /// No description provided for @planGotIt.
   ///
   /// In en, this message translates to:
@@ -3625,20 +3613,8 @@ abstract class AppLocalizations {
   /// No description provided for @planGoalEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Your 30-day goal is set after your 10-minute check.'**
+  /// **'Choose one small goal for the next 30 days. You can change it any time.'**
   String get planGoalEmpty;
-
-  /// No description provided for @planGoalEditSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Changing your goal is coming soon'**
-  String get planGoalEditSoonTitle;
-
-  /// No description provided for @planGoalEditSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon you can change your 30-day goal here. Your coach will help you keep it small and doable.'**
-  String get planGoalEditSoonBody;
 
   /// No description provided for @planHabitsTitle.
   ///
@@ -5870,6 +5846,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t make your coach this time. You can try different choices, or pick a ready-made coach.'**
   String get studioErrNotMade;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Set my goal'**
+  String get goalSetCta;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Set your 30-day goal'**
+  String get goalSheetNewTitle;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Your 30-day goal'**
+  String get goalSheetEditTitle;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'What will you do?'**
+  String get goalActionField;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'For example: Walk after dinner'**
+  String get goalActionHint;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'How many days a week?'**
+  String get goalDaysField;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'For how long?'**
+  String get goalMinutesField;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'When in your day?'**
+  String get goalAnchorField;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'If something gets in the way, I will…'**
+  String get goalBarrierField;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'For example: walk indoors if it rains'**
+  String get goalBarrierHint;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Show my Why with this goal'**
+  String get goalLinkWhy;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get goalSave;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Pause this goal'**
+  String get goalPause;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Restart from day 1'**
+  String get goalRestart;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Paused. Restart it when you\'re ready.'**
+  String get goalPausedNote;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Your goal is saved.'**
+  String get goalSaved;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Your goal is paused. Nothing is lost.'**
+  String get goalPausedSnack;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Day 1 again. You\'ve got this.'**
+  String get goalRestartedSnack;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines and supplements can\'t be a goal or habit here yet. Please keep following your care team\'s plan for them.'**
+  String get goalLabelMedication;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Goals and habits here are kind, everyday steps, not weight, calories or diets. Want to try a different one?'**
+  String get goalLabelNotAllowed;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'After waking up'**
+  String get anchorWakeUp;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'After breakfast'**
+  String get anchorBreakfast;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'After lunch'**
+  String get anchorLunch;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'After dinner'**
+  String get anchorDinner;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Before bed'**
+  String get anchorBedtime;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'New habit'**
+  String get habitSheetNewTitle;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Change this habit'**
+  String get habitSheetEditTitle;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'A supporting habit is a small step that helps your goal. Keep it tiny, so it\'s easy on busy days.'**
+  String get habitSheetBody;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'What is the habit?'**
+  String get habitTitleField;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'For example: Drink a glass of water'**
+  String get habitTitleHint;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Add habit'**
+  String get habitAdd;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Stop this habit'**
+  String get habitStop;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get habitChange;
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day a week} other{{count} days a week}}'**
+  String goalDaysValue(int count);
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'{title} is in your plan.'**
+  String habitAdded(String title);
+
+  /// Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).
+  ///
+  /// In en, this message translates to:
+  /// **'{title} stopped. You can add a new habit any time.'**
+  String habitStoppedSnack(String title);
 }
 
 class _AppLocalizationsDelegate

@@ -8,8 +8,15 @@ import '../../../core/design/tokens.dart';
 import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../checkin/domain/checkin.dart';
+import '../../dev/application/preview_mode.dart';
+import '../../goals/data/goal_repository.dart';
+import '../../goals/domain/goal.dart';
+import '../../goals/presentation/goal_sheets.dart';
 import '../../home/application/home_data.dart';
 import '../../routine/application/routine_data.dart';
+import '../../routine/domain/label_check.dart';
+import '../../routine/presentation/label_check_flow.dart';
+import '../../routine/presentation/routine_sheets.dart' show LabelOutcome;
 import '../../routine/presentation/routine_screen.dart';
 import '../../profile/presentation/profile_button.dart';
 import '../application/plan_data.dart';
@@ -30,27 +37,96 @@ class PlanScreen extends ConsumerStatefulWidget {
 }
 
 class _PlanScreenState extends ConsumerState<PlanScreen> {
-  /// Supporting habits ticked off on this screen.
-  // TODO(T-GOL-01): save to users/{uid}/habit_logs instead.
-  final _doneNow = <String, TimeOfDay>{};
-
-  List<PlanHabit> _habits() => [
-    for (final h in ref.watch(planHabitsProvider))
-      _doneNow.containsKey(h.id)
-          ? h.copyWith(status: HabitStatus.done, completedAt: _doneNow[h.id])
-          : h,
-  ];
+  GoalRepository get _repo => ref.read(goalRepositoryProvider);
+  String get _today => localDateKey(ref.read(clockProvider)());
 
   void _markDone(PlanHabit h) {
     if (h.id == todayStepHabitId) {
       // Shared with Home: both show it done.
       ref.read(stepProgressActionsProvider).markDone();
     } else {
-      setState(
-        () =>
-            _doneNow[h.id] = TimeOfDay.fromDateTime(ref.read(clockProvider)()),
+      final now = ref.read(clockProvider)();
+      _repo.saveLog(
+        HabitLog(date: localDateKey(now), habitId: h.id, doneAt: now),
       );
     }
+  }
+
+  void _snack(String text) => ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(text)));
+
+  /// Typed goal and habit words: the same checks as routine labels (D-46).
+  Future<LabelOutcome> _checkWords(String words) {
+    final l = AppLocalizations.of(context);
+    return runLabelCheck(
+      context,
+      ref,
+      words,
+      blocked: (kind) => switch (kind) {
+        LabelKind.medication => l.goalLabelMedication,
+        LabelKind.notAllowed => l.goalLabelNotAllowed,
+        LabelKind.unkind => l.routineLabelUnkind,
+        LabelKind.disorderedEating => l.routineLabelNotSaved,
+      },
+      notSaved: () => _snack(l.routineLabelNotSaved),
+    );
+  }
+
+  Future<T?> _form<T>(Widget child) {
+    // A snackbar from the last save would cover the sheet's button.
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    return showModalBottomSheet<T>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (_) => child,
+    );
+  }
+
+  Future<void> _editGoal() async {
+    final l = AppLocalizations.of(context);
+    final goal = ref.read(goalProvider).value;
+    final result = await _form<GoalSheetResult>(
+      GoalSheet(goal: goal, today: _today, checkLabel: _checkWords),
+    );
+    switch (result) {
+      case GoalSaved(goal: final g):
+        await _repo.saveGoal(g);
+        if (mounted) _snack(l.goalSaved);
+      case GoalPaused() when goal != null:
+        await _repo.saveGoal(goal.copyWith(status: GoalStatus.paused));
+        if (mounted) _snack(l.goalPausedSnack);
+      case GoalRestarted() when goal != null:
+        await _repo.saveGoal(
+          goal.copyWith(status: GoalStatus.active, startDate: _today),
+        );
+        if (mounted) _snack(l.goalRestartedSnack);
+      case _:
+    }
+  }
+
+  /// Opens a habit sheet for [habit] and saves what comes back.
+  Future<void> _habitSheet(UserHabit habit) async {
+    final l = AppLocalizations.of(context);
+    final result = await _form<HabitSheetResult>(
+      HabitSheet(habit: habit, checkLabel: _checkWords),
+    );
+    switch (result) {
+      case HabitSaved(habit: final h):
+        await _repo.saveHabit(h);
+        if (mounted && habit.title.isEmpty) _snack(l.habitAdded(h.title));
+      case HabitStopped():
+        await _repo.saveHabit(habit.copyWith(active: false));
+        if (mounted) _snack(l.habitStoppedSnack(habit.title));
+      case null:
+    }
+  }
+
+  void _changeHabit(PlanHabit h) {
+    final own = ref.read(userHabitsProvider).value ?? const [];
+    final habit = own.where((x) => x.id == h.id).firstOrNull;
+    if (habit != null) _habitSheet(habit);
   }
 
   Future<void> _sheet(Widget child, {Key? key}) => showModalBottomSheet<void>(
@@ -60,14 +136,31 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
     builder: (context) => KeyedSubtree(key: key, child: child),
   );
 
+  /// FR-GOL-01: room for a supporting habit opens the habit sheet;
+  /// otherwise the plan is full.
   Future<void> _newHabit(List<PlanHabit> habits) {
     final l = AppLocalizations.of(context);
-    final full = HabitLimits.isFull(habits);
-    return _sheet(
-      _InfoSheet(
-        key: Key(full ? 'plan-full' : 'plan-add-soon'),
-        title: full ? l.planFullTitle : l.planAddSoonTitle,
-        body: full ? l.planFullBody : l.planAddSoonBody,
+    final slot = ref.read(previewModeProvider)
+        ? null
+        : freeHabitSlot(
+            ref.read(userHabitsProvider).value ?? const [],
+            HabitLimits.count(habits, HabitRole.supporting),
+          );
+    if (slot == null) {
+      return _sheet(
+        _InfoSheet(
+          key: const Key('plan-full'),
+          title: l.planFullTitle,
+          body: l.planFullBody,
+        ),
+      );
+    }
+    return _habitSheet(
+      UserHabit(
+        id: slot,
+        title: '',
+        anchor: HabitAnchor.breakfast,
+        minutes: UserHabit.minuteChoices[1],
       ),
     );
   }
@@ -108,7 +201,7 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
     final l = AppLocalizations.of(context);
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
-    final habits = _habits();
+    final habits = ref.watch(planHabitsProvider);
     final now = ref.watch(clockProvider)();
     final step = ref.watch(todayStepProvider);
     final progress = ref.watch(stepProgressProvider);
@@ -170,13 +263,8 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
         LwSectionHeader(l.planGoalTitle),
         _GoalCard(
           goal: ref.watch(planGoalProvider),
-          onEdit: () => _sheet(
-            _InfoSheet(
-              key: const Key('plan-goal-edit-soon'),
-              title: l.planGoalEditSoonTitle,
-              body: l.planGoalEditSoonBody,
-            ),
-          ),
+          // Dev preview shows a sample goal: nothing to change.
+          onEdit: ref.watch(previewModeProvider) ? null : _editGoal,
         ),
         LwSectionHeader(l.planHabitsTitle),
         if (habits.isEmpty)
@@ -196,6 +284,7 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
                     habit: h,
                     onDone: () => _markDone(h),
                     onAbout: () => _about(h),
+                    onChange: h.own ? () => _changeHabit(h) : null,
                     onSmaller: h.id == todayStepHabitId && canShrink
                         ? () => ref
                               .read(stepProgressActionsProvider)
@@ -224,7 +313,9 @@ class _GoalCard extends StatelessWidget {
   const _GoalCard({required this.goal, required this.onEdit});
 
   final PlanGoal? goal;
-  final VoidCallback onEdit;
+
+  /// Null in dev preview (a sample goal).
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -243,7 +334,20 @@ class _GoalCard extends StatelessWidget {
             const SizedBox(width: LwSpacing.sm),
             Expanded(
               child: g == null
-                  ? Text(l.planGoalEmpty, style: t.bodyMedium)
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l.planGoalEmpty, style: t.bodyMedium),
+                        if (onEdit != null) ...[
+                          const SizedBox(height: LwSpacing.xs),
+                          FilledButton(
+                            key: const Key('plan-goal-set'),
+                            onPressed: onEdit,
+                            child: Text(l.goalSetCta),
+                          ),
+                        ],
+                      ],
+                    )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -253,60 +357,68 @@ class _GoalCard extends StatelessWidget {
                             Expanded(
                               child: Text(g.title, style: t.titleMedium),
                             ),
-                            Semantics(
-                              label: l.planGoalEditLabel,
-                              button: true,
-                              container: true,
-                              excludeSemantics: true,
-                              child: TextButton(
-                                key: const Key('plan-goal-edit'),
-                                onPressed: onEdit,
-                                child: Text(l.planGoalEdit),
+                            if (onEdit != null)
+                              Semantics(
+                                label: l.planGoalEditLabel,
+                                button: true,
+                                container: true,
+                                excludeSemantics: true,
+                                child: TextButton(
+                                  key: const Key('plan-goal-edit'),
+                                  onPressed: onEdit,
+                                  child: Text(l.planGoalEdit),
+                                ),
                               ),
-                            ),
                           ],
                         ),
                         const SizedBox(height: LwSpacing.xs),
-                        Semantics(
-                          container: true,
-                          excludeSemantics: true,
-                          label: l.planGoalProgressLabel(
-                            g.day,
-                            PlanGoal.days,
-                            (g.progress * 100).round(),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              ClipRRect(
-                                borderRadius: LwRadius.pillAll,
-                                child: LinearProgressIndicator(
-                                  value: g.progress,
-                                  minHeight: LwSpacing.xs,
-                                  color: p.accent,
-                                  backgroundColor: p.surfaceMuted,
+                        if (g.paused)
+                          Text(
+                            l.goalPausedNote,
+                            key: const Key('plan-goal-paused'),
+                            style: t.bodyMedium,
+                          )
+                        else
+                          Semantics(
+                            container: true,
+                            excludeSemantics: true,
+                            label: l.planGoalProgressLabel(
+                              g.day,
+                              PlanGoal.days,
+                              (g.progress * 100).round(),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: LwRadius.pillAll,
+                                  child: LinearProgressIndicator(
+                                    value: g.progress,
+                                    minHeight: LwSpacing.xs,
+                                    color: p.accent,
+                                    backgroundColor: p.surfaceMuted,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: LwSpacing.xxs),
-                              Wrap(
-                                alignment: WrapAlignment.spaceBetween,
-                                spacing: LwSpacing.sm,
-                                children: [
-                                  Text(
-                                    l.planGoalDay(g.day, PlanGoal.days),
-                                    style: t.labelSmall,
-                                  ),
-                                  Text(
-                                    l.planGoalPercent(
-                                      (g.progress * 100).round(),
+                                const SizedBox(height: LwSpacing.xxs),
+                                Wrap(
+                                  alignment: WrapAlignment.spaceBetween,
+                                  spacing: LwSpacing.sm,
+                                  children: [
+                                    Text(
+                                      l.planGoalDay(g.day, PlanGoal.days),
+                                      style: t.labelSmall,
                                     ),
-                                    style: t.labelSmall,
-                                  ),
-                                ],
-                              ),
-                            ],
+                                    Text(
+                                      l.planGoalPercent(
+                                        (g.progress * 100).round(),
+                                      ),
+                                      style: t.labelSmall,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
             ),
@@ -324,12 +436,16 @@ class _HabitRow extends StatelessWidget {
     required this.onDone,
     required this.onAbout,
     required this.onSmaller,
+    this.onChange,
   });
 
   final PlanHabit habit;
   final VoidCallback onDone;
   final VoidCallback onAbout;
   final VoidCallback? onSmaller;
+
+  /// The person's own habit: change or stop it.
+  final VoidCallback? onChange;
 
   @override
   Widget build(BuildContext context) {
@@ -416,9 +532,19 @@ class _HabitRow extends StatelessWidget {
             key: Key('habit-${h.id}-menu'),
             tooltip: l.planHabitMenu(h.title),
             icon: Icon(Icons.more_horiz, color: p.textSecondary),
-            onSelected: (v) => v == 'smaller' ? onSmaller?.call() : onAbout(),
+            onSelected: (v) => switch (v) {
+              'smaller' => onSmaller?.call(),
+              'change' => onChange?.call(),
+              _ => onAbout(),
+            },
             itemBuilder: (context) => [
               PopupMenuItem(value: 'about', child: Text(l.planHabitAbout)),
+              if (onChange != null)
+                PopupMenuItem(
+                  key: const Key('habit-menu-change'),
+                  value: 'change',
+                  child: Text(l.habitChange),
+                ),
               if (onSmaller != null)
                 PopupMenuItem(
                   key: const Key('habit-menu-smaller'),

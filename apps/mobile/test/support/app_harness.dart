@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/goals/data/goal_repository.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
 import 'package:livewell/features/moments/application/moment_launcher.dart';
@@ -99,6 +100,9 @@ class Harness {
   /// My Daily Routine, in memory (T-GOL-03).
   final routines = InMemoryRoutineRepository();
 
+  /// The 30-day goal and own habits, in memory (Step 4a).
+  final goals = InMemoryGoalRepository();
+
   /// Items the coach already asked about (T-GOL-03d).
   final routineAsked = FakeRoutineAskStore();
   final reminders = FakeReminders();
@@ -160,6 +164,7 @@ class Harness {
           voicePreviewPlayerProvider.overrideWithValue(player),
           planRepositoryProvider.overrideWithValue(plans),
           routineRepositoryProvider.overrideWithValue(routines),
+          goalRepositoryProvider.overrideWithValue(goals),
           routineAskStoreProvider.overrideWithValue(routineAsked),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(reminderZone),

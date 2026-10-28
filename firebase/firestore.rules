@@ -269,19 +269,59 @@ service cloud.firestore {
       }
 
       // ---------- goals and habits (FR-GOL) ----------
+      // Step 4a (D-53): one goal ("primary") and at most two own habits
+      // (support_1, support_2), so FR-GOL-01's limits hold here too. Same
+      // sizes and choices as the app (lib/features/goals/domain/goal.dart).
+      function anchors() {
+        return ['wakeUp', 'breakfast', 'lunch', 'dinner', 'bedtime'];
+      }
       match /goals/{goalId} {
+        function validGoal(d) {
+          return d.keys().hasOnly(['action', 'days_per_week', 'minutes',
+                   'anchor', 'barrier_plan', 'link_why', 'status',
+                   'start_date', 'created_at', 'updated_at', 'schema_version'])
+            && d.action is string && d.action.size() > 0
+            && d.action.size() <= 60
+            && d.days_per_week is int
+            && d.days_per_week >= 1 && d.days_per_week <= 7
+            && d.minutes in [2, 5, 10, 15, 20, 30]
+            && d.anchor in anchors()
+            && d.barrier_plan is string && d.barrier_plan.size() <= 120
+            && d.link_why is bool
+            && d.status in ['active', 'paused']
+            && d.start_date is string
+            && d.start_date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+        }
         allow read: if isOwner(uid);
-        allow create: if isAdultOwner(uid) && hasMeta(request.resource.data);
-        allow update: if isAdultOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && goalId == 'primary'
+          && validGoal(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && validGoal(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at;
         allow delete: if false; // pause instead (FR-GOL-02)
       }
 
       match /habits/{habitId} {
+        function validHabit(d) {
+          return d.keys().hasOnly(['title', 'anchor', 'minutes', 'active',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.title is string && d.title.size() > 0
+            && d.title.size() <= 40
+            && d.anchor in anchors()
+            && d.minutes in [2, 5, 10, 15]
+            && d.active is bool;
+        }
         allow read: if isOwner(uid);
         allow create: if isAdultOwner(uid)
-          && request.resource.data.title is string
+          && habitId in ['support_1', 'support_2']
+          && validHabit(request.resource.data)
           && hasMeta(request.resource.data);
-        allow update: if isAdultOwner(uid);
+        // Stopped, not deleted: active = false.
+        allow update: if isAdultOwner(uid)
+          && validHabit(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at;
         allow delete: if false;
       }
 

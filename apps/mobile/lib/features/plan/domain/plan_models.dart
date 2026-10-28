@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' show TimeOfDay;
 
+import '../../goals/domain/goal.dart' show HabitAnchor;
+
 /// The one daily microhabit, or one of up to two supporting habits
 /// (FR-GOL-01).
 enum HabitRole { microhabit, supporting }
@@ -19,6 +21,8 @@ class PlanHabit {
     this.microstep,
     this.minutes,
     this.completedAt,
+    this.anchor,
+    this.own = false,
   });
 
   final String id;
@@ -37,6 +41,12 @@ class PlanHabit {
   final int? minutes;
   final TimeOfDay? completedAt;
 
+  /// When in the day (the person's own habits).
+  final HabitAnchor? anchor;
+
+  /// Added by the person (can be changed or stopped), not by the plan.
+  final bool own;
+
   PlanHabit copyWith({HabitStatus? status, TimeOfDay? completedAt}) =>
       PlanHabit(
         id: id,
@@ -48,6 +58,8 @@ class PlanHabit {
         microstep: microstep,
         minutes: minutes,
         completedAt: completedAt ?? this.completedAt,
+        anchor: anchor,
+        own: own,
       );
 }
 
@@ -77,9 +89,13 @@ class PlanGoal {
     required this.title,
     required this.day,
     required this.progress,
+    this.paused = false,
   });
 
   final String title;
+
+  /// Paused by the person; Restart starts it again from day 1.
+  final bool paused;
 
   /// Day X of 30.
   final int day;

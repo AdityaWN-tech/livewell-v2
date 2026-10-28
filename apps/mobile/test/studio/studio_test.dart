@@ -428,22 +428,14 @@ void main() {
       expect(h.voices.chosen!.voiceId, 'lw-deep');
     });
 
-    testWidgets('clone and Dr. Gokula off: "Coming soon", not choosable, '
-        'no consent banner', (tester) async {
+    testWidgets('clone, loved one and Dr. Gokula off: not shown, no consent '
+        'banner, no "Coming soon"', (tester) async {
       await signedIn().boot(tester);
       await openStudio(tester, row: 'profile-voice');
-      for (final id in ['voice-own', 'voice-loved-one']) {
-        await tester.scrollUntilVisible(
-          find.byKey(Key(id)),
-          300,
-          scrollable: find.byType(Scrollable).last,
-        );
-        final row = tester.widget<VoiceRow>(find.byKey(Key(id)));
-        expect(row.status, 'Coming soon');
-        expect(row.onTap, isNull);
-        expect(row.selected, isNull);
+      for (final id in ['voice-own', 'voice-loved-one', 'voice-dr-gokula']) {
+        expect(find.byKey(Key(id)), findsNothing, reason: id);
       }
-      expect(find.byKey(const Key('voice-dr-gokula')), findsNothing);
+      expect(find.textContaining('oming soon'), findsNothing);
       expect(find.byKey(const Key('voice-consent-banner')), findsNothing);
     });
 
@@ -458,22 +450,29 @@ void main() {
       expect(h.voices.chosen, isNull);
     });
 
-    testWidgets('Dr. Gokula flag on: shown, labelled AI voice, not playable', (
-      tester,
-    ) async {
+    testWidgets('Dr. Gokula flag on but the voice not in the library yet: '
+        'still hidden, never a row that can\'t be chosen', (tester) async {
       await signedIn(flags: const FeatureFlags(drGokulaVoice: true))
           .boot(tester);
       await openStudio(tester, row: 'profile-voice');
+      expect(find.byKey(const Key('voice-dr-gokula')), findsNothing);
+    });
+
+    testWidgets('loved-one flag on (Phase 2): the row shows', (tester) async {
+      await signedIn(flags: const FeatureFlags(lovedOneVoice: true))
+          .boot(tester);
+      await openStudio(tester, row: 'profile-voice');
       await tester.scrollUntilVisible(
-        find.byKey(const Key('voice-dr-gokula')),
+        find.byKey(const Key('voice-loved-one')),
         300,
         scrollable: find.byType(Scrollable).last,
       );
-      final row = tester.widget<VoiceRow>(
-        find.byKey(const Key('voice-dr-gokula')),
+      expect(
+        tester
+            .widget<VoiceRow>(find.byKey(const Key('voice-loved-one')))
+            .detail,
+        'AI voice',
       );
-      expect(row.detail, 'AI voice');
-      expect(row.onPreview, isNull);
     });
 
     testWidgets('the consent banner shows only with a consented clone', (

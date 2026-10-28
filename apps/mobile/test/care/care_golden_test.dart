@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../home/home_screen_test.dart' show bootPreview, signedIn;
-import 'care_screen_test.dart' show openCare, openTab;
+import 'care_screen_test.dart' show openCare;
 
-/// Care (T-UI-02g) golden images: a real account (coach coming soon), its
-/// Safety tab, and the dev preview (sample conversation, AI voice), light
+/// Care (T-UI-02g) golden images: a real account today (Step 4d: help, the
+/// coach, contacts; no chat until the coach exists) and the dev preview
+/// (sample conversation, AI voice), light
 /// and dark, text at 100%, 130% and 200%, on a large phone and an iPhone
 /// SE. Regenerate after an intended visual change:
 ///   flutter test --update-goldens --tags golden
@@ -24,7 +25,7 @@ void main() {
         ('medium', 1.3),
         ('large', 2.0),
       ]) {
-        for (final state in ['chat', 'safety', 'preview']) {
+        for (final state in ['support', 'preview']) {
           if (phone == 'se' && state != 'preview') continue;
           final prefix = phone == 'se' ? 'care_se' : 'care';
           final name = '${prefix}_${state}_${dark ? 'dark' : 'light'}_$label';
@@ -42,7 +43,6 @@ void main() {
               await h.boot(tester);
             }
             await openCare(tester);
-            if (state == 'safety') await openTab(tester, 'safety');
             // Tall enough that the whole screen is in the image.
             final needed = size.height / dpr * (1.8 + (scale - 1) * 3.4);
             tester.view

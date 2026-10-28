@@ -196,13 +196,12 @@ void main() {
   });
 
   group('use my own voice', () {
-    testWidgets('flag off: shown as "Coming soon", not tappable', (
+    testWidgets('flag off: not shown at all (Step 4d, no dead ends)', (
       tester,
     ) async {
       await atVoice().boot(tester);
-      final tile = tester.widget<ListTile>(find.byKey(const Key('voice-own')));
-      expect(tile.enabled, isFalse);
-      expect(find.text('Coming soon'), findsOneWidget);
+      expect(find.byKey(const Key('voice-own')), findsNothing);
+      expect(find.textContaining('oming soon'), findsNothing);
     });
 
     testWidgets('flag on: an entry point that explains, builds nothing', (

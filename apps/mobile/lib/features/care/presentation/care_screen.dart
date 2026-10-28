@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/illustration/illustration.dart';
@@ -44,9 +45,11 @@ enum CareTab { chat, voice, saved, safety }
 /// resources. Everything scrolls together, so nothing hides behind the
 /// message box at any text size (phone bug).
 ///
-/// The AI coach isn't built yet, so nothing is answered: a typed message or
-/// prompt is still checked for red flags first (FR-SAF-01/02), then a kind
-/// "your coach is coming soon" line. Nothing is saved or sent.
+/// The AI coach isn't built yet (Step 4d, D-56): with `coachChat` off (prod
+/// today) Care shows Get help now, the coach, helpful resources, the crisis
+/// contacts and the clinician card; chat, prompts, the Voice and Saved tabs
+/// and history appear with their flags. A typed message is always checked
+/// for red flags first (FR-SAF-01/02).
 class CareScreen extends ConsumerStatefulWidget {
   const CareScreen({super.key});
 
@@ -159,9 +162,35 @@ class _CareScreenState extends ConsumerState<CareScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final p = LwPalette.of(context);
-    final t = Theme.of(context).textTheme;
     final coach = ref.watch(coachNameProvider) ?? l.homeCoachDefaultName;
     final messages = [...ref.watch(coachHistoryProvider), ..._session];
+    final flags = ref.watch(featureFlagsProvider);
+    // The dev preview shows the whole design with sample data.
+    final chatOn = flags.coachChat || ref.watch(previewModeProvider);
+    final voiceOn = flags.coachVoice || ref.watch(previewModeProvider);
+    final tabs = [
+      if (chatOn) (CareTab.chat, l.careTabChat),
+      if (voiceOn) (CareTab.voice, l.careTabVoice),
+      if (chatOn) (CareTab.saved, l.careTabSaved),
+      if (chatOn) (CareTab.safety, l.careTabSafety),
+    ];
+    if (!chatOn) {
+      return LwScreen(
+        eyebrow: l.careEyebrow,
+        title: l.tabCare,
+        profile: const ProfileButton(),
+        actions: [_helpNow(context)],
+        children: [
+          ..._support(context, coach),
+          const SizedBox(height: LwSpacing.md),
+          const HelpContacts(key: Key('care-safety')),
+          _clinicianCard(context),
+          const SizedBox(height: LwSpacing.md),
+          _disclaimer(context),
+          const SizedBox(height: LwSpacing.md),
+        ],
+      );
+    }
     return LwScreen(
       eyebrow: l.careEyebrow,
       title: l.tabCare,
@@ -179,33 +208,16 @@ class _CareScreenState extends ConsumerState<CareScreen> {
       ],
       profile: const ProfileButton(),
       actions: [
-        // Always visible (spec 14.2 Care tab). Red is kept for safety only;
-        // white on it passes AA in both modes.
-        FilledButton.icon(
-          key: const Key('care-help-now'),
-          style: FilledButton.styleFrom(
-            backgroundColor: p.emergency,
-            foregroundColor: p.onEmergency,
-            shape: const StadiumBorder(),
-            minimumSize: const Size(LwSize.minTapTarget, LwSize.minTapTarget),
-          ),
-          onPressed: () => context.push(CareScreen.helpPath),
-          icon: const Icon(Icons.support_outlined),
-          label: Text(l.careHelpNow),
-        ),
-        _StatusPill(voiceOn: ref.watch(coachVoiceOnProvider)),
+        _helpNow(context),
+        // Only while the coach speaks with an AI voice (FR-VOC-08).
+        if (ref.watch(coachVoiceOnProvider)) const _StatusPill(),
       ],
       children: [
         Wrap(
           spacing: LwSpacing.xs,
           runSpacing: LwSpacing.xs,
           children: [
-            for (final (x, name) in [
-              (CareTab.chat, l.careTabChat),
-              (CareTab.voice, l.careTabVoice),
-              (CareTab.saved, l.careTabSaved),
-              (CareTab.safety, l.careTabSafety),
-            ])
+            for (final (x, name) in tabs)
               ChoiceChip(
                 key: Key('care-tab-${x.name}'),
                 label: Text(name),
@@ -216,7 +228,7 @@ class _CareScreenState extends ConsumerState<CareScreen> {
         ),
         const SizedBox(height: LwSpacing.md),
         ...switch (_tab) {
-          CareTab.chat => _chat(context, coach, messages),
+          CareTab.chat => _chat(context, coach, messages, voiceOn: voiceOn),
           CareTab.voice => [
             LwEmptyState(
               icon: Icons.record_voice_over_outlined,
@@ -233,45 +245,116 @@ class _CareScreenState extends ConsumerState<CareScreen> {
           ],
           CareTab.safety => [
             const HelpContacts(key: Key('care-safety')),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(LwSpacing.cardPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l.careClinicianTitle, style: t.titleSmall),
-                    const SizedBox(height: LwSpacing.xxs),
-                    Text(l.careClinicianBody, style: t.bodySmall),
-                  ],
-                ),
-              ),
-            ),
+            _clinicianCard(context),
           ],
         },
         const SizedBox(height: LwSpacing.md),
-        Text(
-          l.careDisclaimer,
-          key: const Key('care-disclaimer'),
-          textAlign: TextAlign.center,
-          style: t.labelSmall,
-        ),
+        _disclaimer(context),
         const SizedBox(height: LwSpacing.md),
       ],
     );
   }
 
-  List<Widget> _chat(
-    BuildContext context,
-    String coach,
-    List<ChatMessage> messages,
-  ) {
+  /// Always visible (spec 14.2 Care tab). Red is kept for safety only;
+  /// white on it passes AA in both modes.
+  Widget _helpNow(BuildContext context) {
+    final p = LwPalette.of(context);
+    return FilledButton.icon(
+      key: const Key('care-help-now'),
+      style: FilledButton.styleFrom(
+        backgroundColor: p.emergency,
+        foregroundColor: p.onEmergency,
+        shape: const StadiumBorder(),
+        minimumSize: const Size(LwSize.minTapTarget, LwSize.minTapTarget),
+      ),
+      onPressed: () => context.push(CareScreen.helpPath),
+      icon: const Icon(Icons.support_outlined),
+      label: Text(AppLocalizations.of(context).careHelpNow),
+    );
+  }
+
+  Widget _clinicianCard(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    return Card(
+      key: const Key('care-clinician'),
+      child: Padding(
+        padding: const EdgeInsets.all(LwSpacing.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l.careClinicianTitle, style: t.titleSmall),
+            const SizedBox(height: LwSpacing.xxs),
+            Text(l.careClinicianBody, style: t.bodySmall),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _disclaimer(BuildContext context) => Text(
+    AppLocalizations.of(context).careDisclaimer,
+    key: const Key('care-disclaimer'),
+    textAlign: TextAlign.center,
+    style: Theme.of(context).textTheme.labelSmall,
+  );
+
+  /// Care without the chat (coach not built): the coach, kindly, and the
+  /// approved lessons that can help now.
+  List<Widget> _support(BuildContext context, String coach) {
     final l = AppLocalizations.of(context);
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
+    return [
+      Container(
+        key: const Key('care-hero'),
+        padding: const EdgeInsets.all(LwSpacing.cardPadding),
+        decoration: BoxDecoration(color: p.mint, borderRadius: LwRadius.lgAll),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              coach,
+              style: t.labelMedium?.copyWith(color: p.onTintSecondary),
+            ),
+            const SizedBox(height: LwSpacing.xs),
+            CoachAvatar(
+              expression: AvatarExpression.calm,
+              bubble: l.careSupportBubble,
+              size: 96,
+            ),
+          ],
+        ),
+      ),
+      ..._resources(context),
+    ];
+  }
+
+  List<Widget> _resources(BuildContext context) {
     final resources = [
       for (final x in ref.watch(lessonsProvider).value ?? const <Lesson>[])
         if (x.kind == LessonKind.lesson) x,
     ].take(2).toList();
+    if (resources.isEmpty) return const [];
+    return [
+      LwSectionHeader(AppLocalizations.of(context).careResourcesTitle),
+      for (final r in resources)
+        Padding(
+          padding: const EdgeInsets.only(bottom: LwSpacing.sm),
+          child: _ResourceCard(r),
+        ),
+    ];
+  }
+
+  List<Widget> _chat(
+    BuildContext context,
+    String coach,
+    List<ChatMessage> messages, {
+    required bool voiceOn,
+  }) {
+    final l = AppLocalizations.of(context);
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
     return [
       // The coach listening, or calm after a safety reply.
       Container(
@@ -326,8 +409,10 @@ class _CareScreenState extends ConsumerState<CareScreen> {
         ],
       ],
       const SizedBox(height: LwSpacing.md),
-      const _TapToSpeak(),
-      const SizedBox(height: LwSpacing.md),
+      if (voiceOn) ...[
+        const _TapToSpeak(),
+        const SizedBox(height: LwSpacing.md),
+      ],
       TextField(
         key: const Key('care-input'),
         controller: _text,
@@ -344,21 +429,14 @@ class _CareScreenState extends ConsumerState<CareScreen> {
           ),
         ),
       ),
-      if (resources.isNotEmpty) ...[
-        LwSectionHeader(l.careResourcesTitle),
-        for (final r in resources)
-          Padding(
-            padding: const EdgeInsets.only(bottom: LwSpacing.sm),
-            child: _ResourceCard(r),
-          ),
-      ],
+      ..._resources(context),
     ];
   }
 }
 
-/// The big green mic with a waveform. Talking to the coach isn't built, so
-/// it says "Coming soon" and does nothing (phone bug). The waveform is
-/// still, so it is fine with reduced motion.
+/// The big green mic with a waveform, shown only with `coachVoice` on (dev
+/// preview today). The waveform is still, so it is fine with reduced
+/// motion.
 class _TapToSpeak extends StatelessWidget {
   const _TapToSpeak();
 
@@ -371,7 +449,7 @@ class _TapToSpeak extends StatelessWidget {
       key: const Key('care-talk'),
       container: true,
       excludeSemantics: true,
-      label: l.careTalkSoonLabel,
+      label: l.careTapToSpeak,
       child: Column(
         children: [
           Row(
@@ -399,11 +477,6 @@ class _TapToSpeak extends StatelessWidget {
           ),
           const SizedBox(height: LwSpacing.xs),
           Text(l.careTapToSpeak, style: t.titleSmall),
-          Text(
-            l.careStatusSoon,
-            key: const Key('care-talk-soon'),
-            style: t.labelMedium?.copyWith(color: p.textSecondary),
-          ),
         ],
       ),
     );
@@ -456,20 +529,22 @@ class _ResourceCard extends StatelessWidget {
   }
 }
 
+/// "AI voice" while the coach speaks (FR-VOC-08).
 class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.voiceOn});
-  final bool voiceOn;
+  const _StatusPill();
 
   @override
   Widget build(BuildContext context) {
     final p = LwPalette.of(context);
     final l = AppLocalizations.of(context);
-    final (text, fill, ink) = voiceOn
-        ? (l.careStatusAiVoice, p.heroSurface, p.onHeroSurface)
-        : (l.careStatusSoon, p.primaryTint, p.onPrimaryTint);
+    final (text, fill, ink) = (
+      l.careStatusAiVoice,
+      p.heroSurface,
+      p.onHeroSurface,
+    );
     return Semantics(
       container: true,
-      label: voiceOn ? l.careStatusAiVoiceLabel : text,
+      label: l.careStatusAiVoiceLabel,
       excludeSemantics: true,
       child: Container(
         key: const Key('care-status'),
@@ -481,10 +556,8 @@ class _StatusPill extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (voiceOn) ...[
-              Icon(Icons.graphic_eq, size: LwSize.iconSm, color: ink),
-              const SizedBox(width: LwSpacing.xxs),
-            ],
+            Icon(Icons.graphic_eq, size: LwSize.iconSm, color: ink),
+            const SizedBox(width: LwSpacing.xxs),
             Text(
               text,
               style: Theme.of(context).textTheme.labelMedium

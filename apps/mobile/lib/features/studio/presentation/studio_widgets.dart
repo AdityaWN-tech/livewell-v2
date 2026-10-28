@@ -408,30 +408,36 @@ class VoiceChoices extends StatelessWidget {
           previewTooltip: l.voicePreview(voiceName(l, v)),
           previewKey: Key('voice-play-${v.id}'),
         ),
-      if (flags.drGokulaVoice)
+      // Never a row that can't be chosen (Step 4d, D-56): Dr. Gokula's
+      // voice shows once it is licensed and in the library.
+      if (flags.drGokulaVoice &&
+          VoiceLibrary.all.any((v) => v.id == drGokulaVoiceId))
         VoiceRow(
           key: const Key('voice-dr-gokula'),
           icon: Icons.verified_outlined,
           name: l.studioDrGokula,
           detail: l.voiceAiLabel,
-          status: l.studioVoiceSoon,
+          onTap: () => onSelect(
+            VoiceLibrary.all.firstWhere((v) => v.id == drGokulaVoiceId),
+          ),
         ),
-      VoiceRow(
-        key: const Key('voice-own'),
-        icon: Icons.record_voice_over_outlined,
-        name: l.studioMyVoice,
-        detail: l.voiceAiLabel,
-        status: clone ? null : l.studioVoiceSoon,
-        onTap: clone ? onOwnVoice : null,
-      ),
-      VoiceRow(
-        key: const Key('voice-loved-one'),
-        icon: Icons.add_circle_outline,
-        name: l.studioLovedOne,
-        detail: l.voiceAiLabel,
-        status: clone ? null : l.studioVoiceSoon,
-        onTap: clone ? onOwnVoice : null,
-      ),
+      if (clone)
+        VoiceRow(
+          key: const Key('voice-own'),
+          icon: Icons.record_voice_over_outlined,
+          name: l.studioMyVoice,
+          detail: l.voiceAiLabel,
+          onTap: onOwnVoice,
+        ),
+      // Phase 2 (FR-VOC-03): its own flag and consent flow.
+      if (flags.lovedOneVoice)
+        VoiceRow(
+          key: const Key('voice-loved-one'),
+          icon: Icons.add_circle_outline,
+          name: l.studioLovedOne,
+          detail: l.voiceAiLabel,
+          onTap: onOwnVoice,
+        ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

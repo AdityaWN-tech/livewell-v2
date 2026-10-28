@@ -11,6 +11,9 @@ class FeatureFlags {
     this.drGokulaVoice = false,
     this.avatarFromPhoto = false,
     this.avatarMaker = false,
+    this.coachChat = false,
+    this.coachVoice = false,
+    this.lovedOneVoice = false,
   });
 
   /// Morning briefing player (FR-DLY-01). Off until briefings are generated.
@@ -37,6 +40,19 @@ class FeatureFlags {
   /// prompts and options are reviewed; also hidden while the service isn't
   /// set up in the app.
   final bool avatarMaker;
+
+  /// Typing to the coach on Care (FR-CNV-01). Off until the agent service
+  /// answers (T-AGT, ADR-001); until then Care shows help, resources and
+  /// the clinician card, never a chat that can't answer (Step 4d, D-56).
+  final bool coachChat;
+
+  /// Talking to the coach out loud (FR-CNV-01/02). Off until speech-to-text,
+  /// the coach's voice and the agent exist.
+  final bool coachVoice;
+
+  /// "A loved one's voice" (FR-VOC-03, Phase 2). Off until its own consent
+  /// and clone flow exist.
+  final bool lovedOneVoice;
 }
 
 final featureFlagsProvider = Provider<FeatureFlags>(

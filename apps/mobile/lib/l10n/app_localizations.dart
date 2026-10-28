@@ -373,25 +373,25 @@ abstract class AppLocalizations {
   /// No description provided for @consentTermsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Terms of use'**
+  /// **'Terms of Service'**
   String get consentTermsTitle;
 
   /// No description provided for @consentPrivacyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Privacy policy'**
+  /// **'Privacy Policy'**
   String get consentPrivacyTitle;
 
   /// No description provided for @consentMedicalDisclaimerTitle.
   ///
   /// In en, this message translates to:
-  /// **'Medical disclaimer'**
+  /// **'Medical Disclaimer'**
   String get consentMedicalDisclaimerTitle;
 
   /// No description provided for @consentAiDisclosureTitle.
   ///
   /// In en, this message translates to:
-  /// **'AI disclosure'**
+  /// **'AI Disclosure'**
   String get consentAiDisclosureTitle;
 
   /// No description provided for @devPreviewApp.
@@ -535,14 +535,8 @@ abstract class AppLocalizations {
   /// No description provided for @legalBody.
   ///
   /// In en, this message translates to:
-  /// **'Please read and accept each of these. Your acceptance is saved with the version and the date.'**
+  /// **'Tap a name to read it. When you tick the box, we save your acceptance of each one with its version and the date.'**
   String get legalBody;
-
-  /// No description provided for @legalRead.
-  ///
-  /// In en, this message translates to:
-  /// **'Read'**
-  String get legalRead;
 
   /// No description provided for @legalAcceptAll.
   ///
@@ -553,7 +547,7 @@ abstract class AppLocalizations {
   /// No description provided for @legalAcceptHint.
   ///
   /// In en, this message translates to:
-  /// **'Tick all four to continue.'**
+  /// **'Tick the box to continue.'**
   String get legalAcceptHint;
 
   /// No description provided for @legalVersion.
@@ -561,6 +555,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version {version}'**
   String legalVersion(String version);
+
+  /// Step 3: the one legal checkbox. Each placeholder is a document name shown as a link; keep all four.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the {terms}, {privacy}, {medical} and {ai}'**
+  String legalAgree(String terms, String privacy, String medical, String ai);
 
   /// No description provided for @legalLoadError.
   ///
@@ -3289,13 +3289,13 @@ abstract class AppLocalizations {
   /// No description provided for @profileTerms.
   ///
   /// In en, this message translates to:
-  /// **'Terms of use'**
+  /// **'Terms of Service'**
   String get profileTerms;
 
   /// No description provided for @profilePrivacyPolicy.
   ///
   /// In en, this message translates to:
-  /// **'Privacy policy'**
+  /// **'Privacy Policy'**
   String get profilePrivacyPolicy;
 
   /// No description provided for @profileVersion.

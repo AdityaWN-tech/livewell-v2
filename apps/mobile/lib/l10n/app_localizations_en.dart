@@ -164,16 +164,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shares anonymous usage counts, never your health details.';
 
   @override
-  String get consentTermsTitle => 'Terms of use';
+  String get consentTermsTitle => 'Terms of Service';
 
   @override
-  String get consentPrivacyTitle => 'Privacy policy';
+  String get consentPrivacyTitle => 'Privacy Policy';
 
   @override
-  String get consentMedicalDisclaimerTitle => 'Medical disclaimer';
+  String get consentMedicalDisclaimerTitle => 'Medical Disclaimer';
 
   @override
-  String get consentAiDisclosureTitle => 'AI disclosure';
+  String get consentAiDisclosureTitle => 'AI Disclosure';
 
   @override
   String get devPreviewApp => 'Preview the app (dev build only)';
@@ -254,20 +254,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get legalBody =>
-      'Please read and accept each of these. Your acceptance is saved with the version and the date.';
-
-  @override
-  String get legalRead => 'Read';
+      'Tap a name to read it. When you tick the box, we save your acceptance of each one with its version and the date.';
 
   @override
   String get legalAcceptAll => 'Accept and continue';
 
   @override
-  String get legalAcceptHint => 'Tick all four to continue.';
+  String get legalAcceptHint => 'Tick the box to continue.';
 
   @override
   String legalVersion(String version) {
     return 'Version $version';
+  }
+
+  @override
+  String legalAgree(String terms, String privacy, String medical, String ai) {
+    return 'I agree to the $terms, $privacy, $medical and $ai';
   }
 
   @override
@@ -1820,10 +1822,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileHelp => 'Help & about';
 
   @override
-  String get profileTerms => 'Terms of use';
+  String get profileTerms => 'Terms of Service';
 
   @override
-  String get profilePrivacyPolicy => 'Privacy policy';
+  String get profilePrivacyPolicy => 'Privacy Policy';
 
   @override
   String profileVersion(String version) {

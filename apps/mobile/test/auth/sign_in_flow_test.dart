@@ -166,10 +166,8 @@ void main() {
 
     await tapText(tester, 'Continue');
     await tapText(tester, "Yes, I'm 18 or older");
-    for (var i = 0; i < 4; i++) {
-      await tester.tap(find.byType(CheckboxListTile).at(i));
-      await tester.pumpAndSettle();
-    }
+    await tester.tap(find.byKey(const Key('legal-agree-box')));
+    await tester.pumpAndSettle();
     await tapText(tester, 'Accept and continue');
     expect(find.byType(AvatarScreen), findsOneWidget);
     expect(h.profiles.created.keys, ['google:1']);

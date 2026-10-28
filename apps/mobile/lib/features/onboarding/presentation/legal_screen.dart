@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,18 +15,72 @@ import '../data/onboarding_store.dart';
 import '../domain/onboarding_progress.dart';
 import 'about_screen.dart' show OnboardingScaffold;
 
-/// Accept the four legal documents, each version-stamped (FR-ONB-02).
-/// Continue stays disabled until all four are ticked.
-class LegalScreen extends ConsumerWidget {
+/// Accept the four legal documents with one checkbox (Step 3, D-52): "I agree
+/// to the Terms of Service, Privacy Policy, Medical Disclaimer and AI
+/// Disclosure", each name a link to its text. Continue stays disabled until
+/// it is ticked. Each document is still its own version-stamped consent
+/// record (FR-ONB-02, written at sign-in by AccountSetup); the optional
+/// permissions stay separate (FR-ONB-03).
+class LegalScreen extends ConsumerStatefulWidget {
   const LegalScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LegalScreen> createState() => _LegalScreenState();
+}
+
+class _LegalScreenState extends ConsumerState<LegalScreen> {
+  late final _links = {
+    for (final type in legalDocuments)
+      type: TapGestureRecognizer()
+        ..onTap = () => context.push('/onboarding/legal/${type.key}'),
+  };
+
+  @override
+  void dispose() {
+    for (final r in _links.values) {
+      r.dispose();
+    }
+    super.dispose();
+  }
+
+  /// The sentence with each document name as a link. The names are passed
+  /// as markers so the translated sentence decides where they go.
+  List<InlineSpan> _sentence(AppLocalizations l, TextStyle? link) {
+    String mark(ConsentType type) => '\u0000${type.index}\u0000';
+    final text = l.legalAgree(
+      mark(ConsentType.terms),
+      mark(ConsentType.privacy),
+      mark(ConsentType.medicalDisclaimer),
+      mark(ConsentType.aiDisclosure),
+    );
+    final parts = text.split('\u0000');
+    return [
+      for (var i = 0; i < parts.length; i++)
+        if (i.isOdd)
+          TextSpan(
+            text: ConsentType.values[int.parse(parts[i])].title(l),
+            style: link,
+            recognizer: _links[ConsentType.values[int.parse(parts[i])]],
+          )
+        else if (parts[i].isNotEmpty)
+          TextSpan(text: parts[i]),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final progress = ref.watch(onboardingProvider).value;
-    final accepted = progress?.legalAcceptedAt ?? const {};
     final allAccepted = progress?.allLegalAccepted ?? false;
+    void setAccepted(bool value) => ref
+        .read(onboardingProvider.notifier)
+        .setAllLegalAccepted(accepted: value, now: DateTime.now());
+    final link = t.bodyLarge?.copyWith(
+      color: LwPalette.of(context).accentStrong,
+      decoration: TextDecoration.underline,
+      fontWeight: FontWeight.w600,
+    );
 
     return OnboardingScaffold(
       title: l.legalTitle,
@@ -60,34 +115,48 @@ class LegalScreen extends ConsumerWidget {
           style: t.labelSmall?.copyWith(color: LwPalette.of(context).caution),
         ),
         const SizedBox(height: LwSpacing.md),
-        for (final type in legalDocuments)
-          Row(
-            children: [
-              Expanded(
-                child: CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  value: accepted.containsKey(type),
-                  title: Text(type.title(l), style: t.titleMedium),
-                  subtitle: Text(
-                    l.legalVersion(ConsentTexts.versionOf(type)),
-                    style: t.labelSmall,
+        // Tapping the box or the plain words ticks it; tapping a name opens
+        // that document.
+        InkWell(
+          key: const Key('legal-agree'),
+          borderRadius: BorderRadius.circular(LwRadius.sm),
+          onTap: () => setAccepted(!allAccepted),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: LwSpacing.xs),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Semantics(
+                  label: l.legalAgree(
+                    ConsentType.terms.title(l),
+                    ConsentType.privacy.title(l),
+                    ConsentType.medicalDisclaimer.title(l),
+                    ConsentType.aiDisclosure.title(l),
                   ),
-                  onChanged: (value) => ref
-                      .read(onboardingProvider.notifier)
-                      .setLegalAccepted(
-                        type,
-                        accepted: value ?? false,
-                        now: DateTime.now(),
-                      ),
+                  child: Checkbox(
+                    key: const Key('legal-agree-box'),
+                    value: allAccepted,
+                    onChanged: (value) => setAccepted(value ?? false),
+                  ),
                 ),
-              ),
-              TextButton(
-                onPressed: () => context.push('/onboarding/legal/${type.key}'),
-                child: Text(l.legalRead),
-              ),
-            ],
+                const SizedBox(width: LwSpacing.xxs),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: LwSpacing.xs),
+                    child: Text.rich(
+                      TextSpan(
+                        style: t.bodyLarge,
+                        children: _sentence(l, link),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
+        ),
+        const SizedBox(height: LwSpacing.xs),
+        Text(l.legalVersion(ConsentTexts.draftVersion), style: t.labelSmall),
       ],
     );
   }

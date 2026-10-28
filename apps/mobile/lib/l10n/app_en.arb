@@ -62,10 +62,10 @@
   "consentMarketingBody": "Occasional emails about new Live Well courses and programs.",
   "consentAnalyticsTitle": "Help improve the app",
   "consentAnalyticsBody": "Shares anonymous usage counts, never your health details.",
-  "consentTermsTitle": "Terms of use",
-  "consentPrivacyTitle": "Privacy policy",
-  "consentMedicalDisclaimerTitle": "Medical disclaimer",
-  "consentAiDisclosureTitle": "AI disclosure",
+  "consentTermsTitle": "Terms of Service",
+  "consentPrivacyTitle": "Privacy Policy",
+  "consentMedicalDisclaimerTitle": "Medical Disclaimer",
+  "consentAiDisclosureTitle": "AI Disclosure",
   "devPreviewApp": "Preview the app (dev build only)",
   "devPreviewNotSaved": "Preview mode: changes here are not saved.",
   "aboutTitle": "What Live Well does",
@@ -89,16 +89,25 @@
   "under18Body": "Thank you for your interest. Live Well is made for people 18 and older, so we haven't saved anything. If you'd like support with your health, a parent, school nurse or doctor is a great place to start.",
   "under18Back": "Back to start",
   "legalTitle": "Before you start",
-  "legalBody": "Please read and accept each of these. Your acceptance is saved with the version and the date.",
-  "legalRead": "Read",
+  "legalBody": "Tap a name to read it. When you tick the box, we save your acceptance of each one with its version and the date.",
   "legalAcceptAll": "Accept and continue",
-  "legalAcceptHint": "Tick all four to continue.",
+  "legalAcceptHint": "Tick the box to continue.",
   "legalVersion": "Version {version}",
   "@legalVersion": {
     "placeholders": {
       "version": {
         "type": "String"
       }
+    }
+  },
+  "legalAgree": "I agree to the {terms}, {privacy}, {medical} and {ai}",
+  "@legalAgree": {
+    "description": "Step 3: the one legal checkbox. Each placeholder is a document name shown as a link; keep all four.",
+    "placeholders": {
+      "terms": {"type": "String"},
+      "privacy": {"type": "String"},
+      "medical": {"type": "String"},
+      "ai": {"type": "String"}
     }
   },
   "legalLoadError": "We couldn't open this document. Please try again.",
@@ -977,8 +986,8 @@
   "profileDeleted": "Deleted.",
   "profileDeleteFailed": "We couldn’t delete that right now. Please try again later.",
   "profileHelp": "Help & about",
-  "profileTerms": "Terms of use",
-  "profilePrivacyPolicy": "Privacy policy",
+  "profileTerms": "Terms of Service",
+  "profilePrivacyPolicy": "Privacy Policy",
   "profileVersion": "Version {version}",
   "@profileVersion": {
     "placeholders": {

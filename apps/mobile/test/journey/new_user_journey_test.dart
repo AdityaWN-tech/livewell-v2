@@ -72,23 +72,10 @@ Future<void> tapKey(WidgetTester tester, String key) =>
 Future<void> tapLabel(WidgetTester tester, String text) =>
     tapFinder(tester, find.text(text));
 
-/// Ticks every legal document (the list is built lazily, so scroll down
-/// and tick what appears, as a person would), then accepts.
+/// Ticks the one legal checkbox ("I agree to the Terms of Service, ..."),
+/// then accepts.
 Future<void> acceptLegal(WidgetTester tester) async {
-  Finder unticked() =>
-      find.byWidgetPredicate((w) => w is CheckboxListTile && w.value != true);
-  for (var round = 0; round < 12; round++) {
-    if (unticked().evaluate().isEmpty) {
-      await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
-      await tester.pumpAndSettle();
-      if (unticked().evaluate().isEmpty) break;
-      continue;
-    }
-    await tester.ensureVisible(unticked().first);
-    await tester.pumpAndSettle();
-    await tester.tap(unticked().first);
-    await tester.pumpAndSettle();
-  }
+  await tapKey(tester, 'legal-agree-box');
   await tapLabel(tester, 'Accept and continue');
 }
 

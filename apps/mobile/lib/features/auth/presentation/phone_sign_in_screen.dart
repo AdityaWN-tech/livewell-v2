@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
@@ -13,11 +14,18 @@ import '../domain/auth.dart';
 import 'auth_copy.dart';
 
 /// Phone sign-in with a one-time SMS code (D-02). Two stages: number, then
-/// code. "Resend" unlocks after [resendDelay].
+/// code. "Resend" unlocks after [resendDelay]. With [linking], the same
+/// screen adds a number to the signed-in account (Profile, Step 4c) and
+/// goes back with true once it's added.
 class PhoneSignInScreen extends ConsumerStatefulWidget {
-  const PhoneSignInScreen({super.key});
+  const PhoneSignInScreen({super.key, this.linking = false});
+
+  final bool linking;
 
   static const resendDelay = Duration(seconds: 30);
+
+  /// Profile > Add a phone number.
+  static const linkPath = '/profile/phone';
 
   @override
   ConsumerState<PhoneSignInScreen> createState() => _PhoneSignInScreenState();
@@ -61,12 +69,11 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
     final e164 = _country.toE164(_number.text)!;
     setState(() => _busy = true);
     try {
-      final v = await ref
-          .read(authServiceProvider)
-          .startPhoneSignIn(
-            e164,
-            resendToken: resend ? _verification?.resendToken : null,
-          );
+      final auth = ref.read(authServiceProvider);
+      final token = resend ? _verification?.resendToken : null;
+      final v = widget.linking
+          ? await auth.startPhoneLink(e164, resendToken: token)
+          : await auth.startPhoneSignIn(e164, resendToken: token);
       if (!mounted) return;
       setState(() => _verification = v);
       _startResendTimer();
@@ -81,6 +88,18 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
     if (!_codeForm.currentState!.validate()) return;
     setState(() => _busy = true);
     final v = _verification!;
+    if (widget.linking) {
+      final l = AppLocalizations.of(context);
+      try {
+        await ref.read(authServiceProvider).confirmPhoneLink(v, _code.text);
+        if (mounted) context.pop(true);
+      } on AuthException catch (e) {
+        if (mounted) showAuthMessage(context, authErrorText(l, e.failure));
+      } finally {
+        if (mounted) setState(() => _busy = false);
+      }
+      return;
+    }
     await runSignIn(
       context,
       ref,
@@ -109,7 +128,7 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
       child: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
-          LwPageTitle(l.phoneTitle),
+          LwPageTitle(widget.linking ? l.profileLinkPhone : l.phoneTitle),
           Text(l.phoneCountryLabel, style: t.labelMedium),
           const SizedBox(height: LwSpacing.xs),
           SegmentedButton<PhoneCountry>(

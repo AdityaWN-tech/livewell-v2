@@ -13,6 +13,7 @@ import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../auth/domain/auth.dart';
 import '../../auth/presentation/auth_copy.dart';
+import '../../auth/presentation/phone_sign_in_screen.dart';
 import '../../home/application/home_data.dart';
 import '../../routine/domain/routine_reminders.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
@@ -195,6 +196,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         await auth.link(p);
       }
       if (mounted) setState(() {});
+    } on AuthException catch (e) {
+      if (mounted) showAuthMessage(context, authErrorText(l, e.failure));
+    }
+  }
+
+  /// Add a phone number (one-time code), or remove it.
+  Future<void> _phone(bool linked) async {
+    if (!_signedIn) return;
+    final l = AppLocalizations.of(context);
+    if (!linked) {
+      final added = await context.push<bool>(PhoneSignInScreen.linkPath);
+      if (!mounted) return;
+      setState(() {});
+      if (added ?? false) _say(l.profilePhoneAdded);
+      return;
+    }
+    final phone = ref.read(authServiceProvider).currentUser?.phoneNumber ?? '';
+    if (!await _confirm(
+      l.profileRemovePhoneTitle,
+      l.profileRemovePhoneBody(phone),
+      l.profileRemovePhone,
+    )) {
+      return;
+    }
+    try {
+      await ref.read(authServiceProvider).unlinkPhone();
+      if (!mounted) return;
+      setState(() {});
+      _say(l.profilePhoneRemoved);
     } on AuthException catch (e) {
       if (mounted) showAuthMessage(context, authErrorText(l, e.failure));
     }
@@ -471,13 +501,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     onTap: () =>
                         _toggleLink(sp, providers.contains(sp.providerId)),
                   ),
-                if (!providers.contains('phone'))
-                  soon(
-                    'profile-link-phone',
-                    // "Coming soon" is the subtitle; never twice (phone bug).
-                    l.profileLinkPhone,
-                    Icons.phone_iphone,
+                ListTile(
+                  key: const Key('profile-link-phone'),
+                  leading: Icon(
+                    providers.contains('phone')
+                        ? Icons.phone_iphone
+                        : Icons.add_call,
                   ),
+                  title: Text(
+                    providers.contains('phone')
+                        ? l.profileRemovePhone
+                        : l.profileLinkPhone,
+                  ),
+                  subtitle: providers.contains('phone')
+                      ? Text(user?.phoneNumber ?? '')
+                      : null,
+                  onTap: () => _phone(providers.contains('phone')),
+                ),
                 ListTile(
                   key: const Key('profile-switch'),
                   leading: const Icon(Icons.switch_account_outlined),

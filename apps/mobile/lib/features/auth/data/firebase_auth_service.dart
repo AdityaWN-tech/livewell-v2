@@ -90,16 +90,37 @@ class FirebaseAuthService implements AuthService {
   Future<PhoneVerification> startPhoneSignIn(
     String phoneE164, {
     int? resendToken,
-  }) {
+  }) => _verifyPhone(
+    phoneE164,
+    resendToken,
+    (credential) => _auth.signInWithCredential(credential),
+  );
+
+  @override
+  Future<PhoneVerification> startPhoneLink(
+    String phoneE164, {
+    int? resendToken,
+  }) => _verifyPhone(
+    phoneE164,
+    resendToken,
+    (credential) => _auth.currentUser!.linkWithCredential(credential),
+  );
+
+  /// Sends the SMS code. Android may read it by itself: then [onAuto] signs
+  /// in or adds the number; the code screen still works if not.
+  Future<PhoneVerification> _verifyPhone(
+    String phoneE164,
+    int? resendToken,
+    Future<fb.UserCredential> Function(fb.PhoneAuthCredential) onAuto,
+  ) {
     final result = Completer<PhoneVerification>();
     _auth.verifyPhoneNumber(
       phoneNumber: phoneE164,
       forceResendingToken: resendToken,
       timeout: const Duration(seconds: 60),
-      // Android may read the SMS itself; the code screen still works if not.
       verificationCompleted: (credential) async {
         try {
-          await _auth.signInWithCredential(credential);
+          await onAuto(credential);
         } on fb.FirebaseAuthException {
           // The user can still type the code.
         }
@@ -237,6 +258,34 @@ class FirebaseAuthService implements AuthService {
     }
     try {
       return _user(await user.unlink(p.providerId));
+    } on fb.FirebaseAuthException catch (e) {
+      throw AuthException(authFailureFromCode(e.code), e.message);
+    }
+  }
+
+  @override
+  Future<AuthUser> confirmPhoneLink(PhoneVerification v, String code) {
+    final user = _auth.currentUser!;
+    // Auto-retrieval may already have added it.
+    if (user.phoneNumber == v.phoneNumber) return Future.value(_user(user));
+    return _guard(
+      () => user.linkWithCredential(
+        fb.PhoneAuthProvider.credential(
+          verificationId: v.verificationId,
+          smsCode: code.trim(),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Future<AuthUser> unlinkPhone() async {
+    final user = _auth.currentUser!;
+    if (user.providerData.length <= 1) {
+      throw const AuthException(AuthFailure.lastMethod);
+    }
+    try {
+      return _user(await user.unlink(fb.PhoneAuthProvider.PROVIDER_ID));
     } on fb.FirebaseAuthException catch (e) {
       throw AuthException(authFailureFromCode(e.code), e.message);
     }

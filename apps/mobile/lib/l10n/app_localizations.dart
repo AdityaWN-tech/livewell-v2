@@ -3010,12 +3010,6 @@ abstract class AppLocalizations {
   /// **'Remove {provider}'**
   String profileUnlink(String provider);
 
-  /// No description provided for @profileLinkPhoneSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Add a phone number: coming soon'**
-  String get profileLinkPhoneSoon;
-
   /// No description provided for @profileLogOut.
   ///
   /// In en, this message translates to:
@@ -6170,6 +6164,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You kept up {step} on {days} days.'**
   String winsSteady(String step, int days);
+
+  /// Profile: add or remove a phone number (Step 4c, D-55).
+  ///
+  /// In en, this message translates to:
+  /// **'This number is already used by another Live Well account. Sign in with it there, or use a different number.'**
+  String get authErrorPhoneInUse;
+
+  /// Profile: add or remove a phone number (Step 4c, D-55).
+  ///
+  /// In en, this message translates to:
+  /// **'Your account already has a phone number.'**
+  String get authErrorAlreadyLinked;
+
+  /// Profile: add or remove a phone number (Step 4c, D-55).
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone number is added. You can sign in with it next time.'**
+  String get profilePhoneAdded;
+
+  /// Profile: add or remove a phone number (Step 4c, D-55).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove phone number'**
+  String get profileRemovePhone;
+
+  /// Profile: add or remove a phone number (Step 4c, D-55).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove your phone number?'**
+  String get profileRemovePhoneTitle;
+
+  /// Profile: add or remove a phone number (Step 4c, D-55).
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number removed.'**
+  String get profilePhoneRemoved;
+
+  /// Profile: add or remove a phone number (Step 4c, D-55).
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t be able to sign in with {phone} any more. You can add it again later.'**
+  String profileRemovePhoneBody(String phone);
 }
 
 class _AppLocalizationsDelegate

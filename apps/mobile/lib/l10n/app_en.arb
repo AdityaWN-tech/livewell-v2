@@ -930,7 +930,6 @@
       }
     }
   },
-  "profileLinkPhoneSoon": "Add a phone number: coming soon",
   "profileLogOut": "Log out",
   "profileSwitch": "Switch account",
   "profileLogOutTitle": "Log out?",
@@ -2025,5 +2024,19 @@
   "winsRoutine": "{count, plural, =1{You did 1 routine step.} other{You did {count} routine steps.}}",
   "@winsRoutine": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"count": {"type": "int"}}},
   "winsSteady": "You kept up {step} on {days} days.",
-  "@winsSteady": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"step": {"type": "String"}, "days": {"type": "int"}}}
+  "@winsSteady": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"step": {"type": "String"}, "days": {"type": "int"}}},
+  "authErrorPhoneInUse": "This number is already used by another Live Well account. Sign in with it there, or use a different number.",
+  "@authErrorPhoneInUse": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "authErrorAlreadyLinked": "Your account already has a phone number.",
+  "@authErrorAlreadyLinked": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "profilePhoneAdded": "Your phone number is added. You can sign in with it next time.",
+  "@profilePhoneAdded": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "profileRemovePhone": "Remove phone number",
+  "@profileRemovePhone": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "profileRemovePhoneTitle": "Remove your phone number?",
+  "@profileRemovePhoneTitle": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "profilePhoneRemoved": "Phone number removed.",
+  "@profilePhoneRemoved": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "profileRemovePhoneBody": "You won't be able to sign in with {phone} any more. You can add it again later.",
+  "@profileRemovePhoneBody": {"description": "Profile: add or remove a phone number (Step 4c, D-55).", "placeholders": {"phone": {"type": "String"}}}
 }

@@ -1674,9 +1674,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get profileLinkPhoneSoon => 'Add a phone number: coming soon';
-
-  @override
   String get profileLogOut => 'Log out';
 
   @override
@@ -3522,5 +3519,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String winsSteady(String step, int days) {
     return 'You kept up $step on $days days.';
+  }
+
+  @override
+  String get authErrorPhoneInUse =>
+      'This number is already used by another Live Well account. Sign in with it there, or use a different number.';
+
+  @override
+  String get authErrorAlreadyLinked =>
+      'Your account already has a phone number.';
+
+  @override
+  String get profilePhoneAdded =>
+      'Your phone number is added. You can sign in with it next time.';
+
+  @override
+  String get profileRemovePhone => 'Remove phone number';
+
+  @override
+  String get profileRemovePhoneTitle => 'Remove your phone number?';
+
+  @override
+  String get profilePhoneRemoved => 'Phone number removed.';
+
+  @override
+  String profileRemovePhoneBody(String phone) {
+    return 'You won\'t be able to sign in with $phone any more. You can add it again later.';
   }
 }

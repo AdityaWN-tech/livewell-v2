@@ -149,6 +149,48 @@ class FakeAuthService implements AuthService {
     );
   }
 
+  /// Numbers another account already uses (phoneInUse when added).
+  final takenPhones = <String>{};
+
+  @override
+  Future<PhoneVerification> startPhoneLink(
+    String phoneE164, {
+    int? resendToken,
+  }) => startPhoneSignIn(phoneE164, resendToken: resendToken);
+
+  @override
+  Future<AuthUser> confirmPhoneLink(PhoneVerification v, String code) async {
+    if (code != validCode) throw const AuthException(AuthFailure.wrongCode);
+    if (takenPhones.contains(v.phoneNumber)) {
+      throw const AuthException(AuthFailure.phoneInUse);
+    }
+    final u = signedIn!;
+    if (u.providers.contains('phone')) {
+      throw const AuthException(AuthFailure.alreadyLinked);
+    }
+    return signedIn = AuthUser(
+      uid: u.uid,
+      email: u.email,
+      phoneNumber: v.phoneNumber,
+      displayName: u.displayName,
+      providers: [...u.providers, 'phone'],
+    );
+  }
+
+  @override
+  Future<AuthUser> unlinkPhone() async {
+    final u = signedIn!;
+    if (u.providers.length <= 1) {
+      throw const AuthException(AuthFailure.lastMethod);
+    }
+    return signedIn = AuthUser(
+      uid: u.uid,
+      email: u.email,
+      displayName: u.displayName,
+      providers: [...u.providers]..remove('phone'),
+    );
+  }
+
   @override
   Future<AuthUser> unlink(SocialProvider p) async {
     final u = signedIn!;

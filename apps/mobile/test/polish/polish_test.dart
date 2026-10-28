@@ -155,7 +155,7 @@ void main() {
   });
 
   group('Profile', () {
-    testWidgets('"Coming soon" appears once on the phone row (phone bug)', (
+    testWidgets('the phone row says "Add a phone number" once (phone bug)', (
       tester,
     ) async {
       await signedIn().boot(tester);
@@ -171,9 +171,10 @@ void main() {
         find.descendant(of: row, matching: find.text('Add a phone number')),
         findsOneWidget,
       );
+      // Step 4c: it works now, so no "Coming soon".
       expect(
         find.descendant(of: row, matching: find.textContaining('oming soon')),
-        findsOneWidget,
+        findsNothing,
       );
     });
   });

@@ -933,9 +933,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Dr. Gokula’s way of building habits that last. Each letter is one part of your plan.';
 
   @override
-  String get frameworkSoon => 'Coming soon';
-
-  @override
   String get frameworkOpen => 'Open';
 
   @override
@@ -1011,13 +1008,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trackWeeklyWins => 'Weekly wins';
-
-  @override
-  String get trackWeeklyWinsSoonTitle => 'Weekly wins are coming soon';
-
-  @override
-  String get trackWeeklyWinsSoonBody =>
-      'Every Sunday your coach will sum up your week: what went well, your check-ins and one small change for next week.';
 
   @override
   String get trackGotIt => 'Got it';
@@ -3436,5 +3426,101 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String habitStoppedSnack(String title) {
     return '$title stopped. You can add a new habit any time.';
+  }
+
+  @override
+  String get winsTitle => 'Your weekly wins';
+
+  @override
+  String get winsSubtitle => 'The last 7 days. Every small step counts.';
+
+  @override
+  String get winsEmptyTitle => 'A fresh week';
+
+  @override
+  String get winsEmptyBody =>
+      'Your wins will show here as you check in and tick off your steps. One small step today is a great start.';
+
+  @override
+  String get winsNextTitle => 'One small change for next week';
+
+  @override
+  String get winsFirstTitle => 'Start with one check-in';
+
+  @override
+  String get winsFirstBody =>
+      'It takes under 30 seconds. Try it after breakfast tomorrow.';
+
+  @override
+  String get winsMoreTitle => 'Check in at the same time each day';
+
+  @override
+  String get winsMoreBody =>
+      'Pair your check-in with something you already do every day, like your morning tea.';
+
+  @override
+  String get winsSmallerTitle => 'Make one habit smaller';
+
+  @override
+  String get winsSmallerBody =>
+      'Pick your easiest habit and shrink it until it feels almost too easy. Then do it right after breakfast.';
+
+  @override
+  String get winsKeepTitle => 'Keep the same plan';
+
+  @override
+  String get winsKeepBody =>
+      'This week worked. Keep the same steps next week and notice how they feel.';
+
+  @override
+  String get winsOpenPlan => 'Open my plan';
+
+  @override
+  String get frameworkThoughtTitle => 'Today\'s thought';
+
+  @override
+  String get whyEditSaved => 'Your Why is saved.';
+
+  @override
+  String winsCheckIns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You checked in on $count days.',
+      one: 'You checked in on 1 day.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String winsMood(String word) {
+    return 'Your mood was mostly “$word”.';
+  }
+
+  @override
+  String winsHabits(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You did your habits $count times.',
+      one: 'You did a habit 1 time.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String winsRoutine(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You did $count routine steps.',
+      one: 'You did 1 routine step.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String winsSteady(String step, int days) {
+    return 'You kept up $step on $days days.';
   }
 }

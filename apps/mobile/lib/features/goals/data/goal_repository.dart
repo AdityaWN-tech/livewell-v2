@@ -28,6 +28,10 @@ abstract class GoalRepository {
 
   /// Marks a habit done for a day; the same habit twice is one log.
   Future<void> saveLog(HabitLog log);
+
+  /// Done logs from [from] to [to] (yyyy-mm-dd, inclusive). Offline: what
+  /// the phone has.
+  Future<List<HabitLog>> logsBetween(String from, String to);
 }
 
 /// Firestore implementation, with Firestore's offline persistence.
@@ -82,14 +86,38 @@ class FirestoreGoalRepository implements GoalRepository {
       .map(
         (s) => [
           for (final d in s.docs)
-            if (d.data()['status'] == 'done')
-              HabitLog(
-                date: d.data()['date'] as String,
-                habitId: d.data()['habit_id'] as String,
-                doneAt: (d.data()['done_at'] as Timestamp?)?.toDate(),
-              ),
+            if (d.data()['status'] == 'done') ?logFrom(d.data()),
         ],
       );
+
+  @override
+  Future<List<HabitLog>> logsBetween(String from, String to) async {
+    final query = _logs
+        .where('date', isGreaterThanOrEqualTo: from)
+        .where('date', isLessThanOrEqualTo: to);
+    QuerySnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await query.get().timeout(serverWait);
+    } catch (_) {
+      snap = await query.get(const GetOptions(source: Source.cache));
+    }
+    return [
+      for (final d in snap.docs)
+        if (d.data()['status'] == 'done') ?logFrom(d.data()),
+    ];
+  }
+
+  static HabitLog? logFrom(Map<String, dynamic> d) {
+    try {
+      return HabitLog(
+        date: d['date'] as String,
+        habitId: d['habit_id'] as String,
+        doneAt: (d['done_at'] as Timestamp?)?.toDate(),
+      );
+    } on TypeError {
+      return null;
+    }
+  }
 
   @override
   Future<void> saveLog(HabitLog log) => _upsert(_logs.doc(log.id), {
@@ -236,6 +264,12 @@ class InMemoryGoalRepository implements GoalRepository {
     logs[log.id] = log;
     _changes.add(null);
   }
+
+  @override
+  Future<List<HabitLog>> logsBetween(String from, String to) async => [
+    for (final l in logs.values)
+      if (l.date.compareTo(from) >= 0 && l.date.compareTo(to) <= 0) l,
+  ];
 }
 
 final _previewGoalsProvider = Provider<GoalRepository>(

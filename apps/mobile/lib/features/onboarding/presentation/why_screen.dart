@@ -18,7 +18,11 @@ import 'about_screen.dart' show OnboardingScaffold;
 /// Home. Checked by the red-flag rules before saving (T-ASM-02); nothing
 /// but the user's own Home reads it until the agents' checks exist (D-21).
 class WhyScreen extends ConsumerStatefulWidget {
-  const WhyScreen({super.key});
+  const WhyScreen({super.key, this.editing = false});
+
+  /// Changing the Why later (from MY GOAL DO IT): starts with the saved
+  /// Why, keeps the onboarding step, and goes back after saving.
+  final bool editing;
 
   /// Long enough for a sentence or two; the rules allow up to 280.
   static const maxLength = 200;
@@ -40,6 +44,9 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.editing) {
+      _text.text = ref.read(currentProfileProvider).value?.whyStatement ?? '';
+    }
     _text.addListener(() => setState(() {}));
   }
 
@@ -114,6 +121,18 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
         }
       }
 
+      if (widget.editing) {
+        final step = ref.read(currentProfileProvider).value?.onboardingStep;
+        await ref
+            .read(profileRepositoryProvider)
+            .saveWhy(uid, _text.text, nextStep: step ?? ProfileStep.assessment);
+        if (!mounted) return;
+        final l = AppLocalizations.of(context);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l.whyEditSaved)));
+        context.pop();
+        return;
+      }
       await ref
           .read(profileRepositoryProvider)
           .saveWhy(uid, _text.text, nextStep: ProfileStep.checkin);

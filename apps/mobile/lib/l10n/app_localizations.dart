@@ -1696,12 +1696,6 @@ abstract class AppLocalizations {
   /// **'Dr. Gokula’s way of building habits that last. Each letter is one part of your plan.'**
   String get frameworkIntro;
 
-  /// No description provided for @frameworkSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get frameworkSoon;
-
   /// No description provided for @frameworkOpen.
   ///
   /// In en, this message translates to:
@@ -1845,18 +1839,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weekly wins'**
   String get trackWeeklyWins;
-
-  /// No description provided for @trackWeeklyWinsSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekly wins are coming soon'**
-  String get trackWeeklyWinsSoonTitle;
-
-  /// No description provided for @trackWeeklyWinsSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Every Sunday your coach will sum up your week: what went well, your check-ins and one small change for next week.'**
-  String get trackWeeklyWinsSoonBody;
 
   /// No description provided for @trackGotIt.
   ///
@@ -6062,6 +6044,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{title} stopped. You can add a new habit any time.'**
   String habitStoppedSnack(String title);
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Your weekly wins'**
+  String get winsTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'The last 7 days. Every small step counts.'**
+  String get winsSubtitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'A fresh week'**
+  String get winsEmptyTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Your wins will show here as you check in and tick off your steps. One small step today is a great start.'**
+  String get winsEmptyBody;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'One small change for next week'**
+  String get winsNextTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Start with one check-in'**
+  String get winsFirstTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'It takes under 30 seconds. Try it after breakfast tomorrow.'**
+  String get winsFirstBody;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Check in at the same time each day'**
+  String get winsMoreTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Pair your check-in with something you already do every day, like your morning tea.'**
+  String get winsMoreBody;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Make one habit smaller'**
+  String get winsSmallerTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick your easiest habit and shrink it until it feels almost too easy. Then do it right after breakfast.'**
+  String get winsSmallerBody;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the same plan'**
+  String get winsKeepTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'This week worked. Keep the same steps next week and notice how they feel.'**
+  String get winsKeepBody;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Open my plan'**
+  String get winsOpenPlan;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s thought'**
+  String get frameworkThoughtTitle;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Your Why is saved.'**
+  String get whyEditSaved;
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You checked in on 1 day.} other{You checked in on {count} days.}}'**
+  String winsCheckIns(int count);
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'Your mood was mostly “{word}”.'**
+  String winsMood(String word);
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You did a habit 1 time.} other{You did your habits {count} times.}}'**
+  String winsHabits(int count);
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You did 1 routine step.} other{You did {count} routine steps.}}'**
+  String winsRoutine(int count);
+
+  /// Weekly wins and MY GOAL DO IT (Step 4b, D-54).
+  ///
+  /// In en, this message translates to:
+  /// **'You kept up {step} on {days} days.'**
+  String winsSteady(String step, int days);
 }
 
 class _AppLocalizationsDelegate

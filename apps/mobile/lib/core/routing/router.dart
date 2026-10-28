@@ -37,6 +37,7 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/track/presentation/track_screen.dart';
+import '../../features/track/presentation/weekly_wins_screen.dart';
 import '../../features/welcome/presentation/welcome_screen.dart';
 import '../../features/consent/domain/consent.dart';
 import '../config/flavor.dart';
@@ -94,7 +95,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: voicePath,
         builder: (context, state) => const VoiceScreen(),
       ),
-      GoRoute(path: whyPath, builder: (context, state) => const WhyScreen()),
+      // ?edit=1: changing the Why later (MY GOAL DO IT), not onboarding.
+      GoRoute(
+        path: whyPath,
+        builder: (context, state) =>
+            WhyScreen(editing: state.uri.queryParameters['edit'] == '1'),
+      ),
       // After the Why: first check-in, then the focus (T-ONB-03d).
       GoRoute(
         path: checkinPath,
@@ -144,6 +150,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'routine',
                         builder: (context, state) => const RoutineScreen(),
+                      ),
+                    // Weekly wins under Track (Step 4b).
+                    if (path == '/track')
+                      GoRoute(
+                        path: 'weekly',
+                        builder: (context, state) => const WeeklyWinsScreen(),
                       ),
                     if (path == '/learn')
                       GoRoute(

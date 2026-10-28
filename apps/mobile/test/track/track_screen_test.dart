@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
+import 'package:livewell/features/track/presentation/weekly_wins_screen.dart';
 import 'package:livewell/features/track/domain/track_models.dart';
 import 'package:livewell/features/track/domain/track_stats.dart';
 import 'package:livewell/features/track/presentation/track_screen.dart';
@@ -279,7 +280,7 @@ void main() {
       expect(find.byKey(const Key('track-health-soon')), findsOneWidget);
     });
 
-    testWidgets('Weekly Reflection: "How was your week?" is coming soon', (
+    testWidgets('Weekly Reflection: "How was your week?" opens weekly wins', (
       tester,
     ) async {
       await signedIn().boot(tester);
@@ -288,7 +289,7 @@ void main() {
       expect(find.text('How was your week?'), findsOneWidget);
       await tester.tap(find.byKey(const Key('track-weekly-wins')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('track-weekly-wins-soon')), findsOneWidget);
+      expect(find.byType(WeeklyWinsScreen), findsOneWidget);
     });
 
     testWidgets('a new check-in updates Track', (tester) async {

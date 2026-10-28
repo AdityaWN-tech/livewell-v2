@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/analytics/analytics.dart';
@@ -27,6 +28,7 @@ import '../application/track_data.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
 import '../domain/track_stats.dart';
+import 'weekly_wins_screen.dart';
 
 /// The streak card's data. Null until habit logs and the streak engine exist.
 /// TODO(T-DLY-07): read users/{uid}/streaks/current and this week's logs.
@@ -94,20 +96,12 @@ class TrackScreen extends ConsumerWidget {
         const SizedBox(height: LwSpacing.sectionGap),
         _WeekStreakCard(ref.watch(streakProvider)),
         LwSectionHeader(l.trackWeeklyTitle),
-        _WeeklyCard(onTap: () => _weeklyWins(context)),
+        _WeeklyCard(onTap: () => context.push(WeeklyWinsScreen.path)),
         const SizedBox(height: LwSpacing.sectionGap),
         const _ReflectionCard(),
       ],
     );
   }
-
-  /// FR-DLY-06 weekly review isn't built yet.
-  Future<void> _weeklyWins(BuildContext context) => _infoSheet(
-    context,
-    key: const Key('track-weekly-wins-soon'),
-    title: AppLocalizations.of(context).trackWeeklyWinsSoonTitle,
-    body: AppLocalizations.of(context).trackWeeklyWinsSoonBody,
-  );
 }
 
 Future<void> _infoSheet(

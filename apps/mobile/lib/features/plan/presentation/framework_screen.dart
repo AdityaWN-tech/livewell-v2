@@ -4,37 +4,130 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
+import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../account/application/account_setup.dart' show whyPath;
 import '../../account/data/profile_repository.dart';
+import '../../checkin/domain/checkin.dart';
+import '../../home/application/home_data.dart';
+import '../../checkin/presentation/checkin_sheet.dart';
+import '../../track/presentation/weekly_wins_screen.dart';
+import 'plan_screen.dart' show affirmationFor;
 
 /// MY GOAL DO IT, reached from Plan (FR-GOL-06). One row per letter
-/// (spec Appendix B). Parts that exist open; the rest say "Coming soon".
-/// TODO(T-GOL-06): re-house the prototype's tabs here once its code is
+/// (spec Appendix B); every letter opens the part of the app that does it
+/// (Step 4b, D-54), never a "coming soon".
+/// TODO(T-GOL-06): re-house the prototype's own tabs once its code is
 /// available (needs-product: the prototype isn't in this repo).
 class FrameworkScreen extends ConsumerWidget {
   const FrameworkScreen({super.key});
+
+  /// Mindset: the day's thought, the same one Plan shows.
+  Future<void> _thought(BuildContext context, DateTime now) {
+    final l = AppLocalizations.of(context);
+    final t = Theme.of(context).textTheme;
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Padding(
+          key: const Key('framework-thought'),
+          padding: const EdgeInsets.fromLTRB(
+            LwSpacing.lg,
+            0,
+            LwSpacing.lg,
+            LwSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l.frameworkThoughtTitle, style: t.titleLarge),
+              const SizedBox(height: LwSpacing.sm),
+              Text('“${affirmationFor(l, now)}”', style: t.headlineSmall),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Accountability: today's check-in, or Track once it's done.
+  Future<void> _checkIn(BuildContext context, WidgetRef ref) async {
+    if (ref.read(todayCheckInProvider).value != null) {
+      context.go('/track');
+      return;
+    }
+    final now = ref.read(clockProvider)();
+    await showCheckInSheet(
+      context,
+      date: localDateKey(now),
+      firstName: ref.read(firstNameProvider),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final why = ref.watch(currentProfileProvider).value?.whyStatement;
-    final rows = <(String, String, String, String?)>[
-      ('M', l.frameworkMindset, l.frameworkMindsetBody, null),
+    final now = ref.watch(clockProvider)();
+    final rows = <(String, String, String, VoidCallback)>[
+      (
+        'M',
+        l.frameworkMindset,
+        l.frameworkMindsetBody,
+        () => _thought(context, now),
+      ),
       (
         'Y',
         l.frameworkWhy,
         (why == null || why.isEmpty) ? l.frameworkWhyEmpty : '“$why”',
-        null,
+        () => context.push('$whyPath?edit=1'),
       ),
-      ('G', l.frameworkGoals, l.frameworkGoalsBody, null),
-      ('O', l.frameworkOrganization, l.frameworkOrganizationBody, null),
-      ('A', l.frameworkAccountability, l.frameworkAccountabilityBody, null),
-      ('L', l.frameworkLifestyle, l.frameworkLifestyleBody, null),
-      ('D', l.frameworkDiscipline, l.frameworkDisciplineBody, null),
-      ('O', l.frameworkOptimism, l.frameworkOptimismBody, null),
-      ('I', l.frameworkImplementation, l.frameworkImplementationBody, null),
-      ('T', l.frameworkTracking, l.frameworkTrackingBody, '/track'),
+      ('G', l.frameworkGoals, l.frameworkGoalsBody, () => context.go('/plan')),
+      (
+        'O',
+        l.frameworkOrganization,
+        l.frameworkOrganizationBody,
+        () => context.push('/plan/routine'),
+      ),
+      (
+        'A',
+        l.frameworkAccountability,
+        l.frameworkAccountabilityBody,
+        () => _checkIn(context, ref),
+      ),
+      (
+        'L',
+        l.frameworkLifestyle,
+        l.frameworkLifestyleBody,
+        () => context.go('/learn'),
+      ),
+      (
+        'D',
+        l.frameworkDiscipline,
+        l.frameworkDisciplineBody,
+        () => context.go('/plan'),
+      ),
+      (
+        'O',
+        l.frameworkOptimism,
+        l.frameworkOptimismBody,
+        () => context.push(WeeklyWinsScreen.path),
+      ),
+      (
+        'I',
+        l.frameworkImplementation,
+        l.frameworkImplementationBody,
+        () => context.go('/home'),
+      ),
+      (
+        'T',
+        l.frameworkTracking,
+        l.frameworkTrackingBody,
+        () => context.go('/track'),
+      ),
     ];
     return Scaffold(
       appBar: AppBar(),
@@ -44,15 +137,13 @@ class FrameworkScreen extends ConsumerWidget {
           LwPageTitle(l.frameworkTitle),
           Text(l.frameworkIntro, style: t.bodyMedium),
           const SizedBox(height: LwSpacing.md),
-          for (final (i, (letter, name, body, target)) in rows.indexed) ...[
+          for (final (i, (letter, name, body, open)) in rows.indexed) ...[
             _LetterRow(
               key: Key('framework-$i'),
               letter: letter,
               name: name,
               body: body,
-              // "Your Why" shows the person's own Why inline.
-              available: i == 1 && why != null && why.isNotEmpty,
-              onTap: target == null ? null : () => context.go(target),
+              onTap: open,
             ),
             const SizedBox(height: LwSpacing.xs),
           ],
@@ -68,22 +159,18 @@ class _LetterRow extends StatelessWidget {
     required this.letter,
     required this.name,
     required this.body,
-    required this.available,
-    this.onTap,
+    required this.onTap,
   });
 
   final String letter;
   final String name;
   final String body;
-  final bool available;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
-    final l = AppLocalizations.of(context);
-    final soon = onTap == null && !available;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -116,16 +203,10 @@ class _LetterRow extends StatelessWidget {
                     children: [
                       Text(name, style: t.titleSmall),
                       Text(body, style: t.bodySmall),
-                      if (soon)
-                        Text(
-                          l.frameworkSoon,
-                          style: t.labelSmall?.copyWith(color: p.accentStrong),
-                        ),
                     ],
                   ),
                 ),
-                if (onTap != null)
-                  Icon(Icons.chevron_right, color: p.textSecondary),
+                Icon(Icons.chevron_right, color: p.textSecondary),
               ],
             ),
           ),

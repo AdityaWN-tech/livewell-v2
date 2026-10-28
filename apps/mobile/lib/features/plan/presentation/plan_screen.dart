@@ -674,6 +674,23 @@ class _FrameworkRow extends StatelessWidget {
 
 /// One kind thought a day, picked by date so it stays the same all day.
 /// Wording in content/copy/affirmations.md (needs human review).
+/// The day's thought: the same one all day, by the day of the year.
+String affirmationFor(AppLocalizations l, DateTime now) {
+  final lines = [
+    l.planAffirmation1,
+    l.planAffirmation2,
+    l.planAffirmation3,
+    l.planAffirmation4,
+    l.planAffirmation5,
+  ];
+  final day = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  ).difference(DateTime(now.year)).inDays;
+  return lines[day % lines.length];
+}
+
 class _AffirmationCard extends StatelessWidget {
   const _AffirmationCard(this.now);
   final DateTime now;
@@ -683,18 +700,6 @@ class _AffirmationCard extends StatelessWidget {
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
-    final lines = [
-      l.planAffirmation1,
-      l.planAffirmation2,
-      l.planAffirmation3,
-      l.planAffirmation4,
-      l.planAffirmation5,
-    ];
-    final day = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).difference(DateTime(now.year)).inDays;
     return Container(
       key: const Key('plan-affirmation'),
       padding: const EdgeInsets.all(LwSpacing.cardPadding),
@@ -715,7 +720,7 @@ class _AffirmationCard extends StatelessWidget {
                 ),
                 const SizedBox(height: LwSpacing.xxs),
                 Text(
-                  '“${lines[day % lines.length]}”',
+                  '“${affirmationFor(l, now)}”',
                   style: t.titleMedium?.copyWith(color: p.onTint),
                 ),
               ],

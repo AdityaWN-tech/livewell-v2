@@ -7,10 +7,11 @@ Redrawn in code from the logo in `apps/mobile/assets/design-reference/portal-log
 | File | Use |
 |---|---|
 | `master/logo.png` | Full lockup, 1024 px (not bundled): teal rounded square, lime mark, "LIVE WELL", "Health. Habit. Happiness." |
-| `master/logo-mark.png`, `master/logo-mark.svg` | Lime circle mark, 1024 px and vector (not bundled; app icon source) |
+| `master/logo-mark.png`, `master/logo-mark.svg` | Lime circle mark, 1024 px and vector (not bundled) |
 | `master/wordmark.png` | "LIVE WELL" lettering, full size (not bundled) |
 | `logo.png`, `logo-mark.png`, `wordmark.png` + `2.0x/ 3.0x/ 4.0x/` | Bundled, sized for how the app shows them (160 dp, 160 dp, 200 dp wide), so phones decode only what they need |
 | `splash/` | Native splash images for flutter_native_splash (not bundled) |
+| `icon/` | App icon sources for flutter_launcher_icons (not bundled): `app-icon.png` (iOS and old Android: the mark at 62% on full-bleed teal, no transparency), `app-icon-foreground.png` (Android adaptive foreground) and `app-icon-monochrome.png` (Android 13+ themed icon) |
 
 Fonts in the redraw: Times New Roman (title) and Arial Bold (tagline), the closest fonts on this PC to the reference.
 When the client's original artwork and font names arrive, replace these files and keep the same names.
@@ -60,13 +61,20 @@ From the illustrated "Live Well v2" design (`docs/design/live-well-v2-illustrate
 ## Logo colours (D-04, logo, splash and icon only)
 | Token | Hex | Where |
 |---|---|---|
-| deepTeal | `#0B3A4E` | Logo background, native splash |
+| deepTeal | `#0B3A4E` | Logo background, native splash, the reveal, app icon background |
 | lime | `#8BE03E` | Logo circle |
 | cream | `#F0F8DC` | Line in the mark |
 | leaf | `#FAFDF0` | Leaf in the mark |
 | text on teal | `#ECF1F6` | Logo lettering, splash text |
 
 These stay until the client approves a new logo (needs-product, D-25).
+
+## App icon and name (Step 2, D-51)
+- Config `flutter_launcher_icons:` in `pubspec.yaml`; regenerate with `python tool/draw_logo.py` then `dart run flutter_launcher_icons` (from `apps/mobile`). **After running it, revert `ios/Runner.xcodeproj/project.pbxproj`**: the tool (0.14.4) wrongly sets `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` to `AppIcon`.
+- **Android:** adaptive icon (teal background + lime mark, 63 dp inside the 66 dp safe circle, so no launcher mask cuts it) with a monochrome layer for themed icons; legacy PNGs for older launchers.
+- **iOS:** the full AppIcon set from one 1024 px image without alpha (App Store rule).
+- One teal `#0B3A4E` for the icon, the native splash (Android incl. 12+, iOS) and the in-app reveal, so opening the app never changes colour. `test/splash/app_icon_test.dart` checks it.
+- **Name:** "Live Well" (Android `app_name` per flavour, iOS `APP_DISPLAY_NAME` and `CFBundleName`); dev and staging add "Dev" / "Staging" so the three can sit side by side.
 
 ## Launch sequence (S-7, D-13)
 1. **Native splash** (flutter_native_splash, config in `pubspec.yaml`): teal `#0B3A4E` + the mark at 160 dp, Android (incl. 12+) and iOS. No white flash.

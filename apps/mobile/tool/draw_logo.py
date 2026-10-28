@@ -4,7 +4,8 @@ Provisional (docs/decisions.md D-15): replace with the client's original artwork
 Usage (from apps/mobile):  python tool/draw_logo.py
 Writes full-size masters to assets/brand/master/ (logo.png lockup, logo-mark.png,
 logo-mark.svg, wordmark.png; not bundled), sized 1x-4x copies of logo, logo-mark and
-wordmark for the app, and assets/brand/splash/ images for flutter_native_splash. The mark is 160 dp wide on every splash (native and Flutter),
+wordmark for the app, assets/brand/splash/ images for flutter_native_splash and
+assets/brand/icon/ sources for flutter_launcher_icons. The mark is 160 dp wide on every splash (native and Flutter),
 so the hand-off between them doesn't jump.
 """
 import math
@@ -65,15 +66,15 @@ def leaf_polygon(cx, cy, length, width, angle, n=60):
     return [(cx + x * math.cos(a) - y * math.sin(a), cy + x * math.sin(a) + y * math.cos(a)) for x, y in pts]
 
 
-def draw_mark(d, cx, cy, r):
-    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=LIME)
+def draw_mark(d, cx, cy, r, circle=LIME, line_fill=CREAM, leaf_fill=LEAF_FILL):
+    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=circle)
     line = [(cx + x * r, cy + y * r) for x, y in sample(beziers(POINTS))]
     w = max(1, round(STROKE * r))
-    d.line(line, fill=CREAM, width=w, joint="curve")
+    d.line(line, fill=line_fill, width=w, joint="curve")
     for end in (line[0], line[-1]):
-        d.ellipse((end[0] - w / 2, end[1] - w / 2, end[0] + w / 2, end[1] + w / 2), fill=CREAM)
+        d.ellipse((end[0] - w / 2, end[1] - w / 2, end[0] + w / 2, end[1] + w / 2), fill=line_fill)
     leaf = leaf_polygon(**LEAF)
-    d.polygon([(cx + x * r, cy + y * r) for x, y in leaf], fill=LEAF_FILL)
+    d.polygon([(cx + x * r, cy + y * r) for x, y in leaf], fill=leaf_fill)
 
 
 def font(names, size):
@@ -122,6 +123,36 @@ def padded_mark(canvas, mark_px):
     off = (canvas - mark_px) // 2
     img.alpha_composite(m, (off, off))
     return img
+
+
+def app_icon(size=1024, mark_share=0.62):
+    """iOS and legacy Android icon: the mark on full-bleed teal, no transparency (App Store rule).
+    The OS rounds the corners; the mark keeps clear of them."""
+    S = size * SS
+    img = Image.new("RGB", (S, S), TEAL)
+    draw_mark(ImageDraw.Draw(img), S / 2, S / 2, S * mark_share / 2)
+    return img.resize((size, size), Image.LANCZOS)
+
+
+def adaptive_foreground(size=1024, mark_share=0.86):
+    """Android adaptive icon foreground. flutter_launcher_icons insets it 16% on each side of the
+    108 dp canvas (73 dp left); the launcher shows the middle 72 dp and every mask keeps the 66 dp
+    safe circle, so the mark is 0.86 x 73 = 63 dp wide."""
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    m = mark(size).resize((round(size * mark_share),) * 2, Image.LANCZOS)
+    off = (size - m.width) // 2
+    img.alpha_composite(m, (off, off))
+    return img
+
+
+def adaptive_monochrome(size=1024, mark_share=0.86):
+    """Android 13+ themed icon: only alpha counts. The circle with the line and leaf cut out."""
+    S = size * SS
+    alpha = Image.new("L", (S, S), 0)
+    draw_mark(ImageDraw.Draw(alpha), S / 2, S / 2, S * mark_share / 2, circle=255, line_fill=0, leaf_fill=0)
+    img = Image.new("RGBA", (S, S), (255, 255, 255, 0))
+    img.putalpha(alpha)
+    return img.resize((size, size), Image.LANCZOS)
 
 
 def wordmark(width=1280):
@@ -179,4 +210,10 @@ if __name__ == "__main__":
     padded_mark(640, 640).save(splash / "splash-mark.png")
     # Android 12+: 960 px canvas (240 dp), icon must fit a 640 px (160 dp) circle.
     padded_mark(960, 640).save(splash / "splash-mark-android12.png")
+    # App icon sources for flutter_launcher_icons (not bundled).
+    icon = OUT / "icon"
+    icon.mkdir(exist_ok=True)
+    app_icon().save(icon / "app-icon.png")
+    adaptive_foreground().save(icon / "app-icon-foreground.png")
+    adaptive_monochrome().save(icon / "app-icon-monochrome.png")
     print("wrote", *(p.relative_to(OUT).as_posix() for p in sorted(OUT.rglob("*.*"))))

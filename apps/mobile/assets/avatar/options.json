@@ -1,0 +1,694 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "note": "T-AVT-08c. The fixed option lists for Build my own and Adjust. Only these values ever reach an image prompt (docs/design/avatar-prompts.md); users never type into a prompt. Adults only: age ranges start at the 20s. Labels are what the app shows; prompt is the words used in the prompt. Step 1 (2026-10-25): 20 hairstyles and 6 body types to meet FR-AVT-02 (8+ skin tones, 20 hairstyles, 6 body types, ages, glasses, head coverings incl. hijab, turban and kippah, a wheelchair and hearing aids). Needs design and inclusion review.",
+  "categories": [
+    {
+      "id": "age_range",
+      "placeholder": "AGE RANGE",
+      "options": [
+        {
+          "id": "20s",
+          "label": "20s",
+          "prompt": "in their 20s"
+        },
+        {
+          "id": "30s",
+          "label": "30s",
+          "prompt": "in their 30s"
+        },
+        {
+          "id": "40s",
+          "label": "40s",
+          "prompt": "in their 40s"
+        },
+        {
+          "id": "50s",
+          "label": "50s",
+          "prompt": "in their 50s"
+        },
+        {
+          "id": "60s",
+          "label": "60s",
+          "prompt": "in their 60s"
+        },
+        {
+          "id": "70s",
+          "label": "70s",
+          "prompt": "in their 70s"
+        }
+      ]
+    },
+    {
+      "id": "face",
+      "placeholder": "FACE",
+      "options": [
+        {
+          "id": "oval",
+          "label": "Oval",
+          "prompt": "oval face"
+        },
+        {
+          "id": "round",
+          "label": "Round",
+          "prompt": "round face"
+        },
+        {
+          "id": "square",
+          "label": "Square",
+          "prompt": "square jaw"
+        },
+        {
+          "id": "heart",
+          "label": "Heart",
+          "prompt": "heart-shaped face"
+        },
+        {
+          "id": "long",
+          "label": "Long",
+          "prompt": "long face"
+        },
+        {
+          "id": "soft",
+          "label": "Soft",
+          "prompt": "soft rounded features"
+        }
+      ]
+    },
+    {
+      "id": "body_type",
+      "placeholder": "BODY TYPE",
+      "options": [
+        {
+          "id": "slim",
+          "label": "Slim",
+          "prompt": "slim build"
+        },
+        {
+          "id": "average",
+          "label": "Average",
+          "prompt": "average build"
+        },
+        {
+          "id": "athletic",
+          "label": "Athletic",
+          "prompt": "athletic build"
+        },
+        {
+          "id": "broad",
+          "label": "Broad",
+          "prompt": "broad-shouldered build"
+        },
+        {
+          "id": "curvy",
+          "label": "Curvy",
+          "prompt": "curvy build"
+        },
+        {
+          "id": "larger",
+          "label": "Larger",
+          "prompt": "larger, fuller build"
+        }
+      ]
+    },
+    {
+      "id": "skin",
+      "placeholder": "SKIN",
+      "options": [
+        {
+          "id": "tone_1",
+          "label": "Tone 1",
+          "prompt": "very light skin"
+        },
+        {
+          "id": "tone_2",
+          "label": "Tone 2",
+          "prompt": "light skin"
+        },
+        {
+          "id": "tone_3",
+          "label": "Tone 3",
+          "prompt": "light-medium skin"
+        },
+        {
+          "id": "tone_4",
+          "label": "Tone 4",
+          "prompt": "medium skin"
+        },
+        {
+          "id": "tone_5",
+          "label": "Tone 5",
+          "prompt": "medium-tan skin"
+        },
+        {
+          "id": "tone_6",
+          "label": "Tone 6",
+          "prompt": "tan skin"
+        },
+        {
+          "id": "tone_7",
+          "label": "Tone 7",
+          "prompt": "medium-brown skin"
+        },
+        {
+          "id": "tone_8",
+          "label": "Tone 8",
+          "prompt": "brown skin"
+        },
+        {
+          "id": "tone_9",
+          "label": "Tone 9",
+          "prompt": "dark brown skin"
+        },
+        {
+          "id": "tone_10",
+          "label": "Tone 10",
+          "prompt": "deep dark skin"
+        }
+      ]
+    },
+    {
+      "id": "eyes",
+      "placeholder": "EYES",
+      "options": [
+        {
+          "id": "round",
+          "label": "Round",
+          "prompt": "round eyes"
+        },
+        {
+          "id": "almond",
+          "label": "Almond",
+          "prompt": "almond-shaped eyes"
+        },
+        {
+          "id": "hooded",
+          "label": "Hooded",
+          "prompt": "hooded eyes"
+        },
+        {
+          "id": "monolid",
+          "label": "Monolid",
+          "prompt": "monolid eyes"
+        },
+        {
+          "id": "downturned",
+          "label": "Downturned",
+          "prompt": "gently downturned eyes"
+        },
+        {
+          "id": "wide",
+          "label": "Wide-set",
+          "prompt": "wide-set eyes"
+        }
+      ]
+    },
+    {
+      "id": "eyebrows",
+      "placeholder": "EYEBROWS",
+      "options": [
+        {
+          "id": "natural",
+          "label": "Natural",
+          "prompt": "natural eyebrows"
+        },
+        {
+          "id": "thick",
+          "label": "Thick",
+          "prompt": "thick eyebrows"
+        },
+        {
+          "id": "thin",
+          "label": "Thin",
+          "prompt": "thin eyebrows"
+        },
+        {
+          "id": "arched",
+          "label": "Arched",
+          "prompt": "arched eyebrows"
+        },
+        {
+          "id": "straight",
+          "label": "Straight",
+          "prompt": "straight eyebrows"
+        }
+      ]
+    },
+    {
+      "id": "nose",
+      "placeholder": "NOSE",
+      "options": [
+        {
+          "id": "small",
+          "label": "Small",
+          "prompt": "small nose"
+        },
+        {
+          "id": "straight",
+          "label": "Straight",
+          "prompt": "straight nose"
+        },
+        {
+          "id": "wide",
+          "label": "Wide",
+          "prompt": "wide nose"
+        },
+        {
+          "id": "button",
+          "label": "Button",
+          "prompt": "button nose"
+        },
+        {
+          "id": "aquiline",
+          "label": "Aquiline",
+          "prompt": "aquiline nose"
+        },
+        {
+          "id": "broad",
+          "label": "Broad",
+          "prompt": "broad nose"
+        }
+      ]
+    },
+    {
+      "id": "lips",
+      "placeholder": "LIPS",
+      "options": [
+        {
+          "id": "thin",
+          "label": "Thin",
+          "prompt": "thin lips"
+        },
+        {
+          "id": "medium",
+          "label": "Medium",
+          "prompt": "medium lips"
+        },
+        {
+          "id": "full",
+          "label": "Full",
+          "prompt": "full lips"
+        },
+        {
+          "id": "wide",
+          "label": "Wide",
+          "prompt": "wide smile"
+        }
+      ]
+    },
+    {
+      "id": "hairstyle",
+      "placeholder": "HAIRSTYLE",
+      "options": [
+        {
+          "id": "short_messy",
+          "label": "Short and messy",
+          "prompt": "short messy hair"
+        },
+        {
+          "id": "short_neat",
+          "label": "Short and neat",
+          "prompt": "short neat hair"
+        },
+        {
+          "id": "buzz",
+          "label": "Buzz cut",
+          "prompt": "buzz-cut hair"
+        },
+        {
+          "id": "bald",
+          "label": "Bald",
+          "prompt": "bald head"
+        },
+        {
+          "id": "shoulder",
+          "label": "Shoulder length",
+          "prompt": "shoulder-length hair"
+        },
+        {
+          "id": "long_straight",
+          "label": "Long and straight",
+          "prompt": "long straight hair"
+        },
+        {
+          "id": "long_wavy",
+          "label": "Long and wavy",
+          "prompt": "long wavy hair"
+        },
+        {
+          "id": "curly",
+          "label": "Curly",
+          "prompt": "curly hair"
+        },
+        {
+          "id": "coily",
+          "label": "Coily",
+          "prompt": "coily natural hair"
+        },
+        {
+          "id": "braids",
+          "label": "Braids",
+          "prompt": "braided hair"
+        },
+        {
+          "id": "bun",
+          "label": "Bun",
+          "prompt": "hair in a bun"
+        },
+        {
+          "id": "ponytail",
+          "label": "Ponytail",
+          "prompt": "hair in a ponytail"
+        },
+        {
+          "id": "pixie",
+          "label": "Pixie cut",
+          "prompt": "short pixie-cut hair"
+        },
+        {
+          "id": "bob",
+          "label": "Bob",
+          "prompt": "chin-length bob haircut"
+        },
+        {
+          "id": "side_part",
+          "label": "Side part",
+          "prompt": "short hair with a neat side part"
+        },
+        {
+          "id": "slicked_back",
+          "label": "Slicked back",
+          "prompt": "slicked-back hair"
+        },
+        {
+          "id": "afro",
+          "label": "Afro",
+          "prompt": "a rounded natural afro"
+        },
+        {
+          "id": "locs",
+          "label": "Locs",
+          "prompt": "shoulder-length locs"
+        },
+        {
+          "id": "cornrows",
+          "label": "Cornrows",
+          "prompt": "neat cornrows"
+        },
+        {
+          "id": "top_knot",
+          "label": "Top knot",
+          "prompt": "hair tied in a top knot"
+        }
+      ]
+    },
+    {
+      "id": "hair_colour",
+      "placeholder": "HAIR COLOUR",
+      "options": [
+        {
+          "id": "black",
+          "label": "Black",
+          "prompt": "black"
+        },
+        {
+          "id": "dark_brown",
+          "label": "Dark brown",
+          "prompt": "dark brown"
+        },
+        {
+          "id": "brown",
+          "label": "Brown",
+          "prompt": "brown"
+        },
+        {
+          "id": "auburn",
+          "label": "Auburn",
+          "prompt": "auburn"
+        },
+        {
+          "id": "red",
+          "label": "Red",
+          "prompt": "red"
+        },
+        {
+          "id": "blonde",
+          "label": "Blonde",
+          "prompt": "blonde"
+        },
+        {
+          "id": "grey",
+          "label": "Grey",
+          "prompt": "grey"
+        },
+        {
+          "id": "white",
+          "label": "White",
+          "prompt": "white"
+        },
+        {
+          "id": "salt_pepper",
+          "label": "Salt and pepper",
+          "prompt": "salt-and-pepper"
+        }
+      ]
+    },
+    {
+      "id": "facial_hair",
+      "placeholder": "FACIAL HAIR",
+      "options": [
+        {
+          "id": "none",
+          "label": "None",
+          "prompt": "none"
+        },
+        {
+          "id": "stubble",
+          "label": "Stubble",
+          "prompt": "light stubble"
+        },
+        {
+          "id": "short_beard",
+          "label": "Short beard",
+          "prompt": "a short neat beard"
+        },
+        {
+          "id": "full_beard",
+          "label": "Full beard",
+          "prompt": "a full beard"
+        },
+        {
+          "id": "moustache",
+          "label": "Moustache",
+          "prompt": "a moustache"
+        },
+        {
+          "id": "goatee",
+          "label": "Goatee",
+          "prompt": "a goatee"
+        }
+      ]
+    },
+    {
+      "id": "outfit",
+      "placeholder": "OUTFIT",
+      "options": [
+        {
+          "id": "knit_sweater",
+          "label": "Knit sweater",
+          "prompt": "a soft knit crew-neck sweater"
+        },
+        {
+          "id": "tshirt",
+          "label": "T-shirt",
+          "prompt": "a plain crew-neck T-shirt"
+        },
+        {
+          "id": "hoodie",
+          "label": "Hoodie",
+          "prompt": "a soft hoodie"
+        },
+        {
+          "id": "cardigan",
+          "label": "Cardigan",
+          "prompt": "a cardigan over a plain top"
+        },
+        {
+          "id": "collared",
+          "label": "Collared shirt",
+          "prompt": "a collared shirt"
+        },
+        {
+          "id": "kurta",
+          "label": "Kurta",
+          "prompt": "a simple kurta"
+        },
+        {
+          "id": "blouse",
+          "label": "Blouse",
+          "prompt": "a simple blouse"
+        }
+      ]
+    },
+    {
+      "id": "outfit_colour",
+      "placeholder": "OUTFIT COLOUR",
+      "options": [
+        {
+          "id": "green",
+          "label": "Green",
+          "prompt": "soft green"
+        },
+        {
+          "id": "sage",
+          "label": "Sage",
+          "prompt": "sage green"
+        },
+        {
+          "id": "navy",
+          "label": "Navy",
+          "prompt": "navy"
+        },
+        {
+          "id": "terracotta",
+          "label": "Terracotta",
+          "prompt": "terracotta"
+        },
+        {
+          "id": "mustard",
+          "label": "Mustard",
+          "prompt": "mustard yellow"
+        },
+        {
+          "id": "plum",
+          "label": "Plum",
+          "prompt": "plum"
+        },
+        {
+          "id": "grey",
+          "label": "Grey",
+          "prompt": "light grey"
+        },
+        {
+          "id": "cream",
+          "label": "Cream",
+          "prompt": "cream"
+        }
+      ]
+    },
+    {
+      "id": "cap",
+      "placeholder": "ACCESSORIES",
+      "options": [
+        {
+          "id": "none",
+          "label": "None",
+          "prompt": ""
+        },
+        {
+          "id": "beanie",
+          "label": "Beanie",
+          "prompt": "a knit beanie"
+        },
+        {
+          "id": "baseball",
+          "label": "Baseball cap",
+          "prompt": "a baseball cap"
+        },
+        {
+          "id": "sun_hat",
+          "label": "Sun hat",
+          "prompt": "a sun hat"
+        }
+      ]
+    },
+    {
+      "id": "head_covering",
+      "placeholder": "ACCESSORIES",
+      "options": [
+        {
+          "id": "none",
+          "label": "None",
+          "prompt": ""
+        },
+        {
+          "id": "hijab",
+          "label": "Hijab",
+          "prompt": "a soft hijab"
+        },
+        {
+          "id": "turban",
+          "label": "Turban",
+          "prompt": "a turban"
+        },
+        {
+          "id": "kippah",
+          "label": "Kippah",
+          "prompt": "a kippah"
+        },
+        {
+          "id": "headscarf",
+          "label": "Headscarf",
+          "prompt": "a headscarf"
+        }
+      ]
+    },
+    {
+      "id": "glasses",
+      "placeholder": "ACCESSORIES",
+      "options": [
+        {
+          "id": "none",
+          "label": "None",
+          "prompt": ""
+        },
+        {
+          "id": "round",
+          "label": "Round glasses",
+          "prompt": "round glasses"
+        },
+        {
+          "id": "rectangular",
+          "label": "Rectangular glasses",
+          "prompt": "rectangular glasses"
+        },
+        {
+          "id": "reading",
+          "label": "Reading glasses",
+          "prompt": "reading glasses"
+        }
+      ]
+    },
+    {
+      "id": "accessories",
+      "placeholder": "ACCESSORIES",
+      "options": [
+        {
+          "id": "none",
+          "label": "None",
+          "prompt": ""
+        },
+        {
+          "id": "hearing_aid",
+          "label": "Hearing aid",
+          "prompt": "a hearing aid"
+        },
+        {
+          "id": "earrings",
+          "label": "Small earrings",
+          "prompt": "small earrings"
+        },
+        {
+          "id": "necklace",
+          "label": "Simple necklace",
+          "prompt": "a simple necklace"
+        },
+        {
+          "id": "wheelchair",
+          "label": "Wheelchair",
+          "prompt": "seated in a wheelchair, the wheelchair visible at the bottom edge"
+        }
+      ]
+    }
+  ]
+}

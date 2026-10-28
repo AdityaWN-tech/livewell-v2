@@ -3250,4 +3250,80 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetRoutineOpen => 'My routine';
+
+  @override
+  String get avatarCatAge => 'Age';
+
+  @override
+  String get avatarCatFace => 'Face shape';
+
+  @override
+  String get avatarCatBody => 'Build';
+
+  @override
+  String get avatarCatSkin => 'Skin tone';
+
+  @override
+  String get avatarCatEyes => 'Eyes';
+
+  @override
+  String get avatarCatEyebrows => 'Eyebrows';
+
+  @override
+  String get avatarCatNose => 'Nose';
+
+  @override
+  String get avatarCatLips => 'Lips';
+
+  @override
+  String get avatarCatHairstyle => 'Hairstyle';
+
+  @override
+  String get avatarCatHairColour => 'Hair colour';
+
+  @override
+  String get avatarCatFacialHair => 'Facial hair';
+
+  @override
+  String get avatarCatOutfit => 'Outfit';
+
+  @override
+  String get avatarCatOutfitColour => 'Outfit colour';
+
+  @override
+  String get avatarCatCap => 'Cap or hat';
+
+  @override
+  String get avatarCatHeadCovering => 'Head covering';
+
+  @override
+  String get avatarCatGlasses => 'Glasses';
+
+  @override
+  String get avatarCatAccessories => 'Accessories and mobility aids';
+
+  @override
+  String get studioBuildMake => 'Make my coach';
+
+  @override
+  String get studioAdjustMake => 'Make these changes';
+
+  @override
+  String get studioAdjustReadyMade =>
+      'Ready-made coaches keep their look. For a coach with the hair, outfit and details you choose, build your own.';
+
+  @override
+  String get studioMakingTitle => 'We\'re making your coach';
+
+  @override
+  String get studioMakingBody =>
+      'It takes a few minutes. You can leave this screen; we\'ll let you know when your coach is ready.';
+
+  @override
+  String get studioErrUnavailable =>
+      'Making a coach isn\'t available right now. You can pick a ready-made coach.';
+
+  @override
+  String get studioErrNotMade =>
+      'We couldn\'t make your coach this time. You can try different choices, or pick a ready-made coach.';
 }

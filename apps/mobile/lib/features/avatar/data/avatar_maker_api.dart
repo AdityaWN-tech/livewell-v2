@@ -43,7 +43,24 @@ abstract class AvatarMakerApi {
     required String idempotencyKey,
   });
 
+  /// Starts "Build my own" from option ids (content/avatar/options.json).
+  Future<String> startBuilt({
+    required Map<String, String> options,
+    required String idempotencyKey,
+  });
+
+  /// Starts "Adjust" on the person's current made-for-you coach: only the
+  /// changed option ids.
+  Future<String> startAdjust({
+    required Map<String, String> changes,
+    required String idempotencyKey,
+  });
+
   Future<AvatarJobStatus> job(String jobId);
+
+  /// False while the Media Service isn't set up: the Studio then hides the
+  /// ways that need it.
+  bool get available;
 }
 
 /// The Media Service isn't deployed yet (it is built in T-AVT-08c/d and set
@@ -57,8 +74,23 @@ class UnavailableAvatarMaker implements AvatarMakerApi {
   }) async => throw const AvatarMakerError('not_configured');
 
   @override
+  Future<String> startBuilt({
+    required Map<String, String> options,
+    required String idempotencyKey,
+  }) async => throw const AvatarMakerError('not_configured');
+
+  @override
+  Future<String> startAdjust({
+    required Map<String, String> changes,
+    required String idempotencyKey,
+  }) async => throw const AvatarMakerError('not_configured');
+
+  @override
   Future<AvatarJobStatus> job(String jobId) async =>
       throw const AvatarMakerError('not_configured');
+
+  @override
+  bool get available => false;
 }
 
 /// The real client: HTTPS to [base] with a Firebase ID token and an App
@@ -132,6 +164,36 @@ class HttpAvatarMaker implements AvatarMakerApi {
     if (code != 202) throw _refusal(json);
     return json['job_id'] as String;
   }
+
+  @override
+  Future<String> startBuilt({
+    required Map<String, String> options,
+    required String idempotencyKey,
+  }) => _start('built', options, idempotencyKey);
+
+  @override
+  Future<String> startAdjust({
+    required Map<String, String> changes,
+    required String idempotencyKey,
+  }) => _start('adjust', changes, idempotencyKey);
+
+  Future<String> _start(
+    String source,
+    Map<String, String> options,
+    String idempotencyKey,
+  ) async {
+    final (code, json) = await _send(
+      'POST',
+      'v1/avatar',
+      body: {'source': source, 'options': options},
+      idempotencyKey: idempotencyKey,
+    );
+    if (code != 202) throw _refusal(json);
+    return json['job_id'] as String;
+  }
+
+  @override
+  bool get available => true;
 
   @override
   Future<AvatarJobStatus> job(String jobId) async {

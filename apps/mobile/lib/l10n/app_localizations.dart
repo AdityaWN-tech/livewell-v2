@@ -5726,6 +5726,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My routine'**
   String get widgetRoutineOpen;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get avatarCatAge;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Face shape'**
+  String get avatarCatFace;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Build'**
+  String get avatarCatBody;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Skin tone'**
+  String get avatarCatSkin;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Eyes'**
+  String get avatarCatEyes;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Eyebrows'**
+  String get avatarCatEyebrows;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Nose'**
+  String get avatarCatNose;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Lips'**
+  String get avatarCatLips;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Hairstyle'**
+  String get avatarCatHairstyle;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Hair colour'**
+  String get avatarCatHairColour;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Facial hair'**
+  String get avatarCatFacialHair;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Outfit'**
+  String get avatarCatOutfit;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Outfit colour'**
+  String get avatarCatOutfitColour;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Cap or hat'**
+  String get avatarCatCap;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Head covering'**
+  String get avatarCatHeadCovering;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Glasses'**
+  String get avatarCatGlasses;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Accessories and mobility aids'**
+  String get avatarCatAccessories;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Make my coach'**
+  String get studioBuildMake;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Make these changes'**
+  String get studioAdjustMake;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Ready-made coaches keep their look. For a coach with the hair, outfit and details you choose, build your own.'**
+  String get studioAdjustReadyMade;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re making your coach'**
+  String get studioMakingTitle;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'It takes a few minutes. You can leave this screen; we\'ll let you know when your coach is ready.'**
+  String get studioMakingBody;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'Making a coach isn\'t available right now. You can pick a ready-made coach.'**
+  String get studioErrUnavailable;
+
+  /// Avatar Studio, Build my own and Adjust (Step 1, D-50).
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t make your coach this time. You can try different choices, or pick a ready-made coach.'**
+  String get studioErrNotMade;
 }
 
 class _AppLocalizationsDelegate

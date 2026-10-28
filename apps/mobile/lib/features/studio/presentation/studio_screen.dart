@@ -7,6 +7,7 @@ import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/application/coach_job_watcher.dart';
+import '../../avatar/data/avatar_maker_api.dart';
 import '../../avatar/data/avatar_repository.dart';
 import '../../avatar/domain/coach_choice.dart';
 import '../../avatar/domain/coaches.dart';
@@ -17,6 +18,7 @@ import '../../voice/data/voice_repository.dart';
 import '../../voice/domain/voice.dart';
 import '../../voice/presentation/voice_screen.dart'
     show AiVoiceLabel, showOwnVoiceSheet;
+import 'avatar_options_picker.dart';
 import 'studio_widgets.dart';
 
 /// Whether a cloned voice with valid consent exists (the consent banner).
@@ -28,9 +30,10 @@ final clonedVoiceConsentProvider = Provider<bool>((ref) => false);
 /// The Avatar Studio (T-AVT-08b), from onboarding and Profile > My coach:
 /// a large live preview of the coach (it breathes and blinks) with its name,
 /// then tabs: the 8 ready-made coaches, "Make me from my photo", "Build my
-/// own" and "Adjust" (made by the Media Service, coming with T-AVT-08c to
-/// 08e), the background, and the voice. The look is saved with "Use this
-/// coach"; the voice with its own button.
+/// own" and "Adjust" (made by the Media Service), the background, and the
+/// voice. The look is saved with "Use this coach"; the voice with its own
+/// button. The ways that need the Media Service show only when it is set up
+/// and their flag is on; never a "coming soon" dead end (Step 1, D-50).
 class StudioScreen extends ConsumerStatefulWidget {
   const StudioScreen({
     super.key,
@@ -67,6 +70,11 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
   String? _nameError;
   VoiceChoice _voice = VoiceChoice.fallback;
   bool _busy = false;
+
+  /// Build my own: one option per category (filled with defaults once the
+  /// lists load). Adjust: only the options that change.
+  Map<String, String>? _build;
+  final _changes = <String, String>{};
 
   @override
   void initState() {
@@ -107,6 +115,59 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  /// The ways that need the Media Service (T-AVT-08c-e): shown only when it
+  /// is set up and the flag is on.
+  bool get _makerReady => ref.read(avatarMakerApiProvider).available;
+  bool get _canBuild =>
+      ref.read(featureFlagsProvider).avatarMaker && _makerReady;
+  bool get _canPhoto =>
+      ref.read(featureFlagsProvider).avatarFromPhoto && _makerReady;
+
+  /// The tabs this person can use now.
+  List<StudioTab> get _tabs => [
+    for (final x in StudioTab.values)
+      if ((!widget.onboarding || x != StudioTab.voice) &&
+          (x != StudioTab.photo || _canPhoto) &&
+          ((x != StudioTab.build && x != StudioTab.adjust) || _canBuild))
+        x,
+  ];
+
+  CoachNoticeTexts _notice(AppLocalizations l) => CoachNoticeTexts(
+    readyTitle: l.coachNoticeReadyTitle,
+    readyBody: l.coachNoticeReadyBody,
+    notMadeTitle: l.coachNoticeNotMadeTitle,
+    notMadeBody: l.coachNoticeNotMadeBody,
+    channelName: l.coachNoticeChannel,
+  );
+
+  String _makerError(AppLocalizations l, String id) => switch (id) {
+    'avatar_daily_limit' => l.photoErrLimit,
+    'network' => l.photoErrNetwork,
+    'not_configured' || 'feature_off' => l.studioErrUnavailable,
+    _ => l.studioErrNotMade,
+  };
+
+  /// Starts a Build my own or Adjust job; the watcher follows it and says
+  /// when the coach is ready (it takes a few minutes, D-39).
+  Future<void> _startJob(
+    Future<String> Function(AvatarMakerApi api, String key) start,
+  ) async {
+    final l = AppLocalizations.of(context);
+    final watcher = ref.read(coachJobWatcherProvider.notifier);
+    final key = '${DateTime.now().microsecondsSinceEpoch}';
+    setState(() => _busy = true);
+    try {
+      final jobId = await start(ref.read(avatarMakerApiProvider), key);
+      watcher.clear();
+      watcher.follow(jobId, _notice(l));
+      if (mounted) setState(_changes.clear);
+    } on AvatarMakerError catch (e) {
+      if (mounted) _say(_makerError(l, e.messageId));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   void _pick(ReadyCoach c) => setState(() {
@@ -210,6 +271,14 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final flags = ref.watch(featureFlagsProvider);
+    final tabs = _tabs;
+    // A tab that isn't available (e.g. opened from a link) falls back to
+    // the coaches.
+    if (!tabs.contains(_tab)) _tab = StudioTab.coaches;
+    final options = ref.watch(avatarOptionsProvider).value;
+    final build = _build ??= options?.defaults;
+    final job = ref.watch(coachJobWatcherProvider);
+    final madeForYou = _saved.source != CoachSource.readyMade;
     ref.listen(coachJobWatcherProvider, (_, job) {
       if (job.stage == CoachJobStage.ready) _loadMade();
     });
@@ -264,15 +333,8 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
         ),
         ...save,
       ],
-      // Off until counsel review (T-CMP-02); then the live selfie (08e).
-      StudioTab.photo when !flags.avatarFromPhoto => [
-        StudioComingSoon(
-          key: const Key('studio-photo-soon'),
-          title: l.studioPhotoTitle,
-          body: l.studioPhotoBody,
-        ),
-        ...save,
-      ],
+      // Shown only with its flag on (counsel review, T-CMP-02) and the
+      // Media Service set up; then the live selfie (08e).
       StudioTab.photo => [
         LwCard(
           key: const Key('studio-photo-intro'),
@@ -302,30 +364,102 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
                 onPressed: () => setState(() => _tab = StudioTab.coaches),
                 child: Text(l.studioTabCoaches),
               ),
-              OutlinedButton(
-                key: const Key('photo-declined-build'),
-                onPressed: () => setState(() => _tab = StudioTab.build),
-                child: Text(l.studioTabBuild),
-              ),
+              if (_canBuild)
+                OutlinedButton(
+                  key: const Key('photo-declined-build'),
+                  onPressed: () => setState(() => _tab = StudioTab.build),
+                  child: Text(l.studioTabBuild),
+                ),
             ],
           ),
         ],
       ],
       StudioTab.build => [
-        StudioComingSoon(
-          key: const Key('studio-build-soon'),
+        LwCard(
+          key: const Key('studio-build-intro'),
           title: l.studioBuildTitle,
           body: l.studioBuildBody,
         ),
-        ...save,
+        const SizedBox(height: LwSpacing.md),
+        if (options == null || build == null)
+          const Center(child: CircularProgressIndicator())
+        else ...[
+          AvatarOptionsPicker(
+            key: const Key('studio-build-options'),
+            categories: options.forBuild,
+            chosen: build,
+            onChanged: (c, o) => setState(() {
+              if (o != null) build[c] = o;
+            }),
+          ),
+          FilledButton.icon(
+            key: const Key('studio-build-make'),
+            onPressed: _busy || job.stage == CoachJobStage.making
+                ? null
+                : () => _startJob(
+                    (api, key) => api.startBuilt(
+                      options: options.valid(build),
+                      idempotencyKey: key,
+                    ),
+                  ),
+            icon: const Icon(Icons.auto_awesome_outlined),
+            label: Text(l.studioBuildMake),
+          ),
+        ],
+      ],
+      // Adjust changes a made-for-you coach. A ready-made coach has no
+      // portrait to change: offer Build my own instead of a dead end.
+      StudioTab.adjust when !madeForYou => [
+        LwCard(
+          key: const Key('studio-adjust-ready-made'),
+          title: l.studioAdjustTitle,
+          body: l.studioAdjustReadyMade,
+        ),
+        const SizedBox(height: LwSpacing.sm),
+        FilledButton(
+          key: const Key('studio-adjust-to-build'),
+          onPressed: () => setState(() => _tab = StudioTab.build),
+          child: Text(l.studioBuildTitle),
+        ),
       ],
       StudioTab.adjust => [
-        StudioComingSoon(
-          key: const Key('studio-adjust-soon'),
+        LwCard(
+          key: const Key('studio-adjust-intro'),
           title: l.studioAdjustTitle,
           body: l.studioAdjustBody,
         ),
-        ...save,
+        const SizedBox(height: LwSpacing.md),
+        if (options == null)
+          const Center(child: CircularProgressIndicator())
+        else ...[
+          AvatarOptionsPicker(
+            key: const Key('studio-adjust-options'),
+            categories: options.forAdjust,
+            chosen: _changes,
+            allowNone: true,
+            onChanged: (c, o) => setState(() {
+              if (o == null) {
+                _changes.remove(c);
+              } else {
+                _changes[c] = o;
+              }
+            }),
+          ),
+          FilledButton.icon(
+            key: const Key('studio-adjust-make'),
+            onPressed:
+                _busy || _changes.isEmpty || job.stage == CoachJobStage.making
+                ? null
+                : () => _startJob(
+                    (api, key) => api.startAdjust(
+                      changes: options.valid(_changes),
+                      idempotencyKey: key,
+                    ),
+                  ),
+            icon: const Icon(Icons.auto_fix_high_outlined),
+            label: Text(l.studioAdjustMake),
+          ),
+        ],
       ],
       StudioTab.background => [
         BackgroundChoices(
@@ -425,12 +559,25 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
               ] else
                 LwPageTitle(l.studioTitle),
               if (_tab != StudioTab.voice) ...look,
+              // A coach being made from a photo or from choices.
+              if (job.stage == CoachJobStage.making) ...[
+                LwCard(
+                  key: const Key('studio-making'),
+                  title: l.studioMakingTitle,
+                  body: l.studioMakingBody,
+                ),
+                const SizedBox(height: LwSpacing.sm),
+              ] else if (job.stage == CoachJobStage.notMade) ...[
+                LwCard(
+                  key: const Key('studio-not-made'),
+                  title: l.coachNoticeNotMadeTitle,
+                  body: _makerError(l, job.messageId ?? ''),
+                ),
+                const SizedBox(height: LwSpacing.sm),
+              ],
               StudioTabs(
                 tab: _tab,
-                tabs: [
-                  for (final x in StudioTab.values)
-                    if (!widget.onboarding || x != StudioTab.voice) x,
-                ],
+                tabs: tabs,
                 onChanged: (x) {
                   ref.read(voicePreviewPlayerProvider).stop();
                   setState(() => _tab = x);

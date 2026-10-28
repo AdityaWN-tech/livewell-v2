@@ -176,14 +176,13 @@ void main() {
     }
   });
 
-  testWidgets('flag off (prod until counsel review): "Coming soon" only', (
+  testWidgets('flag off (prod until counsel review): the tab is hidden', (
     tester,
   ) async {
     final h = photoOn(flag: false);
     await h.boot(tester);
     await openStudio(tester);
-    await tapKey(tester, 'studio-tab-photo');
-    expect(find.byKey(const Key('studio-photo-soon')), findsOneWidget);
+    expect(find.byKey(const Key('studio-tab-photo')), findsNothing);
     expect(find.byKey(const Key('photo-start')), findsNothing);
   });
 

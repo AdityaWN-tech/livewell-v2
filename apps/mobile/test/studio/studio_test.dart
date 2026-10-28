@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/core/config/feature_flags.dart';
+import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/design/avatar/avatar_art.dart';
 import 'package:livewell/core/design/theme.dart';
@@ -17,6 +19,9 @@ import '../support/app_harness.dart';
 import '../support/fakes.dart';
 
 const uid = 'u1';
+
+/// Build my own and Adjust on (the Media Service is set up in the fake).
+const maker = FeatureFlags(avatarMaker: true);
 
 Harness signedIn({FeatureFlags flags = const FeatureFlags()}) {
   final h = Harness(
@@ -112,8 +117,17 @@ void main() {
       h.avatars.saved = const CoachChoice(coach: ReadyCoach.greyGlasses);
       await h.boot(tester);
       await openStudio(tester);
-      for (final tab in StudioTab.values) {
+      // Flags off (prod today): the ways that need the Media Service are
+      // hidden, never "coming soon" (Step 1, D-50).
+      for (final tab in [
+        StudioTab.coaches,
+        StudioTab.background,
+        StudioTab.voice,
+      ]) {
         expect(find.byKey(Key('studio-tab-${tab.name}')), findsOneWidget);
+      }
+      for (final tab in [StudioTab.photo, StudioTab.build, StudioTab.adjust]) {
+        expect(find.byKey(Key('studio-tab-${tab.name}')), findsNothing);
       }
       expect(find.byKey(const Key('studio-stage')), findsOneWidget);
       expect(selected(tester), {ReadyCoach.greyGlasses});
@@ -179,23 +193,28 @@ void main() {
       );
     });
 
-    testWidgets('From my photo, Build my own and Adjust say what is coming', (
-      tester,
-    ) async {
+    testWidgets('no "coming soon" anywhere in the Studio', (tester) async {
       await signedIn().boot(tester);
       await openStudio(tester);
-      for (final (tab, panel) in [
-        ('photo', 'studio-photo-soon'),
-        ('build', 'studio-build-soon'),
-        ('adjust', 'studio-adjust-soon'),
-      ]) {
+      for (final tab in ['coaches', 'background']) {
         await tapKey(tester, 'studio-tab-$tab');
-        expect(find.byKey(Key(panel)), findsOneWidget, reason: tab);
+        expect(
+          find.textContaining(RegExp('coming', caseSensitive: false)),
+          findsNothing,
+          reason: tab,
+        );
       }
-      expect(
-        find.textContaining(RegExp('coming soon', caseSensitive: false)),
-        findsOneWidget,
-      );
+    });
+
+    testWidgets('flag on but the Media Service not set up: still hidden', (
+      tester,
+    ) async {
+      final h = signedIn(flags: maker);
+      h.avatarMaker.available = false;
+      await h.boot(tester);
+      await openStudio(tester);
+      expect(find.byKey(const Key('studio-tab-build')), findsNothing);
+      expect(find.byKey(const Key('studio-tab-adjust')), findsNothing);
     });
 
     testWidgets('dev build: the coaches show their placeholder frames; '
@@ -237,6 +256,148 @@ void main() {
           'assets/avatar/frames/coaches/navy_turban/neutral@2x.webp',
         ),
       );
+    });
+  });
+
+  testWidgets('FR-AVT-01: switching coach type keeps the voice and the '
+      'history', (tester) async {
+    final h = signedIn(flags: maker);
+    h.avatars.saved = const CoachChoice(
+      source: CoachSource.built,
+      framesVersion: 2,
+      coachName: 'Asha',
+    );
+    h.voices.chosen = const VoiceChoice(
+      voiceId: 'lw-deep',
+      speed: 1.1,
+      style: VoiceStyle.energetic,
+    );
+    h.checkIns.days['2026-10-13'] = const CheckIn(
+      date: '2026-10-13',
+      mood: 4,
+      gentleDay: false,
+    );
+    await h.boot(tester);
+    await openStudio(tester);
+    // From a coach built for you back to a ready-made one.
+    await tapKey(tester, 'coach-navy_turban');
+    await tapKey(tester, 'studio-save-avatar');
+    expect(h.avatars.saved!.source, CoachSource.readyMade);
+    expect(h.avatars.saved!.coach, ReadyCoach.navyTurban);
+    expect(h.avatars.saved!.coachName, 'Asha', reason: 'the name stays');
+    expect(
+      h.voices.chosen,
+      const VoiceChoice(
+        voiceId: 'lw-deep',
+        speed: 1.1,
+        style: VoiceStyle.energetic,
+      ),
+    );
+    expect(h.checkIns.days.keys, ['2026-10-13']);
+    expect(h.checkIns.saves, 0);
+  });
+
+  group('Build my own and Adjust (Step 1, FR-AVT-02)', () {
+    testWidgets('Build my own: every category, then "Make my coach"', (
+      tester,
+    ) async {
+      final h = signedIn(flags: maker);
+      await h.boot(tester);
+      await openStudio(tester);
+      await tapKey(tester, 'studio-tab-build');
+      expect(find.byKey(const Key('studio-build-options')), findsOneWidget);
+      // The inclusive lists (FR-AVT-02).
+      for (final key in [
+        'avatar-opt-body_type-broad',
+        'avatar-opt-head_covering-kippah',
+        'avatar-opt-accessories-wheelchair',
+        'avatar-opt-accessories-hearing_aid',
+        'avatar-opt-hairstyle-locs',
+      ]) {
+        await reveal(tester, key);
+        expect(find.byKey(Key(key)), findsOneWidget, reason: key);
+      }
+      await tapKey(tester, 'avatar-opt-body_type-broad');
+      await tapKey(tester, 'avatar-opt-head_covering-kippah');
+      await tapKey(tester, 'studio-build-make');
+      final (source, options) = h.avatarMaker.requests.single;
+      expect(source, 'built');
+      expect(options['body_type'], 'broad');
+      expect(options['head_covering'], 'kippah');
+      // A full choice: one option per category.
+      expect(options.length, 17);
+      // The coach is being made; we say so and it can be left.
+      await toTop(tester);
+      expect(find.byKey(const Key('studio-making')), findsOneWidget);
+      // The watcher asks the service and the coach arrives.
+      await tester.pump(const Duration(seconds: 25));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('studio-making')), findsNothing);
+    });
+
+    testWidgets('a refusal is said kindly, with what to do instead', (
+      tester,
+    ) async {
+      final h = signedIn(flags: maker);
+      h.avatarMaker.refuse = const AvatarMakerError('avatar_daily_limit');
+      await h.boot(tester);
+      await openStudio(tester);
+      await tapKey(tester, 'studio-tab-build');
+      await tapKey(tester, 'studio-build-make');
+      expect(
+        find.textContaining("You've made 3 coaches today"),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('Adjust a ready-made coach: offers Build my own instead', (
+      tester,
+    ) async {
+      final h = signedIn(flags: maker);
+      await h.boot(tester);
+      await openStudio(tester);
+      await tapKey(tester, 'studio-tab-adjust');
+      expect(find.byKey(const Key('studio-adjust-ready-made')), findsOneWidget);
+      await tapKey(tester, 'studio-adjust-to-build');
+      expect(find.byKey(const Key('studio-build-options')), findsOneWidget);
+      expect(h.avatarMaker.requests, isEmpty);
+    });
+
+    testWidgets('Adjust a made-for-you coach: only the changes are sent', (
+      tester,
+    ) async {
+      final h = signedIn(flags: maker);
+      h.avatars.saved = const CoachChoice(
+        source: CoachSource.built,
+        framesVersion: 2,
+      );
+      await h.boot(tester);
+      await openStudio(tester);
+      await tapKey(tester, 'studio-tab-adjust');
+      expect(find.byKey(const Key('studio-adjust-options')), findsOneWidget);
+      // Face, skin, age and build aren't changed by Adjust.
+      expect(find.byKey(const Key('avatar-opt-skin-tone_1')), findsNothing);
+      await reveal(tester, 'studio-adjust-make');
+      expect(
+        tester
+            .widget<ButtonStyleButton>(
+              find.byKey(const Key('studio-adjust-make')),
+            )
+            .onPressed,
+        isNull,
+        reason: 'nothing to change yet',
+      );
+      await tapKey(tester, 'avatar-opt-glasses-round');
+      await tapKey(tester, 'avatar-opt-outfit_colour-plum');
+      // Tapping a chosen one again un-chooses it.
+      await tapKey(tester, 'avatar-opt-glasses-round');
+      await tapKey(tester, 'studio-adjust-make');
+      final (source, changes) = h.avatarMaker.requests.single;
+      expect(source, 'adjust');
+      expect(changes, {'outfit_colour': 'plum'});
+      // Let the job finish (the watcher asks every 10 s).
+      await tester.pump(const Duration(seconds: 25));
+      await tester.pumpAndSettle();
     });
   });
 
@@ -348,7 +509,7 @@ void main() {
   });
 
   group('Background tab', () {
-    testWidgets('pick a colour and save; scenes say when they come', (
+    testWidgets('pick a colour and save; no scene placeholders', (
       tester,
     ) async {
       final h = signedIn();
@@ -362,16 +523,15 @@ void main() {
       await tapKey(tester, 'studio-save-avatar');
       expect(h.avatars.saved!.background, 3);
       expect(h.avatars.saved!.coach, ReadyCoach.shortCurls, reason: 'kept');
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('studio-scene-beach')),
-        300,
-        scrollable: find.byType(Scrollable).last,
+      // Scenes come with their art; until then they aren't shown at all.
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w.key is ValueKey<String> &&
+              (w.key! as ValueKey<String>).value.startsWith('studio-scene-'),
+        ),
+        findsNothing,
       );
-      expect(find.text('Unlocks with a 7-day streak'), findsOneWidget);
-      final beach = tester.widget<VoiceRow>(
-        find.byKey(const Key('studio-scene-beach')),
-      );
-      expect(beach.onTap, isNull);
     });
   });
 
@@ -414,7 +574,9 @@ void main() {
       testWidgets('iPhone SE, text $scale: no overflow on any tab', (
         tester,
       ) async {
-        await signedIn().boot(tester);
+        await signedIn(
+          flags: const FeatureFlags(avatarMaker: true, avatarFromPhoto: true),
+        ).boot(tester);
         tester.view
           ..physicalSize = const Size(750, 1334)
           ..devicePixelRatio = 2;
@@ -423,9 +585,9 @@ void main() {
         await openStudio(tester);
         for (final (tab, last) in [
           ('coaches', 'studio-save-avatar'),
-          ('photo', 'studio-save-avatar'),
-          ('build', 'studio-save-avatar'),
-          ('adjust', 'studio-save-avatar'),
+          ('photo', 'photo-start'),
+          ('build', 'studio-build-make'),
+          ('adjust', 'studio-adjust-to-build'),
           ('background', 'studio-save-avatar'),
           ('voice', 'studio-save-voice'),
         ]) {
@@ -439,6 +601,9 @@ void main() {
           );
           await tester.pumpAndSettle();
         }
+        // "Make my coach" started a job: let it finish.
+        await tester.pump(const Duration(seconds: 25));
+        await tester.pumpAndSettle();
       });
     }
   });

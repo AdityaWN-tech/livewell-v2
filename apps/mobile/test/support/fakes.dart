@@ -887,6 +887,33 @@ class FakeAvatarMaker implements AvatarMakerApi {
     return 'job-1';
   }
 
+  /// Build my own / Adjust requests (source, option ids).
+  final requests = <(String, Map<String, String>)>[];
+
+  /// False: the Media Service isn't set up (the Studio hides Build/Adjust).
+  @override
+  bool available = true;
+
+  @override
+  Future<String> startBuilt({
+    required Map<String, String> options,
+    required String idempotencyKey,
+  }) async {
+    if (refuse case final e?) throw e;
+    requests.add(('built', options));
+    return 'job-built';
+  }
+
+  @override
+  Future<String> startAdjust({
+    required Map<String, String> changes,
+    required String idempotencyKey,
+  }) async {
+    if (refuse case final e?) throw e;
+    requests.add(('adjust', changes));
+    return 'job-adjust';
+  }
+
   /// How many polls fail with a dropped connection first.
   int pollErrors = 0;
 

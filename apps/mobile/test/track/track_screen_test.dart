@@ -4,6 +4,7 @@ import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
 import 'package:livewell/features/track/presentation/weekly_wins_screen.dart';
+import 'package:livewell/features/track/domain/health_summary.dart';
 import 'package:livewell/features/track/domain/track_models.dart';
 import 'package:livewell/features/track/domain/track_stats.dart';
 import 'package:livewell/features/track/presentation/track_screen.dart';
@@ -272,12 +273,97 @@ void main() {
       );
     });
 
-    testWidgets('Connect Health says it is coming soon', (tester) async {
-      await signedIn().boot(tester);
-      await openTrack(tester);
-      await tester.tap(find.byKey(const Key('track-card-steps')));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('track-health-soon')), findsOneWidget);
+    group('Connect Health (Step 4f)', () {
+      Future<Harness> openSheet(
+        WidgetTester tester, [
+        void Function(Harness)? setUp,
+      ]) async {
+        final h = signedIn();
+        setUp?.call(h);
+        await h.boot(tester);
+        await openTrack(tester);
+        expect(find.text('Connect Health'), findsOneWidget);
+        await tester.tap(find.byKey(const Key('track-card-steps')));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('health-sheet')), findsOneWidget);
+        return h;
+      }
+
+      bool healthGranted(Harness h) => isGranted(
+        currentConsents(h.consents.records),
+        ConsentType.healthData,
+      );
+
+      testWidgets('consent first, then the system screen; steps and sleep '
+          'show, and nothing says "coming soon"', (tester) async {
+        final h = await openSheet(tester);
+        expect(find.textContaining('stays on your phone'), findsOneWidget);
+        expect(find.textContaining('soon'), findsNothing);
+        expect(h.health.requests, 0, reason: 'nothing asked before Connect');
+        await tester.tap(find.byKey(const Key('health-connect')));
+        await tester.pumpAndSettle();
+        expect(h.health.requests, 1);
+        expect(healthGranted(h), isTrue);
+        expect(find.byKey(const Key('health-sheet')), findsNothing);
+        expect(find.text('6,432'), findsOneWidget);
+        expect(find.text('Connect Health'), findsNothing);
+        expect(find.text('7h 5m'), findsOneWidget);
+      });
+
+      testWidgets('Not now asks nothing and records nothing', (tester) async {
+        final h = await openSheet(tester);
+        await tester.tap(find.byKey(const Key('health-not-now')));
+        await tester.pumpAndSettle();
+        expect(h.health.requests, 0);
+        expect(healthGranted(h), isFalse);
+        expect(find.text('Connect Health'), findsOneWidget);
+      });
+
+      testWidgets('access refused: the consent stays off and it says how to '
+          'allow it', (tester) async {
+        final h = await openSheet(tester, (h) => h.health.allows = false);
+        await tester.tap(find.byKey(const Key('health-connect')));
+        await tester.pumpAndSettle();
+        expect(healthGranted(h), isFalse);
+        expect(find.byKey(const Key('health-retry')), findsOneWidget);
+        h.health.allows = true;
+        await tester.tap(find.byKey(const Key('health-retry')));
+        await tester.pumpAndSettle();
+        expect(healthGranted(h), isTrue);
+        expect(find.text('6,432'), findsOneWidget);
+      });
+
+      testWidgets('no Health Connect app: offers to get it', (tester) async {
+        final h = await openSheet(
+          tester,
+          (h) => h.health.available = HealthAvailability.needsInstall,
+        );
+        expect(find.byKey(const Key('health-connect')), findsNothing);
+        await tester.tap(find.byKey(const Key('health-install')));
+        await tester.pumpAndSettle();
+        expect(h.health.installs, 1);
+        expect(healthGranted(h), isFalse);
+      });
+
+      testWidgets('a phone that cannot connect is told so', (tester) async {
+        await openSheet(
+          tester,
+          (h) => h.health.available = HealthAvailability.unavailable,
+        );
+        expect(find.byKey(const Key('health-connect')), findsNothing);
+        expect(find.textContaining("can't share health data"), findsOneWidget);
+      });
+
+      testWidgets('turning the consent off disconnects', (tester) async {
+        final h = signedIn();
+        await h.consents.record(ConsentType.healthData, granted: true);
+        await h.boot(tester);
+        await openTrack(tester);
+        expect(find.text('6,432'), findsOneWidget);
+        await h.consents.record(ConsentType.healthData, granted: false);
+        await tester.pumpAndSettle();
+        expect(find.text('Connect Health'), findsOneWidget);
+      });
     });
 
     testWidgets('Weekly Reflection: "How was your week?" opens weekly wins', (

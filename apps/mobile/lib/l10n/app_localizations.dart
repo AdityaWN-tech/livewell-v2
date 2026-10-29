@@ -1846,12 +1846,6 @@ abstract class AppLocalizations {
   /// **'Weekly wins'**
   String get trackWeeklyWins;
 
-  /// No description provided for @trackGotIt.
-  ///
-  /// In en, this message translates to:
-  /// **'Got it'**
-  String get trackGotIt;
-
   /// No description provided for @trackStreakEyebrow.
   ///
   /// In en, this message translates to:
@@ -3675,18 +3669,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Steps: connect Apple Health or Health Connect. Opens details.'**
   String get trackConnectHealthLabel;
-
-  /// No description provided for @trackHealthSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Connecting Health is coming soon'**
-  String get trackHealthSoonTitle;
-
-  /// No description provided for @trackHealthSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon you can connect Apple Health or Health Connect. Your steps and sleep hours will show here, and only if you choose to share them.'**
-  String get trackHealthSoonBody;
 
   /// No description provided for @trackSleepHours.
   ///
@@ -6392,6 +6374,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get breatheClose;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Health'**
+  String get healthAppleHealth;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Health Connect'**
+  String get healthHealthConnect;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Connect {app}'**
+  String healthConnectTitle(String app);
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well can read your steps and sleep from {app} to show them in Track. It only reads, and what it reads stays on your phone. You can turn this off any time in Settings > Consents.'**
+  String healthConnectBody(String app);
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Connect {app}'**
+  String healthConnectButton(String app);
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get healthNotNow;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'To show your steps and sleep, this phone needs the free Health Connect app from Google.'**
+  String get healthNeedsInstallBody;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Get Health Connect'**
+  String get healthInstallButton;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'This phone can\'t share health data with apps. Track still shows your check-ins.'**
+  String get healthUnavailableBody;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get healthClose;
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well wasn\'t given access. To connect, allow steps and sleep for Live Well in {app}.'**
+  String healthDeniedBody(String app);
+
+  /// Step 4f Apple Health / Health Connect (D-59).
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get healthTryAgain;
 }
 
 class _AppLocalizationsDelegate

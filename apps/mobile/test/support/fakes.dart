@@ -29,7 +29,9 @@ import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 import 'package:livewell/features/learn/domain/portal.dart';
+import 'package:livewell/features/track/data/health_source.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
+import 'package:livewell/features/track/domain/health_summary.dart';
 import 'package:livewell/features/track/domain/track_models.dart';
 import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/features/checkin/data/checkin_repository.dart';
@@ -1051,4 +1053,33 @@ class FakeRoutineAskStore implements RoutineAskStore {
 
   @override
   Future<void> markAsked(String itemId) async => ids.add(itemId);
+}
+
+/// Apple Health / Health Connect in tests (Step 4f): set what the phone
+/// "has" and whether the person allows access.
+class FakeHealthSource implements HealthSource {
+  HealthAvailability available = HealthAvailability.available;
+  bool allows = true;
+  HealthSummary summary = const HealthSummary(
+    // The harness's day is a Wednesday.
+    stepsWeek: [4000, 6000, 6432, 0, 0, 0, 0],
+    sleepMinutesAverage: 425,
+  );
+  int requests = 0;
+  int installs = 0;
+
+  @override
+  Future<HealthAvailability> availability() async => available;
+
+  @override
+  Future<bool> requestAccess() async {
+    requests++;
+    return allows;
+  }
+
+  @override
+  Future<HealthSummary> week(DateTime now) async => summary;
+
+  @override
+  Future<void> install() async => installs++;
 }

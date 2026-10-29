@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!-- Capabilities for the flavoured builds (docs/ios-build-setup.md). Each
-     flavour's bundle ID needs Push Notifications, Sign in with Apple and
-     App Groups turned on, and its provisioning profile must include them.
+     flavour's bundle ID needs Push Notifications, Sign in with Apple,
+     App Groups and HealthKit turned on, and its provisioning profile must include them.
      Release builds use the production push environment. -->
 <plist version="1.0">
 <dict>
@@ -12,6 +12,10 @@
 	<array>
 		<string>Default</string>
 	</array>
+	<key>com.apple.developer.healthkit</key>
+	<true/>
+	<key>com.apple.developer.healthkit.access</key>
+	<array/>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>$(APP_GROUP_ID)</string>

@@ -37,6 +37,7 @@ import 'package:livewell/features/routine/application/routine_moment.dart';
 import 'package:livewell/features/routine/data/routine_repository.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
 import 'package:livewell/features/widget/data/widget_inbox.dart';
+import 'package:livewell/features/track/data/health_source.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
@@ -97,6 +98,9 @@ class Harness {
   final player = FakeVoicePreviewPlayer();
   final plans = FakePlanRepository();
 
+  /// Apple Health / Health Connect (Step 4f).
+  final health = FakeHealthSource();
+
   /// My Daily Routine, in memory (T-GOL-03).
   final routines = InMemoryRoutineRepository();
 
@@ -152,6 +156,7 @@ class Harness {
           authServiceProvider.overrideWithValue(auth),
           profileRepositoryProvider.overrideWithValue(profiles),
           consentRepositoryProvider.overrideWithValue(consents),
+          healthSourceProvider.overrideWithValue(health),
           dictationProvider.overrideWithValue(dictation),
           phoneLauncherProvider.overrideWithValue(phone),
           clockProvider.overrideWithValue(() => now),

@@ -9,7 +9,10 @@ import '../../consent/domain/consent.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../../home/application/home_data.dart';
+import '../../goals/data/goal_repository.dart';
+import '../../plan/application/plan_data.dart' show todayHabitLogsProvider;
 import '../data/health_source.dart';
+import '../domain/streak.dart';
 import '../domain/health_summary.dart';
 import '../domain/track_stats.dart';
 
@@ -96,8 +99,25 @@ final healthSummaryProvider = Provider.autoDispose<HealthSummary?>(
   (ref) => ref.watch(healthWeekProvider).value,
 );
 
-/// Habits kept per day, Monday to Sunday, or null until habit logs exist.
-/// TODO(T-GOL-01): count users/{uid}/habit_logs.
-final habitsWeekProvider = Provider<List<int>?>(
-  (ref) => ref.watch(previewModeProvider) ? PreviewSamples.habitsWeek : null,
-);
+/// The dates of every habit done in the last 90 days, one entry per log
+/// (the daily step and the two own habits; D-60). Read again when today's
+/// logs change, so a tick shows at once.
+final recentDoneDatesProvider = FutureProvider<List<String>>((ref) async {
+  ref.watch(todayHabitLogsProvider);
+  final now = ref.watch(clockProvider)();
+  final logs = await ref
+      .watch(goalRepositoryProvider)
+      .logsBetween(
+        localDateKey(DateTime(now.year, now.month, now.day - 90)),
+        localDateKey(now),
+      );
+  return [for (final l in logs) l.date];
+});
+
+/// Habits kept per day, Monday to Sunday, or null with none this week.
+final habitsWeekProvider = Provider<List<int>?>((ref) {
+  if (ref.watch(previewModeProvider)) return PreviewSamples.habitsWeek;
+  final dates = ref.watch(recentDoneDatesProvider).value;
+  if (dates == null) return null;
+  return habitsPerDay(dates, ref.watch(clockProvider)());
+});

@@ -9,6 +9,8 @@ import '../../starter_plan/domain/starter_plan.dart';
 import '../../account/data/profile_repository.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
+import '../../goals/data/goal_repository.dart';
+import '../../goals/domain/goal.dart';
 import '../domain/home_models.dart';
 import '../../avatar/presentation/coach_avatar.dart' show coachChoiceProvider;
 
@@ -62,7 +64,6 @@ final todayPlanProvider = StreamProvider<PlanDay?>((ref) {
 });
 
 /// Today's next step: the plan's step; sample data in the dev preview.
-/// TODO(T-DLY-03): save Done to users/{uid}/habit_logs.
 final todayStepProvider = Provider<TodayStep?>((ref) {
   if (ref.watch(previewModeProvider)) return PreviewSamples.step;
   final day = ref.watch(todayPlanProvider).value;
@@ -85,7 +86,6 @@ final milestoneProvider = Provider<Milestone?>(
 
 /// Done and "make it smaller" for today's step, shared by Home and Plan so
 /// both always show the same step in the same state (T-UI-02 phone bug).
-/// TODO(T-DLY-03): save Done to users/{uid}/habit_logs.
 class StepProgress {
   const StepProgress({
     required this.date,
@@ -110,12 +110,22 @@ class StepProgressNotifier extends Notifier<StepProgress> {
   StepProgress get _current =>
       state.date == _today ? state : StepProgress(date: _today);
 
-  void markDone() => state = StepProgress(
-    date: _today,
-    done: true,
-    smaller: _current.smaller,
-    doneAt: ref.read(clockProvider)(),
-  );
+  /// Saved as today's `daily_step` habit log (id `date_daily_step`, so a
+  /// second tap or an offline retry writes the same document; D-60).
+  void markDone() {
+    final at = ref.read(clockProvider)();
+    state = StepProgress(
+      date: _today,
+      done: true,
+      smaller: _current.smaller,
+      doneAt: at,
+    );
+    // Not awaited: offline it is queued and syncs later.
+    ref
+        .read(goalRepositoryProvider)
+        .saveLog(HabitLog(date: _today, habitId: dailyStepHabitId, doneAt: at))
+        .catchError((_) {});
+  }
 
   void makeSmaller() => state = StepProgress(
     date: _today,
@@ -129,11 +139,28 @@ final _stepProgressStore = NotifierProvider<StepProgressNotifier, StepProgress>(
   StepProgressNotifier.new,
 );
 
-/// Today's progress (a new day is always fresh).
+/// Today's progress (a new day is always fresh). Done also comes from
+/// today's saved `daily_step` log, so it survives a restart (D-60).
 final stepProgressProvider = Provider<StepProgress>((ref) {
   final s = ref.watch(_stepProgressStore);
   final today = localDateKey(ref.watch(clockProvider)());
-  return s.date == today ? s : StepProgress(date: today);
+  final current = s.date == today ? s : StepProgress(date: today);
+  if (current.done) return current;
+  final saved = (ref.watch(_todayStepLogsProvider).value ?? const <HabitLog>[])
+      .where((l) => l.habitId == dailyStepHabitId)
+      .firstOrNull;
+  if (saved == null) return current;
+  return StepProgress(
+    date: today,
+    done: true,
+    smaller: current.smaller,
+    doneAt: saved.doneAt,
+  );
+});
+
+final _todayStepLogsProvider = StreamProvider<List<HabitLog>>((ref) {
+  final today = localDateKey(ref.watch(clockProvider)());
+  return ref.watch(goalRepositoryProvider).watchLogs(today);
 });
 
 final stepProgressActionsProvider = Provider<StepProgressNotifier>(

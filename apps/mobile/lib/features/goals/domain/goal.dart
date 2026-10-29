@@ -156,6 +156,10 @@ class UserHabit {
 }
 
 /// A habit marked done on a day. Idempotent: the id is date_habitId.
+/// The habit id of the coach's daily step (today's plan step) in
+/// habit_logs (D-60). The two own habits use [UserHabit.ids].
+const dailyStepHabitId = 'daily_step';
+
 class HabitLog {
   const HabitLog({required this.date, required this.habitId, this.doneAt});
 

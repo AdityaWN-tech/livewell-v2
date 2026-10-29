@@ -27,15 +27,20 @@ import '../../routine/application/routine_week_data.dart';
 import '../application/track_data.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
+import '../domain/streak.dart';
 import '../domain/track_stats.dart';
 import 'health_connect_sheet.dart';
 import 'weekly_wins_screen.dart';
 
-/// The streak card's data. Null until habit logs and the streak engine exist.
-/// TODO(T-DLY-07): read users/{uid}/streaks/current and this week's logs.
-final streakProvider = Provider<StreakSummary?>(
-  (ref) => ref.watch(previewModeProvider) ? PreviewSamples.streak : null,
-);
+/// The streak card's data, from the habits done (D-60); null before the
+/// first one. TODO(T-DLY-07): read users/{uid}/streaks/current once the
+/// server's streak engine exists.
+final streakProvider = Provider<StreakSummary?>((ref) {
+  if (ref.watch(previewModeProvider)) return PreviewSamples.streak;
+  final dates = ref.watch(recentDoneDatesProvider).value;
+  if (dates == null) return null;
+  return streakFrom(dates.toSet(), ref.watch(clockProvider)());
+});
 
 /// Today's reflection, live.
 final todayReflectionProvider = StreamProvider<Reflection?>((ref) {

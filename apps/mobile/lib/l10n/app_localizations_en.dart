@@ -1321,6 +1321,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceAiLabelLong => 'This is an AI voice';
 
   @override
+  String get voiceHowMadeTitle => 'How this voice is made';
+
+  @override
+  String get voiceHowMadeBody =>
+      'Your coach\'s voice is an AI voice. For now it is your phone\'s own text-to-speech, set to sound close to the voice you chose. It is not a copy of a real person\'s voice. The coach only says lines our team has written and reviewed.';
+
+  @override
   String voiceGreetingNamed(String name) {
     return 'Hi $name, I’m your Live Well coach.';
   }

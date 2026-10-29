@@ -121,6 +121,26 @@ class _VoiceLibraryScreenState extends ConsumerState<VoiceLibraryScreen> {
                     },
                     onOwnVoice: () => showOwnVoiceSheet(context),
                   ),
+                  // How the voice is made (FR-VOC-08).
+                  const SizedBox(height: LwSpacing.md),
+                  Semantics(
+                    container: true,
+                    child: Column(
+                      key: const Key('voice-how-made'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l.voiceHowMadeTitle,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        const SizedBox(height: LwSpacing.xxs),
+                        Text(
+                          l.voiceHowMadeBody,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

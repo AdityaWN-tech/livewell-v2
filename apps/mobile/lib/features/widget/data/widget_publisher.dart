@@ -21,7 +21,7 @@ String appGroupFor(Flavor f) => switch (f) {
 
 /// `home_widget`: the iOS App Group's shared defaults, Android's shared
 /// preferences. The native widgets read [key] (iOS: WidgetKit, Android:
-/// Glance; added in the next PRs).
+/// RemoteViews, D-61).
 class HomeWidgetPublisher implements WidgetPublisher {
   HomeWidgetPublisher(this.appGroupId);
 
@@ -29,7 +29,11 @@ class HomeWidgetPublisher implements WidgetPublisher {
 
   static const key = 'lw_snapshot';
   static const iOSName = 'LiveWellWidget';
-  static const androidName = 'LiveWellWidgetReceiver';
+
+  /// Fully qualified: the dev and staging application ids end in .dev /
+  /// .stg, but the class lives in the base package (D-61).
+  static const androidName =
+      'net.conciergeconnectedcare.livewell.LiveWellWidgetReceiver';
 
   /// The face files last copied for the iOS widget (path → size).
   final _copied = <String, int>{};
@@ -43,7 +47,10 @@ class HomeWidgetPublisher implements WidgetPublisher {
         key,
         jsonEncode(snapshot.toJson()),
       );
-      await HomeWidget.updateWidget(iOSName: iOSName, androidName: androidName);
+      await HomeWidget.updateWidget(
+        iOSName: iOSName,
+        qualifiedAndroidName: androidName,
+      );
     } catch (_) {
       // No widget on this device (or not added yet): nothing to update.
     }

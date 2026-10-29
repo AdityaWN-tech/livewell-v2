@@ -458,21 +458,12 @@ void main() {
       expect(find.byKey(const Key('voice-dr-gokula')), findsNothing);
     });
 
-    testWidgets('loved-one flag on (Phase 2): the row shows', (tester) async {
+    testWidgets('loved-one flag on (Phase 2) but its flow not built: no row, '
+        'so it can never open the own-voice flow', (tester) async {
       await signedIn(flags: const FeatureFlags(lovedOneVoice: true))
           .boot(tester);
       await openStudio(tester, row: 'profile-voice');
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('voice-loved-one')),
-        300,
-        scrollable: find.byType(Scrollable).last,
-      );
-      expect(
-        tester
-            .widget<VoiceRow>(find.byKey(const Key('voice-loved-one')))
-            .detail,
-        'AI voice',
-      );
+      expect(find.byKey(const Key('voice-loved-one')), findsNothing);
     });
 
     testWidgets('the consent banner shows only with a consented clone', (

@@ -88,12 +88,14 @@ void main() {
       expect(find.byKey(const Key('celebration')), findsNothing);
     });
 
-    testWidgets("a Done from another day isn't applied", (tester) async {
+    testWidgets("a Done from an earlier day isn't today's, but is saved for "
+        'that day (D-60)', (tester) async {
       final h = await bootPreview(tester);
       h.widgetInbox.done = '2026-10-13';
       backToTheApp(tester);
       await tester.pumpAndSettle();
       expect(scope(tester).read(stepProgressProvider).done, isFalse);
+      expect(h.goals.logs.keys, contains('2026-10-13_daily_step'));
     });
 
     testWidgets('Check in opens the check-in', (tester) async {

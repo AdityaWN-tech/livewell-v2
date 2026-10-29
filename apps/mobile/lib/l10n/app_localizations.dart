@@ -2374,6 +2374,18 @@ abstract class AppLocalizations {
   /// **'This is an AI voice'**
   String get voiceAiLabelLong;
 
+  /// FR-VOC-08, voice settings (D-61).
+  ///
+  /// In en, this message translates to:
+  /// **'How this voice is made'**
+  String get voiceHowMadeTitle;
+
+  /// FR-VOC-08, voice settings (D-61). Accurate while voices are device TTS (D-49); update with T-VOC-01.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach\'s voice is an AI voice. For now it is your phone\'s own text-to-speech, set to sound close to the voice you chose. It is not a copy of a real person\'s voice. The coach only says lines our team has written and reviewed.'**
+  String get voiceHowMadeBody;
+
   /// No description provided for @voiceGreetingNamed.
   ///
   /// In en, this message translates to:

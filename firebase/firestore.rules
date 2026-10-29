@@ -529,6 +529,28 @@ service cloud.firestore {
         allow create, delete: if false;
       }
 
+      // ---------- content progress: where the person is in a lesson (Step 4e) ----------
+      // One doc per content item; only progress and completed, never what
+      // was read aloud or any health data.
+      match /content_progress/{itemId} {
+        function validProgress(d) {
+          return d.keys().hasOnly(['progress', 'completed',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.progress is number && d.progress >= 0 && d.progress <= 1
+            && d.completed is bool
+            && itemId.matches('^[A-Za-z0-9_-]{1,100}$');
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && validProgress(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && validProgress(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
       // ---------- portal events: app-side events only, append-only (13.2) ----------
       match /portal_events/{eventId} {
         allow read: if isOwner(uid);

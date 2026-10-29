@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show TimeOfDay;
 
 import '../../care/domain/chat.dart';
 import '../../home/domain/home_models.dart';
+import '../../learn/domain/breathing.dart';
 import '../../learn/domain/lesson.dart';
 import '../../learn/domain/portal.dart';
 import '../../plan/domain/plan_models.dart';
@@ -99,6 +100,18 @@ abstract final class PreviewSamples {
       art: 'lesson_reduce_stress',
       summary: 'Why starting with 2 minutes helps a habit stick.',
       readMinutes: 3,
+      cards: [
+        'Willpower runs low at the end of a long day. A habit that is very '
+            'small needs much less of it.',
+        'Start with 2 minutes. Two minutes of walking is easy to begin, and '
+            'beginning is the hardest part.',
+        'Tie it to something you already do, like after your morning tea. '
+            'The old habit reminds you of the new one.',
+      ],
+      microhabit: LessonMicrohabit(
+        title: 'Walk for 2 minutes after your morning tea',
+        minutes: 2,
+      ),
     ),
     Lesson(
       id: 'sample-2',
@@ -107,6 +120,15 @@ abstract final class PreviewSamples {
       art: 'lesson_move_body',
       summary: 'Simple ways to add a short walk to your day.',
       readMinutes: 4,
+      cards: [
+        'A short, easy walk after a meal is a simple way to move more.',
+        'Five or ten minutes is enough. Walk at a pace where you can still '
+            'talk.',
+      ],
+      microhabit: LessonMicrohabit(
+        title: 'Walk for 5 minutes after lunch',
+        minutes: 5,
+      ),
     ),
     Lesson(
       id: 'sample-3',
@@ -115,6 +137,11 @@ abstract final class PreviewSamples {
       art: 'lesson_better_sleep',
       summary: 'A calm routine for the last hour of your day.',
       readMinutes: 5,
+      cards: [
+        'Your body likes a signal that the day is ending.',
+        'Dim the lights and put the phone away an hour before bed.',
+        'Do the same calm thing each night, like reading or slow breathing.',
+      ],
     ),
     Lesson(
       id: 'sample-4',
@@ -123,6 +150,11 @@ abstract final class PreviewSamples {
       art: 'lesson_mindful_eating',
       summary: 'Keeping your reason close when motivation dips.',
       readMinutes: 2,
+      cards: [
+        'Your Why is the reason behind your goal.',
+        'Read it each morning. On hard days, it reminds you what matters.',
+      ],
+      microhabit: LessonMicrohabit(title: 'Read your Why once today'),
     ),
     Lesson(
       id: 'sample-audio-1',
@@ -132,6 +164,7 @@ abstract final class PreviewSamples {
       readMinutes: 5,
       kind: LessonKind.audio,
       art: 'lesson_breathe_reset',
+      breathing: BreathingPattern.box,
     ),
     Lesson(
       id: 'sample-audio-2',
@@ -141,6 +174,7 @@ abstract final class PreviewSamples {
       readMinutes: 5,
       kind: LessonKind.audio,
       art: 'lesson_deep_breathing',
+      breathing: BreathingPattern.calm,
     ),
     Lesson(
       id: 'sample-audio-3',
@@ -150,6 +184,7 @@ abstract final class PreviewSamples {
       readMinutes: 8,
       kind: LessonKind.audio,
       art: 'lesson_better_sleep',
+      breathing: BreathingPattern.sleep,
     ),
   ];
 

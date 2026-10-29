@@ -12,8 +12,29 @@ import '../data/learn_repository.dart';
 import '../domain/lesson.dart';
 import '../domain/portal.dart';
 
+/// The approved items the app can open (D-57): a lesson without its cards
+/// or a session without anything to play is left out, never a dead end.
 final lessonsProvider = StreamProvider<List<Lesson>>(
-  (ref) => ref.watch(learnRepositoryProvider).watchLessons(),
+  (ref) => ref
+      .watch(learnRepositoryProvider)
+      .watchLessons()
+      .map(
+        (all) => [
+          for (final x in all)
+            if (x.opens) x,
+        ],
+      ),
+);
+
+/// One item by id, or null (not approved, can't open, or not loaded).
+final lessonByIdProvider = Provider.family<Lesson?, String>(
+  (ref, id) =>
+      ref.watch(lessonsProvider).value?.where((x) => x.id == id).firstOrNull,
+);
+
+/// Where the person is in each item, by id.
+final contentProgressProvider = StreamProvider<Map<String, ContentProgress>>(
+  (ref) => ref.watch(learnRepositoryProvider).watchProgress(),
 );
 
 final portalOffersProvider = StreamProvider<List<PortalOffer>>(
@@ -68,15 +89,21 @@ final portalCardProvider = Provider<PortalOffer?>((ref) {
   );
 });
 
-/// Where the person stopped, or null. Progress isn't recorded until the
-/// lesson reader and player exist; the dev preview shows a sample.
-/// TODO(T-LRN-01): read users/{uid}/content_progress.
+/// Where the person stopped, or null: the item opened most recently that
+/// is started and not finished.
 final continueLessonProvider = Provider<LessonProgress?>((ref) {
-  if (!ref.watch(previewModeProvider)) return null;
   final all = ref.watch(lessonsProvider).value;
-  if (all == null || all.length <= PreviewSamples.continueIndex) return null;
-  return LessonProgress(
-    lesson: all[PreviewSamples.continueIndex],
-    progress: PreviewSamples.continueProgress,
-  );
+  final progress = ref.watch(contentProgressProvider).value;
+  if (all == null || progress == null) return null;
+  final open = [
+    for (final p in progress.values)
+      if (!p.completed && p.progress > 0) p,
+  ]..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  for (final p in open) {
+    final lesson = all.where((x) => x.id == p.itemId).firstOrNull;
+    if (lesson != null) {
+      return LessonProgress(lesson: lesson, progress: p.progress);
+    }
+  }
+  return null;
 });

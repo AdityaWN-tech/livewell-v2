@@ -2221,20 +2221,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get learnOpenSoonTitle => 'Lessons open here soon';
-
-  @override
-  String get learnOpenSoonBody =>
-      'Soon you can read the full lesson here, and save it to read offline.';
-
-  @override
-  String get learnAudioSoonTitle => 'Audio sessions are coming soon';
-
-  @override
-  String get learnAudioSoonBody =>
-      'Soon you can listen here, and download sessions to listen offline.';
-
-  @override
   String get learnAudioEmpty =>
       'Audio sessions will show here once they are reviewed.';
 
@@ -2244,9 +2230,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get learnProgramsEmptyBody =>
       'Courses from the Live Well Portal show here when one fits you.';
-
-  @override
-  String get learnGotIt => 'Got it';
 
   @override
   String get careTabChat => 'Chat';
@@ -3544,4 +3527,129 @@ class AppLocalizationsEn extends AppLocalizations {
   String profileRequestDataBody(String uid) {
     return 'Please send me a copy of my Live Well data. My account id is $uid.';
   }
+
+  @override
+  String learnReaderCardOf(int n, int total) {
+    return 'Card $n of $total';
+  }
+
+  @override
+  String get learnReaderNext => 'Next';
+
+  @override
+  String get learnReaderBack => 'Back';
+
+  @override
+  String get learnReaderTryThis => 'Try this today';
+
+  @override
+  String get learnReaderEndTitle => 'That\'s the lesson';
+
+  @override
+  String get learnReaderEndBody =>
+      'Well done for taking the time. Small steps add up.';
+
+  @override
+  String get learnReaderFinish => 'Finish lesson';
+
+  @override
+  String get learnReaderMissingTitle => 'This lesson isn\'t here right now';
+
+  @override
+  String get learnReaderMissingBody =>
+      'It may be being updated. You can find other lessons on Learn.';
+
+  @override
+  String get learnReaderBackToLearn => 'Back to Learn';
+
+  @override
+  String get learnListen => 'Listen';
+
+  @override
+  String get learnListenStop => 'Stop listening';
+
+  @override
+  String learnListenProgress(int n, int total) {
+    return 'Listening, card $n of $total';
+  }
+
+  @override
+  String get learnListenUnavailable =>
+      'Listening isn\'t working on this phone right now. You can read the lesson instead.';
+
+  @override
+  String get breatheTitle => 'Breathe with me';
+
+  @override
+  String get breatheCardBody =>
+      'A guided breathing break, 1 to 5 minutes. Works offline.';
+
+  @override
+  String get breatheCardLabel =>
+      'Breathe with me. A guided breathing break, 1 to 5 minutes. Opens the breathing guide.';
+
+  @override
+  String get breathePatternBox => 'Box breathing';
+
+  @override
+  String get breathePatternBoxSteps => 'In 4, hold 4, out 4, hold 4';
+
+  @override
+  String get breathePatternCalm => 'Slow breathing';
+
+  @override
+  String get breathePatternCalmSteps => 'In 4, out 6';
+
+  @override
+  String get breathePatternSleep => 'Sleep wind-down';
+
+  @override
+  String get breathePatternSleepSteps => 'In 4, out 7';
+
+  @override
+  String get breathePatternLabel => 'Pattern';
+
+  @override
+  String get breatheLengthLabel => 'How long';
+
+  @override
+  String get breatheStart => 'Start';
+
+  @override
+  String get breathePause => 'Pause';
+
+  @override
+  String get breatheResume => 'Resume';
+
+  @override
+  String get breatheIn => 'Breathe in';
+
+  @override
+  String get breatheHold => 'Hold';
+
+  @override
+  String get breatheOut => 'Breathe out';
+
+  @override
+  String breatheBreathOf(int n, int total) {
+    return 'Breath $n of $total';
+  }
+
+  @override
+  String get breatheSafety =>
+      'Breathe gently, through your nose if you can. If you feel dizzy or unwell, stop and breathe normally.';
+
+  @override
+  String get breatheDoneTitle => 'Well done';
+
+  @override
+  String breatheDoneBody(int breaths) {
+    return 'You took $breaths calm breaths. Notice how you feel now.';
+  }
+
+  @override
+  String get breatheAgain => 'Again';
+
+  @override
+  String get breatheClose => 'Close';
 }

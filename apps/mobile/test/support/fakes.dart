@@ -476,6 +476,31 @@ class FakeLearnRepository implements LearnRepository {
   @override
   Stream<List<Lesson>> watchLessons() => Stream.value(lessons);
 
+  /// Saved progress, by item id.
+  final progress = <String, ContentProgress>{};
+  final _progressChanges = StreamController<void>.broadcast();
+
+  @override
+  Stream<Map<String, ContentProgress>> watchProgress() async* {
+    yield Map.of(progress);
+    yield* _progressChanges.stream.map((_) => Map.of(progress));
+  }
+
+  @override
+  Future<void> saveProgress(
+    String itemId, {
+    required double progress,
+    required bool completed,
+  }) async {
+    this.progress[itemId] = ContentProgress(
+      itemId: itemId,
+      progress: progress,
+      completed: completed,
+      updatedAt: _now(),
+    );
+    _progressChanges.add(null);
+  }
+
   @override
   Stream<List<PortalOffer>> watchOffers() => Stream.value(offers);
 

@@ -8,6 +8,7 @@ import '../../../core/data/firestore.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
+import '../domain/breathing.dart';
 import '../domain/lesson.dart';
 import '../domain/portal.dart';
 
@@ -15,6 +16,17 @@ import '../domain/portal.dart';
 abstract class LearnRepository {
   /// Approved lessons and audio sessions (content_items).
   Stream<List<Lesson>> watchLessons();
+
+  /// Where the person is in each item (content_progress), by item id.
+  Stream<Map<String, ContentProgress>> watchProgress();
+
+  /// Saves where the person is in [itemId] (0..1). Offline it is kept and
+  /// synced later.
+  Future<void> saveProgress(
+    String itemId, {
+    required double progress,
+    required bool completed,
+  });
 
   /// Active and approved portal offers (portal_offers).
   Stream<List<PortalOffer>> watchOffers();
@@ -52,9 +64,85 @@ class FirestoreLearnRepository implements LearnRepository {
                   ? LessonKind.audio
                   : LessonKind.lesson,
               art: d.data()['art_id'] as String?,
+              cards: [
+                for (final c in (d.data()['cards'] as List?) ?? const [])
+                  if (c is String && c.trim().isNotEmpty) c.trim(),
+              ],
+              microhabit: _microhabit(d.data()['microhabit']),
+              breathing: BreathingPattern.byId(
+                d.data()['breathing'] as String?,
+              ),
+              version: (d.data()['version'] as num?)?.toInt() ?? 1,
             ),
         ],
       );
+
+  static LessonMicrohabit? _microhabit(Object? m) {
+    if (m is! Map) return null;
+    final title = m['title'];
+    if (title is! String || title.trim().isEmpty) return null;
+    return LessonMicrohabit(
+      title: title.trim(),
+      minutes: (m['minutes'] as num?)?.toInt(),
+    );
+  }
+
+  CollectionReference<Map<String, dynamic>> get _progress =>
+      _db.collection('users').doc(_uid()).collection('content_progress');
+
+  @override
+  Stream<Map<String, ContentProgress>> watchProgress() =>
+      _progress.snapshots().map(
+        (s) => {
+          for (final d in s.docs)
+            d.id: ContentProgress(
+              itemId: d.id,
+              progress: ((d.data()['progress'] as num?)?.toDouble() ?? 0).clamp(
+                0,
+                1,
+              ),
+              completed: d.data()['completed'] as bool? ?? false,
+              // Pending server time: treat as now.
+              updatedAt:
+                  (d.data()['updated_at'] as Timestamp?)?.toDate() ??
+                  DateTime.now(),
+            ),
+        },
+      );
+
+  @override
+  Future<void> saveProgress(
+    String itemId, {
+    required double progress,
+    required bool completed,
+  }) async {
+    final ref = _progress.doc(itemId);
+    final fields = {
+      'progress': progress.clamp(0, 1).toDouble(),
+      'completed': completed,
+      'updated_at': FieldValue.serverTimestamp(),
+      'schema_version': 1,
+    };
+    // created_at only on the first write, so a second (offline) save never
+    // changes it (the rules require that).
+    final write = await _exists(ref)
+        ? ref.set(fields, SetOptions(merge: true))
+        : ref.set({...fields, 'created_at': FieldValue.serverTimestamp()});
+    // Offline, the write stays queued and the local copy updates at once.
+    await write.timeout(const Duration(seconds: 3), onTimeout: () {});
+  }
+
+  Future<bool> _exists(DocumentReference<Map<String, dynamic>> ref) async {
+    try {
+      return (await ref.get().timeout(const Duration(seconds: 3))).exists;
+    } catch (_) {
+      try {
+        return (await ref.get(const GetOptions(source: Source.cache))).exists;
+      } on FirebaseException {
+        return false;
+      }
+    }
+  }
 
   @override
   Stream<List<PortalOffer>> watchOffers() => _db
@@ -132,8 +220,40 @@ class PreviewLearnRepository implements LearnRepository {
   final _events = <PortalEventRecord>[];
   final _changes = StreamController<void>.broadcast();
 
+  /// The sample "Pick up where you left off".
+  final _progress = <String, ContentProgress>{
+    PreviewSamples.lessons[PreviewSamples.continueIndex].id: ContentProgress(
+      itemId: PreviewSamples.lessons[PreviewSamples.continueIndex].id,
+      progress: PreviewSamples.continueProgress,
+      completed: false,
+      updatedAt: DateTime(2026),
+    ),
+  };
+  final _progressChanges = StreamController<void>.broadcast();
+
   @override
   Stream<List<Lesson>> watchLessons() => Stream.value(PreviewSamples.lessons);
+
+  @override
+  Stream<Map<String, ContentProgress>> watchProgress() async* {
+    yield Map.of(_progress);
+    yield* _progressChanges.stream.map((_) => Map.of(_progress));
+  }
+
+  @override
+  Future<void> saveProgress(
+    String itemId, {
+    required double progress,
+    required bool completed,
+  }) async {
+    _progress[itemId] = ContentProgress(
+      itemId: itemId,
+      progress: progress,
+      completed: completed,
+      updatedAt: DateTime.now(),
+    );
+    _progressChanges.add(null);
+  }
 
   @override
   Stream<List<PortalOffer>> watchOffers() =>

@@ -14,7 +14,9 @@ import '../../features/auth/presentation/phone_sign_in_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/care/presentation/care_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/learn/presentation/breathing_screen.dart';
 import '../../features/learn/presentation/learn_screen.dart';
+import '../../features/learn/presentation/lesson_reader_screen.dart';
 import '../../features/onboarding/presentation/about_screen.dart';
 import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
@@ -166,6 +168,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'search',
                         builder: (context, state) => const LearnSearchScreen(),
+                      ),
+                    // The lesson reader and breathing sessions (Step 4e).
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'item/:id',
+                        builder: (context, state) =>
+                            LearnItemScreen(id: state.pathParameters['id']!),
+                      ),
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'breathe',
+                        builder: (context, state) => const BreathingScreen(),
                       ),
                   ],
                 ),

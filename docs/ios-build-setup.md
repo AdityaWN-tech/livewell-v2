@@ -15,7 +15,7 @@ This machine is Windows, so iPhone builds are made in the cloud (D-10):
 | staging | `net.conciergeconnectedcare.livewell.stg` | `group.net.conciergeconnectedcare.livewell.stg` | Live Well Staging | Codemagic `ios-staging`, on every push to `main` → TestFlight |
 | prod | `net.conciergeconnectedcare.livewell` | `group.net.conciergeconnectedcare.livewell` | Live Well | Codemagic `ios-prod`, when started by hand (the file is kept, not uploaded) |
 
-The bundle IDs come from D-06 and are **permanent once an app is published**, so check them with the client before step 2. The App Group lets the app share data with the home-screen widget (AVT-08g). Each app uses Push Notifications, Sign in with Apple and its App Group (`ios/Runner/Runner-*.entitlements`).
+The bundle IDs come from D-06 and are **permanent once an app is published**, so check them with the client before step 2. The App Group lets the app share data with the home-screen widget (AVT-08g). Each app uses Push Notifications, Sign in with Apple, HealthKit and its App Group (`ios/Runner/Runner-*.entitlements`). An App ID that already exists needs **HealthKit** ticked and its provisioning profiles regenerated.
 
 ---
 
@@ -42,7 +42,8 @@ On **developer.apple.com > Certificates, Identifiers & Profiles**:
 3. Under Capabilities, tick:
    - **App Groups** → Configure → pick the dev group;
    - **Push Notifications**;
-   - **Sign In with Apple** → "Enable as a primary App ID".
+   - **Sign In with Apple** → "Enable as a primary App ID";
+   - **HealthKit** (Step 4f, D-59: reads steps and sleep; no clinical records, no background delivery).
 4. Continue > Register. Do the same for staging (`.stg`, staging group) and prod (no suffix, prod group).
 
 **The home-screen widget (AVT-08g-b)** is its own small app inside Live Well, so it needs its own App ID per flavour too:

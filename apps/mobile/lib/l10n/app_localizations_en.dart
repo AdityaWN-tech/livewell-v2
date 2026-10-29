@@ -1014,9 +1014,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackWeeklyWins => 'Weekly wins';
 
   @override
-  String get trackGotIt => 'Got it';
-
-  @override
   String get trackStreakEyebrow => 'Consistency';
 
   @override
@@ -2063,13 +2060,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get trackConnectHealthLabel =>
       'Steps: connect Apple Health or Health Connect. Opens details.';
-
-  @override
-  String get trackHealthSoonTitle => 'Connecting Health is coming soon';
-
-  @override
-  String get trackHealthSoonBody =>
-      'Soon you can connect Apple Health or Health Connect. Your steps and sleep hours will show here, and only if you choose to share them.';
 
   @override
   String trackSleepHours(int hours, int minutes) {
@@ -3656,4 +3646,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get breatheClose => 'Close';
+
+  @override
+  String get healthAppleHealth => 'Apple Health';
+
+  @override
+  String get healthHealthConnect => 'Health Connect';
+
+  @override
+  String healthConnectTitle(String app) {
+    return 'Connect $app';
+  }
+
+  @override
+  String healthConnectBody(String app) {
+    return 'Live Well can read your steps and sleep from $app to show them in Track. It only reads, and what it reads stays on your phone. You can turn this off any time in Settings > Consents.';
+  }
+
+  @override
+  String healthConnectButton(String app) {
+    return 'Connect $app';
+  }
+
+  @override
+  String get healthNotNow => 'Not now';
+
+  @override
+  String get healthNeedsInstallBody =>
+      'To show your steps and sleep, this phone needs the free Health Connect app from Google.';
+
+  @override
+  String get healthInstallButton => 'Get Health Connect';
+
+  @override
+  String get healthUnavailableBody =>
+      'This phone can\'t share health data with apps. Track still shows your check-ins.';
+
+  @override
+  String get healthClose => 'Close';
+
+  @override
+  String healthDeniedBody(String app) {
+    return 'Live Well wasn\'t given access. To connect, allow steps and sleep for Live Well in $app.';
+  }
+
+  @override
+  String get healthTryAgain => 'Try again';
 }

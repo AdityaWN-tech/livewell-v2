@@ -4,10 +4,16 @@ import '../../../core/time/clock.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../checkin/data/checkin_repository.dart';
 import '../../checkin/domain/checkin.dart';
+import '../../consent/data/consent_repository.dart';
+import '../../consent/domain/consent.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../../home/application/home_data.dart';
+import '../data/health_source.dart';
+import '../domain/health_summary.dart';
 import '../domain/track_stats.dart';
+
+export '../domain/health_summary.dart';
 
 /// The period picked in Track's header.
 class TrackPeriodNotifier extends Notifier<TrackPeriod> {
@@ -53,31 +59,41 @@ final trackStatsProvider = Provider<TrackStats?>((ref) {
   ]);
 });
 
-/// Apple Health / Health Connect data: steps and sleep hours appear only
-/// with that connection and its consent (T-UI-02e). Not built yet, so only
-/// the dev preview has sample values.
-/// TODO(T-HLT-01): read from the Health integration with its consent.
-class HealthSummary {
-  const HealthSummary({
-    required this.stepsWeek,
-    required this.stepsGoal,
-    required this.sleepMinutesAverage,
-  });
+/// The health data consent (FR-ONB-03): Track reads Apple Health or
+/// Health Connect only while it is granted. Revoking it in Settings >
+/// Consents disconnects.
+final healthConsentProvider = StreamProvider<bool>(
+  (ref) => ref
+      .watch(consentRepositoryProvider)
+      .watchRecords()
+      .map((r) => isGranted(currentConsents(r), ConsentType.healthData)),
+);
 
-  /// Monday to Sunday; 0 for a day without data.
-  final List<int> stepsWeek;
-  final int stepsGoal;
-  final int sleepMinutesAverage;
-}
+/// This week's steps and sleep from the phone's health app, read again
+/// each time Track opens (Step 4f, D-59). Null without the consent, or if
+/// the health app can't be read (Track then offers to connect).
+final healthWeekProvider = FutureProvider.autoDispose<HealthSummary?>((
+  ref,
+) async {
+  if (ref.watch(previewModeProvider)) {
+    return const HealthSummary(
+      stepsWeek: PreviewSamples.stepsWeek,
+      stepsGoal: PreviewSamples.stepsGoal,
+      sleepMinutesAverage: PreviewSamples.sleepMinutesAverage,
+    );
+  }
+  if (!(ref.watch(healthConsentProvider).value ?? false)) return null;
+  try {
+    return await ref
+        .watch(healthSourceProvider)
+        .week(ref.watch(clockProvider)());
+  } catch (_) {
+    return null;
+  }
+});
 
-final healthSummaryProvider = Provider<HealthSummary?>(
-  (ref) => ref.watch(previewModeProvider)
-      ? const HealthSummary(
-          stepsWeek: PreviewSamples.stepsWeek,
-          stepsGoal: PreviewSamples.stepsGoal,
-          sleepMinutesAverage: PreviewSamples.sleepMinutesAverage,
-        )
-      : null,
+final healthSummaryProvider = Provider.autoDispose<HealthSummary?>(
+  (ref) => ref.watch(healthWeekProvider).value,
 );
 
 /// Habits kept per day, Monday to Sunday, or null until habit logs exist.

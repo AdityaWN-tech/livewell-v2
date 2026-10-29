@@ -28,6 +28,7 @@ import '../application/track_data.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
 import '../domain/track_stats.dart';
+import 'health_connect_sheet.dart';
 import 'weekly_wins_screen.dart';
 
 /// The streak card's data. Null until habit logs and the streak engine exist.
@@ -102,46 +103,6 @@ class TrackScreen extends ConsumerWidget {
       ],
     );
   }
-}
-
-Future<void> _infoSheet(
-  BuildContext context, {
-  required Key key,
-  required String title,
-  required String body,
-}) {
-  final t = Theme.of(context).textTheme;
-  final l = AppLocalizations.of(context);
-  return showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    isScrollControlled: true,
-    builder: (context) => SafeArea(
-      child: SingleChildScrollView(
-        key: key,
-        padding: const EdgeInsets.fromLTRB(
-          LwSpacing.lg,
-          0,
-          LwSpacing.lg,
-          LwSpacing.lg,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(title, style: t.titleLarge),
-            const SizedBox(height: LwSpacing.xs),
-            Text(body, style: t.bodyMedium),
-            const SizedBox(height: LwSpacing.lg),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l.trackGotIt),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 }
 
 /// "This Week / This Month / 90 days", a pill below the title.
@@ -226,12 +187,7 @@ class _MetricGrid extends ConsumerWidget {
         detail: '',
         bars: const [],
         label: l.trackConnectHealthLabel,
-        onTap: () => _infoSheet(
-          context,
-          key: const Key('track-health-soon'),
-          title: l.trackHealthSoonTitle,
-          body: l.trackHealthSoonBody,
-        ),
+        onTap: () => showConnectHealth(context),
       );
     } else {
       final todaySteps = health.stepsWeek[today.weekday - 1];
@@ -253,18 +209,17 @@ class _MetricGrid extends ConsumerWidget {
     final sleepWord = sleepAvg == null
         ? null
         : scaleWord(l, TrackMetric.sleep, TrackStats.nearest(sleepAvg));
+    // Sleep hours from the health app when it has any, else the check-in.
+    final sleepMinutes = health?.sleepMinutesAverage;
     final sleep = LwMetric(
       id: 'sleep',
       name: l.trackSleep,
       art: 'icon_sleep',
       tint: p.lavender,
-      value: health != null
-          ? l.trackSleepHours(
-              health.sleepMinutesAverage ~/ 60,
-              health.sleepMinutesAverage % 60,
-            )
+      value: sleepMinutes != null
+          ? l.trackSleepHours(sleepMinutes ~/ 60, sleepMinutes % 60)
           : sleepWord ?? l.trackNoCheckIns,
-      detail: health != null
+      detail: sleepMinutes != null
           ? (sleepWord ?? '')
           : (sleepWord == null ? '' : l.trackFromCheckIns),
       bars: [for (final v in stats?.recent((c) => c.sleep) ?? <int>[]) v / 5],

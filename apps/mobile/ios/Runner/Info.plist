@@ -72,6 +72,10 @@
 		<false/>
 		<key>NSCameraUsageDescription</key>
 	<string>Live Well uses the camera only when you choose to make your coach from a live selfie. The photo is sent securely to make your coach and is deleted right after.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Live Well reads your steps and sleep from Apple Health to show them in Track, only if you choose to connect. It stays on your phone.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Live Well does not write to Apple Health.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Live Well uses the microphone only when you choose to speak, for example to say your Why or talk to your coach.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

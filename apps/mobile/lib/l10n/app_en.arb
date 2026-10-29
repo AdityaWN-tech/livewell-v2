@@ -539,7 +539,6 @@
   "frameworkTrackingBody": "Check-ins, habits and how you feel over time.",
   "trackEyebrow": "Progression",
   "trackWeeklyWins": "Weekly wins",
-  "trackGotIt": "Got it",
   "trackStreakEyebrow": "Consistency",
   "trackStreakDays": "{days}-day streak",
   "@trackStreakDays": {
@@ -1193,8 +1192,6 @@
   },
   "trackConnectHealth": "Connect Health",
   "trackConnectHealthLabel": "Steps: connect Apple Health or Health Connect. Opens details.",
-  "trackHealthSoonTitle": "Connecting Health is coming soon",
-  "trackHealthSoonBody": "Soon you can connect Apple Health or Health Connect. Your steps and sleep hours will show here, and only if you choose to share them.",
   "trackSleepHours": "{hours}h {minutes}m",
   "@trackSleepHours": {
     "placeholders": {
@@ -2113,5 +2110,29 @@
   "breatheAgain": "Again",
   "@breatheAgain": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
   "breatheClose": "Close",
-  "@breatheClose": {"description": "Step 4e Learn reader and breathing guide (D-57)."}
+  "@breatheClose": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "healthAppleHealth": "Apple Health",
+  "@healthAppleHealth": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "healthHealthConnect": "Health Connect",
+  "@healthHealthConnect": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "healthConnectTitle": "Connect {app}",
+  "@healthConnectTitle": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "healthConnectBody": "Live Well can read your steps and sleep from {app} to show them in Track. It only reads, and what it reads stays on your phone. You can turn this off any time in Settings > Consents.",
+  "@healthConnectBody": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "healthConnectButton": "Connect {app}",
+  "@healthConnectButton": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "healthNotNow": "Not now",
+  "@healthNotNow": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "healthNeedsInstallBody": "To show your steps and sleep, this phone needs the free Health Connect app from Google.",
+  "@healthNeedsInstallBody": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "healthInstallButton": "Get Health Connect",
+  "@healthInstallButton": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "healthUnavailableBody": "This phone can't share health data with apps. Track still shows your check-ins.",
+  "@healthUnavailableBody": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "healthClose": "Close",
+  "@healthClose": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "healthDeniedBody": "Live Well wasn't given access. To connect, allow steps and sleep for Live Well in {app}.",
+  "@healthDeniedBody": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "healthTryAgain": "Try again",
+  "@healthTryAgain": {"description": "Step 4f Apple Health / Health Connect (D-59)."}
 }

@@ -24,6 +24,7 @@ AvatarExpression faceForMoment(Moment m) => switch (m) {
   Moment.checkInGood ||
   Moment.checkInOkay ||
   Moment.routineItem => AvatarExpression.happy,
+  Moment.lesson => AvatarExpression.calm,
 };
 
 /// Voice off: the moments show text only and celebrations are silent.

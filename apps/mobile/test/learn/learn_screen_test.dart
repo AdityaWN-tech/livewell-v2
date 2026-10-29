@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/checkin/domain/checkin.dart';
+import 'package:livewell/features/learn/domain/breathing.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 import 'package:livewell/features/learn/domain/portal.dart';
+import 'package:livewell/features/learn/presentation/breathing_screen.dart';
 import 'package:livewell/features/learn/presentation/learn_screen.dart';
 import 'package:livewell/features/learn/presentation/learn_search_screen.dart';
+import 'package:livewell/features/learn/presentation/lesson_reader_screen.dart';
 import 'package:livewell/features/learn/presentation/library_screen.dart';
 
 import '../home/home_screen_test.dart' show bootPreview, signedIn, today;
@@ -43,6 +46,10 @@ Lesson lesson(int i, {LessonKind kind = LessonKind.lesson}) => Lesson(
   summary: 'About item $i',
   readMinutes: i + 1,
   kind: kind,
+  cards: kind == LessonKind.lesson
+      ? ['Card one of $i.', 'Card two of $i.']
+      : const [],
+  breathing: kind == LessonKind.audio ? BreathingPattern.box : null,
 );
 
 void main() {
@@ -163,33 +170,94 @@ void main() {
       expect(find.text('Lesson 1'), findsOneWidget);
     });
 
-    testWidgets('no audio yet: Audio says so kindly', (tester) async {
+    testWidgets('no audio yet: the breathing guide is still there, and '
+        'Audio says so kindly', (tester) async {
       final h = signedIn();
       h.learn.lessons = [lesson(1)];
       await h.boot(tester);
       await openLearn(tester);
-      expect(find.text('Popular Audio Sessions'), findsNothing);
+      await scrollTo(tester, find.byKey(const Key('learn-breathe')));
       await filter(tester, 'audio');
+      expect(find.byKey(const Key('learn-breathe')), findsOneWidget);
       expect(
         find.text('Audio sessions will show here once they are reviewed.'),
         findsOneWidget,
       );
     });
 
-    testWidgets('a lesson and a session open as "coming soon"', (tester) async {
+    testWidgets('items that cannot open yet are not shown (no dead ends)', (
+      tester,
+    ) async {
+      final h = signedIn();
+      h.learn.lessons = [
+        lesson(1),
+        const Lesson(id: 'nocards', category: 'D', title: 'No cards yet'),
+        const Lesson(
+          id: 'recorded',
+          category: 'D',
+          title: 'Recorded session',
+          kind: LessonKind.audio,
+        ),
+      ];
+      await h.boot(tester);
+      await openLearn(tester);
+      expect(find.text('Lesson 1'), findsOneWidget);
+      expect(find.text('No cards yet'), findsNothing);
+      await filter(tester, 'audio');
+      expect(find.text('Recorded session'), findsNothing);
+    });
+
+    testWidgets('a lesson opens in the reader, a session in the breathing '
+        'guide; nothing says "soon"', (tester) async {
       final h = signedIn();
       h.learn.lessons = [lesson(1), lesson(2, kind: LessonKind.audio)];
       await h.boot(tester);
       await openLearn(tester);
+      final soon = find.textContaining(RegExp('soon', caseSensitive: false));
       await tester.tap(find.byKey(const Key('lesson-lesson1')));
       await tester.pumpAndSettle();
-      expect(find.text('Lessons open here soon'), findsOneWidget);
-      await tester.tap(find.text('Got it'));
+      expect(find.byType(LessonReaderScreen), findsOneWidget);
+      expect(find.text('Card one of 1.'), findsOneWidget);
+      expect(soon, findsNothing);
+      await tester.pageBack();
       await tester.pumpAndSettle();
       await scrollTo(tester, find.byKey(const Key('audio-audio2-play')));
       await tester.tap(find.byKey(const Key('audio-audio2-play')));
       await tester.pumpAndSettle();
-      expect(find.text('Audio sessions are coming soon'), findsOneWidget);
+      expect(find.byType(BreathingScreen), findsOneWidget);
+      expect(find.text('Session 2'), findsOneWidget, reason: 'its title');
+      expect(soon, findsNothing);
+    });
+
+    testWidgets('Breathe with me opens the breathing guide', (tester) async {
+      await signedIn().boot(tester);
+      await openLearn(tester);
+      await scrollTo(tester, find.byKey(const Key('learn-breathe')));
+      await tester.tap(find.byKey(const Key('learn-breathe')));
+      await tester.pumpAndSettle();
+      expect(find.byType(BreathingScreen), findsOneWidget);
+      expect(find.text('Breathe with me'), findsOneWidget);
+    });
+
+    testWidgets('where the reader stopped shows as "Pick up where you left '
+        'off"', (tester) async {
+      final h = signedIn();
+      h.learn.lessons = [lesson(1), lesson(2)];
+      await h.boot(tester);
+      await openLearn(tester);
+      expect(find.byKey(const Key('learn-continue')), findsNothing);
+      await tester.tap(find.byKey(const Key('lesson-lesson2')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('lesson-next')));
+      await tester.pumpAndSettle();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('learn-continue')), findsOneWidget);
+      // Card 2 of 2, plus the end page: 2 of 3.
+      expect(find.text('67% done'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('learn-continue')));
+      await tester.pumpAndSettle();
+      expect(find.text('Card two of 2.'), findsOneWidget, reason: 'resumes');
     });
 
     testWidgets('search finds lessons and sessions by title or topic', (

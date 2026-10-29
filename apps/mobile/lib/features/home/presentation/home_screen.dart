@@ -494,7 +494,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Moment.checkInGood ||
             Moment.checkInOkay ||
             Moment.streakMilestone ||
-            Moment.routineItem =>
+            Moment.routineItem ||
+            Moment.lesson =>
               name == null ? l.homeBubble : l.homeBubbleNamed(name),
           },
           // The full message, when there is one to say (T-DLY-03d).

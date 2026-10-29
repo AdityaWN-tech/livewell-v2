@@ -3921,30 +3921,6 @@ abstract class AppLocalizations {
   /// **'{title}. Opens it.'**
   String learnOpenLabelNoTime(String title);
 
-  /// No description provided for @learnOpenSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Lessons open here soon'**
-  String get learnOpenSoonTitle;
-
-  /// No description provided for @learnOpenSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon you can read the full lesson here, and save it to read offline.'**
-  String get learnOpenSoonBody;
-
-  /// No description provided for @learnAudioSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Audio sessions are coming soon'**
-  String get learnAudioSoonTitle;
-
-  /// No description provided for @learnAudioSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Soon you can listen here, and download sessions to listen offline.'**
-  String get learnAudioSoonBody;
-
   /// No description provided for @learnAudioEmpty.
   ///
   /// In en, this message translates to:
@@ -3962,12 +3938,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Courses from the Live Well Portal show here when one fits you.'**
   String get learnProgramsEmptyBody;
-
-  /// No description provided for @learnGotIt.
-  ///
-  /// In en, this message translates to:
-  /// **'Got it'**
-  String get learnGotIt;
 
   /// No description provided for @careTabChat.
   ///
@@ -6194,6 +6164,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please send me a copy of my Live Well data. My account id is {uid}.'**
   String profileRequestDataBody(String uid);
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Card {n} of {total}'**
+  String learnReaderCardOf(int n, int total);
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get learnReaderNext;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get learnReaderBack;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Try this today'**
+  String get learnReaderTryThis;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s the lesson'**
+  String get learnReaderEndTitle;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Well done for taking the time. Small steps add up.'**
+  String get learnReaderEndBody;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Finish lesson'**
+  String get learnReaderFinish;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'This lesson isn\'t here right now'**
+  String get learnReaderMissingTitle;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'It may be being updated. You can find other lessons on Learn.'**
+  String get learnReaderMissingBody;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Learn'**
+  String get learnReaderBackToLearn;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get learnListen;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Stop listening'**
+  String get learnListenStop;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Listening, card {n} of {total}'**
+  String learnListenProgress(int n, int total);
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Listening isn\'t working on this phone right now. You can read the lesson instead.'**
+  String get learnListenUnavailable;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe with me'**
+  String get breatheTitle;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'A guided breathing break, 1 to 5 minutes. Works offline.'**
+  String get breatheCardBody;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe with me. A guided breathing break, 1 to 5 minutes. Opens the breathing guide.'**
+  String get breatheCardLabel;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Box breathing'**
+  String get breathePatternBox;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'In 4, hold 4, out 4, hold 4'**
+  String get breathePatternBoxSteps;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Slow breathing'**
+  String get breathePatternCalm;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'In 4, out 6'**
+  String get breathePatternCalmSteps;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep wind-down'**
+  String get breathePatternSleep;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'In 4, out 7'**
+  String get breathePatternSleepSteps;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern'**
+  String get breathePatternLabel;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'How long'**
+  String get breatheLengthLabel;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get breatheStart;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get breathePause;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get breatheResume;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe in'**
+  String get breatheIn;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Hold'**
+  String get breatheHold;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe out'**
+  String get breatheOut;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Breath {n} of {total}'**
+  String breatheBreathOf(int n, int total);
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe gently, through your nose if you can. If you feel dizzy or unwell, stop and breathe normally.'**
+  String get breatheSafety;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Well done'**
+  String get breatheDoneTitle;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'You took {breaths} calm breaths. Notice how you feel now.'**
+  String breatheDoneBody(int breaths);
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Again'**
+  String get breatheAgain;
+
+  /// Step 4e Learn reader and breathing guide (D-57).
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get breatheClose;
 }
 
 class _AppLocalizationsDelegate

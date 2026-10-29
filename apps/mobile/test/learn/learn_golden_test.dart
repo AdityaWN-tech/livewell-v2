@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 
 import '../home/home_screen_test.dart' show bootPreview, signedIn;
-import 'learn_screen_test.dart' show lesson, openLearn;
+import 'learn_screen_test.dart' show lesson, openLearn, scrollTo;
 
 /// Learn (T-UI-02f) golden images: a real account with a few approved
 /// items (no portal card, D-22) and the dev preview (pick up, featured,
@@ -25,8 +25,8 @@ void main() {
         ('medium', 1.3),
         ('large', 2.0),
       ]) {
-        for (final state in ['catalog', 'preview']) {
-          if (phone == 'se' && state != 'preview') continue;
+        for (final state in ['catalog', 'preview', 'reader', 'breathe']) {
+          if (phone == 'se' && state == 'catalog') continue;
           final prefix = phone == 'se' ? 'learn_se' : 'learn';
           final name = '${prefix}_${state}_${dark ? 'dark' : 'light'}_$label';
           testWidgets(name, (tester) async {
@@ -47,6 +47,44 @@ void main() {
               await bootPreview(tester);
             }
             await openLearn(tester);
+            // Step 4e: the reader on its first card, and the breathing
+            // guide two seconds into a breath (the phone's own size).
+            if (state == 'reader' || state == 'breathe') {
+              tester.view
+                ..physicalSize = size
+                ..devicePixelRatio = dpr;
+              await tester.pumpAndSettle();
+              final open = Key(
+                state == 'reader' ? 'lesson-sample-1' : 'learn-breathe',
+              );
+              await scrollTo(tester, find.byKey(open));
+              await tester.tap(find.byKey(open));
+              await tester.pumpAndSettle();
+              if (state == 'breathe') {
+                await tester.scrollUntilVisible(
+                  find.byKey(const Key('breathe-start')),
+                  200,
+                  scrollable: find.descendant(
+                    of: find.byKey(const Key('breathe-setup')),
+                    matching: find.byType(Scrollable),
+                  ),
+                );
+                await tester.pumpAndSettle();
+                await tester.tap(find.byKey(const Key('breathe-start')));
+                await tester.pump();
+                await tester.pump(const Duration(seconds: 2));
+              }
+              expect(tester.takeException(), isNull);
+              await expectLater(
+                find.byType(MaterialApp),
+                matchesGoldenFile('goldens/$name.png'),
+              );
+              if (state == 'breathe') {
+                await tester.tap(find.byKey(const Key('breathe-pause')));
+                await tester.pump();
+              }
+              return;
+            }
             // Tall enough that the whole screen is in the image.
             final needed = size.height / dpr * (2.2 + (scale - 1) * 4.0);
             tester.view

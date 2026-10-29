@@ -17,11 +17,14 @@ enum Moment {
   streakMilestone,
   // T-GOL-03d: a My Daily Routine reminder. Its lines come from the
   // routine catalog (content/routine/catalog.json), not a script file.
-  routineItem;
+  routineItem,
+  // Step 4e: the coach reading an approved lesson aloud (FR-LRN-02). Its
+  // lines are the lesson's cards; never a full-screen moment.
+  lesson;
 
   /// The moments with a script file in content/coach/moments.
   static List<Moment> get scripted =>
-      values.where((m) => m != routineItem).toList();
+      values.where((m) => m != routineItem && m != lesson).toList();
 
   /// The template file name in content/coach/moments.
   String get file => switch (this) {
@@ -37,10 +40,13 @@ enum Moment {
     Moment.checkInOkay => 'checkin_okay',
     Moment.streakMilestone => 'streak_milestone',
     Moment.routineItem => 'routine_item',
+    Moment.lesson => 'lesson',
   };
 
-  static Moment? byFile(String name) =>
-      Moment.values.where((m) => m.file == name).firstOrNull;
+  /// The moment a `/moment/{file}` link opens; never [lesson].
+  static Moment? byFile(String name) => Moment.values
+      .where((m) => m.file == name && m != Moment.lesson)
+      .firstOrNull;
 }
 
 /// The avatar's expression for a moment (CoachMessage `emotion`).

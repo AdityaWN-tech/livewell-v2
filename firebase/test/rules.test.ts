@@ -819,6 +819,43 @@ describe('routine_logs (T-GOL-03a: idempotent date_itemId)', () => {
   });
 });
 
+describe('content_progress (Step 4e: where the person is in a lesson)', () => {
+  const prog = (o: Record<string, unknown> = {}) => ({
+    progress: 0.5, completed: false, ...meta(), ...o,
+  });
+  const ref = () => doc(as(ALICE), 'users/alice/content_progress/lesson-1');
+
+  it('owner saves and updates progress; nobody else; never deleted', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), prog()));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), prog({ progress: 1, completed: true, created_at: saved.created_at, updated_at: meta().updated_at })),
+    );
+    await assertFails(deleteDoc(ref()));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/content_progress/lesson-1')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/content_progress/lesson-1'), prog()));
+  });
+  it('progress is 0..1, completed a bool, no other fields; meta required', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), prog({ progress: 1.5 })));
+    await assertFails(setDoc(ref(), prog({ progress: -0.1 })));
+    await assertFails(setDoc(ref(), prog({ completed: 'yes' })));
+    await assertFails(setDoc(ref(), prog({ note: 'felt anxious' })));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/content_progress/a b'), prog()));
+    const { schema_version: _, ...noMeta } = prog();
+    await assertFails(setDoc(ref(), noMeta));
+  });
+  it('created_at never changes', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/content_progress/lesson-1': prog() });
+    await assertFails(setDoc(ref(), prog({ created_at: meta().created_at, updated_at: meta().updated_at })));
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), prog()));
+  });
+});
+
 describe('memory_facts (user approves or deletes, FR-CNV-05)', () => {
   beforeEach(async () => {
     await seedAdult(env);

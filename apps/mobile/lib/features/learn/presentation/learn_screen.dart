@@ -14,6 +14,8 @@ import '../application/learn_data.dart';
 import '../data/learn_repository.dart';
 import '../domain/lesson.dart';
 import '../domain/portal.dart';
+import 'breathing_screen.dart';
+import 'lesson_reader_screen.dart';
 
 /// The Learn filter chips (T-UI-02f).
 enum LearnFilter { all, lessons, audio, programs }
@@ -128,8 +130,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
           portal,
         ],
         if (showAll || f == LearnFilter.audio) ...[
-          if (audio.isNotEmpty || f == LearnFilter.audio)
-            LwSectionHeader(l.learnPopularAudio),
+          LwSectionHeader(l.learnPopularAudio),
+          const Padding(
+            padding: EdgeInsets.only(bottom: LwSpacing.sm),
+            child: BreatheCard(),
+          ),
           if (audio.isEmpty && f == LearnFilter.audio)
             LwEmptyState(
               icon: Icons.headphones_outlined,
@@ -155,52 +160,67 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
   }
 }
 
-/// Lessons and audio open in the reader / player once they exist
-/// (T-LRN-01); until then a kind "coming soon".
-Future<void> openLesson(BuildContext context, Lesson lesson) {
-  final l = AppLocalizations.of(context);
-  final t = Theme.of(context).textTheme;
-  final audio = lesson.kind == LessonKind.audio;
-  return showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    isScrollControlled: true,
-    builder: (context) => SafeArea(
-      child: SingleChildScrollView(
-        key: const Key('learn-open-soon'),
-        padding: const EdgeInsets.fromLTRB(
-          LwSpacing.lg,
-          0,
-          LwSpacing.lg,
-          LwSpacing.lg,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(lesson.title, style: t.titleLarge),
-            if (lesson.summary != null) ...[
-              const SizedBox(height: LwSpacing.xs),
-              Text(lesson.summary!, style: t.bodyMedium),
-            ],
-            const SizedBox(height: LwSpacing.md),
-            Text(
-              audio ? l.learnAudioSoonTitle : l.learnOpenSoonTitle,
-              style: t.titleSmall,
+/// A lesson opens in the reader, a breathing session in the breathing
+/// guide (Step 4e).
+Future<void> openLesson(BuildContext context, Lesson lesson) =>
+    context.push(LearnItemScreen.pathFor(lesson.id));
+
+/// "Breathe with me": the built-in breathing guide, always there (it needs
+/// no download and no reviewed recording).
+class BreatheCard extends StatelessWidget {
+  const BreatheCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    return Semantics(
+      button: true,
+      container: true,
+      excludeSemantics: true,
+      label: l.breatheCardLabel,
+      child: Material(
+        key: const Key('learn-breathe'),
+        color: p.sky,
+        borderRadius: LwRadius.lgAll,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.push(BreathingScreen.path),
+          child: Padding(
+            padding: const EdgeInsets.all(LwSpacing.cardPadding),
+            child: Row(
+              children: [
+                const Illustration(
+                  'lesson_deep_breathing',
+                  width: 56,
+                  height: 56,
+                ),
+                const SizedBox(width: LwSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.breatheTitle,
+                        style: t.titleMedium?.copyWith(color: p.onTint),
+                      ),
+                      Text(
+                        l.breatheCardBody,
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.xs),
+                const _PlayDot(),
+              ],
             ),
-            Text(
-              audio ? l.learnAudioSoonBody : l.learnOpenSoonBody,
-              style: t.bodySmall,
-            ),
-            const SizedBox(height: LwSpacing.lg),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l.learnGotIt),
-            ),
-          ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 String _openLabel(AppLocalizations l, Lesson x) => x.readMinutes == null

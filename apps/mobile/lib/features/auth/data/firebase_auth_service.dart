@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart' as fb show Firebase;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../domain/auth.dart';
 
@@ -12,15 +14,38 @@ typedef ProviderSignIn = Future<fb.UserCredential> Function(
   fb.AuthProvider provider,
 );
 
-/// Firebase Auth implementation of [AuthService]. Google and Apple use
-/// Firebase's built-in provider flow (no extra SDK): native Sign in with
-/// Apple on iOS, Firebase's web OAuth flow on Android.
+/// Gets a Google credential from the phone's own account picker.
+typedef GoogleCredentialSource = Future<fb.AuthCredential> Function();
+
+/// Firebase Auth implementation of [AuthService]. Apple uses Firebase's
+/// provider flow (native Sign in with Apple on iOS). **Google on Android**
+/// uses the phone's own account picker (google_sign_in, Credential
+/// Manager) and hands its ID token to Firebase: Firebase's web flow opened
+/// a browser tab that failed on many phones with "missing initial state"
+/// (D-58). Google elsewhere still uses the provider flow.
 class FirebaseAuthService implements AuthService {
-  FirebaseAuthService([fb.FirebaseAuth? auth, this._providerSignIn])
-    : _injected = auth;
+  FirebaseAuthService([
+    fb.FirebaseAuth? auth,
+    this._providerSignIn,
+    GoogleCredentialSource? googleCredential,
+  ]) : _injected = auth,
+       _googleCredential =
+           googleCredential ??
+           (!kIsWeb && defaultTargetPlatform == TargetPlatform.android
+               ? nativeGoogleCredential
+               : null);
 
   final fb.FirebaseAuth? _injected;
   final ProviderSignIn? _providerSignIn;
+
+  /// Null: Google uses the provider flow.
+  final GoogleCredentialSource? _googleCredential;
+
+  /// The native picker, unless a test replaced the whole provider step.
+  bool _native(SocialProvider p) =>
+      p == SocialProvider.google &&
+      _googleCredential != null &&
+      _providerSignIn == null;
 
   PendingLink? _pending;
   fb.AuthCredential? _pendingCredential;
@@ -176,8 +201,9 @@ class FirebaseAuthService implements AuthService {
 
   Future<AuthUser> _social(SocialProvider p) async {
     try {
-      final signIn = _providerSignIn ?? _auth.signInWithProvider;
-      final cred = await signIn(_provider(p));
+      final cred = _native(p)
+          ? await _auth.signInWithCredential(await _googleCredential!())
+          : await (_providerSignIn ?? _auth.signInWithProvider)(_provider(p));
       final user = cred.user!;
       // Apple shares the name only on the first sign-in, and Firebase
       // doesn't copy it to the account: keep it there (T-UI-02c).
@@ -228,6 +254,8 @@ class FirebaseAuthService implements AuthService {
       final credential = _pendingCredential;
       if (credential != null) {
         await user.linkWithCredential(credential);
+      } else if (_native(pending.provider)) {
+        await user.linkWithCredential(await _googleCredential!());
       } else {
         // Some platforms don't return the credential: ask the provider again.
         await user.linkWithProvider(_provider(pending.provider));
@@ -243,7 +271,9 @@ class FirebaseAuthService implements AuthService {
   Future<AuthUser> link(SocialProvider p) async {
     final user = _auth.currentUser!;
     try {
-      final cred = await user.linkWithProvider(_provider(p));
+      final cred = _native(p)
+          ? await user.linkWithCredential(await _googleCredential!())
+          : await user.linkWithProvider(_provider(p));
       return _user(cred.user!);
     } on fb.FirebaseAuthException catch (e) {
       throw AuthException(authFailureFromCode(e.code), e.message);
@@ -292,12 +322,49 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> signOut() => _auth.signOut();
+  Future<void> signOut() async {
+    await _auth.signOut();
+    // So the next Google sign-in asks which account again.
+    if (_googleCredential != null && _providerSignIn == null) {
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (_) {
+        // Not signed in with Google, or the plugin isn't there (tests).
+      }
+    }
+  }
 
   @override
   Future<void> deleteCurrentUser() async {
     await _auth.currentUser?.delete();
     await _auth.signOut();
+  }
+}
+
+Future<void>? _googleReady;
+
+/// A Google ID token from the phone's account picker, as a Firebase
+/// credential. The web client id comes from google-services.json
+/// (`default_web_client_id`), so nothing is configured here. A cancelled
+/// picker is reported as `cancelled`.
+Future<fb.AuthCredential> nativeGoogleCredential() async {
+  final google = GoogleSignIn.instance;
+  try {
+    await (_googleReady ??= google.initialize());
+    final account = await google.authenticate();
+    final idToken = account.authentication.idToken;
+    if (idToken == null) {
+      throw fb.FirebaseAuthException(code: 'invalid-credential');
+    }
+    return fb.GoogleAuthProvider.credential(idToken: idToken);
+  } on GoogleSignInException catch (e) {
+    throw fb.FirebaseAuthException(
+      code: switch (e.code) {
+        GoogleSignInExceptionCode.canceled => 'cancelled',
+        _ => 'google-sign-in-failed',
+      },
+      message: e.description,
+    );
   }
 }
 

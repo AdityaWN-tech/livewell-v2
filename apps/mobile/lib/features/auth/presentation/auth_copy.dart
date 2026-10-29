@@ -20,6 +20,7 @@ String? authErrorText(AppLocalizations l, AuthFailure f) => switch (f) {
   AuthFailure.tooManyRequests => l.authErrorTooMany,
   AuthFailure.network => l.authErrorNetwork,
   AuthFailure.methodDisabled => l.authErrorMethodDisabled,
+  AuthFailure.appNotVerified => l.authErrorAppNotVerified,
   AuthFailure.accountExists => l.authErrorAccountExists,
   AuthFailure.lastMethod => l.authErrorLastMethod,
   AuthFailure.phoneInUse => l.authErrorPhoneInUse,

@@ -177,6 +177,8 @@
   "authErrorNetwork": "No connection. Check your internet and try again.",
   "authErrorMethodDisabled": "This sign-in option isn't available yet.",
   "authErrorUnknown": "Something went wrong. Please try again.",
+  "authErrorAppNotVerified": "We couldn't check this phone to send a code. Please try again in a moment, or sign in with email or Google.",
+  "@authErrorAppNotVerified": {"description": "D-58: Firebase app verification (Play Integrity / reCAPTCHA) failed during phone sign-in."},
   "accountSetupError": "We couldn't finish setting up your account. Please try again.",
   "whyTitle": "Your Why",
   "whyHeading": "What matters most to you?",

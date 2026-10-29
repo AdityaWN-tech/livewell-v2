@@ -2374,6 +2374,42 @@ abstract class AppLocalizations {
   /// **'This is an AI voice'**
   String get voiceAiLabelLong;
 
+  /// D-62: shown by the phone's fingerprint/face/PIN prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Live Well'**
+  String get appLockReason;
+
+  /// D-62: app lock screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well is locked'**
+  String get appLockTitle;
+
+  /// D-62: app lock screen button.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get appLockUnlock;
+
+  /// D-62: Profile > Privacy & data switch (FR-ONB-01).
+  ///
+  /// In en, this message translates to:
+  /// **'Lock with fingerprint or face'**
+  String get profileAppLock;
+
+  /// D-62: Profile switch subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for your phone\'s unlock when Live Well opens.'**
+  String get profileAppLockBody;
+
+  /// D-62: when turning the lock on fails.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone couldn\'t confirm it\'s you, so the lock is off. Set up a screen lock on your phone first.'**
+  String get profileAppLockUnavailable;
+
   /// FR-VOC-08, voice settings (D-61).
   ///
   /// In en, this message translates to:

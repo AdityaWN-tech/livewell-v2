@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/config/flavor.dart';
+import 'features/account/application/app_lock.dart';
 import 'core/design/avatar/avatar_art.dart' show AvatarInitial;
 import 'core/design/theme.dart';
 import 'core/routing/router.dart';
@@ -37,7 +38,8 @@ class LiveWellApp extends ConsumerWidget {
             AppLocalizations.of(context).homeCoachDefaultName;
         child = AvatarInitial(
           initial: name.isEmpty ? '' : name.characters.first.toUpperCase(),
-          child: child!,
+          // Optional fingerprint / face unlock (FR-ONB-01, D-62).
+          child: AppLockGate(child: child!),
         );
         if (appearance.textScale == 1.0) return child;
         final mq = MediaQuery.of(context);

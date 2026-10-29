@@ -248,7 +248,12 @@ void main() {
     testWidgets('approved lessons show as helpful resources', (tester) async {
       final h = chatOn();
       h.learn.lessons = [
-        const Lesson(id: 'a', category: 'Driver 4', title: 'Calm breathing'),
+        const Lesson(
+          id: 'a',
+          category: 'Driver 4',
+          title: 'Calm breathing',
+          cards: ['Breathe slowly.'],
+        ),
       ];
       await h.boot(tester);
       await openCare(tester);
@@ -257,7 +262,9 @@ void main() {
       expect(find.text('From Driver 4'), findsOneWidget);
       await tester.tap(find.byKey(const Key('care-resource-a')));
       await tester.pumpAndSettle();
-      expect(find.text('Lessons open here soon'), findsOneWidget);
+      // It opens in the lesson reader (Step 4e).
+      expect(find.text('Breathe slowly.'), findsOneWidget);
+      expect(find.byKey(const Key('lesson-next')), findsOneWidget);
     });
   });
 
@@ -268,7 +275,12 @@ void main() {
       final h = signedIn();
       h.profiles.regions['u1'] = 'IN';
       h.learn.lessons = [
-        const Lesson(id: 'a', category: 'Driver 4', title: 'Calm breathing'),
+        const Lesson(
+          id: 'a',
+          category: 'Driver 4',
+          title: 'Calm breathing',
+          cards: ['Breathe slowly.'],
+        ),
       ];
       await h.boot(tester);
       await openCare(tester);

@@ -427,6 +427,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authErrorUnknown => 'Something went wrong. Please try again.';
 
   @override
+  String get authErrorAppNotVerified =>
+      'We couldn\'t check this phone to send a code. Please try again in a moment, or sign in with email or Google.';
+
+  @override
   String get accountSetupError =>
       'We couldn\'t finish setting up your account. Please try again.';
 

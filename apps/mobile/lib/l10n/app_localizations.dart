@@ -838,6 +838,12 @@ abstract class AppLocalizations {
   /// **'Something went wrong. Please try again.'**
   String get authErrorUnknown;
 
+  /// D-58: Firebase app verification (Play Integrity / reCAPTCHA) failed during phone sign-in.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t check this phone to send a code. Please try again in a moment, or sign in with email or Google.'**
+  String get authErrorAppNotVerified;
+
   /// No description provided for @accountSetupError.
   ///
   /// In en, this message translates to:

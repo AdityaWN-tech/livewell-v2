@@ -49,6 +49,11 @@ enum AuthFailure {
   /// Google or Apple found a Live Well account with the same email that
   /// was made another way (Firebase account-exists-with-different-credential).
   accountExists,
+
+  /// Firebase couldn't confirm this is the real app (Play Integrity or the
+  /// reCAPTCHA check failed, or this build's signing key isn't registered;
+  /// D-58). Phone codes can't be sent until it can.
+  appNotVerified,
   cancelled,
   unknown,
 }
@@ -82,6 +87,14 @@ AuthFailure authFailureFromCode(String code) => switch (code) {
   'too-many-requests' || 'quota-exceeded' => AuthFailure.tooManyRequests,
   'network-request-failed' => AuthFailure.network,
   'operation-not-allowed' => AuthFailure.methodDisabled,
+  'app-not-authorized' ||
+  'invalid-app-credential' ||
+  'missing-app-credential' ||
+  'missing-client-identifier' ||
+  'captcha-check-failed' ||
+  'missing-recaptcha-token' ||
+  'invalid-recaptcha-token' ||
+  'web-internal-error' => AuthFailure.appNotVerified,
   'web-context-canceled' ||
   'canceled' ||
   'cancelled' ||

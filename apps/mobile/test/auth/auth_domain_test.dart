@@ -77,4 +77,22 @@ void main() {
     expect(authFailureFromCode('web-context-canceled'), AuthFailure.cancelled);
     expect(authFailureFromCode('something-new'), AuthFailure.unknown);
   });
+
+  test('app-verification failures in phone sign-in say so (D-58)', () {
+    for (final code in [
+      'app-not-authorized',
+      'invalid-app-credential',
+      'missing-client-identifier',
+      'captcha-check-failed',
+      'web-internal-error',
+    ]) {
+      expect(
+        authFailureFromCode(code),
+        AuthFailure.appNotVerified,
+        reason: code,
+      );
+    }
+    // The native Google picker reports a cancel as "cancelled".
+    expect(authFailureFromCode('cancelled'), AuthFailure.cancelled);
+  });
 }

@@ -375,6 +375,7 @@ class VoiceChoices extends StatelessWidget {
     required this.flags,
     required this.hasClonedVoiceConsent,
     this.onOwnVoice,
+    this.onLovedOne,
   });
 
   final String selectedId;
@@ -385,6 +386,11 @@ class VoiceChoices extends StatelessWidget {
 
   /// Opens the explanation when the clone flag is on.
   final VoidCallback? onOwnVoice;
+
+  /// The loved-one voice's own consent flow (Phase 2, FR-VOC-03). Not
+  /// built: without it the row isn't shown even with the flag on, so it
+  /// can never open the own-voice flow.
+  final VoidCallback? onLovedOne;
 
   @override
   Widget build(BuildContext context) {
@@ -430,13 +436,13 @@ class VoiceChoices extends StatelessWidget {
           onTap: onOwnVoice,
         ),
       // Phase 2 (FR-VOC-03): its own flag and consent flow.
-      if (flags.lovedOneVoice)
+      if (flags.lovedOneVoice && onLovedOne != null)
         VoiceRow(
           key: const Key('voice-loved-one'),
           icon: Icons.add_circle_outline,
           name: l.studioLovedOne,
           detail: l.voiceAiLabel,
-          onTap: onOwnVoice,
+          onTap: onLovedOne,
         ),
     ];
     return Column(

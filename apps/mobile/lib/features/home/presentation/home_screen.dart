@@ -19,6 +19,8 @@ import '../../avatar/presentation/coach_avatar.dart';
 import '../../checkin/data/checkin_repository.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../checkin/presentation/checkin_sheet.dart';
+import '../../goals/data/goal_repository.dart';
+import '../../goals/domain/goal.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../learn/presentation/learn_screen.dart' show LearnScreen;
 import '../../moments/application/coach_state.dart';
@@ -222,12 +224,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await showCelebration(context);
   }
 
-  /// Done tapped on the widget (iOS 17+, Android 12+): applied once, quietly
-  /// (the widget already celebrated), only for today.
-  /// TODO(T-GOL-01): written to habit_logs, idempotent by date + habit.
+  /// Done tapped on the widget (iOS 17+, Android): applied once, quietly
+  /// (the widget already celebrated). Today's goes through Home; an
+  /// earlier day's (the app wasn't opened since) is saved for that day,
+  /// idempotent by date + habit (D-60).
   Future<void> _widgetDone() async {
     final date = await ref.read(widgetInboxProvider).takeDone();
-    if (!mounted || date != _today) return;
+    if (!mounted || date == null) return;
+    if (date != _today) {
+      if (date.compareTo(_today) < 0) {
+        await ref
+            .read(goalRepositoryProvider)
+            .saveLog(HabitLog(date: date, habitId: dailyStepHabitId))
+            .catchError((_) {});
+      }
+      return;
+    }
     if (!ref.read(stepProgressProvider).done) {
       ref.read(stepProgressActionsProvider).markDone();
     }

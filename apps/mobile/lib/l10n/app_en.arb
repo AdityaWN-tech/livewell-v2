@@ -742,6 +742,10 @@
   "voiceTitle": "Choose your coach’s voice",
   "voiceAiLabel": "AI voice",
   "voiceAiLabelLong": "This is an AI voice",
+  "voiceHowMadeTitle": "How this voice is made",
+  "@voiceHowMadeTitle": {"description": "FR-VOC-08, voice settings (D-61)."},
+  "voiceHowMadeBody": "Your coach's voice is an AI voice. For now it is your phone's own text-to-speech, set to sound close to the voice you chose. It is not a copy of a real person's voice. The coach only says lines our team has written and reviewed.",
+  "@voiceHowMadeBody": {"description": "FR-VOC-08, voice settings (D-61). Accurate while voices are device TTS (D-49); update with T-VOC-01."},
   "voiceGreetingNamed": "Hi {name}, I’m your Live Well coach.",
   "@voiceGreetingNamed": {
     "placeholders": {

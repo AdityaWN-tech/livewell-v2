@@ -104,6 +104,24 @@ void main() {
   });
 
   group('choose another voice', () {
+    testWidgets('the settings say how the voice is made (FR-VOC-08)', (
+      tester,
+    ) async {
+      await atVoice().boot(tester);
+      await tapKey(tester, 'voice-another');
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('voice-how-made')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('How this voice is made'), findsOneWidget);
+      expect(find.textContaining('text-to-speech'), findsOneWidget);
+      expect(
+        find.textContaining('not a copy of a real person'),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('preview, style, speed, then use it', (tester) async {
       final h = atVoice();
       await h.boot(tester);

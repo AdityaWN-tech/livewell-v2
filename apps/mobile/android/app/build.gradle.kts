@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -5,6 +7,12 @@ plugins {
     // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release signing (Step 7, D-63): android/key.properties, never in git.
+val keyFile = rootProject.file("key.properties")
+val keyProps = Properties().apply {
+    if (keyFile.exists()) keyFile.inputStream().use { load(it) }
 }
 
 android {
@@ -60,11 +68,28 @@ android {
         }
     }
 
+    // Release signing (Step 7, D-63): android/key.properties (never in git)
+    // names the upload keystore. Without it, release builds fall back to the
+    // debug key so `flutter run --release` still works, and such a build
+    // can't be uploaded to Play. docs/release/checklist.md has the steps.
+    signingConfigs {
+        if (keyFile.exists()) {
+            create("upload") {
+                storeFile = file(keyProps.getProperty("storeFile"))
+                storePassword = keyProps.getProperty("storePassword")
+                keyAlias = keyProps.getProperty("keyAlias")
+                keyPassword = keyProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keyFile.exists()) {
+                signingConfigs.getByName("upload")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

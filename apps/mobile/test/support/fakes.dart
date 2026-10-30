@@ -29,6 +29,7 @@ import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 import 'package:livewell/features/learn/domain/portal.dart';
+import 'package:livewell/features/account/application/app_lock.dart';
 import 'package:livewell/features/track/data/health_source.dart';
 import 'package:livewell/features/track/data/reflection_repository.dart';
 import 'package:livewell/features/track/domain/health_summary.dart';
@@ -1053,6 +1054,22 @@ class FakeRoutineAskStore implements RoutineAskStore {
 
   @override
   Future<void> markAsked(String itemId) async => ids.add(itemId);
+}
+
+/// The phone's fingerprint / face / PIN prompt in tests (D-62).
+class FakeDeviceUnlock implements DeviceUnlock {
+  bool supported = true;
+  bool succeeds = true;
+  int prompts = 0;
+
+  @override
+  Future<bool> available() async => supported;
+
+  @override
+  Future<bool> unlock(String reason) async {
+    prompts++;
+    return succeeds;
+  }
 }
 
 /// Apple Health / Health Connect in tests (Step 4f): set what the phone

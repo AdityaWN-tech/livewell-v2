@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../account/application/app_lock.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -689,6 +692,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   leading: const Icon(Icons.verified_user_outlined),
                   title: Text(l.profileConsents),
                   onTap: () => context.push('/settings/consents'),
+                ),
+                // Optional fingerprint / face unlock (FR-ONB-01, D-62).
+                SwitchListTile(
+                  key: const Key('profile-app-lock'),
+                  secondary: const Icon(Icons.fingerprint),
+                  title: Text(l.profileAppLock),
+                  subtitle: Text(l.profileAppLockBody),
+                  value: ref.watch(appLockProvider).value ?? false,
+                  onChanged: (on) async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final ok = await ref
+                        .read(appLockProvider.notifier)
+                        .set(on, l.appLockReason);
+                    if (!ok && on) {
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(l.profileAppLockUnavailable)),
+                      );
+                    }
+                  },
                 ),
                 // Memory comes with the coach (FR-CNV-05). Export by email
                 // until the export function exists (FR-SET-02; needs Blaze),

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import '../home/home_screen_test.dart' show signedIn;
 
 /// Step 4d (D-56): a production account never meets a "coming soon" on a
 /// page. Each tab and Profile is scrolled top to bottom and checked (proved
-/// to catch Care's and Profile's old rows). Two remain inside sheets, after
-/// a tap, and go with their own PRs: Learn's lesson reader and audio (Step
-/// 4e) and Track's Health connection (Step 4f).
+/// to catch Care's and Profile's old rows), and so are the screens pushed
+/// from them and Track's Connect Health sheet (Steps 4e/4f, D-61).
 
 final soon = RegExp(r'coming soon|soon you can', caseSensitive: false);
 
@@ -54,6 +54,42 @@ void main() {
       expect(found, isEmpty, reason: '$tab says: $found');
     });
   }
+
+  // Screens pushed from the tabs and Profile.
+  for (final path in [
+    '/plan/framework',
+    '/plan/routine',
+    '/track/weekly',
+    '/learn/library',
+    '/learn/breathe',
+    '/settings/consents',
+  ]) {
+    testWidgets('$path: no "coming soon"', (tester) async {
+      await signedIn(name: 'Robert Hall').boot(tester);
+      GoRouter.of(tester.element(find.byType(NavigationBar))).push(path);
+      await tester.pumpAndSettle();
+      final found = [
+        for (final t in await pageTexts(tester))
+          if (soon.hasMatch(t)) t,
+      ];
+      expect(found, isEmpty, reason: '$path says: $found');
+    });
+  }
+
+  testWidgets('Track > Connect Health sheet: no "coming soon"', (tester) async {
+    await signedIn(name: 'Robert Hall').boot(tester);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Track'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('track-card-steps')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('health-sheet')), findsOneWidget);
+    expect(find.textContaining(soon), findsNothing);
+  });
 
   testWidgets('Profile: no "coming soon"', (tester) async {
     await signedIn(name: 'Robert Hall').boot(tester);

@@ -1321,6 +1321,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceAiLabelLong => 'This is an AI voice';
 
   @override
+  String get appLockReason => 'Unlock Live Well';
+
+  @override
+  String get appLockTitle => 'Live Well is locked';
+
+  @override
+  String get appLockUnlock => 'Unlock';
+
+  @override
+  String get profileAppLock => 'Lock with fingerprint or face';
+
+  @override
+  String get profileAppLockBody =>
+      'Ask for your phone\'s unlock when Live Well opens.';
+
+  @override
+  String get profileAppLockUnavailable =>
+      'This phone couldn\'t confirm it\'s you, so the lock is off. Set up a screen lock on your phone first.';
+
+  @override
   String get voiceHowMadeTitle => 'How this voice is made';
 
   @override

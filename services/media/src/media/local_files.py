@@ -17,7 +17,7 @@ from pathlib import Path
 
 #: Frame files are named by the frame builder (neutral@3x.webp,
 #: thumb_happy.png, avatar_frames.json); nothing else is ever served.
-_NAME = re.compile(r"^[a-z0-9_]+(@[23]x)?\.(webp|png|json)$")
+_NAME = re.compile(r"^[A-Za-z0-9_]+(@[23]x)?\.(webp|png|json)$")
 #: Firebase uids: letters and digits (28 characters in practice).
 _UID = re.compile(r"^[A-Za-z0-9]{1,128}$")
 

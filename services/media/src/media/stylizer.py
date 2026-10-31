@@ -39,12 +39,20 @@ PUBLIC_DEMO_HOSTS = (
 )
 
 
+#: This computer itself: plain HTTP is accepted only to these, and only when
+#: one is approved (a ComfyUI on the developer's laptop, D-64). Nothing sent
+#: there leaves the machine.
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "localhost"})
+
+
 def check_endpoint(url: str, approved_hosts: frozenset[str]) -> None:
-    """Refuses any endpoint that isn't HTTPS to an approved host, and every
-    public demo server, even if someone approved it by mistake."""
+    """Refuses any endpoint that isn't HTTPS to an approved host (or plain
+    HTTP to an approved loopback host), and every public demo server, even if
+    someone approved it by mistake."""
     parts = urlparse(url)
     host = (parts.hostname or "").lower()
-    if parts.scheme != "https" or not host:
+    loopback = parts.scheme == "http" and host in LOOPBACK_HOSTS
+    if (parts.scheme != "https" and not loopback) or not host:
         raise EndpointNotApproved(f"Not an HTTPS endpoint: {url}")
     if any(host == h or host.endswith("." + h) for h in PUBLIC_DEMO_HOSTS):
         raise EndpointNotApproved(f"Public demo server: {host}")

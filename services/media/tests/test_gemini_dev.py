@@ -252,7 +252,7 @@ def test_local_store_versions_and_refuses_odd_names(tmp_path: Path) -> None:
     store.put("u1", 1, "neutral@3x.webp", b"x")
     assert store.next_version("u1") == 2
     assert store.names("u1", 1) == ["neutral@3x.webp"]
-    for name in ("../secret.json", "a/b.png", "x.exe", "NEUTRAL.webp"):
+    for name in ("../secret.json", "a/b.png", "x.exe", "neutral@4x.webp", "neutral.webp.exe"):
         assert not valid_name(name)
         with pytest.raises(ValueError):
             store.put("u1", 1, name, b"x")

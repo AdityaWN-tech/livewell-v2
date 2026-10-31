@@ -57,9 +57,34 @@ python -m venv .venv
 .venv/Scripts/python -m mypy
 ```
 
+## Run locally, free (dev only, D-65)
+
+The developer's laptop runs its own ComfyUI (`livewell-comfyui-dev`,
+`127.0.0.1:6800`, ComfyUI portable in `D:\ComfyUI_windows_portable`) with the
+dev workflows in `workflows/sd15-dev` (SD 1.5, **never deployed**). One AI
+portrait per coach (about 5 minutes on a 4 GB laptop GPU); the blink and mouth
+frames are drawn from it (`media.drawn_frames`), and the checks run locally
+(`media.local_checks`).
+
+```
+pip install -e ".[dev,firebase,local]" --extra-index-url https://download.pytorch.org/whl/cpu
+python comfyui/download_models.py --dev D:/ComfyUI-models      # SD 1.5 (fp16), LCM-LoRA, ControlNet
+python -m media.local_checks download D:/ComfyUI-models/media-checks
+```
+
+| Env var | What it does |
+|---|---|
+| `MEDIA_COMFYUI_URL=http://127.0.0.1:6800`, `MEDIA_COMFYUI_AUTH=none` | The local ComfyUI (no login; refused for any other host). |
+| `MEDIA_ALLOW_LOOPBACK=1` + `MEDIA_APPROVED_HOSTS=127.0.0.1` | Plain HTTP to this computer only; without the switch a loopback host stops the service. |
+| `MEDIA_WORKFLOWS_PATH` | `workflows/sd15-dev`. |
+| `MEDIA_LOCAL_CHECKS=1`, `MEDIA_MODELS_DIR` | YuNet, SFace, CLIP checks and the skin-tone guard. CLIP is **not** an age check. |
+| `MEDIA_DRAWN_FRAMES=1` | Blink and mouth frames drawn; no frame goes to the image model. |
+
+The rest (Firebase, frames on disk, the app's `LW_MEDIA_URL`) is as below.
+
 ## Run locally with Gemini (dev only, D-64)
 
-Without a ComfyUI server, the service can make images with Google Gemini on the
+Paid alternative: the service can make images with Google Gemini on the
 developer's computer. It runs under PM2 as `livewell-media-dev` on
 `127.0.0.1:6799` (entry in the developer's PM2 ecosystem file).
 

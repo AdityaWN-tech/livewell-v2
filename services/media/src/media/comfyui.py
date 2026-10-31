@@ -27,10 +27,11 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import urlparse
 
 import httpx
 
-from .stylizer import Generated, StylizerError, check_endpoint
+from .stylizer import LOOPBACK_HOSTS, Generated, StylizerError, check_endpoint
 
 log = logging.getLogger("media")
 
@@ -187,6 +188,14 @@ class ApiKeyHeader:
 
     def headers(self) -> dict[str, str]:
         return {self.header: self.key}
+
+
+@dataclass(frozen=True)
+class NoAuth:
+    """A ComfyUI on this computer (development, D-64): no headers."""
+
+    def headers(self) -> dict[str, str]:
+        return {}
 
 
 def _image_name(data: bytes) -> tuple[str, str]:
@@ -385,6 +394,11 @@ class ComfyUISettings:
         if self.auth == "id_token":
             # The audience is the service's own URL (Cloud Run checks it).
             return GoogleIdToken(audience=self.url.rstrip("/"))
+        if self.auth == "none":
+            # A ComfyUI on this computer only (D-64): it has no login.
+            if (urlparse(self.url).hostname or "").lower() not in LOOPBACK_HOSTS:
+                raise WorkflowError("MEDIA_COMFYUI_AUTH=none is for a ComfyUI on 127.0.0.1 only")
+            return NoAuth()
         raise WorkflowError(f"Unknown MEDIA_COMFYUI_AUTH: {self.auth}")
 
 

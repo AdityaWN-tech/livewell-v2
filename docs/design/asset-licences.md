@@ -47,6 +47,20 @@ Every file `services/media/workflows/*.json` loads. `comfyui/download_models.py`
 | BRIA RMBG-1.4 / RMBG-2.0 | [briaai](https://huggingface.co/briaai) | CC BY-NC 4.0 (a commercial licence is sold separately) | ⛔ **Blocker:** non-commercial. Not used; BiRefNet instead. |
 | InsightFace models (buffalo_l, antelopev2, ...) | [deepinsight/insightface](https://github.com/deepinsight/insightface) | Code MIT; **models non-commercial**, commercial licence sold separately | ⛔ **Blocker** for face similarity unless licensed (options below). |
 
+### Dev-only models on the developer's laptop (D-64, D-65)
+
+The free "From my photo" demo runs on the developer's laptop only (`services/media/workflows/sd15-dev`, `MEDIA_LOCAL_CHECKS`). **Never deployed, never in prod.** `download_models.py --dev` checks these against `DEV_ONLY`; the prod list `COMMERCIAL_OK` stays Apache-2.0/MIT.
+
+| Model | Hugging Face / source | Licence | Note |
+|---|---|---|---|
+| Stable Diffusion 1.5 (`v1-5-pruned-emaonly.safetensors`, converted to fp16 by `--dev`) | [stable-diffusion-v1-5/stable-diffusion-v1-5](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5) | CreativeML OpenRAIL-M | ⚠️ Dev only. Commercial use allowed with use restrictions, but not on our prod list; trained on LAION-5B (RunwayML withdrew its copy over dataset concerns). |
+| LCM-LoRA for SD 1.5 | [latent-consistency/lcm-lora-sdv1-5](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5) | OpenRAIL++ | ⚠️ Dev only (6 steps instead of 30). |
+| ControlNet 1.1 canny for SD 1.5 (fp16) | [comfyanonymous/ControlNet-v1-1_fp16_safetensors](https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors) | CreativeML OpenRAIL-M | ⚠️ Dev only (keeps the face's shape). |
+| YuNet face detection | [opencv_zoo](https://github.com/opencv/opencv_zoo/tree/main/models/face_detection_yunet) | MIT | ✅ Wired as the dev `FaceLocator` and face count. |
+| SFace face recognition | [opencv_zoo](https://github.com/opencv/opencv_zoo/tree/main/models/face_recognition_sface) | Apache-2.0 | ✅ Dev likeness score only; a cartoon vs photo score is rough and needs tuning. Not an approved face-similarity check. |
+| MediaPipe face landmarker (`face_landmarker.task`) | [Google MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker) | Apache-2.0 | ✅ Draws the blink and mouth frames from the portrait (`media.drawn_frames`). |
+| CLIP ViT-B/32 | [openai/clip-vit-base-patch32](https://huggingface.co/openai/clip-vit-base-patch32) | MIT | ✅ Dev zero-shot nudity / violence / text / child-looking signal. **Not an age check.** |
+
 **Software on the ComfyUI server:**
 
 | Software | Licence | Note |

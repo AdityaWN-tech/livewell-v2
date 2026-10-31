@@ -56,3 +56,52 @@ python -m venv .venv
 .venv/Scripts/python -m ruff check src tests
 .venv/Scripts/python -m mypy
 ```
+
+## Run locally, free (dev only, D-65)
+
+The developer's laptop runs its own ComfyUI (`livewell-comfyui-dev`,
+`127.0.0.1:6800`, ComfyUI portable in `D:\ComfyUI_windows_portable`) with the
+dev workflows in `workflows/sd15-dev` (SD 1.5, **never deployed**). One AI
+portrait per coach (about 5 minutes on a 4 GB laptop GPU); the blink and mouth
+frames are drawn from it (`media.drawn_frames`), and the checks run locally
+(`media.local_checks`).
+
+```
+pip install -e ".[dev,firebase,local]" --extra-index-url https://download.pytorch.org/whl/cpu
+python comfyui/download_models.py --dev D:/ComfyUI-models      # SD 1.5 (fp16), LCM-LoRA, ControlNet
+python -m media.local_checks download D:/ComfyUI-models/media-checks
+```
+
+| Env var | What it does |
+|---|---|
+| `MEDIA_COMFYUI_URL=http://127.0.0.1:6800`, `MEDIA_COMFYUI_AUTH=none` | The local ComfyUI (no login; refused for any other host). |
+| `MEDIA_ALLOW_LOOPBACK=1` + `MEDIA_APPROVED_HOSTS=127.0.0.1` | Plain HTTP to this computer only; without the switch a loopback host stops the service. |
+| `MEDIA_WORKFLOWS_PATH` | `workflows/sd15-dev`. |
+| `MEDIA_LOCAL_CHECKS=1`, `MEDIA_MODELS_DIR` | YuNet, SFace, CLIP checks and the skin-tone guard. CLIP is **not** an age check. |
+| `MEDIA_DRAWN_FRAMES=1` | Blink and mouth frames drawn; no frame goes to the image model. |
+
+The rest (Firebase, frames on disk, the app's `LW_MEDIA_URL`) is as below.
+
+## Run locally with Gemini (dev only, D-64)
+
+Paid alternative: the service can make images with Google Gemini on the
+developer's computer. It runs under PM2 as `livewell-media-dev` on
+`127.0.0.1:6799` (entry in the developer's PM2 ecosystem file).
+
+| Env var | What it does |
+|---|---|
+| `MEDIA_GEMINI_API_KEY_FILE` | File holding a **billing-enabled** Gemini API key (never in the repo). Turns on `GeminiStylizer`, `GeminiInspector`, `GeminiFaceLocator`. |
+| `MEDIA_APPROVED_HOSTS` | Must include `generativelanguage.googleapis.com`. |
+| `MEDIA_FIREBASE_PROJECT` + `GOOGLE_APPLICATION_CREDENTIALS` | Firebase Admin (dev project's service account): ID tokens, consents, `users/{uid}/avatar/current`. |
+| `MEDIA_REQUIRE_APP_CHECK=0` | Dev only: the app has no App Check yet. |
+| `MEDIA_FROM_PHOTO=1` | Allows `source: selfie`. |
+| `MEDIA_FRAMES_DIR` | Keeps frame sets on disk, served by `GET /v1/avatar/frames/{version}` (owner only) as signed links to `GET /v1/avatar/files/...` that expire after 15 minutes. |
+
+```
+pm2 start <ecosystem.config.js> --only livewell-media-dev; pm2 save
+adb reverse tcp:6799 tcp:6799        # again after every reconnect
+flutter run --flavor dev -t lib/main_dev.dart --dart-define=LW_MEDIA_URL=http://127.0.0.1:6799
+```
+
+The app only uses `LW_MEDIA_URL` in a dev debug build (plain HTTP only to
+127.0.0.1/localhost). Jobs live in memory, so a restart loses running jobs.

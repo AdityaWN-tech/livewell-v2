@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/config/media_service.dart';
 import '../domain/liveness.dart';
 
 /// Where a job stands (GET /v1/avatar/jobs/{id}, T-AVT-08c/d).
@@ -94,13 +96,14 @@ class UnavailableAvatarMaker implements AvatarMakerApi {
 }
 
 /// The real client: HTTPS to [base] with a Firebase ID token and an App
-/// Check token on every call (spec 12.1).
+/// Check token on every call (spec 12.1). Plain HTTP only to this phone in a
+/// debug build (a Media Service on the developer's computer, D-64).
 class HttpAvatarMaker implements AvatarMakerApi {
   HttpAvatarMaker({
     required this.base,
     required this.idToken,
     required this.appCheckToken,
-  }) : assert(base.scheme == 'https', 'The Media Service is HTTPS only');
+  }) : assert(mediaUrlAllowed(base), 'The Media Service is HTTPS only');
 
   final Uri base;
   final Future<String> Function() idToken;
@@ -112,7 +115,7 @@ class HttpAvatarMaker implements AvatarMakerApi {
     Map<String, Object?>? body,
     String? idempotencyKey,
   }) async {
-    if (base.scheme != 'https') throw const AvatarMakerError('not_configured');
+    if (!mediaUrlAllowed(base)) throw const AvatarMakerError('not_configured');
     final client = HttpClient()
       ..connectionTimeout = const Duration(seconds: 20);
     try {
@@ -207,7 +210,22 @@ class HttpAvatarMaker implements AvatarMakerApi {
   }
 }
 
-/// TODO(T-AVT-08 deploy): the Media Service URL and App Check activation.
-final avatarMakerApiProvider = Provider<AvatarMakerApi>(
-  (ref) => UnavailableAvatarMaker(),
-);
+/// The signed-in person's Firebase ID token for the Media Service.
+Future<String> firebaseIdToken() async {
+  final token = await fb.FirebaseAuth.instance.currentUser?.getIdToken();
+  if (token == null) throw const AvatarMakerError('not_configured');
+  return token;
+}
+
+/// The Media Service once its address is set (dev: LW_MEDIA_URL, D-64).
+/// TODO(T-AVT-08 deploy): App Check activation; until then the dev service
+/// runs with MEDIA_REQUIRE_APP_CHECK=0 and this sends no token.
+final avatarMakerApiProvider = Provider<AvatarMakerApi>((ref) {
+  final base = ref.watch(mediaServiceBaseProvider);
+  if (base == null) return UnavailableAvatarMaker();
+  return HttpAvatarMaker(
+    base: base,
+    idToken: firebaseIdToken,
+    appCheckToken: () async => '',
+  );
+});

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import io
 import json
+import math
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -33,6 +34,7 @@ SIZES = {"3x": CANVAS, "2x": round(CANVAS * 2 / 3)}
 #: Where the face sits on the canvas: its centre, and its height.
 FACE_CENTRE = (0.5, 0.42)
 FACE_HEIGHT = 0.34
+
 #: Expression thumbnails (notifications, the widget), PNG for every platform.
 THUMB_PX = 192
 THUMBNAILS = ("neutral", "happy", "waving", "listening", "calm", "celebrating")
@@ -66,6 +68,16 @@ class BackgroundRemover(Protocol):
     """Cuts the person out (transparent background)."""
 
     def remove(self, image: Image.Image) -> Image.Image: ...
+
+
+class FrameDrawer(Protocol):
+    """Draws [frames] from the neutral frame without an image model: one AI
+    portrait per coach on a slow laptop (D-64); the expressions then show the
+    neutral face and move in code, like the ready-made coaches."""
+
+    frames: frozenset[str]
+
+    def draw(self, neutral: Image.Image, frame: str) -> Image.Image | None: ...
 
 
 class FrameChecker(Protocol):
@@ -147,6 +159,16 @@ class FrameBuilder:
     max_drift: float = 0.03
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
     log: list[str] = field(default_factory=list)
+    #: Set: the neutral frame is the portrait itself and the drawer's frames
+    #: are drawn from it; no frame goes to the stylizer.
+    drawer: FrameDrawer | None = None
+
+    def _cut_and_align(self, image: Image.Image) -> Image.Image | None:
+        cut = self.remover.remove(image)
+        face = self.locator.locate(cut)
+        if face is None:
+            return None
+        return align(cut, face)
 
     def _make(self, frame: str, reference: bytes, uid: str, job_id: str) -> Image.Image | None:
         """One frame, cut out and aligned; None when it can't be made."""
@@ -159,11 +181,31 @@ class FrameBuilder:
         self.costs.record(CostEntry(uid, job_id, made.model, made.cost_usd, self.clock()))
         image = Image.open(io.BytesIO(made.image))
         image.load()
-        cut = self.remover.remove(image)
-        face = self.locator.locate(cut)
-        if face is None:
+        return self._cut_and_align(image)
+
+    def _neutral(self, portrait: bytes, uid: str, job_id: str) -> Image.Image:
+        neutral = None
+        if self.drawer is not None:
+            image = Image.open(io.BytesIO(portrait))
+            image.load()
+            neutral = self._cut_and_align(image)
+        else:
+            for _ in range(2):
+                neutral = self._make("neutral", portrait, uid, job_id)
+                if neutral is not None:
+                    break
+        if neutral is None:
+            raise FramesError("No neutral frame")
+        return neutral
+
+    def _drawn(self, frame: str, neutral: Image.Image) -> Image.Image | None:
+        """[frame] from the drawer; None for the expressions (they show the
+        neutral face and move in code) or a drawing that fails the check."""
+        assert self.drawer is not None
+        if frame not in self.drawer.frames:
             return None
-        return align(cut, face)
+        made = self.drawer.draw(neutral, frame)
+        return made if made is not None and self._ok(made, neutral) else None
 
     def _ok(self, frame: Image.Image, neutral: Image.Image) -> bool:
         face = self.locator.locate(frame)
@@ -177,13 +219,7 @@ class FrameBuilder:
 
     def build(self, uid: str, portrait: bytes, job_id: str) -> FrameSet:
         check_endpoint(self.stylizer.endpoint, self.approved_hosts)
-        neutral = None
-        for _ in range(2):
-            neutral = self._make("neutral", portrait, uid, job_id)
-            if neutral is not None:
-                break
-        if neutral is None:
-            raise FramesError("No neutral frame")
+        neutral = self._neutral(portrait, uid, job_id)
         neutral_bytes = encode(neutral, CANVAS, "PNG")
         images: dict[str, Image.Image] = {"neutral": neutral}
         fell_back: list[str] = []
@@ -191,6 +227,12 @@ class FrameBuilder:
             if frame == "neutral":
                 continue
             made = None
+            if self.drawer is not None:
+                made = self._drawn(frame, neutral)
+                if made is None and frame in self.drawer.frames:
+                    fell_back.append(frame)
+                images[frame] = made if made is not None else neutral
+                continue
             # Made again once if it fails the check.
             for _ in range(2):
                 attempt = self._make(frame, neutral_bytes, uid, job_id)
@@ -206,8 +248,9 @@ class FrameBuilder:
         images["thumb"] = face_crop(neutral)
         for frame in (*FRAMES, "thumb"):
             source = images[frame]
-            if frame in fell_back:
-                # Point at the neutral files rather than store copies.
+            if frame != "neutral" and source is neutral:
+                # Fallbacks and expressions that move in code: point at the
+                # neutral files rather than store copies.
                 files[frame] = files["neutral"]
                 continue
             files[frame] = {}
@@ -257,6 +300,33 @@ class NotConfiguredFaces:
 
     def locate(self, image: Image.Image) -> FaceBox | None:
         return None
+
+
+@dataclass(frozen=True)
+class PixelFrameChecker:
+    """A FrameChecker without a vision model: the correlation of the two
+    aligned faces, grey and small. The frames are edits of the neutral face
+    on one canvas, so the same head scores near 1 and a different or moved
+    head drops fast."""
+
+    side: int = 64
+
+    def _face(self, image: Image.Image) -> list[float]:
+        half = CANVAS * FACE_HEIGHT / 2
+        cx, cy = CANVAS * FACE_CENTRE[0], CANVAS * FACE_CENTRE[1]
+        box = (round(cx - half), round(cy - half), round(cx + half), round(cy + half))
+        face = image.convert("L").crop(box).resize((self.side, self.side))
+        return [float(v) for v in face.tobytes()]
+
+    def similarity(self, frame: Image.Image, neutral: Image.Image) -> float:
+        a, b = self._face(frame), self._face(neutral)
+        ma, mb = sum(a) / len(a), sum(b) / len(b)
+        cov = sum((x - ma) * (y - mb) for x, y in zip(a, b, strict=True))
+        va = sum((x - ma) ** 2 for x in a)
+        vb = sum((y - mb) ** 2 for y in b)
+        if va == 0 or vb == 0:
+            return 1.0 if va == vb else 0.0
+        return max(0.0, cov / math.sqrt(va * vb))
 
 
 class KeepBackground:

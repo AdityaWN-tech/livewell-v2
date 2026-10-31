@@ -13,13 +13,14 @@ import base64
 import binascii
 import logging
 import os
+import secrets
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal
 
-from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException
+from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Response
 from pydantic import BaseModel, Field
 
 from .audit import AuditEntry, AuditLog, Events, InMemoryAuditLog
@@ -37,10 +38,12 @@ from .frames import (
     FaceLocator,
     FrameBuilder,
     FrameChecker,
+    FrameDrawer,
     FrameStore,
     InMemoryFrameStore,
     KeepBackground,
     NotConfiguredFaces,
+    PixelFrameChecker,
 )
 from .jobs import (
     AvatarDocWriter,
@@ -58,9 +61,10 @@ from .jobs import (
     NoNotifier,
     new_job,
 )
+from .local_files import FrameLinks, LocalFrameStore, valid_name, valid_uid
 from .prompts import OptionBook, PromptBook, PromptError
 from .safety import ImageInspector, NotConfiguredInspector
-from .stylizer import AvatarStylizer, NotConfiguredStylizer
+from .stylizer import LOOPBACK_HOSTS, AvatarStylizer, NotConfiguredStylizer
 
 log = logging.getLogger("media")
 
@@ -104,6 +108,8 @@ class Services:
     stylizer: AvatarStylizer = field(default_factory=NotConfiguredStylizer)
     #: The 14 frames (avatar_frames.json); None: the portrait stylizer.
     frame_stylizer: AvatarStylizer | None = None
+    #: Blink and mouth frames drawn from the portrait (MEDIA_DRAWN_FRAMES).
+    drawer: FrameDrawer | None = None
     inspector: ImageInspector = field(default_factory=NotConfiguredInspector)
     jobs: JobStore = field(default_factory=InMemoryJobs)
     portraits: InMemoryPortraits = field(default_factory=InMemoryPortraits)
@@ -116,6 +122,10 @@ class Services:
     docs: AvatarDocWriter = field(default_factory=InMemoryAvatarDocs)
     audit: AuditLog = field(default_factory=InMemoryAuditLog)
     notifier: JobNotifier = field(default_factory=NoNotifier)
+    #: Frame sets on the service's own disk with signed download links
+    #: (development without Cloud Storage, D-64); None in prod.
+    local_frames: LocalFrameStore | None = None
+    links: FrameLinks | None = None
     #: Off only in tests about the HTTP layer alone.
     build_frames: bool = True
     clock: Callable[[], datetime] = lambda: datetime.now(UTC)
@@ -123,17 +133,77 @@ class Services:
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Services":
         """What the container runs: our ComfyUI server when MEDIA_COMFYUI_URL
-        is set (from Secret Manager); otherwise nothing is configured."""
+        is set (from Secret Manager), else Gemini when MEDIA_GEMINI_API_KEY_FILE
+        is set (D-64); otherwise nothing is configured. Firebase Admin checks
+        callers and consents when MEDIA_FIREBASE_PROJECT is set, and
+        MEDIA_FRAMES_DIR keeps frame sets on this computer (development)."""
         env = dict(os.environ if env is None else env)
-        settings = Settings(approved_hosts=_hosts(env.get("MEDIA_APPROVED_HOSTS", "")))
-        comfy = ComfyUISettings.from_env(env)
-        if comfy is None:
-            return cls(settings=settings)
-        folder = env.get("MEDIA_WORKFLOWS_PATH")
-        portrait, frames = comfyui_stylizers(
-            comfy, settings.approved_hosts, workflows=Path(folder) if folder else WORKFLOWS
+        approved = _hosts(env.get("MEDIA_APPROVED_HOSTS", ""))
+        if approved & LOOPBACK_HOSTS and env.get("MEDIA_ALLOW_LOOPBACK", "0") != "1":
+            # Plain HTTP to this computer is for development only (D-64).
+            raise ValueError("A loopback host is approved without MEDIA_ALLOW_LOOPBACK=1")
+        from_photo = env.get("MEDIA_FROM_PHOTO", "0") == "1"
+        settings = Settings(
+            approved_hosts=approved,
+            from_photo_enabled=lambda: from_photo,
         )
-        return cls(settings=settings, stylizer=portrait, frame_stylizer=frames)
+        s = cls(settings=settings)
+        comfy = ComfyUISettings.from_env(env)
+        key_file = env.get("MEDIA_GEMINI_API_KEY_FILE", "").strip()
+        if comfy is not None:
+            folder = env.get("MEDIA_WORKFLOWS_PATH")
+            workflows = Path(folder) if folder else WORKFLOWS
+            s.stylizer, s.frame_stylizer = comfyui_stylizers(
+                comfy, settings.approved_hosts, workflows=workflows
+            )
+        elif key_file:
+            from .gemini import GeminiClient, GeminiFaceLocator, GeminiInspector, GeminiStylizer
+
+            client = GeminiClient(Path(key_file).read_text().strip(), settings.approved_hosts)
+            s.stylizer = GeminiStylizer(client)
+            s.inspector = GeminiInspector(client)
+            s.locator = GeminiFaceLocator(client)
+            s.checker = PixelFrameChecker()
+        models = env.get("MEDIA_MODELS_DIR", "").strip()
+        if env.get("MEDIA_LOCAL_CHECKS", "0") == "1" and models:
+            from .local_checks import LocalInspector, SkinToneKeeper
+
+            local = LocalInspector.from_dir(Path(models))
+            s.inspector = local
+            s.locator = local.faces
+            s.checker = PixelFrameChecker()
+            # Never lighten or darken the person's skin (D-64).
+            s.stylizer = SkinToneKeeper(s.stylizer, local.faces)
+        if env.get("MEDIA_DRAWN_FRAMES", "0") == "1" and models:
+            from .drawn_frames import LandmarkDrawer
+            from .local_checks import LANDMARKER
+
+            s.drawer = LandmarkDrawer(str(Path(models) / LANDMARKER))
+        project = env.get("MEDIA_FIREBASE_PROJECT", "").strip()
+        if project:
+            from firebase_admin import firestore
+
+            from .firebase_store import (
+                FirebaseAuthenticator,
+                FirestoreAvatarDocs,
+                FirestoreConsents,
+                firebase_app,
+            )
+
+            app = firebase_app(project)
+            s.auth = FirebaseAuthenticator(
+                app, require_app_check=env.get("MEDIA_REQUIRE_APP_CHECK", "1") != "0"
+            )
+            db = firestore.client(app)
+            s.consents = FirestoreConsents(db)
+            s.docs = FirestoreAvatarDocs(db)
+        frames_dir = env.get("MEDIA_FRAMES_DIR", "").strip()
+        if frames_dir:
+            s.local_frames = LocalFrameStore(Path(frames_dir))
+            s.frame_store = s.local_frames
+            # Links only live minutes: a new key per start is enough.
+            s.links = FrameLinks(secrets.token_bytes(32))
+        return s
 
 
 def _hosts(value: str) -> frozenset[str]:
@@ -174,6 +244,7 @@ def create_app(services: Services | None = None) -> FastAPI:
         frames=FrameBuilder(
             prompts=prompts,
             stylizer=s.frame_stylizer or s.stylizer,
+            drawer=s.drawer,
             locator=s.locator,
             remover=s.remover,
             checker=s.checker,
@@ -245,6 +316,42 @@ def create_app(services: Services | None = None) -> FastAPI:
         log.info("avatar job %s queued (%s)", job.id, job.source.value)
         background.add_task(runner.run, job, selfie)
         return job.view()
+
+    @app.get("/v1/avatar/frames/{version}")
+    def frame_links(version: int, uid: Annotated[str, Depends(caller)]) -> dict[str, str]:
+        """Signed download links for the caller's own frame set (what the
+        Core API's signed Cloud Storage URLs do in prod)."""
+        if s.local_frames is None or s.links is None:
+            raise HTTPException(404, "not_found")
+        links = s.links
+        try:
+            names = s.local_frames.names(uid, version)
+        except ValueError:
+            names = []
+        if not names:
+            raise HTTPException(404, "not_found")
+        return {n: links.path(uid, version, n) for n in names}
+
+    @app.get("/v1/avatar/files/{uid}/{version}/{name}")
+    def frame_file(uid: str, version: int, name: str, exp: int, sig: str) -> Response:
+        store, links = s.local_frames, s.links
+        if (
+            store is None
+            or links is None
+            or not valid_uid(uid)
+            or not valid_name(name)
+            or not links.ok(uid, version, name, exp, sig)
+        ):
+            raise HTTPException(404, "not_found")
+        data = store.read(uid, version, name)
+        if data is None:
+            raise HTTPException(404, "not_found")
+        kind = {"webp": "image/webp", "png": "image/png", "json": "application/json"}
+        return Response(
+            data,
+            media_type=kind[name.rsplit(".", 1)[1]],
+            headers={"Cache-Control": "private, no-store"},
+        )
 
     @app.get("/v1/avatar/jobs/{job_id}")
     def status(job_id: str, uid: Annotated[str, Depends(caller)]) -> dict[str, object]:

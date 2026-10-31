@@ -13,6 +13,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["aiohttp>=3.9", "pytest>=8", "ruff>=0.7", "mypy>=1.13"]
+#: Firebase Admin: ID tokens, consents, the avatar doc (MEDIA_FIREBASE_PROJECT).
+firebase = ["firebase-admin>=6.5"]
+#: Free checks on this computer (MEDIA_LOCAL_CHECKS, D-64). Install torch from
+#: the CPU index: --extra-index-url https://download.pytorch.org/whl/cpu
+local = ["opencv-contrib-python>=4.10", "numpy>=2", "torch>=2.9", "transformers>=4.45", "mediapipe>=0.10"]
 
 [build-system]
 requires = ["setuptools>=70"]
@@ -44,3 +49,7 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 packages = ["media"]
+
+[[tool.mypy.overrides]]
+module = ["firebase_admin", "firebase_admin.*", "google.cloud.*", "cv2", "torch", "transformers", "mediapipe", "mediapipe.*"]
+ignore_missing_imports = true

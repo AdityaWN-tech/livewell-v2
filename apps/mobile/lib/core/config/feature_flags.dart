@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'media_service.dart';
+
 /// Feature switches for things that are not built yet or need a kill switch
 /// (spec 10.2). Defaults are off.
 /// TODO(T-FND-11): read these from Firebase Remote Config.
@@ -55,6 +57,10 @@ class FeatureFlags {
   final bool lovedOneVoice;
 }
 
-final featureFlagsProvider = Provider<FeatureFlags>(
-  (ref) => const FeatureFlags(),
-);
+/// Dev with a Media Service on the developer's computer (LW_MEDIA_URL,
+/// D-64) turns the avatar maker and From my photo on to try them; prod and
+/// staging keep every flag off.
+final featureFlagsProvider = Provider<FeatureFlags>((ref) {
+  final mediaDev = ref.watch(mediaServiceBaseProvider) != null;
+  return FeatureFlags(avatarFromPhoto: mediaDev, avatarMaker: mediaDev);
+});

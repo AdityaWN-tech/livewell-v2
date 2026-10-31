@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import io
 import json
+import math
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -257,6 +258,33 @@ class NotConfiguredFaces:
 
     def locate(self, image: Image.Image) -> FaceBox | None:
         return None
+
+
+@dataclass(frozen=True)
+class PixelFrameChecker:
+    """A FrameChecker without a vision model: the correlation of the two
+    aligned faces, grey and small. The frames are edits of the neutral face
+    on one canvas, so the same head scores near 1 and a different or moved
+    head drops fast."""
+
+    side: int = 64
+
+    def _face(self, image: Image.Image) -> list[float]:
+        half = CANVAS * FACE_HEIGHT / 2
+        cx, cy = CANVAS * FACE_CENTRE[0], CANVAS * FACE_CENTRE[1]
+        box = (round(cx - half), round(cy - half), round(cx + half), round(cy + half))
+        face = image.convert("L").crop(box).resize((self.side, self.side))
+        return [float(v) for v in face.tobytes()]
+
+    def similarity(self, frame: Image.Image, neutral: Image.Image) -> float:
+        a, b = self._face(frame), self._face(neutral)
+        ma, mb = sum(a) / len(a), sum(b) / len(b)
+        cov = sum((x - ma) * (y - mb) for x, y in zip(a, b, strict=True))
+        va = sum((x - ma) ** 2 for x in a)
+        vb = sum((y - mb) ** 2 for y in b)
+        if va == 0 or vb == 0:
+            return 1.0 if va == vb else 0.0
+        return max(0.0, cov / math.sqrt(va * vb))
 
 
 class KeepBackground:

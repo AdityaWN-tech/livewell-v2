@@ -19,6 +19,7 @@ The coach has a 3D-style face (ready-made, built from options, adjusted, or made
 |---|---|---|---|
 | Ready-made coaches (8) | Bundled frame sets, `assets/avatar/frames/coaches/` (art made per `docs/design/coach-frames-gemini.md`) | Owner's art, see `asset-licences.md` | In use |
 | Image generation for Build my own, Adjust, From my photo and frames | **Own ComfyUI server** on private Cloud Run (one NVIDIA L4, scales to zero) with Qwen-Image-Edit-2511 (GGUF Q5_K_M), Qwen2.5-VL 7B fp8 text encoder, Qwen-Image VAE, 4-step Lightning LoRA (D-39) | All Apache-2.0 | Built, **not deployed** (needs Blaze billing, D-17) |
+| Dev-only image generation, safety + likeness check and face box (D-64) | Google Gemini API: `gemini-2.5-flash-image` (edits, about $0.039 per image) and `gemini-2.5-flash` (checks), **billing-enabled key only** | Commercial (Gemini API terms) | In use on the developer's computer only; prod needs the DPA and counsel review |
 | Media Service | `services/media`: FastAPI, Pydantic, Uvicorn, Pillow, httpx on Cloud Run | MIT/BSD-style | Built, not deployed |
 | Commercial fallback candidates | Google Vertex AI image editing, OpenAI image editing, BFL FLUX Kontext API, Stability AI API | Commercial terms | Candidates only; scored by `avatar-vendor-scorecard.md` |
 | Image safety check (`ImageInspector`) | Candidate: Google Cloud Vision (safe search, text, logo) | Commercial | **Not chosen** |

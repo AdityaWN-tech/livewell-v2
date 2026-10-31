@@ -56,3 +56,27 @@ python -m venv .venv
 .venv/Scripts/python -m ruff check src tests
 .venv/Scripts/python -m mypy
 ```
+
+## Run locally with Gemini (dev only, D-64)
+
+Without a ComfyUI server, the service can make images with Google Gemini on the
+developer's computer. It runs under PM2 as `livewell-media-dev` on
+`127.0.0.1:6799` (entry in the developer's PM2 ecosystem file).
+
+| Env var | What it does |
+|---|---|
+| `MEDIA_GEMINI_API_KEY_FILE` | File holding a **billing-enabled** Gemini API key (never in the repo). Turns on `GeminiStylizer`, `GeminiInspector`, `GeminiFaceLocator`. |
+| `MEDIA_APPROVED_HOSTS` | Must include `generativelanguage.googleapis.com`. |
+| `MEDIA_FIREBASE_PROJECT` + `GOOGLE_APPLICATION_CREDENTIALS` | Firebase Admin (dev project's service account): ID tokens, consents, `users/{uid}/avatar/current`. |
+| `MEDIA_REQUIRE_APP_CHECK=0` | Dev only: the app has no App Check yet. |
+| `MEDIA_FROM_PHOTO=1` | Allows `source: selfie`. |
+| `MEDIA_FRAMES_DIR` | Keeps frame sets on disk, served by `GET /v1/avatar/frames/{version}` (owner only) as signed links to `GET /v1/avatar/files/...` that expire after 15 minutes. |
+
+```
+pm2 start <ecosystem.config.js> --only livewell-media-dev; pm2 save
+adb reverse tcp:6799 tcp:6799        # again after every reconnect
+flutter run --flavor dev -t lib/main_dev.dart --dart-define=LW_MEDIA_URL=http://127.0.0.1:6799
+```
+
+The app only uses `LW_MEDIA_URL` in a dev debug build (plain HTTP only to
+127.0.0.1/localhost). Jobs live in memory, so a restart loses running jobs.

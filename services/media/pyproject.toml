@@ -13,6 +13,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["aiohttp>=3.9", "pytest>=8", "ruff>=0.7", "mypy>=1.13"]
+#: Firebase Admin: ID tokens, consents, the avatar doc (MEDIA_FIREBASE_PROJECT).
+firebase = ["firebase-admin>=6.5"]
 
 [build-system]
 requires = ["setuptools>=70"]
@@ -44,3 +46,7 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 packages = ["media"]
+
+[[tool.mypy.overrides]]
+module = ["firebase_admin", "firebase_admin.*", "google.cloud.*"]
+ignore_missing_imports = true

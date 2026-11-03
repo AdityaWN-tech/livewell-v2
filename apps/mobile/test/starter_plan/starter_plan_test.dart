@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/time/clock.dart';
+import 'package:livewell/features/home/application/home_data.dart'
+    show stepProgressActionsProvider;
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
@@ -374,6 +376,29 @@ void main() {
       // No frame set yet: the coach's initial ("Coach" until named).
       expect(faces.drawn.single, 'C');
       expect(reminders.faces.keys, containsAll(TouchpointKind.values));
+    });
+
+    test("today's step is done: its reminder isn't scheduled again; "
+        "tomorrow's is (T-TCH-02 TCH-e)", () async {
+      await consents.record(ConsentType.notifications, granted: true);
+      final today = TouchpointScheduler.idFor(
+        DateTime(2026, 10, 15),
+        TouchpointKind.nudge,
+      );
+      final tomorrow = TouchpointScheduler.idFor(
+        DateTime(2026, 10, 16),
+        TouchpointKind.nudge,
+      );
+      await c.read(planSchedulerProvider).reschedule(texts);
+      expect(reminders.scheduled.map((s) => s.id), contains(today));
+
+      c.read(stepProgressActionsProvider).markDone();
+      await Future<void>.delayed(Duration.zero);
+      expect(reminders.dismissed, contains(today));
+      await c.read(planSchedulerProvider).reschedule(texts);
+      final ids = reminders.scheduled.map((s) => s.id);
+      expect(ids, isNot(contains(today)));
+      expect(ids, contains(tomorrow));
     });
 
     test(

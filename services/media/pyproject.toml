@@ -51,5 +51,7 @@ mypy_path = "src"
 packages = ["media"]
 
 [[tool.mypy.overrides]]
-module = ["firebase_admin", "firebase_admin.*", "google.cloud.*", "cv2", "torch", "transformers", "mediapipe", "mediapipe.*"]
+#: Optional laptop-only libraries (the `local` extra, D-64/D-65): CI installs
+#: only `dev`, so mypy can't see them.
+module = ["firebase_admin", "firebase_admin.*", "google.cloud.*", "cv2", "numpy", "numpy.*", "torch", "transformers", "mediapipe", "mediapipe.*"]
 ignore_missing_imports = true

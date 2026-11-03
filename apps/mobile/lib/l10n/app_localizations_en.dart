@@ -1328,6 +1328,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appLockUnlock => 'Unlock';
 
   @override
+  String get profileWidgetHideDetails => 'Hide details on lock screen';
+
+  @override
+  String get profileWidgetHideDetailsBody =>
+      'The widget says \"Your next step is ready\" instead of naming it.';
+
+  @override
   String get profileAppLock => 'Lock with fingerprint or face';
 
   @override

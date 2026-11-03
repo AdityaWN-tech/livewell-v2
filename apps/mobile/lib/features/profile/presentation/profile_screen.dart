@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../widget/application/widget_settings.dart';
 import '../../account/application/app_lock.dart';
 
 import 'package:url_launcher/url_launcher.dart';
@@ -675,6 +676,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                         ],
                       ),
+                    ),
+                    // The home-screen widget (T-AVT-08g-e): on by default.
+                    SwitchListTile(
+                      key: const Key('profile-widget-hide-details'),
+                      secondary: const Icon(Icons.widgets_outlined),
+                      title: Text(l.profileWidgetHideDetails),
+                      subtitle: Text(l.profileWidgetHideDetailsBody),
+                      value: ref.watch(widgetHideDetailsProvider).value ?? true,
+                      onChanged: (hide) => ref
+                          .read(widgetHideDetailsProvider.notifier)
+                          .set(hide),
                     ),
                   ],
                 );

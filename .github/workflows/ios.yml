@@ -33,6 +33,12 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+      # The runner's default Xcode (16.4) can't build device_info_plus 13.3
+      # (pulled in by health, D-59): it uses an iOS 26 API. Codemagic uses
+      # `xcode: latest`, so CI does the same.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - name: No signing files in the repo
         run: |
           if git ls-files | grep -iE '\.(p12|p8|cer|certSigningRequest|mobileprovision|provisionprofile)$'; then

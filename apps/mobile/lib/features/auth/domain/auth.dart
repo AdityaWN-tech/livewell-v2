@@ -8,12 +8,17 @@ class AuthUser {
     this.email,
     this.phoneNumber,
     this.displayName,
+    this.providers = const [],
   });
 
   final String uid;
+
+  /// Sign-in methods on this account: 'password', 'phone', 'google.com',
+  /// 'apple.com'.
+  final List<String> providers;
   final String? email;
 
-  /// E.164, e.g. +919876543210.
+  /// E.164, e.g. +12125550123.
   final String? phoneNumber;
   final String? displayName;
 }
@@ -30,6 +35,25 @@ enum AuthFailure {
   tooManyRequests,
   network,
   methodDisabled,
+
+  /// The only sign-in method left can't be removed.
+  lastMethod,
+
+  /// Adding a phone number that another Live Well account already uses
+  /// (Firebase credential-already-in-use).
+  phoneInUse,
+
+  /// This account already has a phone number.
+  alreadyLinked,
+
+  /// Google or Apple found a Live Well account with the same email that
+  /// was made another way (Firebase account-exists-with-different-credential).
+  accountExists,
+
+  /// Firebase couldn't confirm this is the real app (Play Integrity or the
+  /// reCAPTCHA check failed, or this build's signing key isn't registered;
+  /// D-58). Phone codes can't be sent until it can.
+  appNotVerified,
   cancelled,
   unknown,
 }
@@ -51,8 +75,10 @@ AuthFailure authFailureFromCode(String code) => switch (code) {
   'wrong-password' ||
   'invalid-credential' ||
   'INVALID_LOGIN_CREDENTIALS' => AuthFailure.wrongCredentials,
-  'email-already-in-use' ||
-  'account-exists-with-different-credential' => AuthFailure.emailInUse,
+  'email-already-in-use' => AuthFailure.emailInUse,
+  'credential-already-in-use' => AuthFailure.phoneInUse,
+  'provider-already-linked' => AuthFailure.alreadyLinked,
+  'account-exists-with-different-credential' => AuthFailure.accountExists,
   'weak-password' => AuthFailure.weakPassword,
   'invalid-phone-number' || 'missing-phone-number' => AuthFailure.invalidPhone,
   'invalid-verification-code' ||
@@ -61,6 +87,14 @@ AuthFailure authFailureFromCode(String code) => switch (code) {
   'too-many-requests' || 'quota-exceeded' => AuthFailure.tooManyRequests,
   'network-request-failed' => AuthFailure.network,
   'operation-not-allowed' => AuthFailure.methodDisabled,
+  'app-not-authorized' ||
+  'invalid-app-credential' ||
+  'missing-app-credential' ||
+  'missing-client-identifier' ||
+  'captcha-check-failed' ||
+  'missing-recaptcha-token' ||
+  'invalid-recaptcha-token' ||
+  'web-internal-error' => AuthFailure.appNotVerified,
   'web-context-canceled' ||
   'canceled' ||
   'cancelled' ||
@@ -81,9 +115,10 @@ class PhoneVerification {
   final int? resendToken;
 }
 
-/// Countries offered for phone sign-in (markets India and US, D-03).
+/// Countries offered for phone sign-in. US only (D-66): the app is mainly
+/// used in the US. India is still a market for safety numbers (D-03); people
+/// there sign in with email, Google or Apple.
 enum PhoneCountry {
-  india('IN', '+91', 10),
   us('US', '+1', 10);
 
   const PhoneCountry(this.isoCode, this.dialCode, this.nationalLength);
@@ -96,20 +131,13 @@ enum PhoneCountry {
   /// number for this country.
   String? normalise(String input) {
     var digits = input.replaceAll(RegExp(r'[^0-9]'), '');
-    // Allow people to type the country code or a leading trunk 0.
+    // Allow people to type the country code.
     final cc = dialCode.substring(1);
     if (digits.length == nationalLength + cc.length && digits.startsWith(cc)) {
       digits = digits.substring(cc.length);
     }
-    if (this == PhoneCountry.india &&
-        digits.length == 11 &&
-        digits.startsWith('0')) {
-      digits = digits.substring(1);
-    }
     if (digits.length != nationalLength) return null;
     return switch (this) {
-      // Indian mobile numbers start with 6-9.
-      PhoneCountry.india => RegExp(r'^[6-9]').hasMatch(digits) ? digits : null,
       // NANP: area code and exchange can't start with 0 or 1.
       PhoneCountry.us =>
         RegExp(r'^[2-9][0-9]{2}[2-9]').hasMatch(digits) ? digits : null,
@@ -123,7 +151,9 @@ enum PhoneCountry {
   }
 }
 
-/// Region for safety numbers and legal texts (D-03). Never guessed: +1 is
+/// Region for safety numbers and legal texts (D-03). New phone numbers are
+/// +1 only (D-66), but +91 still maps to India so any +91 account gets India's
+/// emergency and crisis numbers. Never guessed: +1 is
 /// shared with Canada and the Caribbean, so it means US only when the device
 /// is also set to the US. Null means "ask the user later".
 String? inferRegion({String? phoneE164, String? deviceCountry}) {
@@ -138,6 +168,35 @@ String? inferRegion({String? phoneE164, String? deviceCountry}) {
     'US' => 'US',
     _ => null,
   };
+}
+
+/// One-tap sign-in providers.
+enum SocialProvider {
+  google('Google', 'google.com'),
+  apple('Apple', 'apple.com');
+
+  const SocialProvider(this.brandName, this.providerId);
+
+  /// Brand name, never translated.
+  final String brandName;
+
+  /// Firebase provider id.
+  final String providerId;
+}
+
+/// A Google or Apple sign-in that hit an existing account with the same
+/// email. Offered for linking once the person signs in the original way.
+class PendingLink {
+  const PendingLink({required this.provider, this.email});
+
+  final SocialProvider provider;
+  final String? email;
+
+  /// Only link into the account that owns the same email, never another.
+  bool matches(AuthUser user) =>
+      email != null &&
+      user.email != null &&
+      user.email!.trim().toLowerCase() == email!.trim().toLowerCase();
 }
 
 /// Sign-in operations. Firebase implementation in data/; fakes in tests.
@@ -158,8 +217,40 @@ abstract class AuthService {
     String code,
   );
 
+  /// One tap signs in, or signs up when no account exists yet.
   Future<AuthUser> signInWithGoogle();
   Future<AuthUser> signInWithApple();
+
+  /// Set when the last Google/Apple attempt failed with
+  /// [AuthFailure.accountExists]; cleared by [clearPendingLink].
+  PendingLink? get pendingLink;
+
+  /// Adds the pending Google/Apple sign-in to the signed-in account.
+  Future<void> linkPending();
+  void clearPendingLink();
+
+  /// Adds Google or Apple to the signed-in account (Profile).
+  Future<AuthUser> link(SocialProvider provider);
+
+  /// Removes Google or Apple; refuses to remove the last sign-in method.
+  Future<AuthUser> unlink(SocialProvider provider);
+
+  /// Adds a phone number to the signed-in account (Profile, Step 4c):
+  /// sends a code like [startPhoneSignIn], but a code the phone reads by
+  /// itself is added to this account, never used to sign in.
+  Future<PhoneVerification> startPhoneLink(
+    String phoneE164, {
+    int? resendToken,
+  });
+
+  /// Adds the verified number to the signed-in account.
+  Future<AuthUser> confirmPhoneLink(
+    PhoneVerification verification,
+    String code,
+  );
+
+  /// Removes the phone number; refuses to remove the last sign-in method.
+  Future<AuthUser> unlinkPhone();
 
   Future<void> signOut();
 

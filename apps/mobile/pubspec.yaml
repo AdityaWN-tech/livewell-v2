@@ -47,6 +47,21 @@ dependencies:
   shared_preferences: ^2.5.6
   speech_to_text: ^7.5.0
   url_launcher: ^6.3.3
+  firebase_analytics: ^12.6.0
+  image_picker: ^1.2.4
+  audioplayers: ^6.8.1
+  flutter_local_notifications: ^22.3.2
+  home_widget: ^0.10.0
+  timezone: ^0.11.2
+  flutter_timezone: ^5.1.1
+  cloud_functions: ^6.5.0
+  path_provider: ^2.1.6
+  flutter_tts: ^4.2.5
+  camera: ^0.12.1
+  google_mlkit_face_detection: ^0.15.1
+  google_sign_in: ^7.2.0
+  health: ^13.3.2
+  local_auth: ^3.0.2
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +75,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   integration_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
 flutter:
   generate: true # ARB strings (NFR-11), see l10n.yaml
 
@@ -70,10 +86,33 @@ flutter:
 
   assets:
     - assets/brand/
+    # Official Google and Apple sign-in logos (docs/brand/social/README.md).
+    - assets/brand/social/
+    # Coach voice previews, fixed approved text (docs/voices.md).
+    - assets/voices/
+    # Focus -> driver map (copy of content/plan, checked by a test).
+    - assets/plan/
+    - assets/plan/templates/
+    # Avatar Moment scripts (copy of content/coach/moments, checked by a test).
+    - assets/coach/moments/
+    # My Daily Routine activity catalog (copy of content/routine, checked by a test).
+    - assets/routine/
     # Legal texts users accept (copies of content/legal, checked by a test).
     - assets/legal/
     # Red-flag rules (copy of packages/safety-rules/rules.json, checked by a test).
     - assets/safety/
+    # Illustrations and characters by id (T-UI-02b, docs/design/asset-brief.md).
+    - assets/illustrations/
+    # Layered avatar parts by category (T-UI-02h; T-AVT-06 adds styles).
+    - assets/avatar/
+    - assets/avatar/frames/coaches/brown_hair/
+    - assets/avatar/frames/coaches/long_black_hair/
+    - assets/avatar/frames/coaches/green_hijab/
+    - assets/avatar/frames/coaches/navy_turban/
+    - assets/avatar/frames/coaches/grey_glasses/
+    - assets/avatar/frames/coaches/short_curls/
+    - assets/avatar/frames/coaches/short_black_hair/
+    - assets/avatar/frames/coaches/wheelchair/
     # Design references (portal screenshots). Remove before the first store release
     # so they don't ship in the app (NFR-08 size budget).
     - assets/design-reference/
@@ -135,3 +174,16 @@ flutter_native_splash:
   android: true
   ios: true
   web: false
+
+# App icon (Step 2): the Live Well mark on the splash teal, so the icon, the native
+# splash and the in-app reveal share one colour. Sources from tool/draw_logo.py
+# (assets/brand/icon/, not bundled). Regenerate: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: assets/brand/icon/app-icon.png
+  remove_alpha_ios: true
+  min_sdk_android: 24
+  adaptive_icon_background: "#0B3A4E"
+  adaptive_icon_foreground: assets/brand/icon/app-icon-foreground.png
+  adaptive_icon_monochrome: assets/brand/icon/app-icon-monochrome.png

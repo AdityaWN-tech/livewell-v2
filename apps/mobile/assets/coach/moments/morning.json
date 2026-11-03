@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "moment": "morning",
+  "review_status": "pending",
+  "note": "T-DLY-03a. Avatar Moment scripts. Placeholders only: {first_name}, {why}, {step_title}, {step_minutes}, {smaller_minutes}, {streak_days}, {time_of_day}, {weekly_count}. A variant is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level; one step plus a smaller option. review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Listed for review in REVIEW.md.",
+  "when": "Morning briefing (7:00 by default, user-set)",
+  "emotion": "waving",
+  "primary_action": "check_in",
+  "secondary_actions": [
+    "start_step",
+    "make_smaller"
+  ],
+  "variants": [
+    {
+      "id": "m1",
+      "text": "Good {time_of_day}, {first_name}! Hope you slept well. Remember your why: {why}. Today's step: {step_title}. Short on time? {smaller_minutes} minutes still counts. How are you feeling today?"
+    },
+    {
+      "id": "m2",
+      "text": "Good {time_of_day}, {first_name}! A new day is a fresh start. Today's step: {step_title}. Want to check in first and tell me how you feel?"
+    },
+    {
+      "id": "m3",
+      "text": "Hi {first_name}, good {time_of_day}! You are doing this for a reason: {why}. One small step today: {step_title}. How are you feeling?"
+    },
+    {
+      "id": "m4",
+      "text": "Good {time_of_day}! Today's step: {step_title}. Even {smaller_minutes} minutes counts. How are you feeling today?"
+    },
+    {
+      "id": "m5",
+      "text": "Good {time_of_day}, {first_name}! How are you feeling today? Let's find a small step that fits your day."
+    },
+    {
+      "id": "m6",
+      "text": "Good {time_of_day}! How are you feeling today? Let's find a small step that fits your day."
+    }
+  ]
+}

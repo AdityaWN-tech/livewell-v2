@@ -1,0 +1,9 @@
+# The models come from the Cloud Storage volume mounted at /models
+# (docs/media/comfyui-setup.md), laid out by download_models.py.
+livewell:
+  base_path: /models
+  diffusion_models: unet
+  unet: unet
+  text_encoders: text_encoders
+  vae: vae
+  loras: loras

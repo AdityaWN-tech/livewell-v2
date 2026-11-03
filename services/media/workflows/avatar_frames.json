@@ -1,0 +1,218 @@
+{
+  "name": "avatar_frames",
+  "version": 1,
+  "about": "ComfyUI API-format graphs for the Media Service (docs/media/comfyui-setup.md). Placeholders: {{POSITIVE}} and {{NEGATIVE}} (from docs/design/avatar-prompts.md), {{INPUT_IMAGE}} (the uploaded image), {{SEED}}. One diffusion model for every path, so it stays loaded on one L4. Every model needs a commercial licence (docs/design/asset-licences.md).",
+  "use": "The 14 frames, one image per job: neutral is an edit of the approved portrait, every other frame an edit of the neutral one.",
+  "output_node": "14",
+  "models": [
+    {
+      "file": "qwen-image-edit-2511-Q5_K_M.gguf",
+      "folder": "unet",
+      "repo": "unsloth/Qwen-Image-Edit-2511-GGUF",
+      "repo_path": "qwen-image-edit-2511-Q5_K_M.gguf",
+      "licence": "Apache-2.0",
+      "url": "https://huggingface.co/unsloth/Qwen-Image-Edit-2511-GGUF"
+    },
+    {
+      "file": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "folder": "text_encoders",
+      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+      "repo_path": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "licence": "Apache-2.0",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI"
+    },
+    {
+      "file": "qwen_image_vae.safetensors",
+      "folder": "vae",
+      "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+      "repo_path": "split_files/vae/qwen_image_vae.safetensors",
+      "licence": "Apache-2.0",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI"
+    },
+    {
+      "file": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "folder": "loras",
+      "repo": "lightx2v/Qwen-Image-Edit-2511-Lightning",
+      "repo_path": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "licence": "Apache-2.0",
+      "url": "https://huggingface.co/lightx2v/Qwen-Image-Edit-2511-Lightning"
+    }
+  ],
+  "graphs": {
+    "image": {
+      "1": {
+        "class_type": "UnetLoaderGGUF",
+        "inputs": {
+          "unet_name": "qwen-image-edit-2511-Q5_K_M.gguf"
+        },
+        "_meta": {
+          "title": "Qwen-Image-Edit-2511 (GGUF Q5_K_M)"
+        }
+      },
+      "2": {
+        "class_type": "CLIPLoader",
+        "inputs": {
+          "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+          "type": "qwen_image",
+          "device": "default"
+        }
+      },
+      "3": {
+        "class_type": "VAELoader",
+        "inputs": {
+          "vae_name": "qwen_image_vae.safetensors"
+        }
+      },
+      "4": {
+        "class_type": "LoraLoaderModelOnly",
+        "inputs": {
+          "model": [
+            "1",
+            0
+          ],
+          "lora_name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+          "strength_model": 1.0
+        },
+        "_meta": {
+          "title": "Lightning: 4 steps"
+        }
+      },
+      "5": {
+        "class_type": "ModelSamplingAuraFlow",
+        "inputs": {
+          "model": [
+            "4",
+            0
+          ],
+          "shift": 3.1
+        }
+      },
+      "6": {
+        "class_type": "CFGNorm",
+        "inputs": {
+          "model": [
+            "5",
+            0
+          ],
+          "strength": 1.0
+        }
+      },
+      "7": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "{{INPUT_IMAGE}}"
+        }
+      },
+      "8": {
+        "class_type": "ImageScaleToTotalPixels",
+        "inputs": {
+          "image": [
+            "7",
+            0
+          ],
+          "upscale_method": "lanczos",
+          "megapixels": 1.0
+        }
+      },
+      "9": {
+        "class_type": "TextEncodeQwenImageEditPlus",
+        "inputs": {
+          "clip": [
+            "2",
+            0
+          ],
+          "vae": [
+            "3",
+            0
+          ],
+          "prompt": "{{POSITIVE}}",
+          "image1": [
+            "8",
+            0
+          ]
+        }
+      },
+      "10": {
+        "class_type": "TextEncodeQwenImageEditPlus",
+        "inputs": {
+          "clip": [
+            "2",
+            0
+          ],
+          "vae": [
+            "3",
+            0
+          ],
+          "prompt": "{{NEGATIVE}}",
+          "image1": [
+            "8",
+            0
+          ]
+        }
+      },
+      "11": {
+        "class_type": "VAEEncode",
+        "inputs": {
+          "pixels": [
+            "8",
+            0
+          ],
+          "vae": [
+            "3",
+            0
+          ]
+        }
+      },
+      "12": {
+        "class_type": "KSampler",
+        "inputs": {
+          "model": [
+            "6",
+            0
+          ],
+          "seed": "{{SEED}}",
+          "steps": 4,
+          "cfg": 1.0,
+          "sampler_name": "euler",
+          "scheduler": "simple",
+          "positive": [
+            "9",
+            0
+          ],
+          "negative": [
+            "10",
+            0
+          ],
+          "latent_image": [
+            "11",
+            0
+          ],
+          "denoise": 1.0
+        }
+      },
+      "13": {
+        "class_type": "VAEDecode",
+        "inputs": {
+          "samples": [
+            "12",
+            0
+          ],
+          "vae": [
+            "3",
+            0
+          ]
+        }
+      },
+      "14": {
+        "class_type": "SaveImage",
+        "inputs": {
+          "images": [
+            "13",
+            0
+          ],
+          "filename_prefix": "lw"
+        }
+      }
+    }
+  }
+}

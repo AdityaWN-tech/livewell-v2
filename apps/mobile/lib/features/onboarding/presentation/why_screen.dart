@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/speech/dictation.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../account/application/account_setup.dart' show checkinPath;
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
-import '../../consent/data/consent_repository.dart';
-import '../../consent/domain/consent.dart';
+import '../../consent/presentation/microphone_consent.dart';
 import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/presentation/safety_screens.dart';
 import 'about_screen.dart' show OnboardingScaffold;
@@ -18,7 +18,11 @@ import 'about_screen.dart' show OnboardingScaffold;
 /// Home. Checked by the red-flag rules before saving (T-ASM-02); nothing
 /// but the user's own Home reads it until the agents' checks exist (D-21).
 class WhyScreen extends ConsumerStatefulWidget {
-  const WhyScreen({super.key});
+  const WhyScreen({super.key, this.editing = false});
+
+  /// Changing the Why later (from MY GOAL DO IT): starts with the saved
+  /// Why, keeps the onboarding step, and goes back after saving.
+  final bool editing;
 
   /// Long enough for a sentence or two; the rules allow up to 280.
   static const maxLength = 200;
@@ -40,6 +44,9 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.editing) {
+      _text.text = ref.read(currentProfileProvider).value?.whyStatement ?? '';
+    }
     _text.addListener(() => setState(() {}));
   }
 
@@ -69,7 +76,7 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
       setState(() => _listening = false);
       return;
     }
-    if (!await _ensureMicConsent() || !mounted) return;
+    if (!await ensureMicrophoneConsent(context, ref) || !mounted) return;
     _beforeDictation = _text.text.trim();
     final started = await dictation.start((words, isFinal) {
       if (!mounted) return;
@@ -86,43 +93,6 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
       return;
     }
     setState(() => _listening = true);
-  }
-
-  /// The microphone is a separate, revocable consent (FR-ONB-03): ask in the
-  /// app before the OS permission prompt, and record the answer.
-  Future<bool> _ensureMicConsent() async {
-    // One read straight from the store (an unwatched provider would pause).
-    final records = await ref
-        .read(consentRepositoryProvider)
-        .watchRecords()
-        .first;
-    if (isGranted(currentConsents(records), ConsentType.microphone)) {
-      return true;
-    }
-    if (!mounted) return false;
-    final l = AppLocalizations.of(context);
-    final allow = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l.whyMicTitle),
-        content: Text(l.whyMicBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l.whyMicNotNow),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l.whyMicAllow),
-          ),
-        ],
-      ),
-    );
-    if (allow != true) return false;
-    await ref
-        .read(consentRepositoryProvider)
-        .record(ConsentType.microphone, granted: true);
-    return true;
   }
 
   Future<void> _save() async {
@@ -151,10 +121,23 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
         }
       }
 
+      if (widget.editing) {
+        final step = ref.read(currentProfileProvider).value?.onboardingStep;
+        await ref
+            .read(profileRepositoryProvider)
+            .saveWhy(uid, _text.text, nextStep: step ?? ProfileStep.assessment);
+        if (!mounted) return;
+        final l = AppLocalizations.of(context);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(l.whyEditSaved)));
+        context.pop();
+        return;
+      }
       await ref
           .read(profileRepositoryProvider)
-          .saveWhy(uid, _text.text, nextStep: ProfileStep.assessment);
-      if (mounted) context.go('/home');
+          .saveWhy(uid, _text.text, nextStep: ProfileStep.checkin);
+      // Next: the first check-in, then the focus (T-ONB-03d).
+      if (mounted) context.go(checkinPath);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -178,6 +161,7 @@ class _WhyScreenState extends ConsumerState<WhyScreen> {
     ];
     return OnboardingScaffold(
       title: l.whyTitle,
+      art: 'icon_goal',
       primaryLabel: l.whySave,
       onPrimary: _valid && !_saving ? _save : null,
       footer: _valid

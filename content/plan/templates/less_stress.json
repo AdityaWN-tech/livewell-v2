@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "focus": "less_stress",
+  "supporting": [
+    {
+      "id": "three_breaths",
+      "title": "Three slow breaths before you open messages",
+      "anchor": "Before messages",
+      "movement": false
+    },
+    {
+      "id": "gratitude",
+      "title": "Name one good thing before bed",
+      "anchor": "Before bed",
+      "movement": false
+    }
+  ],
+  "days": [
+    {
+      "title": "Do box breathing for {minutes} minutes",
+      "reason": "Slow, even breaths can calm your body.",
+      "anchor": "After lunch",
+      "movement": false
+    },
+    {
+      "title": "Sit somewhere quiet for {minutes} minutes and just notice your breath",
+      "reason": "A short pause can lower stress.",
+      "anchor": "In the afternoon",
+      "movement": false
+    },
+    {
+      "title": "Write down what is on your mind for {minutes} minutes",
+      "reason": "Writing worries down can make them feel smaller.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Listen to calm music for {minutes} minutes",
+      "reason": "Calm music can help you slow down.",
+      "anchor": "In the evening",
+      "movement": false
+    },
+    {
+      "title": "Call or message someone you trust for {minutes} minutes",
+      "reason": "Talking with someone can ease stress.",
+      "anchor": "In the afternoon",
+      "movement": false
+    },
+    {
+      "title": "Spend {minutes} minutes on something you enjoy",
+      "reason": "Doing something you like is good for your mind.",
+      "anchor": "In the evening",
+      "movement": false
+    },
+    {
+      "title": "Do slow breathing for {minutes} minutes and notice how you feel",
+      "reason": "Noticing calm moments helps you find them again.",
+      "anchor": "After lunch",
+      "movement": false
+    }
+  ]
+}

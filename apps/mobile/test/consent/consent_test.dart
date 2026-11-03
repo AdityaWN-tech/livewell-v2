@@ -155,7 +155,7 @@ void main() {
     final repo = await pumpScreen(tester);
     await repo.record(ConsentType.terms, granted: true);
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Terms of use'), 100);
+    await tester.scrollUntilVisible(find.text('Terms of Service'), 100);
     final version = ConsentTexts.versionOf(ConsentType.terms);
     expect(find.text('Accepted · version $version'), findsOneWidget);
     expect(find.text('Not accepted yet'), findsNWidgets(3));

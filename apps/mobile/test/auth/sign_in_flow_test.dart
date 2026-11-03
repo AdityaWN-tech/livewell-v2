@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
+import 'package:livewell/features/avatar/presentation/avatar_screen.dart';
 import 'package:livewell/features/auth/presentation/phone_sign_in_screen.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/onboarding/domain/onboarding_progress.dart';
 import 'package:livewell/features/onboarding/presentation/about_screen.dart';
-import 'package:livewell/features/onboarding/presentation/why_screen.dart';
 
 import '../support/app_harness.dart';
 import '../support/fake_onboarding_store.dart';
@@ -24,36 +24,39 @@ FakeOnboardingStore readyStore() {
 }
 
 void main() {
-  testWidgets('sign-in offers phone, email and Google (Apple only on iPhone)', (
+  testWidgets('sign-in offers phone, email, and Google and Apple icons', (
     tester,
   ) async {
     await Harness(store: readyStore()).boot(tester);
     expect(find.text('Continue with phone'), findsOneWidget);
     expect(find.text('Continue with email'), findsOneWidget);
-    expect(find.text('Continue with Google'), findsOneWidget);
-    expect(find.text('Continue with Apple'), findsNothing); // Android test host
+    expect(find.byKey(const Key('sign-in-google')), findsOneWidget);
+    expect(find.byKey(const Key('sign-in-apple')), findsOneWidget);
   });
 
-  testWidgets('phone: India number, code, then the account is set up', (
+  testWidgets('phone: US number, code, then the account is set up', (
     tester,
   ) async {
     final h = Harness(store: readyStore());
     await h.boot(tester);
     await tapText(tester, 'Continue with phone');
-    await tapText(tester, 'India (+91)');
 
     await tester.enterText(find.byKey(const Key('phone')), '12345');
     await tapText(tester, 'Send code');
-    expect(
-      find.text('Enter a valid mobile number for this country.'),
-      findsOneWidget,
-    );
+    expect(find.text('Enter a valid US mobile number.'), findsOneWidget);
     expect(h.auth.codesSent, 0);
 
-    await tester.enterText(find.byKey(const Key('phone')), '98765 43210');
+    // A number with India's +91 code is rejected: phone sign-in is +1 only
+    // (D-66). (The bare 10 digits 98765 43210 are also a valid US number.)
+    await tester.enterText(find.byKey(const Key('phone')), '+91 98765 43210');
+    await tapText(tester, 'Send code');
+    expect(find.text('Enter a valid US mobile number.'), findsOneWidget);
+    expect(h.auth.codesSent, 0);
+
+    await tester.enterText(find.byKey(const Key('phone')), '(212) 555-0123');
     await tapText(tester, 'Send code');
     expect(
-      find.text('We sent a 6-digit code to +919876543210.'),
+      find.text('We sent a 6-digit code to +12125550123.'),
       findsOneWidget,
     );
     expect(find.text('Resend code in 30 s'), findsOneWidget);
@@ -67,10 +70,11 @@ void main() {
 
     await tester.enterText(find.byKey(const Key('code')), '123456');
     await tapText(tester, 'Verify');
-    expect(find.byType(WhyScreen), findsOneWidget);
+    expect(find.byType(AvatarScreen), findsOneWidget);
 
-    const uid = 'phone:+919876543210';
-    expect(h.profiles.created[uid]!.region, 'IN');
+    const uid = 'phone:+12125550123';
+    // flutter_test's locale is en_US, so +1 resolves to the US (D-03).
+    expect(h.profiles.created[uid]!.region, 'US');
     expect(h.consents.records.map((r) => r.type), legalDocuments);
     expect(h.store.saved, isNull, reason: 'on-device progress cleared');
   });
@@ -79,8 +83,7 @@ void main() {
     final h = Harness(store: readyStore());
     await h.boot(tester);
     await tapText(tester, 'Continue with phone');
-    await tapText(tester, 'India (+91)');
-    await tester.enterText(find.byKey(const Key('phone')), '9876543210');
+    await tester.enterText(find.byKey(const Key('phone')), '2125550123');
     await tapText(tester, 'Send code');
     await pumpFrames(tester, PhoneSignInScreen.resendDelay);
     await tester.pumpAndSettle();
@@ -108,7 +111,7 @@ void main() {
     );
     await tester.tap(find.widgetWithText(FilledButton, 'Create account'));
     await tester.pumpAndSettle();
-    expect(find.byType(WhyScreen), findsOneWidget);
+    expect(find.byType(AvatarScreen), findsOneWidget);
     expect(
       h.profiles.created['email:priya@example.com']!.email,
       'priya@example.com',
@@ -137,9 +140,9 @@ void main() {
     final h = Harness(store: readyStore());
     h.auth.googleFailure = AuthFailure.cancelled;
     await h.boot(tester);
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     expect(find.byType(SnackBar), findsNothing);
-    expect(find.text('Continue with Google'), findsOneWidget);
+    expect(find.byKey(const Key('sign-in-google')), findsOneWidget);
   });
 
   testWidgets('returning member with an account goes straight to Home', (
@@ -149,7 +152,7 @@ void main() {
     h.profiles.existing['google:1'] = 'assessment';
     await h.boot(tester);
     await tapText(tester, 'I already have an account');
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     expect(find.byType(HomeScreen), findsOneWidget);
     expect(h.profiles.created, isEmpty);
   });
@@ -160,18 +163,16 @@ void main() {
     final h = Harness();
     await h.boot(tester);
     await tapText(tester, 'I already have an account');
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     expect(find.byType(AboutScreen), findsOneWidget);
     expect(h.profiles.created, isEmpty, reason: 'no 18+ check or legal yet');
 
     await tapText(tester, 'Continue');
     await tapText(tester, "Yes, I'm 18 or older");
-    for (var i = 0; i < 4; i++) {
-      await tester.tap(find.byType(CheckboxListTile).at(i));
-      await tester.pumpAndSettle();
-    }
+    await tester.tap(find.byKey(const Key('legal-agree-box')));
+    await tester.pumpAndSettle();
     await tapText(tester, 'Accept and continue');
-    expect(find.byType(WhyScreen), findsOneWidget);
+    expect(find.byType(AvatarScreen), findsOneWidget);
     expect(h.profiles.created.keys, ['google:1']);
     expect(h.consents.records, hasLength(4));
   });
@@ -182,7 +183,7 @@ void main() {
     final h = Harness();
     await h.boot(tester);
     await tapText(tester, 'I already have an account');
-    await tapText(tester, 'Continue with Google');
+    await tapKey(tester, 'sign-in-google');
     await tapText(tester, 'Continue');
     await tapText(tester, "No, I'm under 18");
     expect(find.text('Live Well is for adults'), findsOneWidget);
@@ -191,4 +192,21 @@ void main() {
     expect(h.profiles.created, isEmpty);
     expect(h.store.saved, isNull);
   });
+
+  testWidgets('phone screen is US (+1) only, no India option (D-66)', (
+    tester,
+  ) async {
+    await Harness(store: readyStore()).boot(tester);
+    await tapText(tester, 'Continue with phone');
+    expect(find.text('India (+91)'), findsNothing);
+    expect(find.textContaining('+91'), findsNothing);
+    expect(find.text('+1 '), findsOneWidget, reason: 'number field prefix');
+    expect(find.textContaining('Use email, Google or Apple'), findsOneWidget);
+  });
+}
+
+Future<void> tapKey(WidgetTester tester, String key) async {
+  await tester.ensureVisible(find.byKey(Key(key)));
+  await tester.tap(find.byKey(Key(key)));
+  await tester.pumpAndSettle();
 }

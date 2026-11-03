@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget (D-61). Colours match the iPhone widget (D-33). -->
+<resources>
+    <color name="widget_background">#E8F6EF</color>
+    <color name="widget_text">#1B2433</color>
+    <color name="widget_secondary">#445063</color>
+    <color name="widget_primary">#07806F</color>
+    <color name="widget_on_primary">#FFFFFF</color>
+
+    <string name="widget_description">Today\'s step from your coach, with Done.</string>
+    <string name="widget_open_app">Open Live Well to set up your day.</string>
+    <string name="widget_open">Open</string>
+    <plurals name="widget_streak">
+        <item quantity="one">%d-day streak</item>
+        <item quantity="other">%d-day streak</item>
+    </plurals>
+</resources>

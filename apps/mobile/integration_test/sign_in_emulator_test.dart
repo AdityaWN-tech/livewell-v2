@@ -12,6 +12,11 @@ import 'package:livewell/core/data/firestore.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/data/firebase_auth_service.dart';
+import 'package:livewell/features/avatar/data/avatar_repository.dart';
+import 'package:livewell/features/avatar/domain/coach_choice.dart';
+import 'package:livewell/features/avatar/domain/coaches.dart';
+import 'package:livewell/features/voice/data/voice_repository.dart';
+import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/onboarding/data/onboarding_store.dart';
 import 'package:livewell/features/onboarding/domain/onboarding_progress.dart';
@@ -93,7 +98,7 @@ void main() {
     final profile = await db.doc('users/$uid').get();
     expect(profile.exists, isTrue);
     expect(profile['age_confirmed'], isTrue);
-    expect(profile['onboarding_step'], 'why');
+    expect(profile['onboarding_step'], 'avatar');
     if (region != null) expect(profile['region'], region);
 
     final consents = await db.collection('users/$uid/consents').get();
@@ -114,7 +119,7 @@ void main() {
     final user = await auth.createAccountWithEmail(email, 'walk-after-lunch');
 
     final next = await container.read(signInCompletionProvider).complete(user);
-    expect(next, whyPath, reason: 'new accounts write their Why next');
+    expect(next, avatarPath, reason: 'new accounts create their coach next');
     await expectAccountCreated(user.uid);
 
     // Save the Why through the real rules (FR-ONB-05); the account is then
@@ -173,8 +178,165 @@ void main() {
 
     expect(
       await container.read(signInCompletionProvider).complete(user),
-      whyPath,
+      avatarPath,
     );
     await expectAccountCreated(user.uid, region: 'IN');
+  });
+
+  // T-ONB-03a: Google one tap. The Auth emulator accepts an unsigned Google
+  // ID token, so the provider's browser step is replaced by that credential.
+  FirebaseAuthService googleAs(String sub, String email) => FirebaseAuthService(
+    fb.FirebaseAuth.instance,
+    (_) => fb.FirebaseAuth.instance.signInWithCredential(
+      fb.GoogleAuthProvider.credential(
+        idToken: jsonEncode({
+          'sub': sub,
+          'email': email,
+          'email_verified': true,
+          'name': 'Priya Test',
+        }),
+      ),
+    ),
+  );
+
+  testWidgets('Google, new person: one tap signs up and sets up the account', (
+    _,
+  ) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final auth = googleAs('g-$id', 'g-$id@example.com');
+    final user = await auth.signInWithGoogle();
+    expect(user.email, 'g-$id@example.com');
+    expect(
+      await container.read(signInCompletionProvider).complete(user),
+      avatarPath,
+    );
+    await expectAccountCreated(user.uid);
+  });
+
+  testWidgets('Google, existing person: one tap signs in, nothing redone', (
+    _,
+  ) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final auth = googleAs('g-$id', 'g-$id@example.com');
+    final first = await auth.signInWithGoogle();
+    await container.read(signInCompletionProvider).complete(first);
+    await container
+        .read(profileRepositoryProvider)
+        .saveWhy(
+          first.uid,
+          'Energy to travel with my family.',
+          nextStep: ProfileStep.assessment,
+        );
+    final created = (await db.doc('users/${first.uid}').get())['created_at'];
+    final consents =
+        (await db.collection('users/${first.uid}/consents').get()).size;
+
+    await auth.signOut();
+    final again = await auth.signInWithGoogle();
+    expect(again.uid, first.uid, reason: 'same account, not a new one');
+    expect(
+      await container.read(signInCompletionProvider).complete(again),
+      '/home',
+    );
+    final profile = await db.doc('users/${first.uid}').get();
+    expect(profile['created_at'], created);
+    expect(
+      (await db.collection('users/${first.uid}/consents').get()).size,
+      consents,
+      reason: 'no duplicate consent records',
+    );
+  });
+
+  testWidgets('cancelled Google sign-in is reported as cancelled', (_) async {
+    final auth = FirebaseAuthService(
+      fb.FirebaseAuth.instance,
+      (_) => throw fb.FirebaseAuthException(code: 'web-context-canceled'),
+    );
+    await expectLater(
+      auth.signInWithGoogle(),
+      throwsA(
+        isA<AuthException>().having(
+          (e) => e.failure,
+          'failure',
+          AuthFailure.cancelled,
+        ),
+      ),
+    );
+    expect(fb.FirebaseAuth.instance.currentUser, isNull);
+  });
+
+  testWidgets('avatar saves through the real rules, then changes coach', (
+    _,
+  ) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final user = await googleAs(
+      'a-$id',
+      'a-$id@example.com',
+    ).signInWithGoogle();
+    await container.read(signInCompletionProvider).complete(user);
+    final avatars = container.read(avatarRepositoryProvider);
+
+    await avatars.save(
+      const CoachChoice(coach: ReadyCoach.greenHijab, coachName: 'Asha'),
+    );
+    final first = await db.doc('users/${user.uid}/avatar/current').get();
+    expect(first['type'], '3d_adult');
+    expect(first['source'], 'default');
+    expect(first['coach_id'], 'green_hijab');
+    expect(first['raw_media_retained'], isFalse);
+
+    // A second save is an update the rules allow (created_at untouched);
+    // no name: the field goes ("Coach").
+    await avatars.save(
+      const CoachChoice(coach: ReadyCoach.wheelchair, background: 2),
+    );
+    final second = await db.doc('users/${user.uid}/avatar/current').get();
+    expect(second['coach_id'], 'wheelchair');
+    expect(second['background'], 2);
+    expect(second.data(), isNot(contains('coach_name')));
+    expect(second['created_at'], first['created_at']);
+    expect((await avatars.load())!.coach, ReadyCoach.wheelchair);
+  });
+
+  testWidgets('library voice: chosen, then switched, one active (rules)', (
+    _,
+  ) async {
+    final id = DateTime.now().microsecondsSinceEpoch;
+    final user = await googleAs(
+      'v-$id',
+      'v-$id@example.com',
+    ).signInWithGoogle();
+    await container.read(signInCompletionProvider).complete(user);
+    final voices = container.read(voiceRepositoryProvider);
+
+    await voices.choose(VoiceChoice.fallback);
+    await voices.choose(
+      const VoiceChoice(
+        voiceId: 'lw-clear',
+        speed: 1.2,
+        style: VoiceStyle.energetic,
+      ),
+    );
+    final all = await db.collection('users/${user.uid}/voices').get();
+    final byId = {for (final d in all.docs) d.id: d.data()};
+    expect(byId['lw-warm']!['status'], 'inactive');
+    expect(byId['lw-clear']!['status'], 'active');
+    expect(byId['lw-clear']!['kind'], 'library');
+    expect(byId['lw-clear']!['speed'], 1.2);
+    expect(byId['lw-clear']!['style'], 'energetic');
+    // A cloned voice can't be created from the app.
+    await expectLater(
+      db.doc('users/${user.uid}/voices/lw-mine').set({
+        'kind': 'self_clone',
+        'vendor_voice_id': 'x',
+        'status': 'active',
+        'speed': 1,
+        'style': 'calm',
+        'created_at': FieldValue.serverTimestamp(),
+        'updated_at': FieldValue.serverTimestamp(),
+        'schema_version': 1,
+      }),
+      throwsA(isA<FirebaseException>()),
+    );
   });
 }

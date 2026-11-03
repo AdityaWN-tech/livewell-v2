@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "focus": "eat_better",
+  "supporting": [
+    {
+      "id": "water_meals",
+      "title": "A glass of water with each meal",
+      "anchor": "With meals",
+      "movement": false
+    },
+    {
+      "id": "fruit_snack",
+      "title": "Keep a piece of fruit where you can see it",
+      "anchor": "In the kitchen",
+      "movement": false
+    }
+  ],
+  "days": [
+    {
+      "title": "Add one vegetable to lunch and take {minutes} minutes to enjoy it",
+      "reason": "Adding something good is easier than cutting things out.",
+      "anchor": "At lunch",
+      "movement": false
+    },
+    {
+      "title": "Spend {minutes} minutes planning one home-cooked meal",
+      "reason": "A little planning makes healthy meals easier.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Eat one meal slowly, taking {minutes} minutes or more",
+      "reason": "Eating slowly helps you notice when you feel full.",
+      "anchor": "At dinner",
+      "movement": false
+    },
+    {
+      "title": "Spend {minutes} minutes washing and cutting fruit or vegetables for snacks",
+      "reason": "Ready snacks make good choices easy.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Swap one sugary drink for water and take {minutes} minutes to notice the difference",
+      "reason": "Small swaps add up over time.",
+      "anchor": "At lunch",
+      "movement": false
+    },
+    {
+      "title": "Try a new fruit or vegetable and spend {minutes} minutes preparing it",
+      "reason": "Trying new foods keeps healthy eating interesting.",
+      "anchor": "At dinner",
+      "movement": false
+    },
+    {
+      "title": "Spend {minutes} minutes writing down one food habit you want to keep",
+      "reason": "Noticing what works helps it last.",
+      "anchor": "After dinner",
+      "movement": false
+    }
+  ]
+}

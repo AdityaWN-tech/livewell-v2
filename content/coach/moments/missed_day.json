@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "moment": "missed_day",
+  "review_status": "pending",
+  "note": "T-DLY-03a. Avatar Moment scripts. Placeholders only: {first_name}, {why}, {step_title}, {step_minutes}, {smaller_minutes}, {streak_days}, {time_of_day}, {weekly_count}. A variant is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level; one step plus a smaller option. review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Listed for review in REVIEW.md.",
+  "when": "The morning after a day with no step done and no check-in",
+  "emotion": "encouraging",
+  "primary_action": "restart",
+  "secondary_actions": [
+    "check_in"
+  ],
+  "variants": [
+    {
+      "id": "x1",
+      "text": "Good {time_of_day}, {first_name}. Yesterday was a rest day, and that's okay. Let's restart with a small step: {step_title}."
+    },
+    {
+      "id": "x2",
+      "text": "Welcome back, {first_name}! Rest days are part of the plan. Today's step: {step_title}. Want to give it a try?"
+    },
+    {
+      "id": "x3",
+      "text": "Good {time_of_day}! Yesterday was a rest day, and that's okay. Let's restart with one small step."
+    }
+  ]
+}

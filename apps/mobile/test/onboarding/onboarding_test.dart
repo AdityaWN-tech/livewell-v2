@@ -96,15 +96,16 @@ void main() {
     expect(find.byType(LegalScreen), findsOneWidget);
     expect(store.saved!.isAdult, isTrue);
 
-    // Continue stays disabled until every document is ticked.
-    final boxes = find.byType(CheckboxListTile);
-    expect(boxes, findsNWidgets(4));
-    for (var i = 0; i < 4; i++) {
-      expect(primaryButton(tester).onPressed, isNull, reason: 'after $i ticks');
-      await tester.tap(boxes.at(i));
-      await tester.pumpAndSettle();
-    }
+    // One checkbox (Step 3); Continue stays disabled until it is ticked.
+    expect(find.byType(Checkbox), findsOneWidget);
+    expect(primaryButton(tester).onPressed, isNull);
+    await tester.tap(find.byKey(const Key('legal-agree-box')));
+    await tester.pumpAndSettle();
     expect(primaryButton(tester).onPressed, isNotNull);
+    // Still four acceptances (four consent records at sign-in), one time.
+    final accepted = store.saved!.legalAcceptedAt;
+    expect(accepted.keys, unorderedEquals(legalDocuments));
+    expect(accepted.values.toSet(), hasLength(1));
 
     await tapText(tester, 'Accept and continue');
     expect(find.byType(SignInScreen), findsOneWidget);
@@ -113,7 +114,7 @@ void main() {
     expect(saved.readyForAccount, isTrue);
   });
 
-  testWidgets('unticking a document disables Continue again', (tester) async {
+  testWidgets('unticking the box disables Continue again', (tester) async {
     final at = DateTime.utc(2026);
     final store = FakeOnboardingStore(
       OnboardingProgress(
@@ -124,10 +125,10 @@ void main() {
     );
     await boot(tester, store);
     expect(primaryButton(tester).onPressed, isNotNull);
-    await tester.tap(find.byType(CheckboxListTile).first);
+    await tester.tap(find.byKey(const Key('legal-agree-box')));
     await tester.pumpAndSettle();
     expect(primaryButton(tester).onPressed, isNull);
-    expect(store.saved!.allLegalAccepted, isFalse);
+    expect(store.saved!.legalAcceptedAt, isEmpty);
   });
 
   testWidgets('under 18: friendly stop and nothing is stored (FR-ONB-04)', (
@@ -156,10 +157,10 @@ void main() {
     );
     await boot(tester, store);
     expect(find.byType(LegalScreen), findsOneWidget);
-    final first = tester.widget<CheckboxListTile>(
-      find.byType(CheckboxListTile).first,
-    );
-    expect(first.value, isTrue, reason: 'earlier tick kept');
+    // Only some documents (saved by an older version): not ticked, so the
+    // person agrees to all four again.
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
+    expect(primaryButton(tester).onPressed, isNull);
   });
 
   testWidgets('"I already have an account" goes straight to sign-in', (
@@ -171,7 +172,7 @@ void main() {
     expect(find.byType(SignInScreen), findsOneWidget);
   });
 
-  testWidgets('each legal document opens with its draft text and version', (
+  testWidgets('each document name is a link to its draft text and version', (
     tester,
   ) async {
     final store = FakeOnboardingStore(
@@ -181,15 +182,66 @@ void main() {
       ),
     );
     await boot(tester, store);
-    final reads = find.text('Read');
-    expect(reads, findsNWidgets(4));
-    await tester.tap(reads.first);
-    await tester.pumpAndSettle();
-    expect(find.byType(LegalDocumentScreen), findsOneWidget);
-    expect(find.textContaining('DRAFT for review'), findsOneWidget);
     expect(
-      find.text('Version ${ConsentTexts.versionOf(ConsentType.terms)}'),
+      find.text(
+        'I agree to the Terms of Service, Privacy Policy, Medical Disclaimer '
+        'and AI Disclosure',
+        findRichText: true,
+      ),
       findsOneWidget,
     );
+    for (final (name, type) in [
+      ('Terms of Service', ConsentType.terms),
+      ('Privacy Policy', ConsentType.privacy),
+      ('Medical Disclaimer', ConsentType.medicalDisclaimer),
+      ('AI Disclosure', ConsentType.aiDisclosure),
+    ]) {
+      await tester.tapOnText(find.textRange.ofSubstring(name));
+      await tester.pumpAndSettle();
+      expect(find.byType(LegalDocumentScreen), findsOneWidget, reason: name);
+      expect(find.textContaining('DRAFT for review'), findsOneWidget);
+      expect(
+        find.text('Version ${ConsentTexts.versionOf(type)}'),
+        findsOneWidget,
+      );
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+    }
+    // Reading a document doesn't tick the box.
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
+    expect(store.saved?.legalAcceptedAt ?? const {}, isEmpty);
   });
+
+  testWidgets(
+    'the plain words tick the box; screen readers hear the sentence',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      final store = FakeOnboardingStore(
+        OnboardingProgress(
+          step: OnboardingStep.legal,
+          adultConfirmedAt: DateTime.utc(2026),
+        ),
+      );
+      await boot(tester, store);
+      expect(
+        tester.getSemantics(find.byKey(const Key('legal-agree-box'))),
+        matchesSemantics(
+          label:
+              'I agree to the Terms of Service, Privacy Policy, Medical '
+              'Disclaimer and AI Disclosure',
+          hasCheckedState: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasTapAction: true,
+          isFocusable: true,
+          hasFocusAction: true,
+        ),
+      );
+      await tester.tapOnText(find.textRange.ofSubstring('I agree to the'));
+      await tester.pumpAndSettle();
+      expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+      expect(store.saved!.allLegalAccepted, isTrue);
+      handle.dispose();
+    },
+  );
 }

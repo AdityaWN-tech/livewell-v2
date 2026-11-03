@@ -1,0 +1,57 @@
+[project]
+name = "livewell-media"
+version = "0.1.0"
+description = "Live Well Media Service: avatar generation jobs (T-AVT-08c)"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "pydantic>=2.9",
+  "uvicorn>=0.32",
+  "pillow>=11",
+  "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = ["aiohttp>=3.9", "pytest>=8", "ruff>=0.7", "mypy>=1.13"]
+#: Firebase Admin: ID tokens, consents, the avatar doc (MEDIA_FIREBASE_PROJECT).
+firebase = ["firebase-admin>=6.5"]
+#: Free checks on this computer (MEDIA_LOCAL_CHECKS, D-64). Install torch from
+#: the CPU index: --extra-index-url https://download.pytorch.org/whl/cpu
+local = ["opencv-contrib-python>=4.10", "numpy>=2", "torch>=2.9", "transformers>=4.45", "mediapipe>=0.10"]
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N", "SIM", "RUF"]
+ignore = [
+  "S101",  # assert is fine in tests
+  "N818",  # exception names say what happened (NotAuthorized, DailyLimitReached)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["media"]
+
+[[tool.mypy.overrides]]
+#: Optional laptop-only libraries (the `local` extra, D-64/D-65): CI installs
+#: only `dev`, so mypy can't see them.
+module = ["firebase_admin", "firebase_admin.*", "google.cloud.*", "cv2", "numpy", "numpy.*", "torch", "transformers", "mediapipe", "mediapipe.*"]
+ignore_missing_imports = true

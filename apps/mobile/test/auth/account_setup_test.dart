@@ -59,7 +59,7 @@ void main() {
     expect(await setup.afterSignIn(phoneUser, ready), AccountStatus.ready);
     final p = profiles.created['u1']!;
     expect(p.region, 'IN');
-    expect(p.onboardingStep, 'why');
+    expect(p.onboardingStep, 'avatar');
     expect(consents.records.map((r) => r.type), legalDocuments);
     expect(consents.records.every((r) => r.granted), isTrue);
     for (final type in legalDocuments) {

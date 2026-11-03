@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../consent/domain/consent.dart';
 import '../domain/onboarding_progress.dart';
 
 /// Keeps onboarding progress on the device so it resumes at the exact step
@@ -72,19 +71,20 @@ class OnboardingController extends AsyncNotifier<OnboardingProgress> {
     ),
   );
 
-  Future<void> setLegalAccepted(
-    ConsentType type, {
+  /// The one legal checkbox (Step 3): every document accepted at the same
+  /// time, or none. Each still becomes its own consent record at sign-in.
+  Future<void> setAllLegalAccepted({
     required bool accepted,
     required DateTime now,
   }) async {
     final current = await _current();
-    final legal = Map.of(current.legalAcceptedAt);
-    if (accepted) {
-      legal[type] = now;
-    } else {
-      legal.remove(type);
-    }
-    await _update(current.copyWith(legalAcceptedAt: legal));
+    await _update(
+      current.copyWith(
+        legalAcceptedAt: accepted
+            ? {for (final type in legalDocuments) type: now}
+            : const {},
+      ),
+    );
   }
 
   /// Account created: the progress now lives in the profile and consents.

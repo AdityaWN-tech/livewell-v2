@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/checkin/presentation/checkin_sheet.dart';
+import 'package:livewell/features/focus/presentation/focus_screen.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
@@ -40,30 +42,44 @@ void main() {
     expect(find.byType(WhyScreen), findsOneWidget);
   });
 
-  testWidgets('type a Why, save it, and see it on Home (FR-ONB-05)', (
-    tester,
-  ) async {
-    final h = atWhy();
-    await h.boot(tester);
-    expect(saveButton(tester).onPressed, isNull, reason: 'empty');
+  testWidgets(
+    'type a Why, check in, pick a focus, start the plan, see it on Home',
+    (tester) async {
+      final h = atWhy();
+      await h.boot(tester);
+      expect(saveButton(tester).onPressed, isNull, reason: 'empty');
 
-    await tester.enterText(find.byKey(const Key('why')), 'hi');
-    await tester.pump();
-    expect(saveButton(tester).onPressed, isNull, reason: 'too short');
+      await tester.enterText(find.byKey(const Key('why')), 'hi');
+      await tester.pump();
+      expect(saveButton(tester).onPressed, isNull, reason: 'too short');
 
-    await tester.enterText(
-      find.byKey(const Key('why')),
-      '  Energy to play cricket with my son.  ',
-    );
-    await tester.pump();
-    await tapText(tester, 'Save my Why');
+      await tester.enterText(
+        find.byKey(const Key('why')),
+        '  Energy to play cricket with my son.  ',
+      );
+      await tester.pump();
+      await tapText(tester, 'Save my Why');
 
-    expect(h.profiles.whys[uid], 'Energy to play cricket with my son.');
-    expect(h.profiles.existing[uid], ProfileStep.assessment);
-    expect(find.byType(HomeScreen), findsOneWidget);
-    expect(find.text('YOUR WHY'), findsOneWidget);
-    expect(find.text('Energy to play cricket with my son.'), findsOneWidget);
-  });
+      expect(h.profiles.whys[uid], 'Energy to play cricket with my son.');
+      expect(h.profiles.existing[uid], ProfileStep.checkin);
+      // T-ONB-03d: the first check-in opens; closing it moves on to the focus.
+      expect(find.byType(CheckInSheet), findsOneWidget);
+      await tester.tapAt(const Offset(20, 20));
+      await tester.pumpAndSettle();
+      expect(find.byType(FocusScreen), findsOneWidget);
+      await tester.tap(find.byKey(const Key('focus-sleep_better')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('focus-continue')));
+      await tester.pumpAndSettle();
+      // T-ONB-03e: a prod build only uses approved plan templates; they are
+      // still pending review, so it says so and carries on to Home.
+      expect(find.byKey(const Key('plan-not-ready')), findsOneWidget);
+      await tapText(tester, 'Continue');
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.text('YOUR WHY'), findsOneWidget);
+      expect(find.text('Energy to play cricket with my son.'), findsOneWidget);
+    },
+  );
 
   testWidgets('a suggestion fills the box and can be edited', (tester) async {
     final h = atWhy();

@@ -4,33 +4,79 @@ import 'package:flutter/material.dart';
 /// `Theme.of(context).textTheme`, [LwSpacing], [LwRadius], [LwSize], [LwMotion]);
 /// raw colours and magic numbers are not allowed outside lib/core/design/.
 ///
-/// Sources: brand colours from the Live Well logo (docs/brand.md); layout,
+/// Sources: app colours from the T-UI-02 illustrated design (D-33),
+/// logo colours from docs/brand.md; layout,
 /// type scale and component style measured from the portal reference screens
 /// (assets/design-reference/); feel per spec 14.1 (warm, hopeful, calm, premium).
 
 /// Raw brand colours. Use [LwPalette] in widgets; these feed the palettes.
 abstract final class LwBrand {
+  // Logo colours. The logo, splash and launcher icon keep these until the
+  // client approves the new leaf logo (T-UI-02, needs-product).
   static const deepTeal = Color(0xFF0B3A4E);
   static const lime = Color(0xFF8BE03E);
   static const cream = Color(0xFFF0F8DC);
   static const leaf = Color(0xFFFAFDF0);
   static const onTealText = Color(0xFFECF1F6);
+
+  // Illustrated "Live Well v2" palette (T-UI-02, D-33; replaces T-UI-01's
+  // terracotta). Sampled from docs/design/live-well-v2-illustrated.png.
+  /// The design's chip green is #089787; white on it is only 3.6:1, so
+  /// buttons and selected chips use this slightly deeper green (4.9:1).
+  static const green = Color(0xFF07806F);
+
+  /// Bright green for charts, progress and decoration only (3.4:1).
+  static const greenBright = Color(0xFF1E9E70);
+  static const greenDark = Color(0xFF0B5E52);
+  static const navy = Color(0xFF1B2433);
+}
+
+/// A soft drop shadow for cards (T-UI-02: very soft shadows, no heavy
+/// borders).
+abstract final class LwShadow {
+  static const soft = [
+    BoxShadow(color: Color(0x14172A3A), blurRadius: 16, offset: Offset(0, 4)),
+  ];
+  static const softDark = [
+    BoxShadow(color: Color(0x40000000), blurRadius: 16, offset: Offset(0, 4)),
+  ];
+
+  static List<BoxShadow> of(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? softDark : soft;
 }
 
 /// Semantic colours for one brightness. Contrast is checked in
-/// test/design/contrast_test.dart (WCAG 2.2 AA, NFR-06).
+/// test/design/tokens_test.dart (WCAG 2.2 AA, NFR-06).
 @immutable
 class LwPalette extends ThemeExtension<LwPalette> {
   const LwPalette({
     required this.primary,
     required this.onPrimary,
+    required this.primaryDark,
     required this.primaryTint,
     required this.onPrimaryTint,
     required this.accent,
-    required this.onAccent,
+    required this.accentStrong,
+    required this.onAccentStrong,
     required this.accentTint,
+    required this.onAccentTint,
+    required this.heroSurface,
+    required this.onHeroSurface,
+    required this.onHeroSurfaceSecondary,
+    required this.mint,
+    required this.lime,
+    required this.lavender,
+    required this.peach,
+    required this.sky,
+    required this.butter,
+    required this.rose,
+    required this.onTint,
+    required this.onTintSecondary,
     required this.background,
+    required this.washTop,
+    required this.washBottom,
     required this.surface,
+    required this.surfaceMuted,
     required this.textPrimary,
     required this.textSecondary,
     required this.textDisabled,
@@ -42,82 +88,177 @@ class LwPalette extends ThemeExtension<LwPalette> {
     required this.onEmergency,
   });
 
-  /// Brand teal: primary buttons, links, selected icons.
+  /// Fresh green: selected chips, active tab, main buttons, focus rings.
   final Color primary;
   final Color onPrimary;
 
-  /// Soft selected state (chips, tabs), like the reference's tinted "Upcoming" tab.
+  /// Deep green: text and icons on green tints.
+  final Color primaryDark;
+
+  /// Mint: soft selected state (nav indicator, quiet cards).
   final Color primaryTint;
   final Color onPrimaryTint;
 
-  /// Lime: celebrations, progress, streaks. Never used as text on light surfaces.
+  /// Bright green for charts, progress bars and small decoration. It
+  /// reaches 3:1, not 4.5:1: never text, and never text on it.
   final Color accent;
-  final Color onAccent;
-  final Color accentTint;
 
+  /// The main action colour: filled buttons, text links.
+  final Color accentStrong;
+  final Color onAccentStrong;
+
+  /// Butter highlight background.
+  final Color accentTint;
+  final Color onAccentTint;
+
+  /// The featured card (Today's next step, portal card, coach bubble): a
+  /// soft lime pastel with dark text in the illustrated design.
+  final Color heroSurface;
+  final Color onHeroSurface;
+  final Color onHeroSurfaceSecondary;
+
+  /// Category card fills (steps = mint, sleep = lavender, mood = butter,
+  /// stress = sky, ...). Text on them is always [onTint] /
+  /// [onTintSecondary].
+  final Color mint;
+  final Color lime;
+  final Color lavender;
+  final Color peach;
+  final Color sky;
+  final Color butter;
+  final Color rose;
+  final Color onTint;
+  final Color onTintSecondary;
+
+  /// Screen colour; [washTop] to [washBottom] is the mint-to-sky wash.
   final Color background;
+  final Color washTop;
+  final Color washBottom;
+
+  /// White cards.
   final Color surface;
+
+  /// Grey chips and quiet fills.
+  final Color surfaceMuted;
+
   final Color textPrimary;
   final Color textSecondary;
   final Color textDisabled;
 
-  /// Decorative card and divider lines.
+  /// Decorative divider lines.
   final Color outlineSoft;
 
   /// Input borders and other UI boundaries that must reach 3:1.
   final Color outlineStrong;
 
-  /// Positive text and icons (lime is too light for text).
+  /// Positive text and icons.
   final Color success;
 
   /// Gentle notices. Kindness rule (spec 4.1): no red for everyday things.
   final Color caution;
 
-  /// Reserved for emergency and crisis cards only (FR-SAF-01/02).
+  /// Reserved for emergency and crisis cards only (FR-SAF-01/02): a clear
+  /// red, never a pastel, far from every other colour (tested).
   final Color emergency;
   final Color onEmergency;
 
+  /// The 7 pastel category fills, in a fixed order.
+  List<Color> get tints => [mint, lime, lavender, peach, sky, butter, rose];
+
   static const light = LwPalette(
-    primary: LwBrand.deepTeal,
+    primary: LwBrand.green,
     onPrimary: Color(0xFFFFFFFF),
-    primaryTint: Color(0xFFE2EDF0),
-    onPrimaryTint: LwBrand.deepTeal,
-    accent: LwBrand.lime,
-    onAccent: LwBrand.deepTeal,
-    accentTint: Color(0xFFEEF9E2),
-    background: Color(0xFFF4F6F5),
+    primaryDark: LwBrand.greenDark,
+    primaryTint: Color(0xFFE8F9EE),
+    onPrimaryTint: LwBrand.greenDark,
+    accent: LwBrand.greenBright,
+    accentStrong: LwBrand.green,
+    onAccentStrong: Color(0xFFFFFFFF),
+    accentTint: Color(0xFFFEF6DD),
+    onAccentTint: LwBrand.navy,
+    heroSurface: Color(0xFFF3F7C4),
+    onHeroSurface: LwBrand.navy,
+    onHeroSurfaceSecondary: Color(0xFF4F5868),
+    mint: Color(0xFFE8F9EE),
+    lime: Color(0xFFF3F7C4),
+    lavender: Color(0xFFF3EFFE),
+    peach: Color(0xFFFEEBDF),
+    sky: Color(0xFFEBF5FE),
+    butter: Color(0xFFFEF6DD),
+    rose: Color(0xFFFFE3EC),
+    onTint: LwBrand.navy,
+    onTintSecondary: Color(0xFF4F5868),
+    background: Color(0xFFF4FBF8),
+    washTop: Color(0xFFF0FAF7),
+    washBottom: Color(0xFFF3F8FD),
     surface: Color(0xFFFFFFFF),
-    textPrimary: Color(0xFF14232B),
-    textSecondary: Color(0xFF55646B),
-    textDisabled: Color(0xFF8A979C),
-    outlineSoft: Color(0xFFE3E8E7),
-    outlineStrong: Color(0xFF8A979C),
-    success: Color(0xFF2F6B12),
-    caution: Color(0xFF9A5B00),
-    emergency: Color(0xFFB3261E),
+    surfaceMuted: Color(0xFFF2F4F6),
+    textPrimary: LwBrand.navy,
+    textSecondary: Color(0xFF566070),
+    textDisabled: Color(0xFF8C94A3),
+    outlineSoft: Color(0xFFE6EAF0),
+    outlineStrong: Color(0xFF7F8A9A),
+    success: Color(0xFF1E7F55),
+    caution: Color(0xFF8A5A00),
+    emergency: Color(0xFFC62828),
     onEmergency: Color(0xFFFFFFFF),
   );
 
   static const dark = LwPalette(
-    primary: LwBrand.lime,
-    onPrimary: LwBrand.deepTeal,
-    primaryTint: Color(0xFF1C3A2A),
-    onPrimaryTint: LwBrand.lime,
-    accent: LwBrand.lime,
-    onAccent: LwBrand.deepTeal,
-    accentTint: Color(0xFF1C3A2A),
-    background: Color(0xFF0A1A22),
-    surface: Color(0xFF12262F),
-    textPrimary: Color(0xFFEAF0F2),
-    textSecondary: Color(0xFFA9B8BE),
-    textDisabled: Color(0xFF6F8189),
-    outlineSoft: Color(0xFF243B45),
-    outlineStrong: Color(0xFF7D9099),
-    success: Color(0xFF9FE36A),
-    caution: Color(0xFFF2B866),
-    emergency: Color(0xFFB3261E),
+    primary: Color(0xFF4CC9A4),
+    onPrimary: Color(0xFF08201B),
+    primaryDark: Color(0xFFBFF0DF),
+    primaryTint: Color(0xFF1C3A33),
+    onPrimaryTint: Color(0xFFBFF0DF),
+    accent: Color(0xFF3DBB96),
+    accentStrong: Color(0xFF4CC9A4),
+    onAccentStrong: Color(0xFF08201B),
+    accentTint: Color(0xFF3A3320),
+    onAccentTint: Color(0xFFE9F1EF),
+    heroSurface: Color(0xFF2A2F1A),
+    onHeroSurface: Color(0xFFE9F1EF),
+    onHeroSurfaceSecondary: Color(0xFFB9C4C2),
+    mint: Color(0xFF1C3A33),
+    lime: Color(0xFF2A2F1A),
+    lavender: Color(0xFF272240),
+    peach: Color(0xFF3A2A22),
+    sky: Color(0xFF1A2E3E),
+    butter: Color(0xFF3A3320),
+    rose: Color(0xFF3A2230),
+    onTint: Color(0xFFE9F1EF),
+    onTintSecondary: Color(0xFFB9C4C2),
+    background: Color(0xFF0D1A1C),
+    washTop: Color(0xFF0F2022),
+    washBottom: Color(0xFF0D1824),
+    surface: Color(0xFF152528),
+    surfaceMuted: Color(0xFF1F2C2F),
+    textPrimary: Color(0xFFE9F1EF),
+    textSecondary: Color(0xFFA9B8B6),
+    textDisabled: Color(0xFF6E8287),
+    outlineSoft: Color(0xFF243538),
+    outlineStrong: Color(0xFF71858A),
+    success: Color(0xFF7FD1A4),
+    caution: Color(0xFFE9B85C),
+    emergency: Color(0xFFD32F2F),
     onEmergency: Color(0xFFFFFFFF),
   );
+
+  /// A richer shade of a pastel tint, for chart bars and filled segments:
+  /// more colour, a little darker in light mode and lighter in dark mode,
+  /// so the hue stays recognisable (never colour alone: charts are also
+  /// labelled).
+  static Color richer(Color tint) {
+    final hsl = HSLColor.fromColor(tint);
+    final light = hsl.lightness > 0.5;
+    return hsl
+        .withSaturation(
+          (hsl.saturation + (light ? 0.05 : 0.3)).clamp(0, 1).toDouble(),
+        )
+        .withLightness(
+          (hsl.lightness + (light ? -0.13 : 0.14)).clamp(0, 1).toDouble(),
+        )
+        .toColor();
+  }
 
   static LwPalette of(BuildContext context) =>
       Theme.of(context).extension<LwPalette>()!;
@@ -145,12 +286,15 @@ abstract final class LwSpacing {
   static const double sectionGap = lg;
 }
 
-/// Corner radii. Slightly rounder than the references for a warmer feel.
+/// Corner radii (T-UI-02): big friendly cards, pill chips.
 abstract final class LwRadius {
   static const double sm = 8; // badges, small tags
-  static const double md = 12; // buttons, inputs, cards
-  static const double lg = 20; // bottom sheets, hero cards
-  static const double pill = 999; // chips, segmented tabs
+  static const double md = 16; // buttons, inputs
+  static const double lg = 24; // cards, sheets, hero cards
+  static const double pill = 999; // chips, segmented tabs, pills
+
+  static const double card = lg;
+  static const double button = md;
 
   static const BorderRadius smAll = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius mdAll = BorderRadius.all(Radius.circular(md));

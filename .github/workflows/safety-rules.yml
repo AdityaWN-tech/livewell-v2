@@ -29,3 +29,7 @@ jobs:
       - name: bundled app copy matches
         run: diff -u rules.json ../../apps/mobile/assets/safety/rules.json
       - run: python check_cases.py
+      # Short-label rules for custom routine items (T-GOL-03c).
+      - name: label rules app copy matches
+        run: diff -u label_rules.json ../../apps/mobile/assets/safety/label_rules.json
+      - run: python check_label_cases.py

@@ -7,7 +7,9 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Livewell</string>
+		<string>$(APP_DISPLAY_NAME)</string>
+		<key>LWAppGroupId</key>
+		<string>$(APP_GROUP_ID)</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -15,7 +17,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>livewell</string>
+		<string>Live Well</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -68,7 +70,15 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
-		<key>NSMicrophoneUsageDescription</key>
+		<key>NSCameraUsageDescription</key>
+	<string>Live Well uses the camera only when you choose to make your coach from a live selfie. The photo is sent securely to make your coach and is deleted right after.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Live Well uses Face ID only if you turn on the app lock, to check it's you when the app opens.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Live Well reads your steps and sleep from Apple Health to show them in Track, only if you choose to connect. It stays on your phone.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Live Well does not write to Apple Health.</string>
+	<key>NSMicrophoneUsageDescription</key>
 	<string>Live Well uses the microphone only when you choose to speak, for example to say your Why or talk to your coach.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Live Well turns what you say into text so you don't have to type.</string>
@@ -77,5 +87,23 @@
 		<string>tel</string>
 		<string>sms</string>
 	</array>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<false/>
+	<key>GOOGLE_ANALYTICS_IDFV_COLLECTION_ENABLED</key>
+	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>widget</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>livewell</string>
+			</array>
+		</dict>
+	</array>
+	<!-- Widget links (livewell://) are handled by home_widget, not the router. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 </dict>
 </plist>

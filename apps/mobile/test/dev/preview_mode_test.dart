@@ -5,6 +5,8 @@ import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/splash/application/splash_handoff.dart';
+import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
+    show avatarIdleMotionProvider;
 
 import '../support/frames.dart';
 
@@ -13,6 +15,8 @@ Future<void> bootToWelcome(WidgetTester tester, Flavor flavor) async {
     ProviderScope(
       overrides: [
         flavorProvider.overrideWithValue(flavor),
+        // The coach breathes forever; screens couldn't settle.
+        avatarIdleMotionProvider.overrideWithValue(false),
         splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
         appStartupProvider.overrideWith(
           (ref) async => StartDestination.welcome,

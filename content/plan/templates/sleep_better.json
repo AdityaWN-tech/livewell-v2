@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "focus": "sleep_better",
+  "supporting": [
+    {
+      "id": "screens_off",
+      "title": "Screens off 30 minutes before bed",
+      "anchor": "Before bed",
+      "movement": false
+    },
+    {
+      "id": "same_wake",
+      "title": "Wake up at the same time each day",
+      "anchor": "In the morning",
+      "movement": false
+    }
+  ],
+  "days": [
+    {
+      "title": "Dim the lights and wind down for {minutes} minutes before bed",
+      "reason": "A calm wind-down tells your body it is almost time to sleep.",
+      "anchor": "Before bed",
+      "movement": false
+    },
+    {
+      "title": "Read a paper book for {minutes} minutes in bed",
+      "reason": "Reading away from screens can help you relax.",
+      "anchor": "In bed",
+      "movement": false
+    },
+    {
+      "title": "Take {minutes} minutes to write down tomorrow’s to-do list",
+      "reason": "Getting tasks out of your head can make it easier to fall asleep.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Do slow breathing for {minutes} minutes before bed",
+      "reason": "Slow breaths help your body settle.",
+      "anchor": "Before bed",
+      "movement": false
+    },
+    {
+      "title": "Get {minutes} minutes of daylight in the morning",
+      "reason": "Morning light helps set your body clock.",
+      "anchor": "After you wake up",
+      "movement": false
+    },
+    {
+      "title": "Make your bedroom cool and dark, then rest for {minutes} minutes",
+      "reason": "A cool, dark room is easier to sleep in.",
+      "anchor": "Before bed",
+      "movement": false
+    },
+    {
+      "title": "Stop caffeine after lunch and wind down for {minutes} minutes tonight",
+      "reason": "Less caffeine later in the day can help you sleep.",
+      "anchor": "After lunch",
+      "movement": false
+    }
+  ]
+}

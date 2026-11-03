@@ -66,7 +66,7 @@ After turning on Google sign-in (step 7), re-run step 5 so `google-services.json
 ## 7. Turn on sign-in methods (Firebase console → Authentication → Sign-in method)
 - Email/Password: on.
 - Google: on (set the support email).
-- Phone: on. Add **test phone numbers** (e.g. +91 99999 00001 / code 123456) for development so no real SMS is sent. Real SMS volume needs the pay-as-you-go **Blaze** plan; check the console's current terms before beta.
+- Phone: on. Add **test phone numbers** (e.g. +1 650-555-3434 / code 123456; phone sign-in is US only, D-66) for development so no real SMS is sent. Real SMS volume needs the pay-as-you-go **Blaze** plan; check the console's current terms before beta.
 - Apple: needs an Apple Developer account (Services ID + key). Can wait until the iOS work.
 
 ## 8. Create the Firestore database

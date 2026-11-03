@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../tokens.dart';
 
@@ -7,42 +8,248 @@ import '../tokens.dart';
 
 /// Standard screen: bold left-aligned title (as in the reference screens),
 /// 16 dp gutters, scrolling body.
+///
+/// With an [eyebrow] it is a tab screen and uses the shared tab header
+/// ([LwTabHeader]) instead of an app bar, scrolling with the content so it
+/// grows with large text.
 class LwScreen extends StatelessWidget {
   const LwScreen({
     super.key,
     required this.title,
     required this.children,
     this.actions = const [],
+    this.eyebrow,
+    this.icons = const [],
+    this.profile,
+    this.bottom,
+    this.subtitle,
+    this.titleIcon,
   });
+
+  /// Tab screens: a short line under the title.
+  final String? subtitle;
+
+  /// Tab screens: a small icon after the title (Home's sun or moon).
+  final Widget? titleIcon;
 
   final String title;
   final List<Widget> children;
+
+  /// Tab screens: buttons and status pills, on their own row below the
+  /// title. Other screens: app bar actions.
   final List<Widget> actions;
+  final String? eyebrow;
+
+  /// Small icon buttons (search, bell, calendar) next to [profile].
+  final List<Widget> icons;
+
+  /// The profile button, always at the top right of a tab header.
+  final Widget? profile;
+
+  /// Fixed below the scrolling content (for example a message composer).
+  final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
+    if (eyebrow != null) {
+      // No app bar here, so set the status bar icons ourselves: dark icons
+      // on the light background, light icons in dark mode.
+      final dark = Theme.of(context).brightness == Brightness.dark;
+      final p = LwPalette.of(context);
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        child: Scaffold(
+          body: DecoratedBox(
+            // The illustrated design's soft mint-to-sky wash.
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [p.washTop, p.washBottom],
+              ),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(LwSpacing.screenGutter),
+                      children: [
+                        LwTabHeader(
+                          eyebrow: eyebrow!,
+                          title: title,
+                          subtitle: subtitle,
+                          titleIcon: titleIcon,
+                          icons: icons,
+                          profile: profile,
+                          actions: actions,
+                        ),
+                        const SizedBox(height: LwSpacing.md),
+                        ...children,
+                      ],
+                    ),
+                  ),
+                  ?bottom,
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
-      appBar: AppBar(title: Text(title), actions: actions),
+      appBar: AppBar(actions: actions),
       body: ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
-        children: children,
+        children: [LwPageTitle(title), ...children],
       ),
     );
   }
 }
 
-/// Section title inside a screen.
-class LwSectionHeader extends StatelessWidget {
-  const LwSectionHeader(this.text, {super.key});
+/// The one header for every tab (T-UI-02): eyebrow and title on the left,
+/// [icons] and the [profile] button at the top right of the same row, and
+/// any [actions] (buttons, status pills) on their own row below. At large
+/// text sizes the title wraps; it never pushes the profile button off its
+/// row.
+class LwTabHeader extends StatelessWidget {
+  const LwTabHeader({
+    super.key,
+    required this.eyebrow,
+    required this.title,
+    this.icons = const [],
+    this.profile,
+    this.actions = const [],
+    this.subtitle,
+    this.titleIcon,
+  });
+
+  final String eyebrow;
+  final String title;
+  final String? subtitle;
+  final Widget? titleIcon;
+  final List<Widget> icons;
+  final Widget? profile;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Column(
+                  key: const Key('tab-header-title'),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(eyebrow.toUpperCase(), style: t.labelSmall),
+                    if (titleIcon == null)
+                      Text(title, style: t.headlineSmall)
+                    else
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: '$title '),
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: titleIcon!,
+                            ),
+                          ],
+                        ),
+                        style: t.headlineSmall,
+                      ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: LwSpacing.xxs),
+                      Text(subtitle!, style: t.bodyMedium),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            ...icons,
+            ?profile,
+          ],
+        ),
+        if (actions.isNotEmpty) ...[
+          const SizedBox(height: LwSpacing.xs),
+          Wrap(
+            key: const Key('tab-header-actions'),
+            spacing: LwSpacing.xs,
+            runSpacing: LwSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: actions,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// A screen's title inside the page, under a back-arrow-only app bar
+/// (T-UI-02i): it wraps at large text sizes instead of being cut off the
+/// way an app bar title is.
+class LwPageTitle extends StatelessWidget {
+  const LwPageTitle(this.text, {super.key});
 
   final String text;
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: LwSpacing.lg, bottom: LwSpacing.xs),
+    padding: const EdgeInsets.only(bottom: LwSpacing.md),
     child: Semantics(
       header: true,
-      child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+      child: Text(text, style: Theme.of(context).textTheme.headlineSmall),
+    ),
+  );
+}
+
+/// Section title inside a screen, with an optional action on the right
+/// (for example "See all").
+class LwSectionHeader extends StatelessWidget {
+  const LwSectionHeader(
+    this.text, {
+    super.key,
+    this.actionLabel,
+    this.onAction,
+    this.actionKey,
+  });
+
+  final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  final Key? actionKey;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: LwSpacing.lg, bottom: LwSpacing.xs),
+    child: Row(
+      children: [
+        Expanded(
+          child: Semantics(
+            header: true,
+            child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+          ),
+        ),
+        if (actionLabel != null && onAction != null)
+          TextButton(
+            key: actionKey,
+            onPressed: onAction,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(actionLabel!),
+                const Icon(Icons.chevron_right, size: LwSize.iconSm),
+              ],
+            ),
+          ),
+      ],
     ),
   );
 }

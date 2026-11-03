@@ -1,45 +1,1425 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/config/flavor.dart';
+import '../../../core/config/feature_flags.dart';
+import '../../../core/design/avatar/avatar_art.dart' show AvatarView;
+import '../../../core/design/components/speech_bubble.dart';
+import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
+import '../../../core/design/illustration/illustration.dart';
 import '../../../core/design/tokens.dart';
-import '../../account/data/profile_repository.dart';
+import '../../../core/time/clock.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../settings/presentation/settings_screen.dart';
+import '../../account/data/profile_repository.dart';
+import '../../auth/data/firebase_auth_service.dart';
+import '../../avatar/presentation/coach_avatar.dart';
+import '../../checkin/data/checkin_repository.dart';
+import '../../checkin/domain/checkin.dart';
+import '../../checkin/presentation/checkin_sheet.dart';
+import '../../goals/data/goal_repository.dart';
+import '../../goals/domain/goal.dart';
+import '../../dev/application/preview_mode.dart';
+import '../../learn/presentation/learn_screen.dart' show LearnScreen;
+import '../../moments/application/coach_state.dart';
+import '../../moments/application/moment_context.dart';
+import '../../moments/application/moment_launcher.dart';
+import '../../moments/presentation/celebration.dart';
+import '../../moments/domain/coach_message.dart';
+import '../../moments/domain/moment_builder.dart';
+import '../../moments/presentation/moment_screen.dart';
+import '../../notifications/presentation/notifications_screen.dart';
+import '../../profile/presentation/profile_button.dart';
+import '../../routine/application/routine_data.dart';
+import '../../routine/application/routine_moment.dart';
+import '../../routine/application/routine_week_data.dart';
+import '../../routine/presentation/routine_sheets.dart' show iconFor, timeLabel;
+import '../../routine/data/routine_repository.dart';
+import '../../routine/domain/routine.dart'
+    show RoutineItem, RoutineSource, RoutineStatus;
+import '../../routine/domain/routine_reminders.dart';
+import '../../routine/presentation/routine_screen.dart';
+import '../../starter_plan/application/plan_scheduler.dart';
+import '../../starter_plan/data/reminders.dart';
+import '../../starter_plan/presentation/plan_preview_screen.dart'
+    show reminderTexts;
+import '../../track/presentation/track_screen.dart' show streakProvider;
+import '../../widget/data/widget_inbox.dart';
+import '../application/home_data.dart';
 
-/// Home tab. Will hold: avatar (tap to talk), morning briefing player, today's
-/// next step, quick check-in, streak, at most one secondary card (spec 14.2,
-/// T-DLY-01).
-class HomeScreen extends ConsumerWidget {
+export '../application/home_data.dart'
+    show canCheckInProvider, todayCheckInProvider;
+import '../data/name_prompt.dart';
+import '../domain/home_models.dart';
+
+/// Home tab (T-UI-02c, illustrated design): greeting header, the coach
+/// hero with a speech bubble, the Why, Today's Next Step, the 4 Quick
+/// Check-in tiles, the streak and the milestone.
+///
+/// Actions (FR-DLY-03, at most 1 primary and 2 secondary): the step card
+/// opens Done (the primary) and "Make it N min" (a secondary); the check-in
+/// tiles are the other secondary (all 4 open the same check-in). The
+/// briefing is media, not an action, and is off until briefings exist; so
+/// are the coach's "Hear your coach" and the morning card (T-DLY-03).
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final isDev = ref.watch(flavorProvider) == Flavor.dev;
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late final AppLifecycleListener _lifecycle;
+  StreamSubscription<String>? _reminderTaps;
+  StreamSubscription<WidgetLink>? _widgetLinks;
+  bool _asking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycle = AppLifecycleListener(
+      onResume: () {
+        ref.invalidate(todayCheckInProvider);
+        // A new morning, or the morning time has come: the coach's card.
+        ref.invalidate(morningMomentProvider);
+        _maybeAsk();
+        _followTimeZone();
+        _routineReminders();
+        _widgetDone();
+      },
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _start());
+  }
+
+  /// A reminder that started the app opens its moment (the moment offers
+  /// the check-in); otherwise the usual first-open check-in.
+  Future<void> _start() async {
+    final reminders = ref.read(remindersProvider);
+    String? launch;
+    try {
+      _reminderTaps = reminders.taps.listen(_openReminder);
+      launch = await reminders.launchPayload();
+    } catch (_) {
+      // No notifications on this device: Home as usual.
+    }
+    if (!mounted) return;
+    unawaited(_routineReminders());
+    if (launch != null && await _openReminder(launch)) return;
+    // The home-screen widget: a Done tapped there, and the button that
+    // opened the app (T-AVT-08g-b).
+    await _widgetDone();
+    final inbox = ref.read(widgetInboxProvider);
+    _widgetLinks = inbox.links.listen(_openWidgetLink);
+    final link = await inbox.launchLink();
+    if (!mounted) return;
+    if (link != null && link != WidgetLink.home) {
+      await _openWidgetLink(link);
+      return;
+    }
+    await _firstHello();
+    if (mounted) _maybeAsk();
+  }
+
+  /// Right after onboarding the coach says hello once (T-AVT-08f): waving,
+  /// then happy. Nothing when its lines aren't approved yet (prod).
+  Future<void> _firstHello() async {
+    final store = ref.read(firstHelloStoreProvider);
+    try {
+      if (!await store.pending()) return;
+      await store.setPending(false);
+    } catch (_) {
+      return;
+    }
+    final m = await ref.read(coachMessageProvider(Moment.firstHello).future);
+    if (m != null && mounted) await _playMoment(Moment.firstHello);
+  }
+
+  /// The coach reacts to the check-in (T-AVT-08f): a short thank-you that
+  /// fits the mood, or the gentle moment on a gentle day. Nothing after a
+  /// safety response (the safety card has said what matters).
+  Future<void> _reactTo(CheckIn c) async {
+    final moment = MomentBuilder.afterCheckIn(
+      gentleDay: c.gentleDay,
+      mood: c.mood,
+    );
+    final m = await ref.read(coachMessageProvider(moment).future);
+    if (m != null && mounted) await _playMoment(moment);
+  }
+
+  /// Tapping a reminder opens the coach's moment (T-DLY-03c); a routine
+  /// reminder opens its own (T-GOL-03d).
+  Future<bool> _openReminder(String payload) async {
+    if (parseRoutinePayload(payload) != null) {
+      await _playRoutine(payload);
+      return true;
+    }
+    final m = await ref.read(momentLauncherProvider).forPayload(payload);
+    if (!mounted || m == null) return false;
+    _playMoment(m);
+    return true;
+  }
+
+  /// A routine reminder (T-GOL-03d): the coach says its approved lines and
+  /// the items show by name; Done or Not today marks them (from the
+  /// notification), which also cancels what was still pending for them.
+  /// With nothing the coach may say (lines not approved yet, or "Coach
+  /// announces it" off), the routine opens instead.
+  Future<void> _playRoutine(String payload) async {
+    final m = await ref.read(routineMessageProvider(payload).future);
+    if (!mounted) return;
+    if (m == null) {
+      await context.push(RoutineScreen.path);
+      return;
+    }
+    final action = await context.push<MomentAction>(
+      MomentScreen.routinePath(payload),
+    );
+    final status = switch (action) {
+      MomentAction.done => RoutineStatus.done,
+      MomentAction.notToday => RoutineStatus.skipped,
+      _ => null,
+    };
+    if (status == null || !mounted) return;
+    final texts = reminderTexts(AppLocalizations.of(context));
+    await ref.read(routineReminderActionsProvider).mark(payload, status);
+    try {
+      await ref.read(planSchedulerProvider).reschedule(texts);
+    } catch (_) {
+      // Reminders are best effort; the log is saved.
+    }
+  }
+
+  Future<void> _playMoment(Moment m) async {
+    final action = await context.push<MomentAction>(MomentScreen.pathFor(m));
+    if (action != null && mounted) await _onMomentAction(action);
+  }
+
+  /// What a moment's button leads to (T-DLY-03d).
+  Future<void> _onMomentAction(MomentAction action) async {
+    final step = ref.read(todayStepProvider);
+    switch (action) {
+      case MomentAction.checkIn:
+        await _openCheckIn();
+      case MomentAction.startStep || MomentAction.restart:
+        if (step != null) {
+          await _openStep(step, ref.read(todayCheckInProvider).value);
+        }
+      case MomentAction.makeSmaller:
+        ref.read(stepProgressActionsProvider).makeSmaller();
+      case MomentAction.done:
+        await _done();
+      // The evening reply and the week are on Track.
+      case MomentAction.reply || MomentAction.seeWeek:
+        context.go('/track');
+      case MomentAction.notToday || MomentAction.close:
+        break;
+    }
+  }
+
+  /// Today's step is done: the coach celebrates (T-DLY-03d).
+  Future<void> _done() async {
+    ref.read(stepProgressActionsProvider).markDone();
+    await showCelebration(context);
+  }
+
+  /// Done tapped on the widget (iOS 17+, Android): applied once, quietly
+  /// (the widget already celebrated). Today's goes through Home; an
+  /// earlier day's (the app wasn't opened since) is saved for that day,
+  /// idempotent by date + habit (D-60).
+  Future<void> _widgetDone() async {
+    final date = await ref.read(widgetInboxProvider).takeDone();
+    if (!mounted || date == null) return;
+    if (date != _today) {
+      if (date.compareTo(_today) < 0) {
+        await ref
+            .read(goalRepositoryProvider)
+            .saveLog(HabitLog(date: date, habitId: dailyStepHabitId))
+            .catchError((_) {});
+      }
+      return;
+    }
+    if (!ref.read(stepProgressProvider).done) {
+      ref.read(stepProgressActionsProvider).markDone();
+    }
+  }
+
+  /// A widget button opened the app (T-AVT-08g-b).
+  Future<void> _openWidgetLink(WidgetLink link) async {
+    if (!mounted) return;
+    final step = ref.read(todayStepProvider);
+    switch (link) {
+      case WidgetLink.checkIn:
+        await _openCheckIn();
+      case WidgetLink.step:
+        if (step != null) {
+          await _openStep(step, ref.read(todayCheckInProvider).value);
+        }
+      case WidgetLink.makeSmaller:
+        ref.read(stepProgressActionsProvider).makeSmaller();
+      case WidgetLink.done:
+        // iOS 16 / older Android: Done opens the app. Once only.
+        if (step != null && !ref.read(stepProgressProvider).done) {
+          await _done();
+        }
+      case WidgetLink.reflect:
+        context.go('/track');
+      case WidgetLink.home:
+        break;
+      // My Daily Routine (T-GOL-03e).
+      case WidgetLink.routine:
+        await context.push(RoutineScreen.path);
+      case WidgetLink.routineDone:
+        final payload = ref.read(widgetInboxProvider).takeRoutinePayload();
+        if (payload != null) {
+          await ref
+              .read(routineReminderActionsProvider)
+              .mark(payload, RoutineStatus.done, source: RoutineSource.widget);
+        }
+    }
+  }
+
+  @override
+  void dispose() {
+    _reminderTaps?.cancel();
+    _widgetLinks?.cancel();
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  String get _today => localDateKey(ref.read(clockProvider)());
+
+  /// After travel, move the plan's reminders to the new time zone.
+  /// Routine reminders are scheduled a week ahead (T-GOL-03d); opening the
+  /// app moves that week on. Only for people with routine reminders, so
+  /// nothing else is rescheduled.
+  Future<void> _routineReminders() async {
+    if (ref.read(authServiceProvider).currentUser == null) return;
+    final texts = reminderTexts(AppLocalizations.of(context));
+    try {
+      final items = await ref
+          .read(routineRepositoryProvider)
+          .watchItems()
+          .first;
+      if (!items.any((i) => i.reminder)) return;
+      await ref.read(planSchedulerProvider).reschedule(texts);
+    } catch (_) {
+      // Reminders are a nice-to-have; never break Home over them.
+    }
+  }
+
+  Future<void> _followTimeZone() async {
+    if (ref.read(authServiceProvider).currentUser == null) return;
+    try {
+      await ref
+          .read(planSchedulerProvider)
+          .rescheduleIfZoneChanged(reminderTexts(AppLocalizations.of(context)));
+    } catch (_) {
+      // Reminders are a nice-to-have; never break Home over them.
+    }
+  }
+
+  /// First open of the day: ask how they feel before anything else. Once per
+  /// day only; closing the sheet counts as asked.
+  Future<void> _maybeAsk() async {
+    if (_asking || !mounted || !ref.read(canCheckInProvider)) return;
+    _asking = true;
+    try {
+      final today = _today;
+      final existing = await ref
+          .read(checkInRepositoryProvider)
+          .watchDay(today)
+          .first;
+      final prompts = ref.read(checkInPromptStoreProvider);
+      final ask = shouldAskToday(
+        today: today,
+        hasCheckinToday: existing != null,
+        lastAskedDay: await prompts.lastAskedDay(),
+      );
+      if (!ask || !mounted) return;
+      await prompts.markAsked(today);
+      if (!mounted) return;
+      await _openCheckIn(today);
+    } finally {
+      _asking = false;
+    }
+  }
+
+  Future<void> _openCheckIn([String? date]) async {
+    // The sheet can open on the first frame, before the profile has
+    // loaded; wait briefly for it so the greeting can use the first name.
+    if (ref.read(firstNameProvider) == null && !ref.read(previewModeProvider)) {
+      await ref
+          .read(currentProfileProvider.future)
+          .timeout(const Duration(seconds: 1), onTimeout: () => null);
+    }
+    if (!mounted) return;
+    final checkIn = await showCheckInSheet(
+      context,
+      date: date ?? _today,
+      firstName: ref.read(firstNameProvider),
+    );
+    if (checkIn != null && mounted) await _reactTo(checkIn);
+  }
+
+  Future<void> _openStep(TodayStep step, CheckIn? checkIn) async {
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => _StepSheet(
+        step: step,
+        small: _isSmall(step, checkIn),
+        reason: _stepReason(AppLocalizations.of(context), step, checkIn),
+      ),
+    );
+    if (!mounted) return;
+    if (result == 'done') await _done();
+    if (result == 'smaller') {
+      ref.read(stepProgressActionsProvider).makeSmaller();
+    }
+  }
+
+  /// A gentle day always gets the smaller step (FR-DLY-02, T-DLY-02).
+  bool _isSmall(TodayStep step, CheckIn? checkIn) =>
+      ref.read(stepProgressProvider).smaller ||
+      (checkIn?.gentleDay ?? false) ||
+      step.smallerTitle == null;
+
+  String? _stepReason(AppLocalizations l, TodayStep step, CheckIn? checkIn) {
+    final reason = checkIn == null ? null : gentleReasonFor(checkIn);
+    return switch (reason) {
+      null => step.reason,
+      GentleReason.lowMood => l.homeStepGentleLowMood,
+      GentleReason.highStress => l.homeStepGentleStress,
+      GentleReason.both => l.homeStepGentleBoth,
+      GentleReason.other => l.homeStepGentleReason,
+    };
+  }
+
+  Future<void> _saveName(String name) async {
+    await ref.read(namePromptStoreProvider).markAsked();
+    final uid = ref.read(authServiceProvider).currentUser?.uid;
+    if (uid != null) {
+      await ref.read(profileRepositoryProvider).updateSettings(uid, {
+        ProfileSettings.displayName: name,
+      });
+      ref.invalidate(currentProfileProvider);
+    }
+    ref.invalidate(namePromptAskedProvider);
+  }
+
+  Future<void> _skipName() async {
+    await ref.read(namePromptStoreProvider).markAsked();
+    ref.invalidate(namePromptAskedProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final p = LwPalette.of(context);
     final why = ref.watch(currentProfileProvider).value?.whyStatement;
+    final checkIn = ref.watch(todayCheckInProvider).value;
+    final day = ref.watch(dayNumberProvider);
+    final name = ref.watch(firstNameProvider);
+    final hour = ref.watch(clockProvider)().hour;
+    final step = ref.watch(todayStepProvider);
+    final hero = ref.watch(heroMomentProvider);
+    final progress = ref.watch(stepProgressProvider);
+    // Ask once, only for a signed-in account whose profile has loaded
+    // without a name (Google or Apple names are used without asking).
+    final askName =
+        name == null &&
+        ref.watch(signedInUidProvider) != null &&
+        ref.watch(currentProfileProvider).hasValue &&
+        ref.watch(namePromptAskedProvider).value == false;
+    final evening = hour >= 18 || hour < 5;
     return LwScreen(
-      actions: const [SettingsAction()],
-      title: l10n.tabHome,
+      eyebrow: l.tabHome,
+      title: switch (hour) {
+        >= 5 && < 12 =>
+          name == null
+              ? l.homeGreetingMorning
+              : l.homeGreetingMorningNamed(name),
+        >= 12 && < 18 =>
+          name == null
+              ? l.homeGreetingAfternoon
+              : l.homeGreetingAfternoonNamed(name),
+        _ =>
+          name == null
+              ? l.homeGreetingEvening
+              : l.homeGreetingEveningNamed(name),
+      },
+      titleIcon: ExcludeSemantics(
+        child: Icon(
+          evening ? Icons.nightlight_round : Icons.wb_sunny_rounded,
+          key: const Key('home-greeting-icon'),
+          color: evening ? p.primaryDark : p.caution,
+          size: LwSize.iconSm,
+        ),
+      ),
+      subtitle: l.homeSubtitle,
+      icons: [
+        IconButton(
+          key: const Key('home-search'),
+          tooltip: l.homeSearch,
+          onPressed: () => context.push(LearnScreen.searchPath),
+          icon: Icon(Icons.search, color: p.textPrimary),
+        ),
+        IconButton(
+          key: const Key('home-bell'),
+          tooltip: l.homeNotifications,
+          onPressed: () => context.push(NotificationsScreen.path),
+          icon: Icon(Icons.notifications_none, color: p.textPrimary),
+        ),
+      ],
+      profile: const ProfileButton(),
+      actions: [if (day != null) _DayPill(day)],
       children: [
+        if (ref.watch(morningCardProvider) case final moment?) ...[
+          _MomentCard(onPlay: () => _playMoment(moment)),
+          const SizedBox(height: LwSpacing.sm),
+        ],
+        if (askName) ...[
+          _NamePrompt(onSave: _saveName, onSkip: _skipName),
+          const SizedBox(height: LwSpacing.sm),
+        ],
+        _HeroCard(
+          coach: ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,
+          moment: hero,
+          bubble: switch (hero) {
+            Moment.stepDone => l.homeBubbleDone,
+            Moment.gentle =>
+              name == null ? l.homeBubbleGentle : l.homeBubbleGentleNamed(name),
+            Moment.stepReminder =>
+              name == null ? l.homeBubbleStep : l.homeBubbleStepNamed(name),
+            Moment.evening =>
+              name == null
+                  ? l.homeBubbleEvening
+                  : l.homeBubbleEveningNamed(name),
+            Moment.missedDay => l.homeBubbleRestart,
+            // Never the Home moment; only played (T-AVT-08f).
+            Moment.morning ||
+            Moment.weeklyReview ||
+            Moment.firstHello ||
+            Moment.checkInGood ||
+            Moment.checkInOkay ||
+            Moment.streakMilestone ||
+            Moment.routineItem ||
+            Moment.lesson =>
+              name == null ? l.homeBubble : l.homeBubbleNamed(name),
+          },
+          // The full message, when there is one to say (T-DLY-03d).
+          onPlay: ref.watch(coachMessageProvider(hero)).value == null
+              ? null
+              : () => _playMoment(hero),
+          showBriefing: ref.watch(featureFlagsProvider).briefings,
+        ),
         // The Why is shown on Home (FR-ONB-05).
         if (why != null && why.isNotEmpty) ...[
-          LwCard(eyebrow: l10n.homeWhyEyebrow, title: why),
-          const SizedBox(height: LwSpacing.md),
+          const SizedBox(height: LwSpacing.sm),
+          _WhyCard(why),
         ],
-        LwEmptyState(
-          icon: Icons.wb_sunny_outlined,
-          title: l10n.homeEmptyTitle,
-          body: l10n.homeEmptyBody,
+        LwSectionHeader(l.homeNextStepTitle),
+        _StepCard(
+          step: step,
+          checkIn: checkIn,
+          done: progress.done,
+          small: step != null && _isSmall(step, checkIn),
+          reason: step == null ? null : _stepReason(l, step, checkIn),
+          onOpen: step == null ? null : () => _openStep(step, checkIn),
         ),
-        if (isDev)
-          OutlinedButton(
-            onPressed: () => context.push('/dev/tokens'),
-            child: Text(l10n.devDesignTokens),
+        // My Daily Routine (T-GOL-03e): secondary, so Home keeps one
+        // primary action (FR-DLY-03).
+        if (ref.watch(nextRoutineProvider) case final next?) ...[
+          const SizedBox(height: LwSpacing.sm),
+          _NextRoutineRow(
+            item: next,
+            onOpen: () => context.push(RoutineScreen.path),
+            onDone: () =>
+                ref.read(routineActionsProvider).mark(next, RoutineStatus.done),
           ),
+        ],
+        if (ref.watch(canCheckInProvider)) ...[
+          LwSectionHeader(l.homeCheckInTitle),
+          _CheckInTiles(checkIn: checkIn, onTap: _openCheckIn),
+          if (checkIn != null) ...[
+            const SizedBox(height: LwSpacing.sm),
+            _CheckInResponse(checkIn),
+          ],
+        ],
+        const SizedBox(height: LwSpacing.sectionGap),
+        LwStreakCard(ref.watch(streakProvider)),
+        const SizedBox(height: LwSpacing.sm),
+        _MilestoneCard(ref.watch(milestoneProvider)),
       ],
+    );
+  }
+}
+
+class _DayPill extends StatelessWidget {
+  const _DayPill(this.day);
+  final int day;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final l = AppLocalizations.of(context);
+    return Semantics(
+      label: l.homeDayLabel(day),
+      container: true,
+      excludeSemantics: true,
+      child: Container(
+        key: const Key('home-day'),
+        padding: const EdgeInsets.symmetric(
+          horizontal: LwSpacing.sm,
+          vertical: LwSpacing.xxs,
+        ),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: LwRadius.pillAll,
+          border: Border.all(color: p.outlineSoft),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _Dot(p.accent),
+            const SizedBox(width: LwSpacing.xs),
+            Text(
+              l.homeDay(day),
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Dot extends StatelessWidget {
+  const _Dot(this.color);
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: LwSpacing.xs,
+    height: LwSpacing.xs,
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  );
+}
+
+/// "What should your coach call you?", asked once (T-UI-02c).
+class _NamePrompt extends StatefulWidget {
+  const _NamePrompt({required this.onSave, required this.onSkip});
+
+  final Future<void> Function(String name) onSave;
+  final Future<void> Function() onSkip;
+
+  @override
+  State<_NamePrompt> createState() => _NamePromptState();
+}
+
+class _NamePromptState extends State<_NamePrompt> {
+  final _text = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final name = _text.text.trim();
+    if (!isValidFirstName(name)) {
+      setState(() => _error = AppLocalizations.of(context).homeNameError);
+      return;
+    }
+    await widget.onSave(name);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    return Container(
+      key: const Key('home-name-prompt'),
+      padding: const EdgeInsets.all(LwSpacing.cardPadding),
+      decoration: BoxDecoration(color: p.mint, borderRadius: LwRadius.lgAll),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.homeNameTitle,
+            style: t.titleMedium?.copyWith(color: p.onTint),
+          ),
+          const SizedBox(height: LwSpacing.sm),
+          TextField(
+            key: const Key('home-name-field'),
+            controller: _text,
+            textCapitalization: TextCapitalization.words,
+            autofillHints: const [AutofillHints.givenName],
+            maxLength: 30,
+            decoration: InputDecoration(
+              hintText: l.profileNameHint,
+              errorText: _error,
+              counterText: '',
+            ),
+            onSubmitted: (_) => _save(),
+          ),
+          const SizedBox(height: LwSpacing.sm),
+          Wrap(
+            spacing: LwSpacing.sm,
+            runSpacing: LwSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              FilledButton(
+                key: const Key('home-name-save'),
+                onPressed: _save,
+                child: Text(l.homeNameSave),
+              ),
+              TextButton(
+                key: const Key('home-name-skip'),
+                style: TextButton.styleFrom(foregroundColor: p.primaryDark),
+                onPressed: widget.onSkip,
+                child: Text(l.homeNameNotNow),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The coach waving on a leafy scene, with a greeting bubble and, when
+/// briefings exist, the Morning Briefing row (T-UI-02c).
+class _HeroCard extends StatelessWidget {
+  const _HeroCard({
+    required this.coach,
+    required this.moment,
+    required this.bubble,
+    required this.showBriefing,
+    this.onPlay,
+  });
+
+  final String coach;
+
+  /// The moment of the day the coach is in: its face, and the short
+  /// version of its message in the bubble (T-DLY-03d).
+  final Moment moment;
+  final String bubble;
+  final bool showBriefing;
+
+  /// Plays the full moment; null when there is nothing approved to say.
+  final VoidCallback? onPlay;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    return ClipRRect(
+      key: const Key('home-coach'),
+      borderRadius: LwRadius.lgAll,
+      child: Stack(
+        children: [
+          const Positioned.fill(
+            child: Illustration(
+              'scene_home_hero',
+              fit: BoxFit.cover,
+              placeholderIcon: false,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(LwSpacing.cardPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  coach,
+                  style: t.labelMedium?.copyWith(color: p.onTintSecondary),
+                ),
+                const SizedBox(height: LwSpacing.xs),
+                // A gentle bounce once on greeting, and with each new moment.
+                LwOnceMotion(
+                  key: ValueKey(moment),
+                  child: CoachAvatar(
+                    expression: faceForMoment(moment),
+                    bubble: bubble,
+                    size: 104,
+                  ),
+                ),
+                const SizedBox(height: LwSpacing.sm),
+                if (showBriefing)
+                  _BriefingRow()
+                else
+                  // Wraps on small phones and large text.
+                  Wrap(
+                    spacing: LwSpacing.sm,
+                    runSpacing: LwSpacing.xs,
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        l.homeTagline,
+                        key: const Key('home-tagline'),
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                      if (onPlay != null) _PlayPill(onPlay: onPlay!),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Hear your coach": plays the full moment. Media, like the briefing, so
+/// not one of Home's actions (FR-DLY-03).
+class _PlayPill extends StatelessWidget {
+  const _PlayPill({required this.onPlay});
+  final VoidCallback onPlay;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    return Material(
+      color: p.surface,
+      shape: const StadiumBorder(),
+      child: InkWell(
+        key: const Key('home-moment-play'),
+        customBorder: const StadiumBorder(),
+        onTap: onPlay,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: LwSpacing.sm),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.play_circle_fill, color: p.primary),
+                const SizedBox(width: LwSpacing.xxs),
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context).homeMomentPlay,
+                    style: t.labelLarge?.copyWith(color: p.textPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Your Morning Briefing" (flag on). No briefings are made yet, so the
+/// player waits, saying so; it never plays made-up audio.
+class _BriefingRow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    return Container(
+      key: const Key('home-briefing'),
+      padding: const EdgeInsets.all(LwSpacing.sm),
+      decoration: BoxDecoration(color: p.surface, borderRadius: LwRadius.mdAll),
+      child: Row(
+        children: [
+          Container(
+            width: LwSize.minTapTarget,
+            height: LwSize.minTapTarget,
+            decoration: BoxDecoration(
+              color: p.surfaceMuted,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.play_arrow_rounded, color: p.textSecondary),
+          ),
+          const SizedBox(width: LwSpacing.sm),
+          Expanded(child: Text(l.homeBriefingSoon, style: t.titleSmall)),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Your coach has a message" (T-DLY-03c): the morning moment, when the
+/// app is opened before its reminder was tapped. Tapping plays it.
+class _MomentCard extends ConsumerWidget {
+  const _MomentCard({required this.onPlay});
+  final VoidCallback onPlay;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final t = Theme.of(context).textTheme;
+    final p = LwPalette.of(context);
+    return Card(
+      key: const Key('home-moment-card'),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPlay,
+        child: Padding(
+          padding: const EdgeInsets.all(LwSpacing.cardPadding),
+          child: Row(
+            children: [
+              AvatarView(
+                images: ref.watch(coachImagesProvider).value,
+                background: ref.watch(coachBackgroundProvider),
+                expression: AvatarExpression.waving,
+                size: LwSize.inputHeight,
+              ),
+              const SizedBox(width: LwSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l.homeMomentTitle, style: t.titleMedium),
+                    Text(l.homeMomentBody, style: t.bodyMedium),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.play_circle_fill,
+                color: p.primary,
+                size: LwSize.minTapTarget,
+                semanticLabel: l.momentPlay,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WhyCard extends StatelessWidget {
+  const _WhyCard(this.why);
+  final String why;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).textTheme;
+    return Card(
+      key: const Key('home-why'),
+      child: Padding(
+        padding: const EdgeInsets.all(LwSpacing.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).homeWhyEyebrow.toUpperCase(),
+              style: t.labelSmall,
+            ),
+            const SizedBox(height: LwSpacing.xxs),
+            Text(why, style: t.bodyLarge),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's Next Step: a lime card with art, the step and a short line.
+/// Tapping it opens the step with Done and the smaller option.
+class _StepCard extends StatelessWidget {
+  const _StepCard({
+    required this.step,
+    required this.checkIn,
+    required this.done,
+    required this.small,
+    required this.reason,
+    required this.onOpen,
+  });
+
+  final TodayStep? step;
+  final CheckIn? checkIn;
+  final bool done;
+  final bool small;
+  final String? reason;
+  final VoidCallback? onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final step = this.step;
+    final checkIn = this.checkIn;
+    final gentle = checkIn?.gentleDay ?? false;
+
+    final String title;
+    if (step == null) {
+      title = checkIn == null
+          ? l.homeTodayStepBeforeCheckIn
+          : gentle
+          ? l.homeTodayStepGentle
+          : checkIn.timeAvailable != null
+          ? l.homeTodayStepTimed(checkIn.timeAvailable!)
+          : l.homeTodayStepUntimed;
+    } else {
+      title = small ? (step.smallerTitle ?? step.title) : step.title;
+    }
+    final content = Padding(
+      padding: const EdgeInsets.all(LwSpacing.cardPadding),
+      child: Row(
+        children: [
+          const Illustration('icon_steps', width: 56, height: 56),
+          const SizedBox(width: LwSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (step != null)
+                  Text(
+                    step.driver,
+                    style: t.labelSmall?.copyWith(
+                      color: p.onHeroSurfaceSecondary,
+                    ),
+                  ),
+                Text(
+                  title,
+                  style: (step == null ? t.bodyLarge : t.titleMedium)?.copyWith(
+                    color: p.onHeroSurface,
+                  ),
+                ),
+                if (step != null && done)
+                  Row(
+                    key: const Key('step-done-message'),
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: p.primaryDark,
+                        size: LwSize.iconSm,
+                      ),
+                      const SizedBox(width: LwSpacing.xxs),
+                      Flexible(
+                        child: Text(
+                          l.homeStepDoneShort,
+                          style: t.bodySmall?.copyWith(color: p.primaryDark),
+                        ),
+                      ),
+                    ],
+                  )
+                else if (reason != null)
+                  Text(
+                    reason!,
+                    key: const Key('step-reason'),
+                    style: t.bodySmall?.copyWith(
+                      color: p.onHeroSurfaceSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (onOpen != null && !done)
+            Icon(Icons.chevron_right, color: p.onHeroSurface),
+        ],
+      ),
+    );
+    return Material(
+      key: const Key('today-step'),
+      color: p.heroSurface,
+      borderRadius: LwRadius.lgAll,
+      clipBehavior: Clip.antiAlias,
+      child: onOpen == null || done
+          ? content
+          : Semantics(
+              button: true,
+              label: l.homeNextStepOpenLabel(title),
+              container: true,
+              excludeSemantics: true,
+              child: InkWell(
+                key: const Key('step-open'),
+                onTap: onOpen,
+                child: content,
+              ),
+            ),
+    );
+  }
+}
+
+/// The step, opened from Today's Next Step: Done (the one primary action,
+/// FR-DLY-03) and the smaller option.
+class _StepSheet extends StatelessWidget {
+  const _StepSheet({
+    required this.step,
+    required this.small,
+    required this.reason,
+  });
+
+  final TodayStep step;
+  final bool small;
+  final String? reason;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          LwSpacing.screenGutter,
+          0,
+          LwSpacing.screenGutter,
+          LwSpacing.lg,
+        ),
+        child: Column(
+          key: const Key('step-sheet'),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(step.driver, style: t.labelSmall),
+            Text(
+              small ? (step.smallerTitle ?? step.title) : step.title,
+              style: t.titleLarge,
+            ),
+            if (reason != null) ...[
+              const SizedBox(height: LwSpacing.xs),
+              Text(reason!, style: t.bodyMedium),
+            ],
+            const SizedBox(height: LwSpacing.lg),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                key: const Key('step-done'),
+                onPressed: () => Navigator.pop(context, 'done'),
+                icon: const Icon(Icons.check),
+                label: Text(l.homeStepDone),
+              ),
+            ),
+            if (!small && step.smallerMinutes != null) ...[
+              const SizedBox(height: LwSpacing.xs),
+              Center(
+                child: Semantics(
+                  label: l.homeStepSmallerLabel(step.smallerMinutes!),
+                  container: true,
+                  excludeSemantics: true,
+                  button: true,
+                  child: TextButton(
+                    key: const Key('step-smaller'),
+                    style: TextButton.styleFrom(foregroundColor: p.primaryDark),
+                    onPressed: () => Navigator.pop(context, 'smaller'),
+                    child: Text(l.homeStepSmaller(step.smallerMinutes!)),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Mood, Energy, Sleep and Stress tiles (T-UI-02c). Any tile opens the
+/// mood-first check-in; after it, each shows today's answer in full words.
+class _CheckInTiles extends StatelessWidget {
+  const _CheckInTiles({required this.checkIn, required this.onTap});
+
+  final CheckIn? checkIn;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final l = AppLocalizations.of(context);
+    final c = checkIn;
+    String value(int? v, List<String> words) => c == null
+        ? l.homeTileEmpty
+        : v == null
+        ? l.homeTileSkipped
+        : words[v - 1];
+    final tiles = [
+      (
+        'mood',
+        l.homeTileMood,
+        'icon_mood',
+        p.butter,
+        value(c?.mood, [
+          l.checkinMood1,
+          l.checkinMood2,
+          l.checkinMood3,
+          l.checkinMood4,
+          l.checkinMood5,
+        ]),
+      ),
+      (
+        'energy',
+        l.homeTileEnergy,
+        'icon_energy',
+        p.peach,
+        value(c?.energy, [
+          l.checkinEnergy1,
+          l.checkinEnergy2,
+          l.checkinEnergy3,
+          l.checkinEnergy4,
+          l.checkinEnergy5,
+        ]),
+      ),
+      (
+        'sleep',
+        l.homeTileSleep,
+        'icon_sleep',
+        p.lavender,
+        value(c?.sleep, [
+          l.checkinSleep1,
+          l.checkinSleep2,
+          l.checkinSleep3,
+          l.checkinSleep4,
+          l.checkinSleep5,
+        ]),
+      ),
+      (
+        'stress',
+        l.homeTileStress,
+        'icon_stress',
+        p.sky,
+        value(c?.stress, [
+          l.checkinStress1,
+          l.checkinStress2,
+          l.checkinStress3,
+          l.checkinStress4,
+          l.checkinStress5,
+        ]),
+      ),
+    ];
+    return LayoutBuilder(
+      builder: (context, box) {
+        // 4 across normally; 2 across on small phones or with large text,
+        // so values like "Very high" never break mid-word.
+        final scale = MediaQuery.textScalerOf(context).scale(1);
+        final columns = box.maxWidth / scale >= 300 ? 4 : 2;
+        final gap = LwSpacing.xs;
+        final width = (box.maxWidth - gap * (columns - 1)) / columns;
+        return Wrap(
+          key: const Key('home-checkin-card'),
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            for (final (id, label, art, tint, v) in tiles)
+              SizedBox(
+                width: width,
+                child: LwCheckinTile(
+                  id: id,
+                  label: label,
+                  art: art,
+                  tint: tint,
+                  value: v,
+                  onTap: onTap,
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// The coach's reaction to today's check-in (T-DLY-03d): a matching face
+/// and one supportive line. On a gentle day the line matches the reason:
+/// low mood, high stress, both, or a neutral line (T-UI-02c).
+class _CheckInResponse extends ConsumerWidget {
+  const _CheckInResponse(this.checkIn);
+  final CheckIn checkIn;
+
+  /// Calm on a gentle day, celebrating when it's a good day, else happy.
+  static AvatarExpression faceFor(CheckIn c) => c.gentleDay
+      ? AvatarExpression.calm
+      : toneFor(c) == CheckInTone.high
+      ? AvatarExpression.celebrating
+      : AvatarExpression.happy;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final text = switch (gentleReasonFor(checkIn)) {
+      GentleReason.lowMood => l.checkinResponseGentleLowMood,
+      GentleReason.highStress => l.checkinResponseGentleStress,
+      GentleReason.both => l.checkinResponseGentleBoth,
+      GentleReason.other => l.checkinResponseGentle,
+      null =>
+        toneFor(checkIn) == CheckInTone.high
+            ? l.checkinResponseHigh
+            : l.checkinResponseSteady,
+    };
+    final face = faceFor(checkIn);
+    return LwOnceMotion(
+      key: ValueKey(face),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AvatarView(
+            key: Key('checkin-reaction-${face.name}'),
+            images: ref.watch(coachImagesProvider).value,
+            background: ref.watch(coachBackgroundProvider),
+            expression: face,
+            size: LwSize.inputHeight,
+          ),
+          const SizedBox(width: LwSpacing.sm),
+          Expanded(
+            child: SpeechBubble(key: const Key('checkin-response'), text: text),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MilestoneCard extends StatelessWidget {
+  const _MilestoneCard(this.milestone);
+  final Milestone? milestone;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final m = milestone;
+    return Card(
+      key: const Key('home-milestone'),
+      child: Padding(
+        padding: const EdgeInsets.all(LwSpacing.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: LwSpacing.sm,
+              alignment: WrapAlignment.spaceBetween,
+              children: [
+                Text(l.homeMilestoneTitle, style: t.titleSmall),
+                if (m != null)
+                  Text(
+                    l.homeMilestonePhase(m.phase, m.phaseCount),
+                    style: t.labelMedium?.copyWith(color: p.accentStrong),
+                  ),
+              ],
+            ),
+            const SizedBox(height: LwSpacing.sm),
+            if (m == null)
+              Text(l.homeMilestoneEmpty, style: t.bodySmall)
+            else ...[
+              Semantics(
+                label: l.homeMilestoneHabitsLabel(
+                  m.habitsKept,
+                  m.habitsPlanned,
+                ),
+                container: true,
+                excludeSemantics: true,
+                child: ClipRRect(
+                  borderRadius: LwRadius.pillAll,
+                  child: LinearProgressIndicator(
+                    value: m.progress,
+                    minHeight: LwSpacing.xs,
+                    color: p.accent,
+                    backgroundColor: p.surfaceMuted,
+                  ),
+                ),
+              ),
+              const SizedBox(height: LwSpacing.xs),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ExcludeSemantics(
+                  child: Text(
+                    l.homeMilestoneHabits(m.habitsKept, m.habitsPlanned),
+                    style: t.labelMedium,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Next in your routine" (T-GOL-03e): the person's next own step today.
+/// Tap to open the routine; the circle marks it done.
+class _NextRoutineRow extends StatelessWidget {
+  const _NextRoutineRow({
+    required this.item,
+    required this.onOpen,
+    required this.onDone,
+  });
+
+  final RoutineItem item;
+  final VoidCallback onOpen;
+  final VoidCallback onDone;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final time = timeLabel(context, item.time);
+    return Material(
+      key: const Key('home-routine-next'),
+      color: p.mint,
+      borderRadius: LwRadius.lgAll,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onOpen,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            LwSpacing.xs,
+            LwSpacing.xs,
+            LwSpacing.md,
+            LwSpacing.xs,
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                key: const Key('home-routine-done'),
+                tooltip: l.routineMarkDone(item.label),
+                onPressed: onDone,
+                icon: Icon(
+                  Icons.radio_button_unchecked,
+                  color: p.onTintSecondary,
+                ),
+              ),
+              ExcludeSemantics(
+                child: Icon(iconFor(item.icon), color: p.primaryDark),
+              ),
+              const SizedBox(width: LwSpacing.sm),
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  label: l.homeRoutineNextLabel(item.label, time),
+                  excludeSemantics: true,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.homeRoutineNext.toUpperCase(),
+                        style: t.labelSmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                      Text(
+                        item.label,
+                        style: t.titleSmall?.copyWith(color: p.onTint),
+                      ),
+                      Text(
+                        time,
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, color: p.onTint),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

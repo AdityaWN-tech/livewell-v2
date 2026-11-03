@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -5,6 +7,12 @@ plugins {
     // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Release signing (Step 7, D-63): android/key.properties, never in git.
+val keyFile = rootProject.file("key.properties")
+val keyProps = Properties().apply {
+    if (keyFile.exists()) keyFile.inputStream().use { load(it) }
 }
 
 android {
@@ -15,6 +23,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications (scheduled reminders, T-ONB-03e).
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -22,7 +32,8 @@ android {
         applicationId = "net.conciergeconnectedcare.livewell"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // Health Connect needs Android 8 (API 26) or later (Step 4f, D-59).
+        minSdk = maxOf(26, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
@@ -57,11 +68,28 @@ android {
         }
     }
 
+    // Release signing (Step 7, D-63): android/key.properties (never in git)
+    // names the upload keystore. Without it, release builds fall back to the
+    // debug key so `flutter run --release` still works, and such a build
+    // can't be uploaded to Play. docs/release/checklist.md has the steps.
+    signingConfigs {
+        if (keyFile.exists()) {
+            create("upload") {
+                storeFile = file(keyProps.getProperty("storeFile"))
+                storePassword = keyProps.getProperty("storePassword")
+                keyAlias = keyProps.getProperty("keyAlias")
+                keyPassword = keyProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keyFile.exists()) {
+                signingConfigs.getByName("upload")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
@@ -80,4 +108,8 @@ flutter {
 // Warn instead of failing so those flavors still compile; bootstrap() stops them at launch.
 googleServices {
     missingGoogleServicesStrategy = com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy.WARN
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

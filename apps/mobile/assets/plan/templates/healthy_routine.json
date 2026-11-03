@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "focus": "healthy_routine",
+  "supporting": [
+    {
+      "id": "same_wake",
+      "title": "Wake up at the same time each day",
+      "anchor": "In the morning",
+      "movement": false
+    },
+    {
+      "id": "plan_tomorrow",
+      "title": "Spend one minute planning tomorrow",
+      "anchor": "After dinner",
+      "movement": false
+    }
+  ],
+  "days": [
+    {
+      "title": "Pick one time each day for your habit and do it for {minutes} minutes",
+      "reason": "Doing things at the same time makes them automatic.",
+      "anchor": "After breakfast",
+      "movement": false
+    },
+    {
+      "title": "Stretch gently for {minutes} minutes after you wake up",
+      "reason": "A short morning routine sets the tone for the day.",
+      "anchor": "After you wake up",
+      "movement": true
+    },
+    {
+      "title": "Spend {minutes} minutes tidying one small space",
+      "reason": "A tidy space can make the day feel calmer.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Take a {minutes}-minute walk at the same time as yesterday",
+      "reason": "Same time, same place helps a habit stick.",
+      "anchor": "After lunch",
+      "movement": true
+    },
+    {
+      "title": "Spend {minutes} minutes getting ready for tomorrow",
+      "reason": "Getting ready the night before makes mornings easier.",
+      "anchor": "After dinner",
+      "movement": false
+    },
+    {
+      "title": "Do your habit for {minutes} minutes right after something you already do",
+      "reason": "Linking a new habit to an old one helps you remember.",
+      "anchor": "After breakfast",
+      "movement": false
+    },
+    {
+      "title": "Spend {minutes} minutes looking back at your week",
+      "reason": "Looking back helps you see how far you have come.",
+      "anchor": "In the evening",
+      "movement": false
+    }
+  ]
+}

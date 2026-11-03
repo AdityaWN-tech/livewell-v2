@@ -1,0 +1,236 @@
+{
+  "name": "avatar_frames_sd15_dev",
+  "version": 1,
+  "about": "DEV ONLY (D-64): free avatar maker on the developer's laptop (RTX 2050, 4 GB). Stable Diffusion 1.5 is CreativeML OpenRAIL-M, not on the prod licence list (download_models.py COMMERCIAL_OK): never deploy these. Placeholders as in ../avatar_portrait.json.",
+  "use": "Expression frames as light edits of the neutral frame.",
+  "output_node": "21",
+  "models": [
+    {
+      "file": "v1-5-pruned-emaonly-fp16.safetensors",
+      "folder": "checkpoints",
+      "repo": "stable-diffusion-v1-5/stable-diffusion-v1-5",
+      "repo_path": "v1-5-pruned-emaonly.safetensors",
+      "convert": "fp16 (download_models --dev)",
+      "licence": "CreativeML-OpenRAIL-M",
+      "url": "https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-v1-5"
+    },
+    {
+      "file": "lcm-lora-sdv1-5.safetensors",
+      "folder": "loras",
+      "repo": "latent-consistency/lcm-lora-sdv1-5",
+      "repo_path": "pytorch_lora_weights.safetensors",
+      "licence": "OpenRAIL++",
+      "url": "https://huggingface.co/latent-consistency/lcm-lora-sdv1-5"
+    },
+    {
+      "file": "control_v11p_sd15_canny_fp16.safetensors",
+      "folder": "controlnet",
+      "repo": "comfyanonymous/ControlNet-v1-1_fp16_safetensors",
+      "repo_path": "control_v11p_sd15_canny_fp16.safetensors",
+      "licence": "CreativeML-OpenRAIL-M",
+      "url": "https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors"
+    }
+  ],
+  "graphs": {
+    "image": {
+      "1": {
+        "class_type": "CheckpointLoaderSimple",
+        "inputs": {
+          "ckpt_name": "v1-5-pruned-emaonly-fp16.safetensors"
+        }
+      },
+      "2": {
+        "class_type": "LoraLoader",
+        "inputs": {
+          "model": [
+            "1",
+            0
+          ],
+          "clip": [
+            "1",
+            1
+          ],
+          "lora_name": "lcm-lora-sdv1-5.safetensors",
+          "strength_model": 1.0,
+          "strength_clip": 1.0
+        }
+      },
+      "3": {
+        "class_type": "ModelSamplingDiscrete",
+        "inputs": {
+          "model": [
+            "2",
+            0
+          ],
+          "sampling": "lcm",
+          "zsnr": false
+        }
+      },
+      "4": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+          "clip": [
+            "2",
+            1
+          ],
+          "text": "stylized 3d animated film character portrait of an adult, smooth soft shading, clean simple shapes, soft studio lighting, plain mint green background, high quality render"
+        }
+      },
+      "5": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+          "clip": [
+            "2",
+            1
+          ],
+          "text": "{{POSITIVE}}"
+        }
+      },
+      "6": {
+        "class_type": "ConditioningConcat",
+        "inputs": {
+          "conditioning_to": [
+            "4",
+            0
+          ],
+          "conditioning_from": [
+            "5",
+            0
+          ]
+        }
+      },
+      "7": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+          "clip": [
+            "2",
+            1
+          ],
+          "text": "{{NEGATIVE}}"
+        }
+      },
+      "10": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "{{INPUT_IMAGE}}"
+        }
+      },
+      "11": {
+        "class_type": "ImageScaleToTotalPixels",
+        "inputs": {
+          "image": [
+            "10",
+            0
+          ],
+          "upscale_method": "lanczos",
+          "megapixels": 0.3,
+          "resolution_steps": 8
+        }
+      },
+      "12": {
+        "class_type": "Canny",
+        "inputs": {
+          "image": [
+            "11",
+            0
+          ],
+          "low_threshold": 0.3,
+          "high_threshold": 0.6
+        }
+      },
+      "13": {
+        "class_type": "ControlNetLoader",
+        "inputs": {
+          "control_net_name": "control_v11p_sd15_canny_fp16.safetensors"
+        }
+      },
+      "14": {
+        "class_type": "ControlNetApplyAdvanced",
+        "inputs": {
+          "positive": [
+            "6",
+            0
+          ],
+          "negative": [
+            "7",
+            0
+          ],
+          "control_net": [
+            "13",
+            0
+          ],
+          "image": [
+            "12",
+            0
+          ],
+          "strength": 0.5,
+          "start_percent": 0.0,
+          "end_percent": 0.8
+        }
+      },
+      "15": {
+        "class_type": "VAEEncode",
+        "inputs": {
+          "pixels": [
+            "11",
+            0
+          ],
+          "vae": [
+            "1",
+            2
+          ]
+        }
+      },
+      "16": {
+        "class_type": "KSampler",
+        "inputs": {
+          "model": [
+            "3",
+            0
+          ],
+          "seed": "{{SEED}}",
+          "steps": 6,
+          "cfg": 1.5,
+          "sampler_name": "lcm",
+          "scheduler": "sgm_uniform",
+          "positive": [
+            "14",
+            0
+          ],
+          "negative": [
+            "14",
+            1
+          ],
+          "latent_image": [
+            "15",
+            0
+          ],
+          "denoise": 0.5
+        }
+      },
+      "20": {
+        "class_type": "VAEDecode",
+        "inputs": {
+          "samples": [
+            "16",
+            0
+          ],
+          "vae": [
+            "1",
+            2
+          ]
+        }
+      },
+      "21": {
+        "class_type": "SaveImage",
+        "inputs": {
+          "images": [
+            "20",
+            0
+          ],
+          "filename_prefix": "lw"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "note": "T-ONB-03d. Maps 'What would you like to work on this week?' to a driver. Driver keys are PROVISIONAL until Dr. Gokula's 8 driver names are confirmed (needs-product); the clinical team must approve before prod. involves_movement = a movement plan may be offered, so the FR-GOL-03 activity check runs first.",
+  "focus": {
+    "move_more":       { "driver": "movement",  "involves_movement": true },
+    "sleep_better":    { "driver": "sleep",     "involves_movement": false },
+    "eat_better":      { "driver": "nutrition", "involves_movement": false },
+    "less_stress":     { "driver": "stress",    "involves_movement": false },
+    "more_energy":     { "driver": "energy",    "involves_movement": true },
+    "healthy_routine": { "driver": "routine",   "involves_movement": true }
+  }
+}

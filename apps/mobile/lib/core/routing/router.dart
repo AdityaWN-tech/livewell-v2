@@ -4,22 +4,42 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
+import '../../features/dev/presentation/illustration_gallery.dart';
+import '../../features/dev/presentation/avatar_frames_gallery.dart';
+import '../../features/dev/presentation/moments_gallery.dart';
+import '../../features/moments/domain/coach_message.dart';
+import '../../features/moments/presentation/moment_screen.dart';
 import '../../features/auth/presentation/email_sign_in_screen.dart';
 import '../../features/auth/presentation/phone_sign_in_screen.dart';
 import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/care/presentation/care_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/learn/presentation/breathing_screen.dart';
 import '../../features/learn/presentation/learn_screen.dart';
+import '../../features/learn/presentation/lesson_reader_screen.dart';
 import '../../features/onboarding/presentation/about_screen.dart';
 import '../../features/onboarding/presentation/age_gate_screen.dart';
 import '../../features/onboarding/presentation/legal_screen.dart';
 import '../../features/onboarding/presentation/why_screen.dart';
-import '../../features/account/application/account_setup.dart' show whyPath;
+import '../../features/account/application/account_setup.dart'
+    show avatarPath, checkinPath, focusPath, planPath, voicePath, whyPath;
+import '../../features/avatar/presentation/avatar_screen.dart';
+import '../../features/voice/presentation/voice_screen.dart';
+import '../../features/focus/presentation/focus_screen.dart';
+import '../../features/starter_plan/presentation/plan_preview_screen.dart';
+import '../../features/focus/presentation/onboarding_checkin_screen.dart';
+import '../../features/learn/presentation/learn_search_screen.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/learn/presentation/library_screen.dart';
+import '../../features/safety/presentation/help_now_screen.dart';
+import '../../features/plan/presentation/framework_screen.dart';
+import '../../features/routine/presentation/routine_screen.dart';
 import '../../features/plan/presentation/plan_screen.dart';
-import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/track/presentation/track_screen.dart';
+import '../../features/track/presentation/weekly_wins_screen.dart';
 import '../../features/welcome/presentation/welcome_screen.dart';
 import '../../features/consent/domain/consent.dart';
 import '../config/flavor.dart';
@@ -68,7 +88,34 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(path: whyPath, builder: (context, state) => const WhyScreen()),
+      // After sign-up: create your coach (T-ONB-03b), then the Why.
+      GoRoute(
+        path: avatarPath,
+        builder: (context, state) => const AvatarScreen(),
+      ),
+      GoRoute(
+        path: voicePath,
+        builder: (context, state) => const VoiceScreen(),
+      ),
+      // ?edit=1: changing the Why later (MY GOAL DO IT), not onboarding.
+      GoRoute(
+        path: whyPath,
+        builder: (context, state) =>
+            WhyScreen(editing: state.uri.queryParameters['edit'] == '1'),
+      ),
+      // After the Why: first check-in, then the focus (T-ONB-03d).
+      GoRoute(
+        path: checkinPath,
+        builder: (context, state) => const OnboardingCheckInScreen(),
+      ),
+      GoRoute(
+        path: focusPath,
+        builder: (context, state) => const FocusScreen(),
+      ),
+      GoRoute(
+        path: planPath,
+        builder: (context, state) => const PlanPreviewScreen(),
+      ),
       GoRoute(
         path: '/sign-in',
         builder: (context, state) => const SignInScreen(),
@@ -90,14 +137,96 @@ final routerProvider = Provider<GoRouter>((ref) {
           for (final (path, screen) in _tabs)
             StatefulShellBranch(
               routes: [
-                GoRoute(path: path, builder: (context, state) => screen),
+                GoRoute(
+                  path: path,
+                  builder: (context, state) => screen,
+                  routes: [
+                    // MY GOAL DO IT under Plan (FR-GOL-06).
+                    if (path == '/plan')
+                      GoRoute(
+                        path: 'framework',
+                        builder: (context, state) => const FrameworkScreen(),
+                      ),
+                    // My Daily Routine under Plan (T-GOL-03b).
+                    if (path == '/plan')
+                      GoRoute(
+                        path: 'routine',
+                        builder: (context, state) => const RoutineScreen(),
+                      ),
+                    // Weekly wins under Track (Step 4b).
+                    if (path == '/track')
+                      GoRoute(
+                        path: 'weekly',
+                        builder: (context, state) => const WeeklyWinsScreen(),
+                      ),
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'library',
+                        builder: (context, state) => const LibraryScreen(),
+                      ),
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'search',
+                        builder: (context, state) => const LearnSearchScreen(),
+                      ),
+                    // The lesson reader and breathing sessions (Step 4e).
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'item/:id',
+                        builder: (context, state) =>
+                            LearnItemScreen(id: state.pathParameters['id']!),
+                      ),
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'breathe',
+                        builder: (context, state) => const BreathingScreen(),
+                      ),
+                  ],
+                ),
               ],
             ),
         ],
       ),
+      // An Avatar Moment, full screen (T-DLY-03b). Notifications open it in
+      // T-DLY-03c; an unknown moment goes Home.
+      GoRoute(
+        path: '/moment/:name',
+        redirect: (context, state) =>
+            Moment.byFile(state.pathParameters['name'] ?? '') == null
+            ? '/home'
+            : null,
+        builder: (context, state) => MomentScreen(
+          moment: Moment.byFile(state.pathParameters['name']!)!,
+          // A routine reminder's payload (T-GOL-03d).
+          routine: state.uri.queryParameters['r'],
+        ),
+      ),
+      // Today's reminders, from the bell on Home (T-UI-02i).
+      GoRoute(
+        path: NotificationsScreen.path,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      // Safety resources, always reachable from Care (spec 14.2).
+      GoRoute(
+        path: '/help',
+        builder: (context, state) => const HelpNowScreen(),
+      ),
+      // Profile (T-ONB-03f) is the settings home; /settings stays as the
+      // parent of the consents screen and opens Profile too.
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
+        routes: [
+          // Add a phone number to this account (Step 4c).
+          GoRoute(
+            path: 'phone',
+            builder: (context, state) => const PhoneSignInScreen(linking: true),
+          ),
+        ],
+      ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
+        builder: (context, state) => const ProfileScreen(),
         routes: [
           GoRoute(
             path: 'consents',
@@ -109,6 +238,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: '/dev/tokens',
           builder: (context, state) => const DesignGallery(),
+        ),
+      if (flavor == Flavor.dev)
+        GoRoute(
+          path: MomentsGallery.path,
+          builder: (context, state) => const MomentsGallery(),
+        ),
+      if (flavor == Flavor.dev)
+        GoRoute(
+          path: AvatarFramesGallery.path,
+          builder: (context, state) => const AvatarFramesGallery(),
+        ),
+      if (flavor == Flavor.dev)
+        GoRoute(
+          path: IllustrationGallery.path,
+          builder: (context, state) => const IllustrationGallery(),
         ),
     ],
   );

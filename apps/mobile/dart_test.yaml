@@ -3,3 +3,7 @@
 # else on Linux (--exclude-tags golden).
 tags:
   golden:
+  # Frames for the onboarding walkthrough video (T-ONB-03g); only on demand:
+  #   flutter test --update-goldens --run-skipped --tags walkthrough test/journey
+  walkthrough:
+    skip: "Walkthrough frames are made on demand (see the test file)."

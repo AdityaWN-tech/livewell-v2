@@ -1,5 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import '../../features/profile/data/account_actions.dart';
+import '../data/firestore.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/account/application/account_setup.dart';
@@ -43,6 +47,15 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
   StartupTrace.mark('startup_begin');
   await Firebase.initializeApp(options: options);
   StartupTrace.mark('firebase_ready');
+  // After a log out: clear the last account's offline Firestore copy before
+  // anything reads it (T-ONB-03f). Must run before Firestore is first used.
+  if (await ref.read(localDataProvider).takeCachePending()) {
+    try {
+      await ref.read(firestoreProvider).clearPersistence();
+    } catch (_) {
+      // Already in use (rare): it is cleared on the next start instead.
+    }
+  }
   // The signed-in user is restored from the device; don't wait long for it.
   final user = await FirebaseAuth.instance.authStateChanges().first.timeout(
     const Duration(seconds: 2),

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "moment": "first_hello",
+  "review_status": "pending",
+  "note": "T-AVT-08f. Avatar Moment scripts. Placeholders only: {first_name}, {coach_name}, {why}, {step_title}, {step_minutes}, {smaller_minutes}, {streak_days}, {time_of_day}, {weekly_count}. A variant is used only when every placeholder in it has a value. Invitations, never orders or guilt; about an 8th-grade reading level. review_status: pending until the clinical team approves; prod uses approved only (dev may use pending). Listed for review in REVIEW.md.",
+  "when": "Once, on Home right after onboarding (avatar, voice and Why chosen)",
+  "emotion": "waving",
+  "then_emotion": "happy",
+  "primary_action": "start_step",
+  "secondary_actions": [
+    "close"
+  ],
+  "variants": [
+    {
+      "id": "h1",
+      "text": "Hi {first_name}, I'm {coach_name}, your Live Well coach. You told me your why: {why}. Let's start with one small step: {step_title}."
+    },
+    {
+      "id": "h2",
+      "text": "Hi {first_name}, I'm {coach_name}, your Live Well coach. Let's start with one small step: {step_title}."
+    },
+    {
+      "id": "h3",
+      "text": "Hi {first_name}, I'm {coach_name}, your Live Well coach. I'm here to help you take one small step at a time."
+    },
+    {
+      "id": "h4",
+      "text": "Hi, I'm {coach_name}, your Live Well coach. I'm here to help you take one small step at a time."
+    },
+    {
+      "id": "h5",
+      "text": "Hi, I'm your Live Well coach. I'm here to help you take one small step at a time."
+    },
+    {
+      "id": "h6",
+      "text": "Hello! I'm your Live Well coach. Let's take one small step at a time, together."
+    },
+    {
+      "id": "h7",
+      "text": "Hi {first_name}, I'm your Live Well coach. You told me your why: {why}. Let's start with one small step: {step_title}."
+    },
+    {
+      "id": "h8",
+      "text": "Hi {first_name}, I'm your Live Well coach. Let's start with one small step: {step_title}."
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
-import 'package:livewell/features/home/presentation/home_screen.dart';
+import 'package:livewell/features/focus/presentation/onboarding_checkin_screen.dart';
 import 'package:livewell/features/onboarding/presentation/why_screen.dart';
 import 'package:livewell/features/safety/presentation/safety_screens.dart';
 
@@ -109,7 +109,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(OnboardingCheckInScreen), findsOneWidget);
     expect(
       h.profiles.whys[uid],
       'I want to come off my diabetes medicines one day',
@@ -122,6 +122,6 @@ void main() {
     await saveWhy(tester, 'I want to stay active for my grandchildren.');
     expect(find.byType(SafetyInterruptScreen), findsNothing);
     expect(find.byType(SafetyNoticeSheet), findsNothing);
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(OnboardingCheckInScreen), findsOneWidget);
   });
 }

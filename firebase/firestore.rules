@@ -60,7 +60,79 @@ service cloud.firestore {
       function clientProfileKeys() {
         return ['display_name', 'email', 'tz', 'locale', 'region',
                 'age_confirmed', 'onboarding_step', 'focus_driver',
+                'focus_choices', 'activity_limited', 'touchpoints',
+                'coach_name', 'appearance', 'quiet_hours',
+                'notification_categories', 'routine_mode',
+                'routine_reminders_per_day',
                 'why_statement', 'created_at', 'updated_at', 'schema_version'];
+      }
+
+      // "What would you like to work on this week?" (T-ONB-03d): 1 or 2 of
+      // the fixed choices; activity_limited from the FR-GOL-03 check.
+      function validFocus(d) {
+        return (!('focus_choices' in d)
+                || (d.focus_choices is list
+                    && d.focus_choices.size() >= 1
+                    && d.focus_choices.size() <= 2
+                    && d.focus_choices.hasOnly(['move_more', 'sleep_better',
+                         'eat_better', 'less_stress', 'more_energy',
+                         'healthy_routine'])))
+          && (!('focus_driver' in d)
+              || (d.focus_driver is string && d.focus_driver.size() <= 40))
+          && (!('activity_limited' in d) || d.activity_limited is bool)
+          && (!('touchpoints' in d) || validTouchpoints(d.touchpoints))
+          && validSettings(d);
+      }
+
+      // Profile settings (T-ONB-03f, FR-SET-01): kept on the profile so they
+      // follow the person across devices.
+      function hhmm(v) {
+        return v is string && v.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$');
+      }
+      function validSettings(d) {
+        return (!('coach_name' in d)
+                || (d.coach_name is string && d.coach_name.size() >= 1
+                    && d.coach_name.size() <= 20))
+          && (!('appearance' in d)
+              || (d.appearance is map
+                  && d.appearance.keys().hasOnly(['theme', 'text_scale'])
+                  && d.appearance.theme in ['system', 'light', 'dark']
+                  && d.appearance.text_scale in [1.0, 1.15, 1.3]))
+          && (!('quiet_hours' in d)
+              || (d.quiet_hours is map
+                  && d.quiet_hours.keys().hasOnly(['start', 'end'])
+                  && hhmm(d.quiet_hours.start) && hhmm(d.quiet_hours.end)))
+          && (!('notification_categories' in d)
+              || (d.notification_categories is map
+                  && d.notification_categories.keys()
+                       .hasOnly(['greeting', 'nudge', 'reflection'])
+                  && d.notification_categories.greeting is bool
+                  && d.notification_categories.nudge is bool
+                  && d.notification_categories.reflection is bool))
+          // Life-event mode for My Daily Routine (T-GOL-03b, FR-DLY-09):
+          // travel / sick / busy until a date, or none.
+          && (!('routine_mode' in d)
+              || (d.routine_mode is map
+                  && ((d.routine_mode.keys().hasOnly(['kind'])
+                       && d.routine_mode.kind == 'none')
+                      || (d.routine_mode.keys().hasOnly(['kind', 'until'])
+                          && d.routine_mode.kind in ['travel', 'sick', 'busy']
+                          && d.routine_mode.until is string
+                          && d.routine_mode.until.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))))
+          // Routine reminders per day (T-GOL-03d): 0 (off) to 10.
+          && (!('routine_reminders_per_day' in d)
+              || (d.routine_reminders_per_day is int
+                  && d.routine_reminders_per_day >= 0
+                  && d.routine_reminders_per_day <= 10));
+      }
+
+      // Morning / midday / evening touchpoint times, "HH:MM" (T-ONB-03e).
+      function validTouchpoints(t) {
+        return t is map
+          && t.keys().hasOnly(['morning', 'midday', 'evening'])
+          && t.morning.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+          && t.midday.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+          && t.evening.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$');
       }
 
       // The personal Why (FR-ONB-05) is short free text.
@@ -74,11 +146,13 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(clientProfileKeys())
         && request.resource.data.age_confirmed == true
         && validWhy(request.resource.data)
+        && validFocus(request.resource.data)
         && hasMeta(request.resource.data);
       allow update: if isOwner(uid)
         && onlyChanges(clientProfileKeys())
         && request.resource.data.age_confirmed == true
         && validWhy(request.resource.data)
+        && validFocus(request.resource.data)
         && request.resource.data.updated_at is timestamp;
       // Account deletion runs on the server (FR-SET-02).
       allow delete: if false;
@@ -101,33 +175,85 @@ service cloud.firestore {
         allow update, delete: if false;
       }
 
-      // ---------- avatar: client style only, vendor fields server-only ----------
+      // ---------- avatar: the coach the person picks; made-for-you sets server-only ----------
+      // T-AVT-08b: the app writes a ready-made coach (`source: default`,
+      // `coach_id`), the coach's name and the background. Selfie and built
+      // avatars, `frames_version`, vendor ids and thumbnails are written by
+      // the Media Service (T-AVT-08c/d). Older cartoon docs keep `style_config`.
       match /avatar/{docId} {
         function clientAvatarKeys() {
           return ['type', 'style_config', 'raw_media_retained',
-                  'created_at', 'updated_at', 'schema_version'];
+                  'created_at', 'updated_at', 'schema_version',
+                  'source', 'coach_id', 'coach_name', 'background'];
+        }
+        function readyCoaches() {
+          return ['brown_hair', 'long_black_hair', 'green_hijab', 'navy_turban',
+                  'grey_glasses', 'short_curls', 'short_black_hair', 'wheelchair'];
+        }
+        function validAvatar(d) {
+          return d.type in ['stylized', 'photoreal', '3d_adult']
+            && d.get('raw_media_retained', false) == false
+            && (d.type != '3d_adult'
+                || (d.get('source', '') in ['default', 'selfie', 'built']
+                    && d.get('coach_id', 'brown_hair') in readyCoaches()))
+            && (!('coach_name' in d)
+                || (d.coach_name is string
+                    && d.coach_name.size() >= 1 && d.coach_name.size() <= 20))
+            && (!('background' in d)
+                || (d.background is int && d.background >= 0 && d.background <= 5));
         }
         allow read: if isOwner(uid);
         allow create: if isAdultOwner(uid) && docId == 'current'
           && request.resource.data.keys().hasOnly(clientAvatarKeys())
-          && request.resource.data.type in ['stylized', 'photoreal']
+          && validAvatar(request.resource.data)
+          // Only a ready-made coach is made on the phone.
+          && request.resource.data.get('source', 'default') == 'default'
           && hasMeta(request.resource.data);
         allow update: if isAdultOwner(uid) && docId == 'current'
-          && onlyChanges(['type', 'style_config', 'raw_media_retained', 'updated_at'])
-          && request.resource.data.type in ['stylized', 'photoreal'];
+          && onlyChanges(['type', 'style_config', 'raw_media_retained', 'updated_at',
+                          'source', 'coach_id', 'coach_name', 'background'])
+          && validAvatar(request.resource.data)
+          // The app may go back to a ready-made coach, never claim a
+          // made-for-you one.
+          && (request.resource.data.get('source', 'default')
+                == resource.data.get('source', 'default')
+              || request.resource.data.get('source', 'default') == 'default');
         allow delete: if false; // "Delete my avatar" runs on the server (FR-SET-03)
       }
 
       // ---------- voices: status and vendor ids are server-only (16.2) ----------
       match /voices/{voiceId} {
+        function validSpeed(d) {
+          return d.speed is number && d.speed >= 0.8 && d.speed <= 1.2;
+        }
+        // A library voice (T-ONB-03c): no personal data, chosen in the app.
+        // Id = the app's catalogue id; only fixed fields.
+        function validLibraryVoice(d) {
+          return d.keys().hasOnly(['kind', 'vendor_voice_id', 'status',
+                   'speed', 'style', 'created_at', 'updated_at',
+                   'schema_version'])
+            && d.kind == 'library'
+            && voiceId.matches('^lw-[a-z0-9-]{1,30}$')
+            && d.vendor_voice_id is string
+            && d.status in ['active', 'inactive']
+            && validSpeed(d)
+            && d.style in ['calm', 'energetic'];
+        }
         allow read: if isOwner(uid);
-        // The app may only change playback preferences on an existing voice.
+        // Cloned voices (self, loved one, Dr. Gokula) are created only by
+        // the server after the consent flow (spec 7.4, 16.2).
+        allow create: if isAdultOwner(uid)
+          && validLibraryVoice(request.resource.data)
+          && hasMeta(request.resource.data);
+        // Any voice: playback preferences. Library voices: also switching
+        // which one is active. Status of cloned voices stays server-only.
         allow update: if isAdultOwner(uid)
-          && onlyChanges(['speed', 'style', 'updated_at'])
-          && request.resource.data.speed is number
-          && request.resource.data.speed >= 0.8
-          && request.resource.data.speed <= 1.2;
-        allow create, delete: if false;
+          && validSpeed(request.resource.data)
+          && (onlyChanges(['speed', 'style', 'updated_at'])
+              || (resource.data.kind == 'library'
+                  && onlyChanges(['status', 'speed', 'style', 'updated_at'])
+                  && request.resource.data.status in ['active', 'inactive']));
+        allow delete: if false;
       }
 
       // ---------- assessments: saveable until completed (FR-ONB-06) ----------
@@ -143,19 +269,59 @@ service cloud.firestore {
       }
 
       // ---------- goals and habits (FR-GOL) ----------
+      // Step 4a (D-53): one goal ("primary") and at most two own habits
+      // (support_1, support_2), so FR-GOL-01's limits hold here too. Same
+      // sizes and choices as the app (lib/features/goals/domain/goal.dart).
+      function anchors() {
+        return ['wakeUp', 'breakfast', 'lunch', 'dinner', 'bedtime'];
+      }
       match /goals/{goalId} {
+        function validGoal(d) {
+          return d.keys().hasOnly(['action', 'days_per_week', 'minutes',
+                   'anchor', 'barrier_plan', 'link_why', 'status',
+                   'start_date', 'created_at', 'updated_at', 'schema_version'])
+            && d.action is string && d.action.size() > 0
+            && d.action.size() <= 60
+            && d.days_per_week is int
+            && d.days_per_week >= 1 && d.days_per_week <= 7
+            && d.minutes in [2, 5, 10, 15, 20, 30]
+            && d.anchor in anchors()
+            && d.barrier_plan is string && d.barrier_plan.size() <= 120
+            && d.link_why is bool
+            && d.status in ['active', 'paused']
+            && d.start_date is string
+            && d.start_date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+        }
         allow read: if isOwner(uid);
-        allow create: if isAdultOwner(uid) && hasMeta(request.resource.data);
-        allow update: if isAdultOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && goalId == 'primary'
+          && validGoal(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && validGoal(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at;
         allow delete: if false; // pause instead (FR-GOL-02)
       }
 
       match /habits/{habitId} {
+        function validHabit(d) {
+          return d.keys().hasOnly(['title', 'anchor', 'minutes', 'active',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.title is string && d.title.size() > 0
+            && d.title.size() <= 40
+            && d.anchor in anchors()
+            && d.minutes in [2, 5, 10, 15]
+            && d.active is bool;
+        }
         allow read: if isOwner(uid);
         allow create: if isAdultOwner(uid)
-          && request.resource.data.title is string
+          && habitId in ['support_1', 'support_2']
+          && validHabit(request.resource.data)
           && hasMeta(request.resource.data);
-        allow update: if isAdultOwner(uid);
+        // Stopped, not deleted: active = false.
+        allow update: if isAdultOwner(uid)
+          && validHabit(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at;
         allow delete: if false;
       }
 
@@ -178,19 +344,176 @@ service cloud.firestore {
       }
 
       // ---------- check-ins: one per date (FR-DLY-02) ----------
+      // Mood first (T-DLY-02): mood required, the rest optional.
       match /checkins/{date} {
+        function optionalScore(d, key) {
+          return !(key in d) || isScore(d[key]);
+        }
         function validCheckin(d) {
-          return isScore(d.energy) && isScore(d.sleep)
-            && isScore(d.stress) && isScore(d.mood)
-            && d.time_available in [2, 5, 10, 30]
-            && d.source in ['app', 'widget', 'watch'];
+          return d.keys().hasOnly(['mood', 'energy', 'sleep', 'stress',
+                   'time_available', 'barrier_text', 'source', 'gentle_day',
+                   'created_at', 'updated_at', 'schema_version'])
+            && isScore(d.mood)
+            && optionalScore(d, 'energy')
+            && optionalScore(d, 'sleep')
+            && optionalScore(d, 'stress')
+            && (!('time_available' in d) || d.time_available in [2, 5, 10, 30])
+            && (!('barrier_text' in d)
+                || (d.barrier_text is string && d.barrier_text.size() <= 140))
+            && d.source in ['app', 'widget', 'watch']
+            && d.gentle_day is bool
+            // Safety floor (spec 15.3): low mood or high stress is always a
+            // gentle day, so no portal card can appear that day.
+            && (d.gentle_day == true
+                || (d.mood > 2 && (!('stress' in d) || d.stress < 4)));
         }
         allow read: if isOwner(uid);
         allow create: if isAdultOwner(uid)
           && date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
           && validCheckin(request.resource.data)
           && hasMeta(request.resource.data);
-        allow update: if isAdultOwner(uid) && validCheckin(request.resource.data);
+        // Same-day re-submit updates the record; created_at never changes.
+        allow update: if isAdultOwner(uid)
+          && validCheckin(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
+      // ---------- evening reflection, one per local date (FR-DLY-05, T-UI-01d) ----------
+      // The app runs the text through the red-flag rules before saving;
+      // emergency, crisis and disordered-eating text is never sent.
+      match /reflections/{date} {
+        function validReflection(d) {
+          return d.keys().hasOnly(['text', 'prompt', 'source', 'created_at',
+                   'updated_at', 'schema_version'])
+            && d.text is string && d.text.size() > 0 && d.text.size() <= 500
+            && d.prompt in ['went_well']
+            && d.source in ['app'];
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && validReflection(request.resource.data)
+          && hasMeta(request.resource.data);
+        // Same-day edit; created_at never changes.
+        allow update: if isAdultOwner(uid)
+          && validReflection(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
+      // ---------- My Daily Routine (T-GOL-03a) ----------
+      // Routines the person builds for each weekday. Items come from the
+      // approved catalog (content/routine/catalog.json) or are custom labels
+      // (the app runs them through the red-flag rules first, GOL-03c; they
+      // are never spoken, FR-VOC-05).
+      // Each item is its own document (D-44): a list of 12 items can't be
+      // checked in one document within the 1000-expression limit.
+      function validWeekdays(v) {
+        return v is list && v.size() >= 1 && v.size() <= 7
+          && v.toSet().size() == v.size()
+          && v.toSet().hasOnly(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+      }
+      function routineId(v) {
+        return v is string && v.matches('^[A-Za-z0-9-]{1,40}$');
+      }
+
+      // A named set of days ("Weekdays", "Weekend"). Never deleted: paused
+      // with active, like habits.
+      match /routines/{rid} {
+        function validRoutine(d) {
+          return d.keys().hasOnly(['name', 'days', 'active',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.name is string && d.name.size() > 0 && d.name.size() <= 40
+            && validWeekdays(d.days)
+            && d.active is bool;
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && routineId(rid)
+          && validRoutine(request.resource.data)
+          && hasMeta(request.resource.data);
+        // created_at never changes.
+        allow update: if isAdultOwner(uid)
+          && validRoutine(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
+      // One step of a routine. The person may delete an item (with undo in
+      // the app). Up to 12 a day is the app's limit; rules can't count.
+      match /routine_items/{itemId} {
+        // Same lists as the app (a test keeps them in sync).
+        function routineCatalogIds() {
+          return ['wake_up', 'drink_water', 'morning_stretch', 'morning_walk',
+                  'breathing_break', 'healthy_breakfast', 'work_break',
+                  'walk_after_meal', 'family_time', 'read', 'quiet_time',
+                  'screen_off', 'sleep_wind_down', 'bedtime'];
+        }
+        function routineIcons() {
+          return ['sunrise', 'water', 'stretch', 'walk', 'breathe', 'breakfast',
+                  'pause', 'family', 'book', 'quiet', 'screen_off', 'moon',
+                  'bed', 'star', 'heart', 'music'];
+        }
+        function validItem(d) {
+          return d.keys().hasOnly(['routine_id', 'catalog_id', 'custom',
+                   'label', 'icon', 'time', 'duration_min', 'days', 'reminder',
+                   'avatar_announce', 'order',
+                   'created_at', 'updated_at', 'schema_version'])
+            && routineId(d.routine_id)
+            // Either an approved activity or a custom one, never both.
+            && (('catalog_id' in d && !('custom' in d)
+                  && d.catalog_id in routineCatalogIds())
+                || (!('catalog_id' in d) && 'custom' in d && d.custom == true))
+            && d.label is string && d.label.size() > 0 && d.label.size() <= 40
+            && d.icon in routineIcons()
+            && hhmm(d.time)
+            && d.duration_min is int && d.duration_min >= 1 && d.duration_min <= 180
+            && (!('days' in d) || validWeekdays(d.days))
+            && d.reminder is bool
+            && d.avatar_announce is bool
+            && d.order is int;
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && routineId(itemId)
+          && validItem(request.resource.data)
+          && hasMeta(request.resource.data);
+        // created_at never changes; an item can't switch between catalog
+        // and custom (that would let a custom label take a catalog line).
+        allow update: if isAdultOwner(uid)
+          && validItem(request.resource.data)
+          && request.resource.data.get('catalog_id', null) == resource.data.get('catalog_id', null)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if isOwner(uid);
+      }
+
+      // One log per item per local day, id date_itemId, so marking the same
+      // item from the app, the widget and the notification (offline too)
+      // stays one log.
+      match /routine_logs/{logId} {
+        function validRoutineLog(d) {
+          return d.keys().hasOnly(['date', 'item_id', 'status', 'source',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.date is string && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+            && routineId(d.item_id)
+            && logId == d.date + '_' + d.item_id
+            && d.status in ['done', 'skipped']
+            && d.source in ['app', 'widget', 'notification'];
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && validRoutineLog(request.resource.data)
+          && hasMeta(request.resource.data);
+        // The id fixes date and item; only the status and source change.
+        allow update: if isAdultOwner(uid)
+          && validRoutineLog(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
         allow delete: if false;
       }
 
@@ -206,6 +529,28 @@ service cloud.firestore {
         allow create, delete: if false;
       }
 
+      // ---------- content progress: where the person is in a lesson (Step 4e) ----------
+      // One doc per content item; only progress and completed, never what
+      // was read aloud or any health data.
+      match /content_progress/{itemId} {
+        function validProgress(d) {
+          return d.keys().hasOnly(['progress', 'completed',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.progress is number && d.progress >= 0 && d.progress <= 1
+            && d.completed is bool
+            && itemId.matches('^[A-Za-z0-9_-]{1,100}$');
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && validProgress(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && validProgress(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
       // ---------- portal events: app-side events only, append-only (13.2) ----------
       match /portal_events/{eventId} {
         allow read: if isOwner(uid);
@@ -218,9 +563,38 @@ service cloud.firestore {
       }
 
       // ---------- server-written, read-only for the app ----------
+      // Daily plans are written by the nightly job, except the rule-based
+      // 7-day starter plan (T-ONB-03e), which the app writes itself. The app
+      // can never overwrite a plan the server wrote.
       match /daily_plans/{date} {
+        function validStep(s) {
+          return s is map
+            && s.keys().hasOnly(['title', 'reason', 'anchor', 'minutes',
+                 'smaller_title', 'smaller_minutes', 'focus'])
+            && s.title is string && s.title.size() <= 160
+            && s.minutes in [2, 5, 10, 30];
+        }
+        function validStarterDay(d) {
+          return d.keys().hasOnly(['next_step', 'alternatives', 'supporting',
+                   'mode', 'day_number', 'source', 'template_version',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.source == 'starter_v1'
+            && validStep(d.next_step)
+            && d.alternatives is list && d.alternatives.size() <= 2
+            && d.supporting is list && d.supporting.size() <= 2
+            && d.mode in ['normal', 'gentle']
+            && d.day_number is int && d.day_number >= 1 && d.day_number <= 7;
+        }
         allow read: if isOwner(uid);
-        allow write: if false;
+        allow create: if isAdultOwner(uid)
+          && date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && validStarterDay(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && resource.data.source == 'starter_v1'
+          && validStarterDay(request.resource.data)
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
       }
       match /messages/{messageId} {
         allow read: if isOwner(uid);

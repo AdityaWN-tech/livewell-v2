@@ -4,6 +4,7 @@ portrait with the blink and mouth frames drawn, and checks that run locally."""
 from __future__ import annotations
 
 import io
+from importlib.util import find_spec
 from pathlib import Path
 
 import pytest
@@ -26,6 +27,13 @@ from media.stylizer import EndpointNotApproved, check_endpoint
 SD15 = Path(__file__).resolve().parents[1] / "workflows" / "sd15-dev"
 LOCAL = "http://127.0.0.1:6800"
 LOCAL_ONLY = frozenset({"127.0.0.1"})
+
+#: Tests that need the `local` extra (OpenCV, NumPy, D-64). CI installs only
+#: `dev`, so they run on the developer's laptop and are skipped in CI.
+needs_local = pytest.mark.skipif(
+    find_spec("cv2") is None or find_spec("numpy") is None,
+    reason="needs the local extra: pip install -e '.[local]'",
+)
 
 
 # --- Plain HTTP only to this computer -------------------------------------
@@ -147,6 +155,7 @@ def test_a_failed_drawing_falls_back_to_neutral() -> None:
     assert fs.fell_back == ("mouth_O",)
 
 
+@needs_local
 def test_the_drawn_frames_are_blink_and_every_mouth_shape() -> None:
     from media.drawn_frames import DRAWN as REAL  # needs the local extra
 
@@ -182,6 +191,7 @@ def solid(rgb: tuple[int, int, int]) -> bytes:
     return out.getvalue()
 
 
+@needs_local
 def test_the_portrait_gets_the_selfies_skin_tone() -> None:
     keeper = SkinToneKeeper(LighterStylizer(), WholeImageFace())  # type: ignore[arg-type]
     selfie = solid((120, 80, 60))

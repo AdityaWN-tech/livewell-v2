@@ -1,6 +1,6 @@
 # Roadmap
 
-The work in progress and what comes next, as a checklist. Each item is one PR, stacked on the one before and reviewed by the owner before the next starts. The overall build order and status of every task is in [progress.md](progress.md); agreed changes in [decisions.md](decisions.md).
+The work in progress and what comes next, as a checklist. Each item is one PR on a short branch off `main`, merged when CI is green and the owner has reviewed it (D-67; until 2026-11-03 PRs were stacked on the one before). The overall build order and status of every task is in [progress.md](progress.md); agreed changes in [decisions.md](decisions.md).
 
 ## Now: the 3D coach (T-AVT-08) and builds
 

@@ -2,20 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 
 void main() {
-  group('PhoneCountry.india', () {
-    const c = PhoneCountry.india;
-    test('accepts 10-digit mobiles starting 6-9, in common formats', () {
-      expect(c.toE164('98765 43210'), '+919876543210');
-      expect(c.toE164('+91 98765-43210'), '+919876543210');
-      expect(c.toE164('09876543210'), '+919876543210');
-      expect(c.toE164('6000000000'), '+916000000000');
-    });
-    test('rejects landline-style, short or long numbers', () {
-      expect(c.toE164('5876543210'), isNull);
-      expect(c.toE164('987654321'), isNull);
-      expect(c.toE164('987654321012'), isNull);
-      expect(c.toE164(''), isNull);
-    });
+  test('phone sign-in offers US (+1) only (D-66)', () {
+    expect(PhoneCountry.values, [PhoneCountry.us]);
+    expect(PhoneCountry.us.toE164('+91 98765 43210'), isNull);
   });
 
   group('PhoneCountry.us', () {
@@ -32,6 +21,8 @@ void main() {
   });
 
   group('inferRegion (D-03: never guess)', () {
+    // Kept although new phone numbers are +1 only (D-66): any +91 account
+    // must still get India's emergency and crisis numbers.
     test('+91 is India', () {
       expect(inferRegion(phoneE164: '+919876543210'), 'IN');
     });

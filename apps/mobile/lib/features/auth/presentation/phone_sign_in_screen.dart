@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,10 +35,8 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
   final _codeForm = GlobalKey<FormState>();
   final _number = TextEditingController();
   final _code = TextEditingController();
-  late PhoneCountry _country =
-      PlatformDispatcher.instance.locale.countryCode == 'US'
-      ? PhoneCountry.us
-      : PhoneCountry.india;
+  // US numbers only (D-66).
+  static const _country = PhoneCountry.us;
   PhoneVerification? _verification;
   bool _busy = false;
   int _resendIn = 0;
@@ -129,20 +126,7 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
           LwPageTitle(widget.linking ? l.profileLinkPhone : l.phoneTitle),
-          Text(l.phoneCountryLabel, style: t.labelMedium),
-          const SizedBox(height: LwSpacing.xs),
-          SegmentedButton<PhoneCountry>(
-            segments: [
-              ButtonSegment(
-                value: PhoneCountry.india,
-                label: Text(l.countryIndia),
-              ),
-              ButtonSegment(value: PhoneCountry.us, label: Text(l.countryUs)),
-            ],
-            selected: {_country},
-            showSelectedIcon: false,
-            onSelectionChanged: (s) => setState(() => _country = s.first),
-          ),
+          Text(l.phoneUsOnlyNote, style: t.bodyMedium),
           const SizedBox(height: LwSpacing.lg),
           TextFormField(
             key: const Key('phone'),

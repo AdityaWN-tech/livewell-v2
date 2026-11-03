@@ -18,7 +18,7 @@ class AuthUser {
   final List<String> providers;
   final String? email;
 
-  /// E.164, e.g. +919876543210.
+  /// E.164, e.g. +12125550123.
   final String? phoneNumber;
   final String? displayName;
 }
@@ -115,9 +115,10 @@ class PhoneVerification {
   final int? resendToken;
 }
 
-/// Countries offered for phone sign-in (markets India and US, D-03).
+/// Countries offered for phone sign-in. US only (D-66): the app is mainly
+/// used in the US. India is still a market for safety numbers (D-03); people
+/// there sign in with email, Google or Apple.
 enum PhoneCountry {
-  india('IN', '+91', 10),
   us('US', '+1', 10);
 
   const PhoneCountry(this.isoCode, this.dialCode, this.nationalLength);
@@ -130,20 +131,13 @@ enum PhoneCountry {
   /// number for this country.
   String? normalise(String input) {
     var digits = input.replaceAll(RegExp(r'[^0-9]'), '');
-    // Allow people to type the country code or a leading trunk 0.
+    // Allow people to type the country code.
     final cc = dialCode.substring(1);
     if (digits.length == nationalLength + cc.length && digits.startsWith(cc)) {
       digits = digits.substring(cc.length);
     }
-    if (this == PhoneCountry.india &&
-        digits.length == 11 &&
-        digits.startsWith('0')) {
-      digits = digits.substring(1);
-    }
     if (digits.length != nationalLength) return null;
     return switch (this) {
-      // Indian mobile numbers start with 6-9.
-      PhoneCountry.india => RegExp(r'^[6-9]').hasMatch(digits) ? digits : null,
       // NANP: area code and exchange can't start with 0 or 1.
       PhoneCountry.us =>
         RegExp(r'^[2-9][0-9]{2}[2-9]').hasMatch(digits) ? digits : null,
@@ -157,7 +151,9 @@ enum PhoneCountry {
   }
 }
 
-/// Region for safety numbers and legal texts (D-03). Never guessed: +1 is
+/// Region for safety numbers and legal texts (D-03). New phone numbers are
+/// +1 only (D-66), but +91 still maps to India so any +91 account gets India's
+/// emergency and crisis numbers. Never guessed: +1 is
 /// shared with Canada and the Caribbean, so it means US only when the device
 /// is also set to the US. Null means "ask the user later".
 String? inferRegion({String? phoneE164, String? deviceCountry}) {

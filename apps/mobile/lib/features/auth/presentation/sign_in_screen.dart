@@ -8,8 +8,8 @@ import '../../../l10n/app_localizations.dart';
 import '../data/firebase_auth_service.dart';
 import 'auth_copy.dart';
 
-/// Choose how to sign in (FR-ONB-01, D-02). Phone first: most current
-/// portal members use +91 phone numbers. Google and Apple are one-tap logo
+/// Choose how to sign in (FR-ONB-01, D-02). Phone sign-in takes US (+1)
+/// numbers only (D-66); everyone else uses email, Google or Apple. Google and Apple are one-tap logo
 /// buttons (T-ONB-03a): one tap signs in, or signs up if there's no account.
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});

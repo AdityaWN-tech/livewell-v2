@@ -12,14 +12,12 @@ import 'profile_test.dart' show confirm, openProfile, signedIn, tapKey;
 
 Future<void> addNumber(
   WidgetTester tester, {
-  String number = '98765 43210',
+  String number = '(212) 555-0123',
   String code = '123456',
 }) async {
   await tapKey(tester, 'profile-link-phone');
   expect(find.byType(PhoneSignInScreen), findsOneWidget);
   expect(find.text('Add a phone number'), findsOneWidget);
-  await tester.tap(find.text('India (+91)'));
-  await tester.pumpAndSettle();
   await tester.enterText(find.byKey(const Key('phone')), number);
   await tester.tap(find.text('Send code'));
   await tester.pumpAndSettle();
@@ -40,7 +38,7 @@ void main() {
     final user = h.auth.signedIn!;
     expect(user.uid, 'u1', reason: 'added to this account, not a new one');
     expect(user.providers, ['password', 'phone']);
-    expect(user.phoneNumber, '+919876543210');
+    expect(user.phoneNumber, '+12125550123');
     expect(find.textContaining('Your phone number is added'), findsOneWidget);
 
     // The row now offers to remove it, showing the number.
@@ -63,7 +61,7 @@ void main() {
 
   testWidgets('a number another account uses: a kind message', (tester) async {
     final h = signedIn();
-    h.auth.takenPhones.add('+919876543210');
+    h.auth.takenPhones.add('+12125550123');
     await h.boot(tester);
     await openProfile(tester);
     await addNumber(tester);

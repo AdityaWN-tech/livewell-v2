@@ -682,17 +682,11 @@ abstract class AppLocalizations {
   /// **'Continue with phone'**
   String get phoneTitle;
 
-  /// No description provided for @phoneCountryLabel.
+  /// No description provided for @phoneUsOnlyNote.
   ///
   /// In en, this message translates to:
-  /// **'Country'**
-  String get phoneCountryLabel;
-
-  /// No description provided for @countryIndia.
-  ///
-  /// In en, this message translates to:
-  /// **'India (+91)'**
-  String get countryIndia;
+  /// **'Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.'**
+  String get phoneUsOnlyNote;
 
   /// No description provided for @countryUs.
   ///
@@ -709,7 +703,7 @@ abstract class AppLocalizations {
   /// No description provided for @phoneInvalidMsg.
   ///
   /// In en, this message translates to:
-  /// **'Enter a valid mobile number for this country.'**
+  /// **'Enter a valid US mobile number.'**
   String get phoneInvalidMsg;
 
   /// No description provided for @phoneSendCode.

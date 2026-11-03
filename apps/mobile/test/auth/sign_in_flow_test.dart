@@ -34,26 +34,29 @@ void main() {
     expect(find.byKey(const Key('sign-in-apple')), findsOneWidget);
   });
 
-  testWidgets('phone: India number, code, then the account is set up', (
+  testWidgets('phone: US number, code, then the account is set up', (
     tester,
   ) async {
     final h = Harness(store: readyStore());
     await h.boot(tester);
     await tapText(tester, 'Continue with phone');
-    await tapText(tester, 'India (+91)');
 
     await tester.enterText(find.byKey(const Key('phone')), '12345');
     await tapText(tester, 'Send code');
-    expect(
-      find.text('Enter a valid mobile number for this country.'),
-      findsOneWidget,
-    );
+    expect(find.text('Enter a valid US mobile number.'), findsOneWidget);
     expect(h.auth.codesSent, 0);
 
-    await tester.enterText(find.byKey(const Key('phone')), '98765 43210');
+    // A number with India's +91 code is rejected: phone sign-in is +1 only
+    // (D-66). (The bare 10 digits 98765 43210 are also a valid US number.)
+    await tester.enterText(find.byKey(const Key('phone')), '+91 98765 43210');
+    await tapText(tester, 'Send code');
+    expect(find.text('Enter a valid US mobile number.'), findsOneWidget);
+    expect(h.auth.codesSent, 0);
+
+    await tester.enterText(find.byKey(const Key('phone')), '(212) 555-0123');
     await tapText(tester, 'Send code');
     expect(
-      find.text('We sent a 6-digit code to +919876543210.'),
+      find.text('We sent a 6-digit code to +12125550123.'),
       findsOneWidget,
     );
     expect(find.text('Resend code in 30 s'), findsOneWidget);
@@ -69,8 +72,9 @@ void main() {
     await tapText(tester, 'Verify');
     expect(find.byType(AvatarScreen), findsOneWidget);
 
-    const uid = 'phone:+919876543210';
-    expect(h.profiles.created[uid]!.region, 'IN');
+    const uid = 'phone:+12125550123';
+    // flutter_test's locale is en_US, so +1 resolves to the US (D-03).
+    expect(h.profiles.created[uid]!.region, 'US');
     expect(h.consents.records.map((r) => r.type), legalDocuments);
     expect(h.store.saved, isNull, reason: 'on-device progress cleared');
   });
@@ -79,8 +83,7 @@ void main() {
     final h = Harness(store: readyStore());
     await h.boot(tester);
     await tapText(tester, 'Continue with phone');
-    await tapText(tester, 'India (+91)');
-    await tester.enterText(find.byKey(const Key('phone')), '9876543210');
+    await tester.enterText(find.byKey(const Key('phone')), '2125550123');
     await tapText(tester, 'Send code');
     await pumpFrames(tester, PhoneSignInScreen.resendDelay);
     await tester.pumpAndSettle();
@@ -190,14 +193,15 @@ void main() {
     expect(h.store.saved, isNull);
   });
 
-  testWidgets('phone screen labels both countries with their codes', (
+  testWidgets('phone screen is US (+1) only, no India option (D-66)', (
     tester,
   ) async {
     await Harness(store: readyStore()).boot(tester);
     await tapText(tester, 'Continue with phone');
-    expect(find.text('India (+91)'), findsOneWidget);
-    // Regression: PR #13 had overwritten this label with "the US".
-    expect(find.text('United States (+1)'), findsOneWidget);
+    expect(find.text('India (+91)'), findsNothing);
+    expect(find.textContaining('+91'), findsNothing);
+    expect(find.text('+1 '), findsOneWidget, reason: 'number field prefix');
+    expect(find.textContaining('Use email, Google or Apple'), findsOneWidget);
   });
 }
 

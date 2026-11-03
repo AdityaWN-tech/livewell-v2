@@ -337,10 +337,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneTitle => 'Continue with phone';
 
   @override
-  String get phoneCountryLabel => 'Country';
-
-  @override
-  String get countryIndia => 'India (+91)';
+  String get phoneUsOnlyNote =>
+      'Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.';
 
   @override
   String get countryUs => 'United States (+1)';
@@ -349,7 +347,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneNumberLabel => 'Mobile number';
 
   @override
-  String get phoneInvalidMsg => 'Enter a valid mobile number for this country.';
+  String get phoneInvalidMsg => 'Enter a valid US mobile number.';
 
   @override
   String get phoneSendCode => 'Send code';

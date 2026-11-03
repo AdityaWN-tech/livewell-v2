@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/analytics/analytics.dart';
 import '../../../core/config/feature_flags.dart';
 import '../../../core/design/avatar/avatar_art.dart' show AvatarView;
 import '../../../core/design/components/speech_bubble.dart';
@@ -114,6 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _widgetLinks = inbox.links.listen(_openWidgetLink);
     final link = await inbox.launchLink();
     if (!mounted) return;
+    if (link == WidgetLink.home) _logWidgetTap();
     if (link != null && link != WidgetLink.home) {
       await _openWidgetLink(link);
       return;
@@ -231,6 +233,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _widgetDone() async {
     final date = await ref.read(widgetInboxProvider).takeDone();
     if (!mounted || date == null) return;
+    _logWidgetTap();
     if (date != _today) {
       if (date.compareTo(_today) < 0) {
         await ref
@@ -245,9 +248,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  /// `widget_interaction {action, size, slot}` for the tap the inbox just
+  /// read (T-AVT-08g-e). Fixed names only; only with the analytics consent.
+  void _logWidgetTap() {
+    final tap = ref.read(widgetInboxProvider).takeInteraction();
+    if (tap == null) return;
+    unawaited(ref.read(analyticsProvider).widgetInteraction(tap));
+  }
+
   /// A widget button opened the app (T-AVT-08g-b).
   Future<void> _openWidgetLink(WidgetLink link) async {
     if (!mounted) return;
+    _logWidgetTap();
     final step = ref.read(todayStepProvider);
     switch (link) {
       case WidgetLink.checkIn:

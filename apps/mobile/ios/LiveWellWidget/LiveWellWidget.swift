@@ -47,6 +47,9 @@ enum Shared {
 
   /// Done tapped on the widget: the app applies it once (HomeWidgetInbox).
   static let doneKey = "lw_done_date"
+  /// The size and slot that Done was tapped in (widget_interaction).
+  static let doneSizeKey = "lw_done_size"
+  static let doneSlotKey = "lw_done_slot"
 
   static func snapshot() -> WidgetSnapshotData? {
     guard let text = defaults?.string(forKey: "lw_snapshot"),
@@ -82,9 +85,27 @@ enum Shared {
     return f.date(from: String(text.prefix(19)))
   }
 
-  /// Opens the app; home_widget passes links that carry `homeWidget`.
-  static func url(_ link: String) -> URL? {
-    URL(string: link + (link.contains("?") ? "&" : "?") + "homeWidget=1")
+  /// Opens the app; home_widget passes links that carry `homeWidget`. The
+  /// widget's `size` and the entry's `slot` go along for the app's
+  /// `widget_interaction` analytics (T-AVT-08g-e): fixed names only.
+  static func url(_ link: String, size: String, slot: String?) -> URL? {
+    guard var parts = URLComponents(string: link) else { return nil }
+    var items = parts.queryItems ?? []
+    items.append(URLQueryItem(name: "size", value: size))
+    if let slot = slot, !slot.isEmpty { items.append(URLQueryItem(name: "slot", value: slot)) }
+    items.append(URLQueryItem(name: "homeWidget", value: "1"))
+    parts.queryItems = items
+    return parts.url
+  }
+
+  /// The analytics name of a widget size.
+  static func sizeName(_ family: WidgetFamily) -> String {
+    switch family {
+    case .systemSmall: return "small"
+    case .systemLarge: return "large"
+    case .accessoryRectangular: return "lock_rectangular"
+    default: return "medium"
+    }
   }
 }
 
@@ -95,9 +116,21 @@ struct MarkStepDoneIntent: AppIntent {
   static var title: LocalizedStringResource = "Mark today's step done"
   static var isDiscoverable: Bool = false
 
+  @Parameter(title: "Size") var size: String
+  @Parameter(title: "Slot") var slot: String
+
+  init() {}
+
+  init(size: String, slot: String) {
+    self.size = size
+    self.slot = slot
+  }
+
   func perform() async throws -> some IntentResult {
     // Idempotent: one date, applied once by the app.
     Shared.defaults?.set(Shared.dayKey(Date()), forKey: Shared.doneKey)
+    Shared.defaults?.set(size, forKey: Shared.doneSizeKey)
+    Shared.defaults?.set(slot, forKey: Shared.doneSlotKey)
     WidgetCenter.shared.reloadAllTimelines()
     return .result()
   }
@@ -199,6 +232,8 @@ struct FaceView: View {
 
 struct ActionButton: View {
   let action: WidgetActionData
+  let size: String
+  let slot: String
   var filled = true
 
   var body: some View {
@@ -213,14 +248,14 @@ struct ActionButton: View {
   @available(iOS 17.0, *)
   @ViewBuilder var interactive: some View {
     if action.id == "done" {
-      Button(intent: MarkStepDoneIntent()) { label }.buttonStyle(.plain)
+      Button(intent: MarkStepDoneIntent(size: size, slot: slot)) { label }.buttonStyle(.plain)
     } else {
       opensApp
     }
   }
 
   @ViewBuilder var opensApp: some View {
-    if let url = Shared.url(action.link) {
+    if let url = Shared.url(action.link, size: size, slot: slot) {
       Link(destination: url) { label }
     }
   }
@@ -283,6 +318,8 @@ struct CoachWidgetView: View {
   @Environment(\.widgetFamily) var family
   let item: CoachEntry
 
+  var size: String { Shared.sizeName(family) }
+
   var body: some View {
     content.widgetBackground(Palette.background)
   }
@@ -301,16 +338,16 @@ struct CoachWidgetView: View {
       case .accessoryRectangular:
         // Generic unless the person turned details on (lock_headline).
         Text(e.lockHeadline).font(.headline).lineLimit(2)
-          .widgetURL(Shared.url("livewell://home"))
+          .widgetURL(Shared.url("livewell://home", size: size, slot: e.slot))
       case .systemSmall:
         VStack(alignment: .leading, spacing: 6) {
           FaceView(expression: e.expression, size: 44)
           Text(e.headline).font(.system(size: 15, weight: .semibold))
             .foregroundColor(Palette.text).lineLimit(2).minimumScaleFactor(0.85)
           Spacer(minLength: 0)
-          ActionButton(action: e.primaryAction)
+          ActionButton(action: e.primaryAction, size: size, slot: e.slot)
         }
-        .widgetURL(Shared.url(e.primaryAction.link))
+        .widgetURL(Shared.url(e.primaryAction.link, size: size, slot: e.slot))
       case .systemLarge:
         VStack(alignment: .leading, spacing: 12) {
           header(e, s, face: 72)
@@ -334,7 +371,7 @@ struct CoachWidgetView: View {
         FaceView(expression: "happy", size: 40)
         Text("Live Well").font(.headline).foregroundColor(Palette.text)
       }
-      .widgetURL(Shared.url("livewell://home"))
+      .widgetURL(Shared.url("livewell://home", size: size, slot: nil))
     }
   }
 
@@ -355,8 +392,10 @@ struct CoachWidgetView: View {
 
   func buttons(_ e: WidgetEntryData) -> some View {
     HStack(spacing: 8) {
-      ActionButton(action: e.primaryAction)
-      if let second = e.secondaryAction { ActionButton(action: second, filled: false) }
+      ActionButton(action: e.primaryAction, size: size, slot: e.slot)
+      if let second = e.secondaryAction {
+        ActionButton(action: second, size: size, slot: e.slot, filled: false)
+      }
     }
   }
 }

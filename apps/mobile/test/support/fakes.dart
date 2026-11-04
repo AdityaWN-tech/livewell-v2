@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/painting.dart' show Color;
 import 'package:flutter/widgets.dart' show Key, SizedBox, Widget;
+import 'package:livewell/features/widget/domain/widget_interaction.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
 import 'package:livewell/features/avatar/domain/liveness.dart';
@@ -442,6 +443,14 @@ class FakeAnalytics implements Analytics {
   Future<void> reflectionSubmitted({required bool voice}) async => events.add({
     'name': 'reflection_submitted',
     'mode': voice ? 'voice' : 'text',
+  });
+
+  @override
+  Future<void> widgetInteraction(WidgetInteraction i) async => events.add({
+    'name': 'widget_interaction',
+    'action': i.action,
+    'size': i.size,
+    'slot': i.slot,
   });
 }
 
@@ -1041,7 +1050,18 @@ class FakeWidgetInbox implements WidgetInbox {
   Future<String?> takeDone() async {
     final d = done;
     done = null;
+    if (d != null) interaction ??= WidgetInteraction.doneOnWidget();
     return d;
+  }
+
+  /// The tap behind the next link or Done (T-AVT-08g-e).
+  WidgetInteraction? interaction;
+
+  @override
+  WidgetInteraction? takeInteraction() {
+    final i = interaction;
+    interaction = null;
+    return i;
   }
 }
 

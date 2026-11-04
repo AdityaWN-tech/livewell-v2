@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/consent/data/consent_repository.dart';
 import '../../features/consent/domain/consent.dart';
+import '../../features/widget/domain/widget_interaction.dart';
 
 /// Product analytics (spec 12.2), deliberately narrow: one typed method per
 /// event, taking only ids, counts and durations. There is no way to pass a
@@ -17,6 +18,10 @@ abstract class Analytics {
 
   /// `reflection_submitted {mode}`, mode "text" or "voice". Never the text.
   Future<void> reflectionSubmitted({required bool voice});
+
+  /// `widget_interaction {action, size, slot}`: fixed names only
+  /// (T-AVT-08g-e, T-TCH-02 TCH-e).
+  Future<void> widgetInteraction(WidgetInteraction i);
 }
 
 /// Firebase Analytics, only with the analytics consent (FR-ONB-03).
@@ -65,6 +70,19 @@ class ConsentedFirebaseAnalytics implements Analytics {
       await analytics?.logEvent(
         name: 'reflection_submitted',
         parameters: {'mode': voice ? 'voice' : 'text'},
+      );
+    } catch (_) {
+      // Analytics must never break the app.
+    }
+  }
+
+  @override
+  Future<void> widgetInteraction(WidgetInteraction i) async {
+    try {
+      final analytics = await _allowed();
+      await analytics?.logEvent(
+        name: 'widget_interaction',
+        parameters: {'action': i.action, 'size': i.size, 'slot': i.slot},
       );
     } catch (_) {
       // Analytics must never break the app.

@@ -47,6 +47,13 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
   StartupTrace.mark('startup_begin');
   await Firebase.initializeApp(options: options);
   StartupTrace.mark('firebase_ready');
+  // The app's first frame (the home-screen widget's inputs, for example)
+  // can ask for Firestore before Firebase is ready. That attempt fails and
+  // Riverpod keeps the error until a later retry, so a signed-in start read
+  // the stored error and showed "We couldn't start" (D-71). Start again
+  // from a ready Firebase; everything that read it too early follows.
+  // (After an await: changing another provider is allowed here.)
+  ref.invalidate(firestoreProvider);
   // After a log out: clear the last account's offline Firestore copy before
   // anything reads it (T-ONB-03f). Must run before Firestore is first used.
   if (await ref.read(localDataProvider).takeCachePending()) {

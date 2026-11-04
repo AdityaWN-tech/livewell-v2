@@ -5,6 +5,8 @@ import '../../auth/data/firebase_auth_service.dart';
 import '../../checkin/data/checkin_repository.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../starter_plan/data/plan_repository.dart';
+import '../../starter_plan/data/reminders.dart';
+import '../../starter_plan/domain/touchpoints.dart';
 import '../../starter_plan/domain/starter_plan.dart';
 import '../../account/data/profile_repository.dart';
 import '../../dev/application/preview_mode.dart';
@@ -125,6 +127,17 @@ class StepProgressNotifier extends Notifier<StepProgress> {
         .read(goalRepositoryProvider)
         .saveLog(HabitLog(date: _today, habitId: dailyStepHabitId, doneAt: at))
         .catchError((_) {});
+    // The step is done (in the app or on the widget): today's step
+    // reminder is no longer needed (T-TCH-02 TCH-e). Rescheduling skips it
+    // too (PlanScheduler.reschedule).
+    try {
+      ref
+          .read(remindersProvider)
+          .dismiss(TouchpointScheduler.idFor(at, TouchpointKind.nudge))
+          .catchError((_) {});
+    } catch (_) {
+      // No notifications on this device.
+    }
   }
 
   void makeSmaller() => state = StepProgress(

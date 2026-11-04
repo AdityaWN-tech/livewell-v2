@@ -1,6 +1,6 @@
 # Roadmap
 
-The work in progress and what comes next, as a checklist. Each item is one PR on a short branch off `main`, merged when CI is green and the owner has reviewed it (D-67; until 2026-11-03 PRs were stacked on the one before). The overall build order and status of every task is in [progress.md](progress.md); agreed changes in [decisions.md](decisions.md).
+The work in progress and what comes next, as a checklist. Each item is one PR on a short branch off `main`, merged when CI is green and the owner has reviewed it (D-67; until 2026-11-03 PRs were stacked on the one before). Agreed changes are in [decisions.md](decisions.md); the latest spec audit is in [audit/](audit/) and release steps in [release/checklist.md](release/checklist.md).
 
 ## Now: the 3D coach (T-AVT-08) and builds
 
@@ -18,12 +18,14 @@ The work in progress and what comes next, as a checklist. Each item is one PR on
 - [ ] **AVT-08g** The widget with the 3D avatar (replaces T-TCH-02's widget), in five PRs:
   - [x] **08g-a** Shared widget data: the snapshot and its timeline (no native widget yet)
   - [x] **08g-b** iOS widgets (WidgetKit, SwiftUI), Done with App Intents on iOS 17+ (PR #55; builds on Codemagic, not yet seen on an iPhone)
-  - [ ] **08g-c** Android widgets (Glance), Done on Android 12+
+  - [x] **08g-c** Android widgets, Done without opening the app (classic RemoteViews, not Glance; D-61)
   - [ ] **08g-d** Look and feel, "Add the widget" card
   - [ ] **08g-e** Hide details on lock screen, sign-out, analytics
+    - [x] part 1: the Hide details setting, sign-out, step reminder off after Done (D-68)
+    - [ ] part 2: `widget_interaction {action, size, slot}` (needs the size from the native widgets)
 - [ ] **AVT-08h** Settings and deletion (Delete my avatar)
 - [ ] **T-DLY-03e** Daily plan settings
-- [ ] **T-GOL-03** My Daily Routine (its reminders use the 3D avatar)
+- [x] **T-GOL-03** My Daily Routine (D-44 to D-48)
 
 ## Blocked
 

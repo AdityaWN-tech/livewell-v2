@@ -119,7 +119,10 @@ void main() {
     );
     expect(saved.barrierText, 'Long meeting day');
     expect(saved.gentleDay, isFalse);
-    expect(h.checkIns.saves, 1);
+    // Saved as it goes (after each answer, then the note), always the one
+    // record for today: idempotent by date (D-70).
+    expect(h.checkIns.days.keys, [today]);
+    expect(h.checkIns.saves, greaterThanOrEqualTo(1));
 
     expect(
       find.text("Love that energy. Let's use it well today."),

@@ -9,6 +9,7 @@ import '../../../core/speech/dictation.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
+import '../../home/application/home_data.dart' show todayCheckInProvider;
 import '../../consent/presentation/microphone_consent.dart';
 import '../../moments/application/coach_state.dart';
 import '../../safety/data/safety_rules_provider.dart';
@@ -54,6 +55,82 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
   bool _saving = false;
   bool _listening = false;
 
+  /// A red flag in the note (or a note that couldn't be checked) made today
+  /// a gentle day; it stays gentle for the rest of this check-in.
+  bool _redFlag = false;
+
+  /// Today was already a gentle day before this check-in (a redo): it stays
+  /// gentle (spec 15.3; the rules enforce it too).
+  late final bool _alreadyGentle;
+  late final CheckInRepository _repo;
+
+  // One save at a time, newest wins: saves run in order (so a second save
+  // sees the first and merges), and only the latest pending one is sent.
+  CheckIn? _pendingSave;
+  Future<void>? _saveRun;
+
+  @override
+  void initState() {
+    super.initState();
+    _repo = ref.read(checkInRepositoryProvider);
+    final existing = ref.read(todayCheckInProvider).value;
+    _alreadyGentle =
+        existing != null && existing.date == widget.date && existing.gentleDay;
+  }
+
+  /// The check-in as answered so far. The note is never part of an early
+  /// save: it is only sent after the red-flag check in [_finish].
+  CheckIn _current({String? barrierText}) {
+    final mood = _mood!;
+    return CheckIn(
+      date: widget.date,
+      mood: mood,
+      energy: _energy,
+      sleep: _sleep,
+      stress: _stress,
+      timeAvailable: _time,
+      barrierText: barrierText,
+      gentleDay:
+          _alreadyGentle ||
+          _redFlag ||
+          isGentleDay(mood: mood, stress: _stress),
+    );
+  }
+
+  /// Queues [c] to be saved. Throws only if the last save tried failed.
+  Future<void> _save(CheckIn c) {
+    _pendingSave = c;
+    return _saveRun ??= _drainSaves();
+  }
+
+  Future<void> _drainSaves() async {
+    Object? error;
+    try {
+      while (_pendingSave != null) {
+        final next = _pendingSave!;
+        _pendingSave = null;
+        try {
+          await _repo.save(next);
+          error = null;
+        } catch (e) {
+          // Only that a save failed, never the answers (AGENTS.md).
+          debugPrint('LW checkin_save_failed ${e.runtimeType}');
+          error = e;
+        }
+      }
+    } finally {
+      _saveRun = null;
+    }
+    if (error != null) throw error;
+  }
+
+  /// Saves what is answered so far, without waiting: closing the sheet
+  /// after the mood keeps it (and a gentle day stays recorded).
+  void _saveSoFar() {
+    if (_mood == null) return;
+    _save(_current()).ignore();
+  }
+
   @override
   void dispose() {
     if (_listening) _dictation.stop();
@@ -77,6 +154,7 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
       }
       _step++;
     });
+    _saveSoFar();
   }
 
   void _skipQuestion() => setState(() => _step++);
@@ -116,23 +194,53 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
     setState(() => _saving = true);
     if (_listening) await _dictation.stop();
 
-    var barrierText = _barrier.text.trim().isEmpty
+    String? barrierText = _barrier.text.trim().isEmpty
         ? null
         : _barrier.text.trim();
-    var gentle = isGentleDay(mood: mood, stress: _stress);
 
     // Red flags in the free text come first, before any other response
     // (FR-SAF-01/02, T-DLY-02 Safety).
     if (barrierText != null) {
-      final rules = await ref.read(safetyRulesProvider.future);
+      final SafetyRules rules;
+      try {
+        rules = await ref.read(safetyRulesProvider.future);
+      } catch (_) {
+        // The note can't be checked, so it isn't saved, and today counts
+        // as a gentle day (no portal card). The rest is saved; the user can
+        // try again or leave.
+        ref.invalidate(safetyRulesProvider);
+        _redFlag = true;
+        _saveSoFar();
+        if (mounted) {
+          setState(() => _saving = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l.checkinNoteCheckFailed),
+              action: SnackBarAction(
+                label: l.checkinTryAgain,
+                onPressed: _finish,
+              ),
+            ),
+          );
+        }
+        return;
+      }
       final result = rules.check(barrierText);
       if (!result.isClear) {
-        // The coach stays quiet for the rest of today (T-DLY-03d).
-        ref.read(safetyHoldStoreProvider.notifier).holdToday();
-        final uid = ref.read(authServiceProvider).currentUser?.uid;
-        final region = uid == null
-            ? null
-            : (await ref.read(profileRepositoryProvider).get(uid))?.region;
+        final distress =
+            result.interrupts ||
+            result.category == SafetyCategory.disorderedEating;
+        if (distress) {
+          // Recorded before the card is shown, so it holds even if the app
+          // is closed on the card: a gentle day, without the note (FR-SAF-04
+          // suppresses this content; spec 15.3).
+          _redFlag = true;
+          _saveSoFar();
+        }
+        // The coach stays quiet today and portal cards stay off for 72
+        // hours (T-DLY-03d, FR-SAF-07); kept on the phone (D-70).
+        ref.read(safetyHoldStoreProvider.notifier).holdToday().ignore();
+        final region = await _region();
         if (!mounted) return;
         final proceed = await showSafetyResponse(
           context,
@@ -140,14 +248,8 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
           rules.contactsFor(region),
           continueLabel: l.checkinContinue,
         );
-        final distress =
-            result.interrupts ||
-            result.category == SafetyCategory.disorderedEating;
         if (distress) {
-          // Not kept, like the Why (FR-SAF-04 suppresses this content), and
-          // no portal card today (spec 15.3).
           barrierText = null;
-          gentle = true;
         } else if (!proceed) {
           // "Change it": stay on this step to edit.
           if (mounted) setState(() => _saving = false);
@@ -156,18 +258,9 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
       }
     }
 
-    final checkIn = CheckIn(
-      date: widget.date,
-      mood: mood,
-      energy: _energy,
-      sleep: _sleep,
-      stress: _stress,
-      timeAvailable: _time,
-      barrierText: barrierText,
-      gentleDay: gentle,
-    );
+    final checkIn = _current(barrierText: barrierText);
     try {
-      await ref.read(checkInRepositoryProvider).save(checkIn);
+      await _save(checkIn);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -186,6 +279,25 @@ class _CheckInSheetState extends ConsumerState<CheckInSheet> {
           ),
     );
     if (mounted) Navigator.of(context).pop(checkIn);
+  }
+
+  /// Region for the emergency and crisis numbers. The card must not wait on
+  /// the network: the loaded profile first, else a short look-up; unknown
+  /// shows both countries (D-03).
+  Future<String?> _region() async {
+    final loaded = ref.read(currentProfileProvider).value?.region;
+    if (loaded != null) return loaded;
+    final uid = ref.read(authServiceProvider).currentUser?.uid;
+    if (uid == null) return null;
+    try {
+      return (await ref
+              .read(profileRepositoryProvider)
+              .get(uid)
+              .timeout(const Duration(seconds: 2)))
+          ?.region;
+    } catch (_) {
+      return null;
+    }
   }
 
   @override

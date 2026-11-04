@@ -336,6 +336,8 @@
     }
   },
   "checkinSaveError": "We couldn't save your check-in. Please try again.",
+  "checkinNoteCheckFailed": "We couldn't check your note just now, so it wasn't saved. Your other answers are saved.",
+  "checkinTryAgain": "Try again",
   "checkinContinue": "Continue",
   "homeTodayStepEyebrow": "Today's one step",
   "homeTodayStepTimed": "A step that fits in {minutes} minutes will appear here.",

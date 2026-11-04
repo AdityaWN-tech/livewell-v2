@@ -4,6 +4,7 @@ import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/time/clock.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../home/application/home_data.dart';
+import '../../safety/data/safety_event_store.dart';
 import '../../notifications/presentation/notifications_screen.dart'
     show reminderTimesProvider;
 import '../../starter_plan/domain/touchpoints.dart';
@@ -39,26 +40,57 @@ class CoachMuted extends Notifier<bool> {
 
 final coachMutedProvider = NotifierProvider<CoachMuted, bool>(CoachMuted.new);
 
-/// A red flag came up today (the check-in showed a safety response): the
-/// coach stays quiet for the rest of the day, no moments and no
-/// celebration voice. Safety messages are never Avatar Moments.
-/// TODO(D-22): kept with the recorded safety event, so a restart keeps it.
-class SafetyHold extends Notifier<String?> {
+/// A red flag came up (the check-in showed a safety response). The time is
+/// kept on the phone (survives a restart): the coach stays quiet for the
+/// rest of that day, no moments and no celebration voice, and portal cards
+/// stay off for 72 hours. Safety messages are never Avatar Moments.
+/// TODO(D-22): also read the server's safety event record once it exists.
+class SafetyHold extends AsyncNotifier<DateTime?> {
   @override
-  String? build() => null;
+  Future<DateTime?> build() =>
+      ref.watch(safetyEventStoreProvider).lastEventAt();
 
-  void holdToday() => state = localDateKey(ref.read(clockProvider)());
+  /// Records a safety event now. The hold applies at once; the phone's copy
+  /// is written in the background.
+  Future<void> holdToday() async {
+    final now = ref.read(clockProvider)();
+    state = AsyncData(now);
+    try {
+      await ref.read(safetyEventStoreProvider).recordEvent(now);
+    } catch (_) {
+      // Kept in memory for this run; nothing else to do.
+    }
+  }
 }
 
-final safetyHoldStoreProvider = NotifierProvider<SafetyHold, String?>(
+final safetyHoldStoreProvider = AsyncNotifierProvider<SafetyHold, DateTime?>(
   SafetyHold.new,
 );
 
-final safetyHoldTodayProvider = Provider<bool>(
-  (ref) =>
-      ref.watch(safetyHoldStoreProvider) ==
-      localDateKey(ref.watch(clockProvider)()),
-);
+/// The coach is on today's safety hold. The phone's record loads in a few
+/// milliseconds at start; until then, or if it can't be read, there is no
+/// known hold (as before D-70). Portal cards use the stricter
+/// [recentSafetyEventProvider], where unknown counts as an event.
+final safetyHoldTodayProvider = Provider<bool>((ref) {
+  final today = localDateKey(ref.watch(clockProvider)());
+  final last = ref.watch(safetyHoldStoreProvider).value;
+  return last != null && localDateKey(last) == today;
+});
+
+/// How long portal cards stay off after a safety event (AGENTS.md, FR-SAF-07).
+const safetyPortalBlock = Duration(hours: 72);
+
+/// A safety event in the last 72 hours on this phone. Unknown (loading or
+/// unreadable) counts as yes. A time in the future (clock changed) also
+/// counts as recent.
+final recentSafetyEventProvider = Provider<bool>((ref) {
+  final now = ref.watch(clockProvider)();
+  return switch (ref.watch(safetyHoldStoreProvider)) {
+    AsyncData(:final value) =>
+      value != null && now.difference(value) < safetyPortalBlock,
+    _ => true,
+  };
+});
 
 /// The moment the coach on Home is in now: Done once the step is done, the
 /// gentle one on a gentle day, else by the time of day (morning until the

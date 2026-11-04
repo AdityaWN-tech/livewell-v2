@@ -609,6 +609,24 @@ describe('checkins (T-DLY-02: mood first, one per local date)', () => {
   it('nothing is stored before the 18+ gate', async () => {
     await assertFails(setDoc(ref(), checkin()));
   });
+  it('once gentle, a same-day redo keeps it gentle (spec 15.3, D-70)', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/checkins/2026-10-13': checkin({ mood: 1, gentle_day: true }) });
+    const saved = (await getDoc(ref())).data()!;
+    const redo = (o: Record<string, unknown>) =>
+      setDoc(ref(), checkin({ created_at: saved.created_at, updated_at: meta().updated_at, ...o }));
+    await assertFails(redo({ mood: 5, gentle_day: false }));
+    await assertSucceeds(redo({ mood: 5, gentle_day: true }));
+    // Not gentle yet: a later answer may still make it gentle.
+    await seed(env, { 'users/alice/checkins/2026-10-14': checkin({ mood: 4, gentle_day: false }) });
+    const ref14 = doc(as(ALICE), 'users/alice/checkins/2026-10-14');
+    const saved14 = (await getDoc(ref14)).data()!;
+    await assertSucceeds(
+      setDoc(ref14, checkin({
+        created_at: saved14.created_at, updated_at: meta().updated_at, stress: 5, gentle_day: true,
+      })),
+    );
+  });
 });
 
 describe('reflections (FR-DLY-05, T-UI-01d: one per local date)', () => {

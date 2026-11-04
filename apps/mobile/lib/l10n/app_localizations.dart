@@ -1354,6 +1354,18 @@ abstract class AppLocalizations {
   /// **'We couldn\'t save your check-in. Please try again.'**
   String get checkinSaveError;
 
+  /// No description provided for @checkinNoteCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t check your note just now, so it wasn\'t saved. Your other answers are saved.'**
+  String get checkinNoteCheckFailed;
+
+  /// No description provided for @checkinTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get checkinTryAgain;
+
   /// No description provided for @checkinContinue.
   ///
   /// In en, this message translates to:

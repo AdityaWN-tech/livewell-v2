@@ -724,6 +724,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t save your check-in. Please try again.';
 
   @override
+  String get checkinNoteCheckFailed =>
+      'We couldn\'t check your note just now, so it wasn\'t saved. Your other answers are saved.';
+
+  @override
+  String get checkinTryAgain => 'Try again';
+
+  @override
   String get checkinContinue => 'Continue';
 
   @override

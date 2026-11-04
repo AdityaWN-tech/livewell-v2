@@ -373,10 +373,14 @@ service cloud.firestore {
           && validCheckin(request.resource.data)
           && hasMeta(request.resource.data);
         // Same-day re-submit updates the record; created_at never changes.
+        // Once a day is gentle it stays gentle (spec 15.3, D-70): a redo
+        // with a better mood can't bring portal cards back that day.
         allow update: if isAdultOwner(uid)
           && validCheckin(request.resource.data)
           && request.resource.data.created_at == resource.data.created_at
-          && request.resource.data.updated_at is timestamp;
+          && request.resource.data.updated_at is timestamp
+          && (resource.data.gentle_day != true
+              || request.resource.data.gentle_day == true);
         allow delete: if false;
       }
 

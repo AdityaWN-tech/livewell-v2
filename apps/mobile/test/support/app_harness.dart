@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/safety/data/safety_event_store.dart';
 import 'package:livewell/features/goals/data/goal_repository.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
@@ -61,6 +63,8 @@ class Harness {
     DateTime? now,
     FakeCheckInRepository? checkIns,
     FakeCheckInPromptStore? checkInPrompt,
+    InMemorySafetyEventStore? safetyEvents,
+    this.overrides = const [],
     FakeAnalytics? analytics,
     this.flags = const FeatureFlags(),
     FakeReflectionRepository? reflections,
@@ -76,6 +80,7 @@ class Harness {
        // Default: already asked today, so tests that aren't about the
        // check-in aren't interrupted by its sheet.
        checkInPrompt = checkInPrompt ?? FakeCheckInPromptStore('2026-10-14'),
+       safetyEvents = safetyEvents ?? InMemorySafetyEventStore(),
        analytics = analytics ?? FakeAnalytics(),
        dictation = dictation ?? FakeDictation(),
        phone = phone ?? FakePhoneLauncher(),
@@ -142,6 +147,13 @@ class Harness {
   DateTime now;
   final FakeCheckInRepository checkIns;
   final FakeCheckInPromptStore checkInPrompt;
+
+  /// This phone's record of the last safety event (D-70).
+  final InMemorySafetyEventStore safetyEvents;
+
+  /// Extra provider overrides for one test (e.g. a failing safety rules
+  /// load), applied last.
+  final List<Override> overrides;
   final FakeAnalytics analytics;
 
   /// Cold start the real app: signed out resumes at the saved onboarding
@@ -199,6 +211,8 @@ class Harness {
                 : learn,
           ),
           checkInPromptStoreProvider.overrideWithValue(checkInPrompt),
+          safetyEventStoreProvider.overrideWithValue(safetyEvents),
+          ...overrides,
           analyticsProvider.overrideWithValue(analytics),
           // Same decisions as the real startup, minus Firebase.
           appStartupProvider.overrideWith((ref) async {

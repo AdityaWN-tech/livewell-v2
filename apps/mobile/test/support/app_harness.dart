@@ -115,6 +115,7 @@ class Harness {
   final routineAsked = FakeRoutineAskStore();
   final reminders = FakeReminders();
   final reminderZone = FakeReminderZoneStore();
+  final reminderLedger = FakeReminderLedgerStore();
   final faces = FakeCoachFaces();
   final selfieCapture = FakeSelfieCapture();
   final avatarMaker = FakeAvatarMaker();
@@ -178,6 +179,7 @@ class Harness {
           routineAskStoreProvider.overrideWithValue(routineAsked),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(reminderZone),
+          reminderLedgerStoreProvider.overrideWithValue(reminderLedger),
           appearanceStoreProvider.overrideWithValue(appearance),
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),

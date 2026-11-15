@@ -1346,6 +1346,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your coach\'s voice is an AI voice. For now it is your phone\'s own text-to-speech, set to sound close to the voice you chose. It is not a copy of a real person\'s voice. The coach only says lines our team has written and reviewed.';
 
   @override
+  String voiceHowMadeLibraryBody(String name) {
+    return '$name is an AI voice. It was made with Kokoro, an open-source text-to-speech model, and it is not a copy of any real person\'s voice. For now, your coach speaks with the voice on your phone that sounds closest to $name, so it may sound a little different from the sample. Your coach only says lines our team has written and reviewed.';
+  }
+
+  @override
   String voiceGreetingNamed(String name) {
     return 'Hi $name, I’m your Live Well coach.';
   }

@@ -87,6 +87,7 @@ class _ConsentSwitch extends ConsumerWidget {
       title: Text(type.title(l), style: t.titleMedium),
       subtitle: Text(type.body(l)!, style: t.bodySmall),
       onChanged: (value) async {
+        if (!value && !await _confirmRevoke(context, l)) return;
         try {
           await ref
               .read(consentRepositoryProvider)
@@ -99,5 +100,32 @@ class _ConsentSwitch extends ConsumerWidget {
         }
       },
     );
+  }
+
+  /// Revoking camera, microphone, face and voice models, portal linking or
+  /// marketing deletes or stops something on the server (D-76), so the
+  /// person sees what will happen first. Nothing else asks.
+  Future<bool> _confirmRevoke(BuildContext context, AppLocalizations l) async {
+    final effect = type.revokeEffect(l);
+    if (effect == null) return true;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.consentRevokeTitle(type.title(l))),
+        content: Text(effect),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l.consentRevokeKeep),
+          ),
+          FilledButton(
+            key: const Key('confirm-revoke'),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l.consentRevokeConfirm),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
   }
 }

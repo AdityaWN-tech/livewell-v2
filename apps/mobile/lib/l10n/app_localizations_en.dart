@@ -3569,6 +3569,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Well done for taking the time. Small steps add up.';
 
   @override
+  String get learnReaderPortalTitle => 'Go deeper on the Live Well Portal';
+
+  @override
   String get learnReaderFinish => 'Finish lesson';
 
   @override

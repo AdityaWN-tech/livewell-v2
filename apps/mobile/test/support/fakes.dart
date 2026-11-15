@@ -1097,6 +1097,13 @@ class FakeHealthSource implements HealthSource {
   @override
   Future<HealthSummary> week(DateTime now) async => summary;
 
+  /// Steps per day for This Month and 90 days (T-GOL-02).
+  Map<String, int> days = const {};
+
+  @override
+  Future<Map<String, int>> dailySteps(DateTime first, DateTime now) async =>
+      days;
+
   @override
   Future<void> install() async => installs++;
 }

@@ -10,7 +10,9 @@ import {
   deleteField,
   doc,
   getDoc,
+  getDocs,
   setDoc,
+  Timestamp,
   updateDoc,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
@@ -653,6 +655,106 @@ describe('reflections (FR-DLY-05, T-UI-01d: one per local date)', () => {
   });
   it('nothing is stored before the 18+ gate', async () => {
     await assertFails(setDoc(ref(), reflection()));
+  });
+});
+
+describe('metrics (T-GOL-02: weight, blood pressure, glucose, meals; D-72)', () => {
+  const at = () => Timestamp.now();
+  const weight = (o: Record<string, unknown> = {}) => ({
+    kind: 'weight', source: 'manual', measured_at: at(), value: 72.5, unit: 'kg', ...meta(), ...o,
+  });
+  const bp = (o: Record<string, unknown> = {}) => ({
+    kind: 'blood_pressure', source: 'manual', measured_at: at(), systolic: 120, diastolic: 80, unit: 'mmHg', ...meta(), ...o,
+  });
+  const glucose = (o: Record<string, unknown> = {}) => ({
+    kind: 'glucose', source: 'manual', measured_at: at(), value: 98, unit: 'mg/dL', ...meta(), ...o,
+  });
+  const meal = (o: Record<string, unknown> = {}) => ({
+    kind: 'meal', source: 'manual', measured_at: at(), meal: 'lunch', ...meta(), ...o,
+  });
+  const ref = (id = 'm1') => doc(as(ALICE), `users/alice/metrics/${id}`);
+
+  it('owner adds, reads and deletes; nobody else can read or write', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), weight()));
+    await assertSucceeds(getDoc(ref()));
+    await assertSucceeds(getDocs(collection(as(ALICE), 'users/alice/metrics')));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/metrics/m1')));
+    await assertFails(getDocs(collection(as(BOB), 'users/alice/metrics')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/metrics/m2'), weight()));
+    await assertFails(deleteDoc(doc(as(BOB), 'users/alice/metrics/m1')));
+    await assertFails(getDoc(doc(anon(), 'users/alice/metrics/m1')));
+    await assertSucceeds(deleteDoc(ref()));
+  });
+  it('points are never edited (delete and add again)', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/metrics/m1': weight() });
+    await assertFails(setDoc(ref(), weight({ value: 73 })));
+    await assertFails(updateDoc(ref(), { value: 73 }));
+  });
+  it('each kind with its own fields and units', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref('w-kg'), weight()));
+    await assertSucceeds(setDoc(ref('w-lb'), weight({ value: 160.4, unit: 'lb' })));
+    await assertSucceeds(setDoc(ref('bp'), bp()));
+    await assertSucceeds(setDoc(ref('g'), glucose()));
+    for (const m of ['breakfast', 'lunch', 'dinner', 'snack']) {
+      await assertSucceeds(setDoc(ref(`meal-${m}`), meal({ meal: m })));
+    }
+    await assertSucceeds(setDoc(ref('health'), weight({ source: 'health' })));
+    // Wrong unit for the kind.
+    await assertFails(setDoc(ref(), weight({ unit: 'stone' })));
+    await assertFails(setDoc(ref(), bp({ unit: 'kPa' })));
+    await assertFails(setDoc(ref(), glucose({ unit: 'mmol/L' })));
+    // Fields of another kind, or unknown ones.
+    await assertFails(setDoc(ref(), weight({ systolic: 120 })));
+    await assertFails(setDoc(ref(), meal({ value: 500 })));
+    await assertFails(setDoc(ref(), meal({ note: 'pizza' })));
+    await assertFails(setDoc(ref(), glucose({ meal: 'lunch' })));
+    await assertFails(setDoc(ref(), meal({ meal: 'brunch' })));
+    await assertFails(setDoc(ref(), weight({ kind: 'steps' })));
+    await assertFails(setDoc(ref(), weight({ source: 'web' })));
+  });
+  it('limits catch typos only (D-72)', async () => {
+    await seedAdult(env);
+    // Edges are accepted, as they are: the app doesn't judge them.
+    await assertSucceeds(setDoc(ref('a'), weight({ value: 20 })));
+    await assertSucceeds(setDoc(ref('b'), weight({ value: 300 })));
+    await assertSucceeds(setDoc(ref('c'), weight({ value: 660, unit: 'lb' })));
+    await assertSucceeds(setDoc(ref('d'), bp({ systolic: 260, diastolic: 159 })));
+    await assertSucceeds(setDoc(ref('e'), bp({ systolic: 51, diastolic: 30 })));
+    await assertSucceeds(setDoc(ref('f'), glucose({ value: 20 })));
+    await assertSucceeds(setDoc(ref('g'), glucose({ value: 600 })));
+    await assertFails(setDoc(ref(), weight({ value: 19.9 })));
+    await assertFails(setDoc(ref(), weight({ value: 301 })));
+    await assertFails(setDoc(ref(), weight({ value: 43, unit: 'lb' })));
+    await assertFails(setDoc(ref(), weight({ value: '72' })));
+    await assertFails(setDoc(ref(), bp({ systolic: 261 })));
+    await assertFails(setDoc(ref(), bp({ diastolic: 29 })));
+    await assertFails(setDoc(ref(), bp({ systolic: 80, diastolic: 80 })));
+    await assertFails(setDoc(ref(), bp({ systolic: 120.5 })));
+    await assertFails(setDoc(ref(), glucose({ value: 601 })));
+    await assertFails(setDoc(ref(), glucose({ value: 19 })));
+    await assertFails(setDoc(ref(), glucose({ value: 98.5 })));
+  });
+  it('measured_at: not in the future, at most 31 days back', async () => {
+    await seedAdult(env);
+    const shift = (ms: number) => Timestamp.fromMillis(Date.now() + ms);
+    const day = 24 * 60 * 60 * 1000;
+    await assertSucceeds(setDoc(ref('a'), weight({ measured_at: shift(-30 * day) })));
+    await assertFails(setDoc(ref(), weight({ measured_at: shift(60 * 60 * 1000) })));
+    await assertFails(setDoc(ref(), weight({ measured_at: shift(-32 * day) })));
+    await assertFails(setDoc(ref(), weight({ measured_at: '2026-10-14' })));
+  });
+  it('rejects bad ids and missing meta', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/metrics/a.b'), weight()));
+    await assertFails(setDoc(ref('x'.repeat(41)), weight()));
+    const { schema_version: _, ...noMeta } = weight();
+    await assertFails(setDoc(ref(), noMeta));
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), weight()));
   });
 });
 

@@ -39,6 +39,7 @@ import 'package:livewell/features/track/data/reflection_repository.dart';
 import 'package:livewell/features/widget/data/widget_inbox.dart';
 import 'package:livewell/features/account/application/app_lock.dart';
 import 'package:livewell/features/track/data/health_source.dart';
+import 'package:livewell/features/track/data/metric_repository.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
@@ -102,6 +103,9 @@ class Harness {
   /// Apple Health / Health Connect (Step 4f).
   final health = FakeHealthSource();
 
+  /// Weight, blood pressure, glucose and meals, in memory (T-GOL-02).
+  final metrics = InMemoryMetricRepository();
+
   /// Fingerprint / face unlock (D-62).
   final unlock = FakeDeviceUnlock();
 
@@ -161,6 +165,11 @@ class Harness {
           profileRepositoryProvider.overrideWithValue(profiles),
           consentRepositoryProvider.overrideWithValue(consents),
           healthSourceProvider.overrideWithValue(health),
+          metricRepositoryProvider.overrideWith(
+            (ref) => ref.watch(previewModeProvider)
+                ? InMemoryMetricRepository()
+                : metrics,
+          ),
           deviceUnlockProvider.overrideWithValue(unlock),
           dictationProvider.overrideWithValue(dictation),
           phoneLauncherProvider.overrideWithValue(phone),

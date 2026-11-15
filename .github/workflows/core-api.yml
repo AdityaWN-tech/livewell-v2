@@ -1,13 +1,13 @@
-# Core API / Cloud Functions tests (T-FND-05 audit trigger). Runs the real
-# functions against the Firestore + Functions emulators.
+# Core API / Cloud Functions tests (T-FND-05 audit trigger and revoke handling). Runs the real
+# functions against the Firestore, Functions and Storage emulators.
 name: core-api
 
 on:
   pull_request:
-    paths: ["services/core-api/**", "firebase.json", ".github/workflows/core-api.yml"]
+    paths: ["services/core-api/**", "firebase.json", "firebase/storage.rules", ".github/workflows/core-api.yml"]
   push:
     branches: [main]
-    paths: ["services/core-api/**", "firebase.json", ".github/workflows/core-api.yml"]
+    paths: ["services/core-api/**", "firebase.json", "firebase/storage.rules", ".github/workflows/core-api.yml"]
 
 concurrency:
   group: core-api-${{ github.ref }}

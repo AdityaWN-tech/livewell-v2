@@ -46,6 +46,22 @@
   "consentLegalWithdrawNote": "These are needed to use Live Well. To withdraw, close your account from My data.",
   "consentSaveError": "We couldn't save that change. Please try again.",
   "consentLoadError": "We couldn't load your choices. Please try again.",
+  "consentRevokeTitle": "Turn off {name}?",
+  "@consentRevokeTitle": {
+    "description": "Confirming a revoke that deletes or stops something on our side (FR-ONB-03, D-76).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "consentRevokeKeep": "Keep it on",
+  "consentRevokeConfirm": "Turn off",
+  "consentRevokeCamera": "Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach's name stays. This can't be undone.",
+  "consentRevokeMicrophone": "Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can't be undone.",
+  "consentRevokeBiometric": "Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can't be undone.",
+  "consentRevokePortalLinking": "We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.",
+  "consentRevokeMarketing": "We stop sending news and offers. It can take up to 24 hours.",
   "consentNotificationsTitle": "Reminders and nudges",
   "consentNotificationsBody": "Lets Live Well send your briefing, check-in and habit reminders. You choose the times and quiet hours.",
   "consentHealthDataTitle": "Health data",

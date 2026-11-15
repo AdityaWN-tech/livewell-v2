@@ -1,0 +1,76 @@
+{
+  "conditions": [],
+  "parameters": {
+    "ff_briefings": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Morning briefing player (FR-DLY-01). Off by default.",
+      "valueType": "BOOLEAN"
+    },
+    "ff_portal_cards": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Portal cards (spec 10.2 kill switch). Off by default.",
+      "valueType": "BOOLEAN"
+    },
+    "ff_voice_clone": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Use my own voice (FR-VOC-02). Cloned voices kill switch. PROD-LOCKED: in prod only 'false' has effect unless the build allows it (D-73).",
+      "valueType": "BOOLEAN"
+    },
+    "ff_dr_gokula_voice": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Dr. Gokula (Licensed) voice (FR-VOC-01). Kill switch. PROD-LOCKED until the licence is signed (D-73).",
+      "valueType": "BOOLEAN"
+    },
+    "ff_avatar_from_photo": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Make me from my photo (T-AVT-08e). PROD-LOCKED until counsel review T-CMP-02 (D-73).",
+      "valueType": "BOOLEAN"
+    },
+    "ff_avatar_maker": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Build my own / Adjust in the Avatar Studio (T-AVT-08c). Off by default; also needs the Media Service.",
+      "valueType": "BOOLEAN"
+    },
+    "ff_coach_chat": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Typing to the coach on Care (FR-CNV-01). Agent kill switch. Off by default.",
+      "valueType": "BOOLEAN"
+    },
+    "ff_coach_voice": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Talking to the coach out loud (FR-CNV-01/02). Agent kill switch. Off by default.",
+      "valueType": "BOOLEAN"
+    },
+    "ff_loved_one_voice": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "A loved one's voice (FR-VOC-03). Cloned voices kill switch. PROD-LOCKED (D-73).",
+      "valueType": "BOOLEAN"
+    },
+    "ff_photoreal_streaming": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Live photo-realistic avatar streaming (spec 8.4/10.2 kill switch). Not built yet. PROD-LOCKED (D-73).",
+      "valueType": "BOOLEAN"
+    }
+  },
+  "parameterGroups": {}
+}

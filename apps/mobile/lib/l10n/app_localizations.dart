@@ -6231,6 +6231,12 @@ abstract class AppLocalizations {
   /// **'Well done for taking the time. Small steps add up.'**
   String get learnReaderEndBody;
 
+  /// FR-LRN-04 / T-PRT-03: heading above the lesson's related portal card at the end of the reader (D-74).
+  ///
+  /// In en, this message translates to:
+  /// **'Go deeper on the Live Well Portal'**
+  String get learnReaderPortalTitle;
+
   /// Step 4e Learn reader and breathing guide (D-57).
   ///
   /// In en, this message translates to:

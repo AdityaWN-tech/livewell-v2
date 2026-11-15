@@ -27,6 +27,7 @@ class Lesson {
     this.microhabit,
     this.breathing,
     this.version = 1,
+    this.portalOfferId,
   });
 
   final String id;
@@ -57,6 +58,11 @@ class Lesson {
   /// The approved content version (content `version`), part of every
   /// narrated line's message id.
   final int version;
+
+  /// The portal offer an editor linked to this lesson (content
+  /// `portal_offer_id`, FR-LRN-04), shown at the lesson's end when every
+  /// portal rule passes (D-74). Null: no card.
+  final String? portalOfferId;
 
   /// Whether the app can open it now. A lesson needs its cards; an audio
   /// session needs a breathing pattern until recorded audio can play

@@ -608,6 +608,34 @@ service cloud.firestore {
         allow read: if isOwner(uid);
         allow write: if false; // linking and unlinking run on the server (FR-SET-04)
       }
+
+      // ---------- devices: where server pushes go (T-TCH-01, D-77) ----------
+      // One per app install (a random id). Only the FCM token, the platform
+      // and the IANA time zone (for quiet hours and the local day); no
+      // personal data. The app writes it with the notifications consent and
+      // deletes it when the consent is turned off or on log out; the server
+      // removes tokens FCM reports as invalid.
+      match /devices/{deviceId} {
+        function validDevice(d) {
+          return d.keys().hasOnly(['token', 'platform', 'time_zone',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.token is string && d.token.size() > 0 && d.token.size() <= 4096
+            && d.platform in ['android', 'ios']
+            && d.time_zone is string && d.time_zone.size() > 0
+            && d.time_zone.size() <= 64
+            && d.updated_at == request.time
+            && hasMeta(d);
+        }
+        allow read: if isOwner(uid);
+        allow create, update: if isAdultOwner(uid)
+          && deviceId.matches('^[A-Za-z0-9]{8,64}$')
+          && validDevice(request.resource.data);
+        allow delete: if isOwner(uid);
+      }
+      // Server pushes sent per local day, for the daily cap (server-only).
+      match /push_days/{date} {
+        allow read, write: if false;
+      }
     }
 
     // ---------- global catalogues: read-only, approved items only ----------
@@ -632,6 +660,10 @@ service cloud.firestore {
       allow read, write: if false;
     }
     match /audit_log/{id} {
+      allow read, write: if false;
+    }
+    // Push requests from other servers (T-TCH-01, D-77).
+    match /push_outbox/{id} {
       allow read, write: if false;
     }
 

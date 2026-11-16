@@ -25,11 +25,14 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `users/{uid}/memory_facts/{id}` | fact, category, confidence, source_message_id, status | Owner read; change status to saved/deleted only; deleted is final | Memory Agent proposals |
 | `users/{uid}/streaks/current` | length, grace_used_week, best, restart_count | Owner read only | streak engine |
 | `users/{uid}/portal_link/{doc}` | tagmango_customer_ref, matched_email_hash, status | Owner read only | link/unlink |
+| `users/{uid}/devices/{installId}` | token (FCM), platform (android/ios), time_zone (IANA, for quiet hours and the local day). **No name, contact or health data.** `installId` is a random id kept on the phone (T-TCH-01, D-77) | Owner read; adult owner create/update with exactly these fields (+ meta, `updated_at` = server time); owner delete (consent off, log out) | removes tokens FCM reports invalid; deleted with the account |
+| `users/{uid}/push_days/{YYYY-MM-DD}` | count, nudges: server pushes sent on that **local** day, for the daily cap of 4 (D-77) | **None** | `sendPush` |
 | `users/{uid}/content_progress/{itemId}` | progress (0–1), completed (bool) (Step 4e, D-57). Feeds "Pick up where you left off". Not in spec section 11 | Owner read/create/update; id letters, digits, `_`, `-`; only these fields; created_at never changes; no delete | — |
 | `users/{uid}/portal_events/{id}` | event, offer_id, click_id, value | Owner read; **append-only** create of card_shown / clicked / dismissed | order / progress / completed (webhooks) |
 | `portal_offers/{id}` | title, url, offer_type, tags, price_display, active, review_status | Signed-in read of active + approved only (queries must filter the same way) | Admin |
 | `content_items/{id}` | type (lesson/audio), review_status, title, category, summary, read_minutes, art_id, version; lessons: **cards** (short paragraphs, read one at a time) and **microhabit** {title, minutes}; breathing sessions: **breathing** (box/calm/sleep). The app shows only items it can open (a lesson with cards, a session with a breathing pattern; D-57). Full Blueprint 6.7 metadata still needs-product | Signed-in read of approved only | Admin |
 | `safety_events/{id}` | — | **None** | all |
 | `audit_log/{id}` | actor, action, target, timestamp, ip_hash, details (no health content) | **None** | Cloud Functions; interim Firestore store (D-18), idempotent ids e.g. `consent_{uid}_{consentId}` |
+| `push_outbox/{id}` | uid, category (fixed list), ref_id (an id, never text); then result {status, reason}, processed_at, expire_at (TTL, 7 days) | **None** | other servers ask for a push (Media Service: `coach_{jobId}`); `onPushRequest` sends it through `sendPush` (D-77) |
 
 Anything not listed is denied.

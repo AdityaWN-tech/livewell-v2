@@ -23,7 +23,7 @@ The work in progress and what comes next, as a checklist. Each item is one PR on
   - [ ] **08g-e** Hide details on lock screen, sign-out, analytics
 - [ ] **AVT-08h** Settings and deletion (Delete my avatar)
 - [ ] **T-DLY-03e** Daily plan settings
-- [ ] **T-GOL-03** My Daily Routine (its reminders use the 3D avatar)
+- [x] **T-GOL-03** My Daily Routine (its reminders use the 3D avatar) (T-GOL-03a to 03e on main)
 
 ## Finishing partly done tasks (2026-11-15/16)
 

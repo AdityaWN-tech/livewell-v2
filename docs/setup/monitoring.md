@@ -2,7 +2,7 @@
 
 What the code already does:
 
-- **App (Crashlytics).** `lib/core/monitoring/crash_reporting.dart`. Flutter errors and uncaught async errors go to Crashlytics as the **error type and stack trace only**. Messages are never sent, because a message can quote a mood, a note or a reflection. Breadcrumbs and custom keys come from fixed lists. No user id is set. Collection is **off** until the user grants the analytics consent (Profile > Privacy). It turns off again on revoke or sign-out, and cached reports are then deleted. In dev it also needs `--dart-define=LW_CRASH_REPORTS=true`. Android and iOS ship with collection off (manifest / Info.plist).
+- **App (Crashlytics).** `lib/core/monitoring/crash_reporting.dart`. Flutter errors and uncaught async errors go to Crashlytics as the **error type and stack trace only**. Messages are never sent, because a message can quote a mood, a note or a reflection. Breadcrumbs and custom keys come from fixed lists. No user id is set. Collection is **off** until the user grants the analytics consent (Profile > Privacy & consents). It turns off again on revoke or sign-out, and cached reports are then deleted. In dev it also needs `--dart-define=LW_CRASH_REPORTS=true`. Android and iOS ship with collection off (manifest / Info.plist).
 - **Core API (Cloud Functions).** `services/core-api/src/observability/log.ts`. Each function logs `fn.ok` / `fn.error` with `fn`, `code`, `duration_ms` and nothing else. Error messages are never logged. A callable that fails unexpectedly returns `internal` with a fixed message.
 - **Media Service.** `services/media` logs only job ids, workflow names, status codes and durations (checked for D-80). Keep it that way: no prompts, image data, names or free text in `log.*` calls.
 - **Alerts and dashboard as code.** `infra/terraform/monitoring` sets up an email channel, a log-based metric `core_api_fn_errors`, and three alerts: Core API function errors, 5xx responses on any Cloud Run / Functions service, and p95 latency over 2 s for 10 minutes. It also creates a "Live Well: Core API" dashboard.
@@ -40,7 +40,7 @@ firebase crashlytics:symbols:upload --app=<FIREBASE_APP_ID> "build/symbols"
 cd "D:\Adii voult\Adii\LiveWell\apps\mobile"
 flutter run --flavor dev -t lib/main_dev.dart --dart-define=LW_CRASH_REPORTS=true
 ```
-1. Sign in, then **Profile > Privacy > turn on "Help improve the app"** (the analytics consent).
+1. Sign in, then **Profile > Privacy & consents > turn on "Help improve the app"** (the analytics consent).
 2. **Profile > Developer > Crash reporting** must say "Collection is ON".
 3. Tap **Send a test error**, then **Throw an uncaught error**. Close the app fully and open it again, because reports are sent on the next start.
 4. Within about 5 minutes, Crashlytics shows a `StateError` issue (reason `devTestError` / `uncaughtAsync`) with **no message**. In the issue, the logs and the keys there must be **no** `mood=2`, `sleep=4h` or `I feel awful today`: only the breadcrumb `devTestError` and the key `flavor = dev`. Take a screenshot for the PR.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/goals/data/goal_repository.dart';
+import 'package:livewell/features/avatar/application/avatar_deletion.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
 import 'package:livewell/features/moments/application/moment_launcher.dart';
@@ -125,6 +126,7 @@ class Harness {
   final appearance = FakeAppearanceStore();
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
+  final avatarLocal = FakeAvatarLocalData();
   final localData = FakeLocalData();
 
   /// The coach blinks and breathes (off by default so screens settle).
@@ -181,6 +183,7 @@ class Harness {
           appearanceStoreProvider.overrideWithValue(appearance),
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
+          avatarLocalDataProvider.overrideWithValue(avatarLocal),
           localDataProvider.overrideWithValue(localData),
           namePromptStoreProvider.overrideWithValue(namePrompt),
           coachSpeakerProvider.overrideWithValue(speaker),

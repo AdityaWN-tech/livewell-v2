@@ -30,14 +30,14 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `portal_offers/{id}` | title, url, offer_type, tags, price_display, active, review_status | Signed-in read of active + approved only (queries must filter the same way) | Admin |
 | `content_items/{id}` | type (lesson/audio), review_status, title, category, summary, read_minutes, art_id, version; lessons: **cards** (short paragraphs, read one at a time) and **microhabit** {title, minutes}; breathing sessions: **breathing** (box/calm/sleep). The app shows only items it can open (a lesson with cards, a session with a breathing pattern; D-57). Full Blueprint 6.7 metadata still needs-product | Signed-in read of approved only | Admin |
 | `safety_events/{id}` | — | **None** | all |
-| `audit_log/{id}` | actor, action, target, timestamp, ip_hash, details (no health content) | **None** | Cloud Functions; interim Firestore store (D-18), idempotent ids e.g. `consent_{uid}_{consentId}`, `consent_revoke_handled_{uid}_{consentId}` (D-76) |
+| `audit_log/{id}` | actor, action, target, timestamp, ip_hash, details (no health content) | **None** | Cloud Functions; interim Firestore store (D-18), idempotent ids e.g. `consent_{uid}_{consentId}`, `consent_revoke_handled_{uid}_{consentId}` (D-76); `avatar.deleted` (Delete my avatar: existed, media_files_deleted, avatar_reset, vendor_requests_queued; D-78) |
 | `consent_revocations/{uid}_{consentId}` | uid, consent_id, type, steps[], status (pending/done/failed), attempts, requested_at, due_by (+24 h), completed_at, counts{}, last_error (code only), followed_up (D-76) | **None** | `onConsentCreated`, `consentRevokeSweep` |
-| `vendor_requests/{kind_uid_hash}` | uid, kind (avatar_model_delete / voice_model_delete / portal_unlink / marketing_unsubscribe), vendor, vendor_ref, source, status (pending), requested_at, due_by (D-76). Queue for vendor adapters; no vendor is connected yet | **None** | revoke handling (adds); vendor adapters (drain, log confirmation) |
+| `vendor_requests/{kind_uid_hash}` | uid, kind (avatar_model_delete / voice_model_delete / portal_unlink / marketing_unsubscribe), vendor, vendor_ref, source (`consent_revoked:{consentId}` or `delete_my_avatar`, D-78), status (pending), requested_at, due_by (D-76). Queue for vendor adapters; no vendor is connected yet | **None** | revoke handling (adds); vendor adapters (drain, log confirmation) |
 | `marketing_suppressions/{uid}` | uid, suppressed (bool), since, source (D-76). Any marketing sender checks the consent **and** this list | **None** | revoke handling / new marketing grant |
 
 ## Cloud Storage (D-76)
 
-Rules: `firebase/storage.rules`, nothing open to clients (the server uses the Admin SDK and signed URLs). Reserved prefixes for personal media; revoke handling deletes them:
+Rules: `firebase/storage.rules`, nothing open to clients (the server uses the Admin SDK and signed URLs). Reserved prefixes for personal media; revoke handling deletes them, and "Delete my avatar" (`deleteAvatar` callable, D-78) deletes `selfies/{uid}/` and `avatars/{uid}/` with the same code (`deleteFaceData`):
 
 | Prefix | Holds | Deleted when revoked |
 |---|---|---|

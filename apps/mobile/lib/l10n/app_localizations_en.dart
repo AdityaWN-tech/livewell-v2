@@ -2584,6 +2584,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get devAvatarFrames => 'Avatar frames';
 
   @override
+  String get devCrashReporting => 'Crash reporting';
+
+  @override
   String get devAvatarTalk => 'Talk (mouth frames only)';
 
   @override

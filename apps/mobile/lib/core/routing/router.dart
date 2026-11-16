@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/consents_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
+import '../../features/dev/presentation/crash_check_screen.dart';
 import '../../features/dev/presentation/illustration_gallery.dart';
 import '../../features/dev/presentation/avatar_frames_gallery.dart';
 import '../../features/dev/presentation/moments_gallery.dart';
@@ -253,6 +254,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(
           path: IllustrationGallery.path,
           builder: (context, state) => const IllustrationGallery(),
+        ),
+      if (flavor == Flavor.dev)
+        GoRoute(
+          path: CrashCheckScreen.path,
+          builder: (context, state) => const CrashCheckScreen(),
         ),
     ],
   );

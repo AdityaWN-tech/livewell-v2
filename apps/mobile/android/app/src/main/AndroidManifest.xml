@@ -19,6 +19,9 @@
              (FR-ONB-03); the app switches collection on only after that. -->
         <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
         <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+        <!-- Crash reports likewise (T-FND-10, D-80): off until the analytics
+             consent; CrashReporter switches it on. -->
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
         <!-- The home-screen widget (FR-TCH-03, D-61) and its Done button. -->
         <receiver android:name=".LiveWellWidgetReceiver" android:exported="false">
             <intent-filter>

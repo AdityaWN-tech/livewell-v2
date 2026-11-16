@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -12,6 +14,7 @@ import '../../features/onboarding/data/onboarding_store.dart';
 import '../../features/onboarding/domain/onboarding_progress.dart';
 import '../../firebase/firebase_options.dart';
 import '../config/flavor.dart';
+import '../config/remote_flags.dart';
 import 'startup_trace.dart';
 
 /// Where the app goes after the splash.
@@ -47,6 +50,9 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
   StartupTrace.mark('startup_begin');
   await Firebase.initializeApp(options: options);
   StartupTrace.mark('firebase_ready');
+  // Feature flags from Remote Config (T-FND-11, D-73): last launch's values
+  // first, then a fetch. Not awaited, so startup never waits on it.
+  unawaited(ref.read(remoteFlagValuesProvider.notifier).load());
   // After a log out: clear the last account's offline Firestore copy before
   // anything reads it (T-ONB-03f). Must run before Firestore is first used.
   if (await ref.read(localDataProvider).takeCachePending()) {

@@ -2,9 +2,9 @@
   "name": "livewell-firebase",
   "private": true,
   "type": "module",
-  "description": "Firestore security rules and their emulator tests (T-FND-06)",
+  "description": "Firestore and Cloud Storage security rules and their emulator tests (T-FND-06, T-CMP-03)",
   "scripts": {
-    "test": "firebase emulators:exec --only firestore --project demo-livewell \"vitest run && node scripts/check-coverage.mjs\"",
+    "test": "firebase emulators:exec --only firestore,storage --project demo-livewell \"vitest run && node scripts/check-coverage.mjs\"",
     "test:watch": "vitest",
     "typecheck": "tsc"
   },

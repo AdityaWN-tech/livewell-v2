@@ -1,8 +1,10 @@
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
+import { exportPrefix } from './export-collections.js';
 
 /**
  * Deletions the app can't do itself (firestore.rules forbid client deletes):
@@ -63,6 +65,13 @@ export async function deleteAccountFor(uid: string, log: AuditLog) {
   });
   // The profile and every sub-collection (check-ins, plans, consents, …).
   await db.recursiveDelete(db.doc(`users/${uid}`));
+  // Any data export files waiting to be downloaded (T-CMP-03, D-82).
+  // A project without Cloud Storage yet has no bucket: nothing to delete.
+  try {
+    await getStorage().bucket().deleteFiles({ prefix: exportPrefix(uid) });
+  } catch (e) {
+    if ((e as { code?: number }).code !== 404) throw e;
+  }
   try {
     await getAuth().deleteUser(uid);
   } catch (e) {

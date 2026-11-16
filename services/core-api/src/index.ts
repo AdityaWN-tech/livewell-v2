@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase-admin/app';
 
+import { makeDataExport } from './account/data-export.js';
 import { makeDeletions } from './account/deletions.js';
 import { makeOnConsentCreated } from './consents/on-consent-created.js';
 
@@ -13,3 +14,10 @@ export const onConsentCreated = makeOnConsentCreated();
  * T-ONB-03f), each with an audit entry.
  */
 export const { deleteAvatar, deleteVoice, deleteAccount } = makeDeletions();
+
+/**
+ * "Download my data" (FR-SET-02, T-CMP-03, D-82): request, build (trigger)
+ * and a short-lived download link.
+ */
+export const { requestDataExport, onDataExportRequested, getDataExportLink } =
+  makeDataExport();

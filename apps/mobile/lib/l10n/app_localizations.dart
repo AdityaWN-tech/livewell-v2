@@ -6488,6 +6488,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get healthTryAgain;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'Get a file with everything you’ve shared.'**
+  String get dataExportRowNote;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'A copy of your data'**
+  String get dataExportTitle;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll put everything you’ve shared with Live Well into one file: your profile, check-ins, plans, coach messages and settings, with a short summary you can read. It’s usually ready in a few minutes.'**
+  String get dataExportIntro;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare my file'**
+  String get dataExportStart;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'We’re preparing your file. You can close this and come back; it’s usually ready in a few minutes.'**
+  String get dataExportPreparing;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'Your file is ready. You can download it until {date}.'**
+  String dataExportReady(String date);
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get dataExportDownload;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t prepare your file this time. Please try again.'**
+  String get dataExportFailed;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get dataExportRetry;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'Email us instead'**
+  String get dataExportEmailInstead;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'You can ask for a new copy once a day.'**
+  String get dataExportLimited;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'You can ask for a new copy once a day. Please try again after {date}.'**
+  String dataExportLimitedUntil(String date);
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t start that right now. Please try again later.'**
+  String get dataExportStartFailed;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t open the download. Please try again.'**
+  String get dataExportLinkFailed;
+
+  /// T-CMP-03 download my data (D-82).
+  ///
+  /// In en, this message translates to:
+  /// **'The file is personal. Keep it somewhere safe and share it only with people you trust.'**
+  String get dataExportPrivacyNote;
 }
 
 class _AppLocalizationsDelegate

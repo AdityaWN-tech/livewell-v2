@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// Live Well v2 Cloud Storage rules. HUMAN REVIEW REQUIRED (security, privacy).
+// Tests: firebase/test/storage.rules.test.ts (npm test).
+//
+// The app never reads or writes Cloud Storage directly (D-17, D-82):
+// - exports/{uid}/...  data export zips (T-CMP-03), written by Cloud
+//   Functions and downloaded only through a short-lived signed URL from
+//   getDataExportLink. Deleted after 7 days by the bucket's lifecycle rule
+//   (firebase/storage-lifecycle.json).
+// - avatars/{uid}/...  coach frame sets, written by the Media Service and
+//   served through signed links.
+// Admin SDK and signed URLs bypass these rules, so clients get nothing.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

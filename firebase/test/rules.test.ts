@@ -10,6 +10,10 @@ import {
   deleteField,
   doc,
   getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
@@ -906,6 +910,7 @@ describe('server-written documents are read-only for the owner', () => {
     'users/alice/messages/m1',
     'users/alice/streaks/current',
     'users/alice/portal_link/current',
+    'users/alice/data_exports/job1',
   ];
   for (const path of paths) {
     it(path, async () => {
@@ -916,6 +921,28 @@ describe('server-written documents are read-only for the owner', () => {
       await assertFails(setDoc(doc(as(ALICE), path), { x: 2, ...meta() }));
     });
   }
+});
+
+describe('data_exports (T-CMP-03: owner reads status, server writes)', () => {
+  const job = () => ({ status: 'ready', counts: { checkins: 1 }, ...meta() });
+  it('the owner reads and lists their jobs; nobody else can', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/data_exports/j1': job() });
+    await assertSucceeds(getDoc(doc(as(ALICE), 'users/alice/data_exports/j1')));
+    await assertSucceeds(
+      getDocs(query(collection(as(ALICE), 'users/alice/data_exports'), orderBy('created_at', 'desc'), limit(1))),
+    );
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/data_exports/j1')));
+    await assertFails(getDocs(collection(as(BOB), 'users/alice/data_exports')));
+    await assertFails(getDoc(doc(anon(), 'users/alice/data_exports/j1')));
+  });
+  it('the app can never create, change or delete a job', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/data_exports/j1': job() });
+    await assertFails(addDoc(collection(as(ALICE), 'users/alice/data_exports'), { status: 'preparing', ...meta() }));
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/data_exports/j1'), { status: 'ready' }));
+    await assertFails(deleteDoc(doc(as(ALICE), 'users/alice/data_exports/j1')));
+  });
 });
 
 describe('global catalogues (approved and active only)', () => {

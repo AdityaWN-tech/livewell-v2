@@ -461,10 +461,10 @@ packages:
     dependency: "direct main"
     description:
       name: firebase_remote_config
-      sha256: "17266f5faf9e671db8a7a0afa27eae1d99ed1fe384489e8a86ef64fc9c68a6f4"
+      sha256: fa518445638fa3903e359ac544bd3243e72ada025728c8dbfa4b28ae939e8b38
       url: "https://pub.dev"
     source: hosted
-    version: "6.7.1"
+    version: "6.7.0"
   firebase_remote_config_platform_interface:
     dependency: transitive
     description:

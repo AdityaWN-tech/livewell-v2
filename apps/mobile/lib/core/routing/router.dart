@@ -42,6 +42,7 @@ import '../../features/track/presentation/track_screen.dart';
 import '../../features/track/presentation/weekly_wins_screen.dart';
 import '../../features/welcome/presentation/welcome_screen.dart';
 import '../../features/consent/domain/consent.dart';
+import '../../features/starter_plan/presentation/daily_plan_screen.dart';
 import '../config/flavor.dart';
 import 'app_shell.dart';
 
@@ -221,6 +222,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'phone',
             builder: (context, state) => const PhoneSignInScreen(linking: true),
+          ),
+          // Profile > Daily plan (T-DLY-03e).
+          GoRoute(
+            path: 'daily-plan',
+            builder: (context, state) => const DailyPlanScreen(),
           ),
         ],
       ),

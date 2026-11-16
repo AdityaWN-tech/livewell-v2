@@ -51,7 +51,11 @@ class PlanScheduler {
     final quiet = QuietHours.fromMap(
       settings[ProfileSettings.quietHours] as Map<String, dynamic>?,
     );
-    final items = TouchpointScheduler.build(
+    // "Not today" (T-DLY-03e): that moment's reminder is off for the day.
+    final notToday = NotToday.fromMap(
+      settings[ProfileSettings.notToday] as Map<String, dynamic>?,
+    );
+    final items = notToday.filter(TouchpointScheduler.build(
       days: [for (final d in dates) DateTime.parse(d)],
       times: await plans.loadTimes(),
       quiet: quiet,
@@ -61,7 +65,7 @@ class PlanScheduler {
         settings[ProfileSettings.notificationCategories]
             as Map<String, dynamic>?,
       ),
-    );
+    ));
     // My Daily Routine (T-GOL-03d): its own category and cap, same quiet
     // hours, scheduled in the same pass so neither wipes the other.
     final routine = await routineRemindersFor(

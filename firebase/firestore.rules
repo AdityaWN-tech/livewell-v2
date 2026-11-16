@@ -634,6 +634,17 @@ service cloud.firestore {
     match /audit_log/{id} {
       allow read, write: if false;
     }
+    // Revoke handling (FR-ONB-03 → 16.3, D-76): the per-revocation task, the
+    // queue of vendor-side deletions/unlinks, and the marketing stop list.
+    match /consent_revocations/{id} {
+      allow read, write: if false;
+    }
+    match /vendor_requests/{id} {
+      allow read, write: if false;
+    }
+    match /marketing_suppressions/{id} {
+      allow read, write: if false;
+    }
 
     // Anything else: denied by default (no other match blocks).
   }

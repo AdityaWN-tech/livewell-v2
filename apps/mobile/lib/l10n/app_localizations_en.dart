@@ -108,6 +108,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t load your choices. Please try again.';
 
   @override
+  String consentRevokeTitle(String name) {
+    return 'Turn off $name?';
+  }
+
+  @override
+  String get consentRevokeKeep => 'Keep it on';
+
+  @override
+  String get consentRevokeConfirm => 'Turn off';
+
+  @override
+  String get consentRevokeCamera =>
+      'Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach\'s name stays. This can\'t be undone.';
+
+  @override
+  String get consentRevokeMicrophone =>
+      'Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can\'t be undone.';
+
+  @override
+  String get consentRevokeBiometric =>
+      'Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can\'t be undone.';
+
+  @override
+  String get consentRevokePortalLinking =>
+      'We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.';
+
+  @override
+  String get consentRevokeMarketing =>
+      'We stop sending news and offers. It can take up to 24 hours.';
+
+  @override
   String get consentNotificationsTitle => 'Reminders and nudges';
 
   @override
@@ -1703,7 +1734,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileMyCoach => 'My coach';
 
   @override
-  String get profileChangeAvatar => 'Change avatar';
+  String get profileChangeAvatar => 'Choose another coach';
 
   @override
   String get profileChangeVoice => 'Change voice';
@@ -1788,7 +1819,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDeleteAvatarBody =>
-      'Your coach’s avatar will be deleted. Your coach will use the default look.';
+      'This removes the coach made for you: its portrait, every picture of its faces, and any copy kept by our avatar partner. It can’t be undone.\n\nA ready-made coach will take over straight away, with the same name and voice. You can make a new one whenever you like.';
 
   @override
   String get profileDeleteVoiceBody =>
@@ -1807,6 +1838,44 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileDeleteFailed =>
       'We couldn’t delete that right now. Please try again later.';
+
+  @override
+  String get profileCoachReadyMade => 'A ready-made coach';
+
+  @override
+  String get profileCoachFromPhoto => 'Made from your photo';
+
+  @override
+  String get profileCoachBuilt => 'Built by you';
+
+  @override
+  String get profileRemakeFromPhoto => 'Remake from a new photo';
+
+  @override
+  String get profileBuildMyOwn => 'Build my own';
+
+  @override
+  String get profileAdjustCoach => 'Adjust';
+
+  @override
+  String get profileDeleteAvatarTitle => 'Delete your avatar?';
+
+  @override
+  String get profileDeleteAvatarKeep => 'Keep it';
+
+  @override
+  String get profileDeletingAvatar => 'Deleting your avatar…';
+
+  @override
+  String get profileAvatarDeleted =>
+      'Your avatar is deleted. A ready-made coach is with you now.';
+
+  @override
+  String get profileAvatarDeleteFailed =>
+      'We couldn’t reach our servers, so your avatar hasn’t been deleted yet.';
+
+  @override
+  String get profileTryAgain => 'Try again';
 
   @override
   String get profileHelp => 'Help & about';

@@ -274,6 +274,54 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load your choices. Please try again.'**
   String get consentLoadError;
 
+  /// Confirming a revoke that deletes or stops something on our side (FR-ONB-03, D-76).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off {name}?'**
+  String consentRevokeTitle(String name);
+
+  /// No description provided for @consentRevokeKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it on'**
+  String get consentRevokeKeep;
+
+  /// No description provided for @consentRevokeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get consentRevokeConfirm;
+
+  /// No description provided for @consentRevokeCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach\'s name stays. This can\'t be undone.'**
+  String get consentRevokeCamera;
+
+  /// No description provided for @consentRevokeMicrophone.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can\'t be undone.'**
+  String get consentRevokeMicrophone;
+
+  /// No description provided for @consentRevokeBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can\'t be undone.'**
+  String get consentRevokeBiometric;
+
+  /// No description provided for @consentRevokePortalLinking.
+  ///
+  /// In en, this message translates to:
+  /// **'We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.'**
+  String get consentRevokePortalLinking;
+
+  /// No description provided for @consentRevokeMarketing.
+  ///
+  /// In en, this message translates to:
+  /// **'We stop sending news and offers. It can take up to 24 hours.'**
+  String get consentRevokeMarketing;
+
   /// No description provided for @consentNotificationsTitle.
   ///
   /// In en, this message translates to:
@@ -3061,7 +3109,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileChangeAvatar.
   ///
   /// In en, this message translates to:
-  /// **'Change avatar'**
+  /// **'Choose another coach'**
   String get profileChangeAvatar;
 
   /// No description provided for @profileChangeVoice.
@@ -3223,7 +3271,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileDeleteAvatarBody.
   ///
   /// In en, this message translates to:
-  /// **'Your coach’s avatar will be deleted. Your coach will use the default look.'**
+  /// **'This removes the coach made for you: its portrait, every picture of its faces, and any copy kept by our avatar partner. It can’t be undone.\n\nA ready-made coach will take over straight away, with the same name and voice. You can make a new one whenever you like.'**
   String get profileDeleteAvatarBody;
 
   /// No description provided for @profileDeleteVoiceBody.
@@ -3255,6 +3303,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn’t delete that right now. Please try again later.'**
   String get profileDeleteFailed;
+
+  /// No description provided for @profileCoachReadyMade.
+  ///
+  /// In en, this message translates to:
+  /// **'A ready-made coach'**
+  String get profileCoachReadyMade;
+
+  /// No description provided for @profileCoachFromPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Made from your photo'**
+  String get profileCoachFromPhoto;
+
+  /// No description provided for @profileCoachBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Built by you'**
+  String get profileCoachBuilt;
+
+  /// No description provided for @profileRemakeFromPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remake from a new photo'**
+  String get profileRemakeFromPhoto;
+
+  /// No description provided for @profileBuildMyOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Build my own'**
+  String get profileBuildMyOwn;
+
+  /// No description provided for @profileAdjustCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust'**
+  String get profileAdjustCoach;
+
+  /// No description provided for @profileDeleteAvatarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your avatar?'**
+  String get profileDeleteAvatarTitle;
+
+  /// No description provided for @profileDeleteAvatarKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it'**
+  String get profileDeleteAvatarKeep;
+
+  /// No description provided for @profileDeletingAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your avatar…'**
+  String get profileDeletingAvatar;
+
+  /// No description provided for @profileAvatarDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your avatar is deleted. A ready-made coach is with you now.'**
+  String get profileAvatarDeleted;
+
+  /// No description provided for @profileAvatarDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t reach our servers, so your avatar hasn’t been deleted yet.'**
+  String get profileAvatarDeleteFailed;
+
+  /// No description provided for @profileTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get profileTryAgain;
 
   /// No description provided for @profileHelp.
   ///

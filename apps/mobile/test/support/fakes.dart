@@ -44,6 +44,7 @@ import 'package:livewell/core/design/avatar/avatar_art.dart'
     show AvatarExpression;
 import 'package:livewell/features/widget/data/widget_inbox.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
+import 'package:livewell/features/avatar/application/avatar_deletion.dart';
 import 'package:livewell/features/widget/domain/widget_snapshot.dart';
 
 /// In-memory sign-in for widget tests.
@@ -784,9 +785,13 @@ class FakeDeletions implements Deletions {
   final calls = <String>[];
   bool fail = false;
 
+  /// What the server does after each call (e.g. resets the avatar).
+  void Function(String name)? onCall;
+
   Future<void> _do(String name) async {
     if (fail) throw Exception('not deployed');
     calls.add(name);
+    onCall?.call(name);
   }
 
   @override
@@ -1008,6 +1013,20 @@ class FakeWidgetPublisher implements WidgetPublisher {
   @override
   Future<void> publish(WidgetSnapshot snapshot) async =>
       published.add(snapshot);
+
+  /// How many times the widget's face copies were cleared.
+  int facesCleared = 0;
+
+  @override
+  Future<void> clearFaces() async => facesCleared++;
+}
+
+/// The avatar's copies on the phone (frame sets, widget faces).
+class FakeAvatarLocalData implements AvatarLocalData {
+  final cleared = <String>[];
+
+  @override
+  Future<void> clear(String uid) async => cleared.add(uid);
 }
 
 class FakeWidgetInbox implements WidgetInbox {

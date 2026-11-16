@@ -30,4 +30,16 @@ extension ConsentCopy on ConsentType {
     ConsentType.analytics => l.consentAnalyticsBody,
     _ => null,
   };
+
+  /// What revoking deletes or stops on our side (spec 16.3, D-76), shown
+  /// before the switch goes off. Null when nothing is held server-side (the
+  /// app simply stops: reminders, Health reads, analytics).
+  String? revokeEffect(AppLocalizations l) => switch (this) {
+    ConsentType.camera => l.consentRevokeCamera,
+    ConsentType.microphone => l.consentRevokeMicrophone,
+    ConsentType.biometric => l.consentRevokeBiometric,
+    ConsentType.portalLinking => l.consentRevokePortalLinking,
+    ConsentType.marketing => l.consentRevokeMarketing,
+    _ => null,
+  };
 }

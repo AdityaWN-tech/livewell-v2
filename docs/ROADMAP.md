@@ -21,8 +21,8 @@ The work in progress and what comes next, as a checklist. Each item is one PR on
   - [ ] **08g-c** Android widgets (Glance), Done on Android 12+
   - [ ] **08g-d** Look and feel, "Add the widget" card
   - [ ] **08g-e** Hide details on lock screen, sign-out, analytics
-- [ ] **AVT-08h** Settings and deletion (Delete my avatar)
-- [ ] **T-DLY-03e** Daily plan settings
+- [ ] **AVT-08h** Settings and deletion (Delete my avatar) (PR #92, D-78; merge after #88; needs human review: privacy)
+- [ ] **T-DLY-03e** Daily plan settings (PR #93, D-79)
 - [x] **T-GOL-03** My Daily Routine (its reminders use the 3D avatar) (T-GOL-03a to 03e on main)
 
 ## Finishing partly done tasks (2026-11-15/16)
@@ -37,7 +37,7 @@ Each is one PR off `main`, waiting for review; none merged yet.
 - [ ] **T-VOC-02** "How this voice is made" in voice settings (PR #89)
 - [ ] **T-TCH-01** FCM device registration and a capped, consent-checked server push (PR #90, D-77)
 
-Expected merge conflicts: #90 with #84 (`reminders.dart`, test fakes) and with #88 (rules, `index.ts`, `decisions.md`). After #84 and #90 merge, the app should report its scheduled reminders per day so the server stops assuming the worst case (D-77). After #88 and #90 merge, revoking the notifications consent should also delete `users/{uid}/devices` (D-77).
+#92 and #93 both change the Profile screen: whichever merges second needs a rebase and new Profile goldens. Expected merge conflicts: #90 with #84 (`reminders.dart`, test fakes) and with #88 (rules, `index.ts`, `decisions.md`). After #84 and #90 merge, the app should report its scheduled reminders per day so the server stops assuming the worst case (D-77). After #88 and #90 merge, revoking the notifications consent should also delete `users/{uid}/devices` (D-77).
 
 ## Blocked
 

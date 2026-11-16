@@ -3717,4 +3717,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthTryAgain => 'Try again';
+
+  @override
+  String get dataExportRowNote => 'Get a file with everything you’ve shared.';
+
+  @override
+  String get dataExportTitle => 'A copy of your data';
+
+  @override
+  String get dataExportIntro =>
+      'We’ll put everything you’ve shared with Live Well into one file: your profile, check-ins, plans, coach messages and settings, with a short summary you can read. It’s usually ready in a few minutes.';
+
+  @override
+  String get dataExportStart => 'Prepare my file';
+
+  @override
+  String get dataExportPreparing =>
+      'We’re preparing your file. You can close this and come back; it’s usually ready in a few minutes.';
+
+  @override
+  String dataExportReady(String date) {
+    return 'Your file is ready. You can download it until $date.';
+  }
+
+  @override
+  String get dataExportDownload => 'Download';
+
+  @override
+  String get dataExportFailed =>
+      'We couldn’t prepare your file this time. Please try again.';
+
+  @override
+  String get dataExportRetry => 'Try again';
+
+  @override
+  String get dataExportEmailInstead => 'Email us instead';
+
+  @override
+  String get dataExportLimited => 'You can ask for a new copy once a day.';
+
+  @override
+  String dataExportLimitedUntil(String date) {
+    return 'You can ask for a new copy once a day. Please try again after $date.';
+  }
+
+  @override
+  String get dataExportStartFailed =>
+      'We couldn’t start that right now. Please try again later.';
+
+  @override
+  String get dataExportLinkFailed =>
+      'We couldn’t open the download. Please try again.';
+
+  @override
+  String get dataExportPrivacyNote =>
+      'The file is personal. Keep it somewhere safe and share it only with people you trust.';
 }

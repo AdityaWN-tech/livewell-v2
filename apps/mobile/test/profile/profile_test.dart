@@ -345,8 +345,8 @@ void main() {
       expect(h.localData.clears, 0);
     });
 
-    testWidgets('no Memory, and no Export without a data-request address '
-        '(Step 4d): never a greyed-out "Coming soon" row', (tester) async {
+    testWidgets('no Memory; Export is the in-app download (T-CMP-03, '
+        'D-82): never a greyed-out "Coming soon" row', (tester) async {
       await signedIn().boot(tester);
       await openProfile(tester);
       await tester.scrollUntilVisible(
@@ -354,7 +354,7 @@ void main() {
         300,
         scrollable: find.byType(Scrollable).first,
       );
-      expect(find.byKey(const Key('profile-export')), findsNothing);
+      expect(find.byKey(const Key('profile-export')), findsOneWidget);
       expect(find.byKey(const Key('profile-memory')), findsNothing);
       expect(find.textContaining('oming soon'), findsNothing);
     });

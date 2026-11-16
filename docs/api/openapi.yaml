@@ -60,6 +60,87 @@ paths:
               schema: {$ref: "#/components/schemas/AvatarJob"}
         "401": {description: not_authorized}
         "404": {description: "not_found (also someone else's job)"}
+  /requestDataExport:
+    post:
+      summary: Ask for a copy of my data (core-api callable, FR-SET-02, T-CMP-03, D-82)
+      description: >
+        Firebase callable (Cloud Functions 2nd gen, us-central1; the app calls
+        it with cloud_functions httpsCallable). Signed-in account that passed
+        the 18+ gate only. One export per 24 hours; a failed export, or one
+        still preparing after an hour, does not count. Writes
+        users/{uid}/data_exports/{jobId} (status preparing) and an audit entry
+        with no content; the onDataExportRequested trigger then builds a zip
+        (data.json, summary.pdf, README.txt) at Cloud Storage
+        exports/{uid}/{jobId}.zip, kept 7 days, and sets status ready (with
+        expires_at and per-collection counts) or failed.
+      servers:
+        - url: https://us-central1-PROJECT.cloudfunctions.net/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data: {type: object, maxProperties: 0}
+      responses:
+        "200":
+          description: Job created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required: [jobId]
+                    properties:
+                      jobId: {type: string}
+        "400": {description: "FAILED_PRECONDITION: no profile or the 18+ gate was not passed"}
+        "401": {description: "UNAUTHENTICATED"}
+        "429":
+          description: >
+            RESOURCE_EXHAUSTED: one export a day; error.details has
+            retry_after (ISO 8601) and job_id (the export that counts)
+  /getDataExportLink:
+    post:
+      summary: A short-lived download link for my ready export (core-api callable, D-82)
+      description: >
+        Firebase callable. Returns a V4 signed URL valid for 15 minutes (never
+        past the export's expires_at) for the caller's own ready export.
+        Each link is audit-logged with no content.
+      servers:
+        - url: https://us-central1-PROJECT.cloudfunctions.net/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [data]
+              properties:
+                data:
+                  type: object
+                  required: [jobId]
+                  properties:
+                    jobId: {type: string, pattern: "^[A-Za-z0-9]{1,40}$"}
+      responses:
+        "200":
+          description: The link
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required: [url, expiresAt]
+                    properties:
+                      url: {type: string, format: uri}
+                      expiresAt: {type: string, format: date-time}
+        "400": {description: "INVALID_ARGUMENT (bad jobId) | FAILED_PRECONDITION (the export expired)"}
+        "401": {description: "UNAUTHENTICATED"}
+        "404": {description: "NOT_FOUND: no such ready export of the caller (also someone else's)"}
 components:
   securitySchemes:
     firebaseIdToken: {type: http, scheme: bearer}

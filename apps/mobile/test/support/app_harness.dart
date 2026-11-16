@@ -30,6 +30,7 @@ import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
+import 'package:livewell/features/profile/data/data_export.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
@@ -42,6 +43,7 @@ import 'package:livewell/features/track/data/health_source.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
+import 'fake_data_exports.dart';
 import 'fake_onboarding_store.dart';
 import 'fakes.dart';
 import 'frames.dart';
@@ -125,6 +127,9 @@ class Harness {
   final appearance = FakeAppearanceStore();
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
+
+  /// Download my data (T-CMP-03).
+  final exports = FakeDataExports();
   final localData = FakeLocalData();
 
   /// The coach blinks and breathes (off by default so screens settle).
@@ -181,6 +186,8 @@ class Harness {
           appearanceStoreProvider.overrideWithValue(appearance),
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
+          dataExportsProvider.overrideWithValue(exports),
+          dataExportOpenerProvider.overrideWithValue(exports.open),
           localDataProvider.overrideWithValue(localData),
           namePromptStoreProvider.overrideWithValue(namePrompt),
           coachSpeakerProvider.overrideWithValue(speaker),

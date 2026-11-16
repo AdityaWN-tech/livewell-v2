@@ -23,6 +23,8 @@ The work in progress and what comes next, as a checklist. Each item is one PR on
   - [ ] **08g-e** Hide details on lock screen, sign-out, analytics
 - [ ] **AVT-08h** Settings and deletion (Delete my avatar) (PR #92, D-78; merge after #88; needs human review: privacy)
 - [ ] **T-DLY-03e** Daily plan settings (PR #93, D-79)
+- [ ] **T-FND-10** Crashlytics with consent gating and no PHI; server logging and alerts (PR #94, D-80; agent tracing waits for the agents)
+- [ ] **T-CMP-03** Download my data (PR #95, D-82; needs privacy and legal review; deploy needs Blaze)
 - [x] **T-GOL-03** My Daily Routine (its reminders use the 3D avatar) (T-GOL-03a to 03e on main)
 
 ## Finishing partly done tasks (2026-11-15/16)
@@ -37,7 +39,7 @@ Each is one PR off `main`, waiting for review; none merged yet.
 - [ ] **T-VOC-02** "How this voice is made" in voice settings (PR #89)
 - [ ] **T-TCH-01** FCM device registration and a capped, consent-checked server push (PR #90, D-77)
 
-#92 and #93 both change the Profile screen: whichever merges second needs a rebase and new Profile goldens. Expected merge conflicts: #90 with #84 (`reminders.dart`, test fakes) and with #88 (rules, `index.ts`, `decisions.md`). After #84 and #90 merge, the app should report its scheduled reminders per day so the server stops assuming the worst case (D-77). After #88 and #90 merge, revoking the notifications consent should also delete `users/{uid}/devices` (D-77).
+#92, #93, #94 and #95 all change the Profile screen: whichever merges second needs a rebase and new Profile goldens. Expected merge conflicts: #90 with #84 (`reminders.dart`, test fakes) and with #88 (rules, `index.ts`, `decisions.md`). After #84 and #90 merge, the app should report its scheduled reminders per day so the server stops assuming the worst case (D-77). After #88 and #90 merge, revoking the notifications consent should also delete `users/{uid}/devices` (D-77).
 
 ## Blocked
 
@@ -45,3 +47,4 @@ Each is one PR off `main`, waiting for review; none merged yet.
 - **Deploying the ComfyUI server and the Media Service:** needs the Blaze plan (billing for Cloud Run GPUs, D-17), then `docs/media/comfyui-setup.md`.
 - **Push on real devices:** the code is in PR #90; the owner steps (enable FCM, upload the APNs key, Push capability on each App ID, deploy rules and functions) are in `docs/setup/push-notifications.md`. Personalised push copy ("Priya, …", FR-TCH-02) conflicts with "nothing personal on the lock screen" and needs the client (D-77).
 - **Lessons:** the reader works but has no approved lessons; waiting on clinical content.
+- **Assessment (T-ASM-01, then T-ASM-03 scoring and the Live Well Map):** not built. `content/assessment/` is empty. Needs the Blueprint 7.3 bank schema, the 7.5 banned-phrase list, the questions and the 8 driver names from the clinical team; the owner chose to wait for them (2026-11-16) rather than draft provisional content.

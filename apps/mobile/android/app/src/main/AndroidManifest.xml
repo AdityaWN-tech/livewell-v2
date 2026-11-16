@@ -19,6 +19,11 @@
              (FR-ONB-03); the app switches collection on only after that. -->
         <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
         <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+        <!-- Push (T-TCH-01, D-77): no FCM token until the notifications consent
+             is granted (the app turns auto-init on then), and pushes without
+             a channel land in the coach's channel. -->
+        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="coach" />
         <!-- The home-screen widget (FR-TCH-03, D-61) and its Done button. -->
         <receiver android:name=".LiveWellWidgetReceiver" android:exported="false">
             <intent-filter>

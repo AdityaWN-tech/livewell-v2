@@ -161,11 +161,16 @@ void main() {
         ];
         await h.boot(tester);
         await openProfile(tester);
+        final removes = h.devices.removes, deletes = h.push.deletes;
         await tapKey(tester, key);
         await confirm(tester);
         expect(h.auth.signedIn, isNull);
         expect(h.reminders.scheduled, isEmpty);
         expect(h.reminders.cancels, 1);
+        // The device leaves the account and its push token is dropped
+        // (T-TCH-01).
+        expect(h.devices.removes, removes + 1);
+        expect(h.push.deletes, deletes + 1);
         expect(h.photo.path, isNull);
         expect(h.localData.clears, 1);
         expect(h.localData.pending, isTrue, reason: 'cache cleared next start');

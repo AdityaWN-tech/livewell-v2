@@ -23,7 +23,10 @@ class MomentPlayback {
     captions: m?['captions'] is bool ? m!['captions'] as bool : true,
   );
 
-  Map<String, Object> toMap() => {'auto_speak': autoSpeak, 'captions': captions};
+  Map<String, Object> toMap() => {
+    'auto_speak': autoSpeak,
+    'captions': captions,
+  };
 
   MomentPlayback copyWith({bool? autoSpeak, bool? captions}) => MomentPlayback(
     autoSpeak: autoSpeak ?? this.autoSpeak,
@@ -34,8 +37,10 @@ class MomentPlayback {
 /// The person's playback settings; the defaults until the profile loads.
 final momentPlaybackProvider = Provider<MomentPlayback>(
   (ref) => MomentPlayback.fromMap(
-    ref.watch(currentProfileProvider).value?.settings[ProfileSettings
-            .momentPlayback]
+    ref
+            .watch(currentProfileProvider)
+            .value
+            ?.settings[ProfileSettings.momentPlayback]
         as Map<String, dynamic>?,
   ),
 );

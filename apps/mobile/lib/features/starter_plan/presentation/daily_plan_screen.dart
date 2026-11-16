@@ -47,9 +47,9 @@ class _DailyPlanScreenState extends ConsumerState<DailyPlanScreen> {
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(text)));
 
-  String _fmt(ClockTime c) => MaterialLocalizations.of(
-    context,
-  ).formatTimeOfDay(TimeOfDay(hour: c.hour, minute: c.minute));
+  String _fmt(ClockTime c) =>
+      MaterialLocalizations.of(context)
+          .formatTimeOfDay(TimeOfDay(hour: c.hour, minute: c.minute));
 
   Future<void> _save(Map<String, Object> fields) async {
     final uid = _uid;

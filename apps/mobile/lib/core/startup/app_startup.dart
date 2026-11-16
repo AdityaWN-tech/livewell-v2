@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -8,10 +10,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/account/application/account_setup.dart';
 import '../../features/auth/data/firebase_auth_service.dart';
+import '../../features/consent/data/consent_repository.dart';
 import '../../features/onboarding/data/onboarding_store.dart';
 import '../../features/onboarding/domain/onboarding_progress.dart';
 import '../../firebase/firebase_options.dart';
 import '../config/flavor.dart';
+import '../monitoring/crash_reporting.dart';
 import 'startup_trace.dart';
 
 /// Where the app goes after the splash.
@@ -47,6 +51,7 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
   StartupTrace.mark('startup_begin');
   await Firebase.initializeApp(options: options);
   StartupTrace.mark('firebase_ready');
+  _startCrashReporting(ref);
   // After a log out: clear the last account's offline Firestore copy before
   // anything reads it (T-ONB-03f). Must run before Firestore is first used.
   if (await ref.read(localDataProvider).takeCachePending()) {
@@ -75,3 +80,18 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
 /// Not signed in: resume onboarding at the exact step (FR-ONB-06).
 StartDestination signedOutDestination(OnboardingProgress progress) =>
     StartDestination(progress.step.path, signedIn: false);
+
+/// Crash reporting (T-FND-10, D-80): handlers now, collection only once the
+/// analytics consent is known to be granted. Not awaited (NFR-01).
+void _startCrashReporting(Ref ref) {
+  final crash = ref.read(crashReporterProvider)..install();
+  crash.follow(
+    crashCollectionAllowed(
+      flavor: ref.read(flavorProvider),
+      devOptIn: devCrashReportsOptIn,
+      signedIn: FirebaseAuth.instance.authStateChanges().map((u) => u != null),
+      consents: () => ref.read(consentRepositoryProvider).watchRecords(),
+    ),
+  );
+  unawaited(crash.setKey(CrashKey.flavor, ref.read(flavorProvider)));
+}

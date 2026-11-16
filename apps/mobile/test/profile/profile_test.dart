@@ -5,7 +5,6 @@ import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/auth/presentation/sign_in_screen.dart';
-import 'package:livewell/features/consent/domain/consent.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
 import 'package:livewell/features/profile/presentation/profile_screen.dart';
@@ -16,7 +15,6 @@ import 'package:livewell/features/avatar/domain/coaches.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
-import '../starter_plan/starter_plan_test.dart' show plan;
 
 const uid = 'u1';
 

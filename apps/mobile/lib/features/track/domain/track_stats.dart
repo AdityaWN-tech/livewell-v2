@@ -20,9 +20,19 @@ enum TrackPeriod {
 }
 
 /// The values Track charts, from the check-ins (1 to 5 scales), My Daily
-/// Routine (items done, T-GOL-03e) and, when connected, Apple Health /
-/// Health Connect (steps, sleep hours).
-enum TrackMetric { steps, sleep, mood, habits, routine }
+/// Routine (items done, T-GOL-03e), when connected, Apple Health /
+/// Health Connect (steps), and the measures the person records (T-GOL-02).
+enum TrackMetric {
+  steps,
+  sleep,
+  mood,
+  habits,
+  routine,
+  weight,
+  bloodPressure,
+  glucose,
+  meals,
+}
 
 /// One day of the Mon-Sun chart; [value] is null when nothing was logged.
 class DayValue {

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **Proposed, needs owner decision.** Nothing is built (`apps/admin/` and `apps/voice-owner-web/` hold only `.gitkeep`). AGENTS.md's stack table stays "Flutter Web or Next.js" until the owner decides (D-90). |
+| Status | **Accepted (owner, 2026-11-19): split.** Admin / CMS in **Flutter Web**; voice-owner page in **Next.js (static export)** (D-90). Nothing is built yet. |
 | Date | 2026-11-19 |
 | Task | T-FND-03 (spec 10.2 and AGENTS.md: "Admin, voice-owner page: Flutter Web or Next.js (chosen in T-FND-03)") |
 | Related | D-03 (India + US), D-17 (Spark plan), D-18 / D-85 (audit log), ADR-001 (voice vendor not chosen), ADR-002 (agents), D-90 |

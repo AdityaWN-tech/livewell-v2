@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | **Proposed, needs owner decision.** Nothing is built. AGENTS.md's stack table stays "LangGraph or Google ADK" until the owner decides (D-90). |
+| Status | **Accepted (owner, 2026-11-19): LangGraph**, with **Claude (Anthropic API)** as the LLM for the morning-briefing spike, called through our own `ModelClient` with the official `anthropic` Python SDK and a zero-data-retention dev key (D-90). Questions 3, 4 and 6-8 below are still open. |
 | Date | 2026-11-19 |
 | Task | T-FND-03 (vendor and framework spike: "agent framework (LangGraph vs ADK) ... Write ADRs"). Done when (spec 17.4): "ADRs merged with scorecards against the Section 8.3 criteria; morning-briefing prototype runs end to end". This ADR is the paper half; the spike (below) is the other half. |
 | Related | D-03 (India + US, region-aware safety), D-14 (nam5; Cloud Run may run in a US and an India region), D-17 (Spark plan, nothing deployed yet), D-21/D-22 (safety engine, event logging), D-80 (T-FND-10 left agent tracing open), D-90; ADR-001; ADR-003 |

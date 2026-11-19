@@ -142,6 +142,15 @@ class _VoiceScreenState extends ConsumerState<VoiceScreen> {
                         color: LwPalette.light.textPrimary,
                       ),
                     ),
+                    // The rest of the recording, captioned (T-REL-01).
+                    Text(
+                      l.voiceGreetingRest,
+                      key: const Key('voice-greeting-rest'),
+                      textAlign: TextAlign.center,
+                      style: t.bodyMedium?.copyWith(
+                        color: LwPalette.light.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),

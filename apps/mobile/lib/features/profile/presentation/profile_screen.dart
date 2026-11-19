@@ -625,20 +625,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 return Column(
                   children: [
                     for (final (k, name) in moments)
-                      SwitchListTile(
-                        key: Key('profile-touchpoint-${k.name}'),
-                        title: Text(name),
-                        subtitle: InkWell(
-                          onTap: () => _editTouchpoint(k, quiet),
-                          child: Text(
-                            _fmt(times.of(k)),
-                            style: t.labelLarge?.copyWith(
-                              color: p.accentStrong,
+                      // Not a SwitchListTile: it merges everything into one
+                      // switch, so a screen reader could never reach the
+                      // time (T-REL-01). The switch and the time are two
+                      // labelled controls.
+                      ListTile(
+                        title: ExcludeSemantics(child: Text(name)),
+                        // A labelled button, 48 dp tall (T-REL-01).
+                        subtitle: Semantics(
+                          key: Key('profile-time-${k.name}'),
+                          container: true,
+                          button: true,
+                          label: l.profileChangeTime(name, _fmt(times.of(k))),
+                          child: InkWell(
+                            onTap: () => _editTouchpoint(k, quiet),
+                            child: ExcludeSemantics(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  minHeight: LwSize.minTapTarget,
+                                ),
+                                child: Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Text(
+                                    _fmt(times.of(k)),
+                                    style: t.labelLarge?.copyWith(
+                                      color: p.accentStrong,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                        value: enabled.contains(k),
-                        onChanged: (on) => _toggleCategory(enabled, k, on),
+                        trailing: Semantics(
+                          label: name,
+                          child: Switch(
+                            key: Key('profile-touchpoint-${k.name}'),
+                            value: enabled.contains(k),
+                            onChanged: (on) => _toggleCategory(enabled, k, on),
+                          ),
+                        ),
                       ),
                     ListTile(
                       key: const Key('profile-quiet-start'),

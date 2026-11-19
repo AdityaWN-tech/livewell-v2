@@ -217,7 +217,10 @@ class _PlanPreviewScreenState extends ConsumerState<PlanPreviewScreen> {
       body = ListView(
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
-          Text(l.planPreviewTitle, style: t.displaySmall),
+          Semantics(
+            header: true,
+            child: Text(l.planPreviewTitle, style: t.displaySmall),
+          ),
           const SizedBox(height: LwSpacing.md),
           Text(
             l.planNotReady,

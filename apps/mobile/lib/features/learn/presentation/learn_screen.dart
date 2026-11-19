@@ -351,6 +351,7 @@ class LessonCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
     final x = lesson;
+    final large = MediaQuery.textScalerOf(context).scale(1) > 1.3;
     return Semantics(
       button: true,
       container: true,
@@ -382,8 +383,10 @@ class LessonCard extends StatelessWidget {
                       Text(
                         x.summary!,
                         style: t.bodySmall,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
+                        // Cards are one column at large text: show it all
+                        // rather than cut it off (T-REL-01).
+                        maxLines: large ? null : 3,
+                        overflow: large ? null : TextOverflow.ellipsis,
                       ),
                     if (x.readMinutes != null) ...[
                       const SizedBox(height: LwSpacing.xxs),

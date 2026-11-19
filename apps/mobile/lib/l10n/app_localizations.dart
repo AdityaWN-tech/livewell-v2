@@ -6488,6 +6488,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get healthTryAgain;
+
+  /// T-REL-01 caption: the rest of what greeting.m4a says (docs/voices.md), so the whole recording is captioned (NFR-06).
+  ///
+  /// In en, this message translates to:
+  /// **'I’m here to help, one small step at a time.'**
+  String get voiceGreetingRest;
+
+  /// T-REL-01: heading over the transcript of the voice samples (NFR-06 captions).
+  ///
+  /// In en, this message translates to:
+  /// **'What you’ll hear'**
+  String get voiceSampleTitle;
+
+  /// T-REL-01 transcript of the calm voice samples (docs/voices.md, closed script).
+  ///
+  /// In en, this message translates to:
+  /// **'“Hi, I’m your Live Well coach. Let’s take one small step together today.”'**
+  String get voiceSampleCalm;
+
+  /// T-REL-01 transcript of the energetic voice samples (docs/voices.md, closed script).
+  ///
+  /// In en, this message translates to:
+  /// **'“Hi! I’m your Live Well coach. Let’s make today count, one small step at a time!”'**
+  String get voiceSampleEnergetic;
+
+  /// T-REL-01 screen-reader label for a daily plan time in Profile.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {time}. Change the time'**
+  String profileChangeTime(String name, String time);
 }
 
 class _AppLocalizationsDelegate

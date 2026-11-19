@@ -527,6 +527,8 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
           },
           onOwnVoice: () => showOwnVoiceSheet(context),
         ),
+        const SizedBox(height: LwSpacing.sm),
+        VoiceSampleTranscript(style: _voice.style),
         const SizedBox(height: LwSpacing.md),
         FilledButton(
           key: const Key('studio-save-voice'),

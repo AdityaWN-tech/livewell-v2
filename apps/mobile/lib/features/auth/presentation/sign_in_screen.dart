@@ -45,7 +45,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           child: ListView(
             padding: const EdgeInsets.all(LwSpacing.screenGutter),
             children: [
-              Text(l.signInTitle, style: t.displaySmall),
+              Semantics(
+                header: true,
+                child: Text(l.signInTitle, style: t.displaySmall),
+              ),
               const SizedBox(height: LwSpacing.sm),
               Text(l.signInBody, style: t.bodyMedium),
               const SizedBox(height: LwSpacing.xl),
@@ -64,11 +67,18 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               Row(
                 children: [
                   const Expanded(child: Divider()),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: LwSpacing.sm,
+                  // Flexible: wraps at the largest text sizes (T-REL-01).
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: LwSpacing.sm,
+                      ),
+                      child: Text(
+                        l.signInOrContinueWith,
+                        style: t.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    child: Text(l.signInOrContinueWith, style: t.bodySmall),
                   ),
                   const Expanded(child: Divider()),
                 ],

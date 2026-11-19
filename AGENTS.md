@@ -71,6 +71,7 @@ docs/                   Spec, decisions, setup guides, API, data model, ADRs
 | Golden images only / update them | `flutter test --tags golden` / `flutter test --update-goldens --tags golden` |
 | Firestore smoke test on a device | `flutter test integration_test/firestore_smoke_test.dart --flavor dev -d DEVICE` |
 | Firestore rules tests (emulator + coverage gate) | `cd firebase; $env:JAVA_HOME="D:\android\jbr"; npm test` (JAVA_HOME = the `jbr` folder inside your Android Studio / Android SDK install) |
+| Admin (Flutter Web) analyze + tests | `cd "D:\Adii voult\Adii\LiveWell\apps\admin"; flutter analyze; flutter test` (D-92) |
 | Core API / functions tests (Firestore + Functions emulators) | `cd services/core-api; npm test` (needs JAVA_HOME as above) |
 | Consent end to end on a device (emulators) | from repo root: `firebase emulators:exec --only auth,firestore,functions --project my-livewell "cd apps/mobile && flutter test integration_test/consent_emulator_test.dart --flavor dev -d DEVICE"` |
 | CI (GitHub Actions) | `.github/workflows/mobile.yml`: Linux runs everything except goldens; Windows runs goldens |

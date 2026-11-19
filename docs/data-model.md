@@ -30,6 +30,7 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `portal_offers/{id}` | title, url, offer_type, tags, price_display, active, review_status | Signed-in read of active + approved only (queries must filter the same way) | Admin |
 | `content_items/{id}` | type (lesson/audio), review_status, title, category, summary, read_minutes, art_id, version; lessons: **cards** (short paragraphs, read one at a time) and **microhabit** {title, minutes}; breathing sessions: **breathing** (box/calm/sleep). The app shows only items it can open (a lesson with cards, a session with a breathing pattern; D-57). Full Blueprint 6.7 metadata still needs-product | Signed-in read of approved only | Admin |
 | `safety_events/{id}` | — | **None** | all |
-| `audit_log/{id}` | actor, action, target, timestamp, ip_hash, details (no health content) | **None** | Cloud Functions; interim Firestore store (D-18), idempotent ids e.g. `consent_{uid}_{consentId}` |
+| `audit_log/{id}` | actor, action (fixed list, `services/core-api/src/audit/audit-actions.ts`), target, timestamp, ip_hash, details (numbers, booleans or short tokens only: no health content, no free text), seq, prev_hash, hash (SHA-256 chain), chain_version | **None** (no read, create, update or delete) | Core API's one audit writer (`FirestoreAuditLog`), **create only**, idempotent ids e.g. `consent_{uid}_{consentId}`; each entry also copied to the retention-locked Cloud Logging bucket by the write-only `audit-writer` account (D-85; was the interim store of D-18) |
+| `audit_log/_head` | seq, hash, updated_at (the last entry of the chain) | **None** | the audit writer, in the same transaction as each entry (D-85) |
 
 Anything not listed is denied.

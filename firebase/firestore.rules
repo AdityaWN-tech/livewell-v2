@@ -631,8 +631,12 @@ service cloud.firestore {
     match /safety_events/{id} {
       allow read, write: if false;
     }
+    // Append-only audit log (T-FND-09, D-85): entries and the `_head` chain
+    // pointer are created by the Core API's one audit writer (Admin SDK).
+    // No client may read, create, change or delete them.
     match /audit_log/{id} {
-      allow read, write: if false;
+      allow read: if false;
+      allow create, update, delete: if false;
     }
 
     // Anything else: denied by default (no other match blocks).

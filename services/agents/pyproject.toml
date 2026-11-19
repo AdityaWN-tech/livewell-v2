@@ -1,0 +1,69 @@
+[project]
+name = "livewell-agents"
+version = "0.1.0"
+description = "Live Well Agent Service: orchestrator graph, safety gates, ModelClient (T-AGT-01, T-FND-03 spike)"
+requires-python = ">=3.12"
+# Exact pins for the graph runtime and the LLM SDK (ADR-002: pin, the graph
+# layer must stay thin and replaceable). langgraph pulls langchain-core in as
+# its own dependency; our code never imports LangChain or LangSmith (D-90).
+dependencies = [
+  "fastapi>=0.115",
+  "pydantic>=2.9",
+  "uvicorn>=0.32",
+  "langgraph==1.2.23",
+  "anthropic==2.10.0",
+  "opentelemetry-api>=1.30",
+  "opentelemetry-sdk>=1.30",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.7", "mypy>=1.13", "httpx>=0.27", "jsonschema>=4.23", "types-jsonschema"]
+#: Firebase Admin: ID token + App Check verification and the consent store.
+firebase = ["firebase-admin>=6.5"]
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests", "evals"]
+# The live eval calls the real Anthropic API; it never runs by default.
+addopts = "-m 'not live'"
+filterwarnings = [
+  # langsmith (pulled in by langchain-core, never used) on Python 3.14
+  "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:langsmith",
+]
+markers = [
+  "live: calls the real Anthropic API (needs ANTHROPIC_API_KEY and LW_LIVE_EVALS=1)",
+  "critical: critical safety case (spec 15.2/15.3): must pass 100%",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N", "SIM", "RUF"]
+ignore = [
+  "S101",  # assert is fine in tests
+  "N818",  # exception names say what happened (NotAuthorized)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B"]
+"evals/*" = ["S", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["livewell_agents"]
+
+[[tool.mypy.overrides]]
+#: Optional deploy-only library (the `firebase` extra): CI installs only `dev`.
+module = ["firebase_admin", "firebase_admin.*"]
+ignore_missing_imports = true

@@ -1,0 +1,44 @@
+# Agent Service (T-AGT-01): lint, types, tests and the offline safety evals.
+# No secrets: every test uses FakeModelClient. The live eval (evals/live) is
+# opt-in and never runs here. A failing critical safety case fails this job,
+# which blocks merge (spec 15.2).
+name: agents
+
+on:
+  pull_request:
+    paths:
+      - "services/agents/**"
+      - "packages/safety-rules/**"
+      - "packages/schemas/coach_message.schema.json"
+      - "content/coach/moments/morning.json"
+      - "apps/mobile/lib/l10n/app_en.arb"
+      - ".github/workflows/agents.yml"
+  push:
+    branches: [main]
+    paths:
+      - "services/agents/**"
+      - "packages/safety-rules/**"
+      - "packages/schemas/coach_message.schema.json"
+      - "content/coach/moments/morning.json"
+      - "apps/mobile/lib/l10n/app_en.arb"
+      - ".github/workflows/agents.yml"
+
+defaults:
+  run:
+    working-directory: services/agents
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+      - name: tests and offline evals (critical safety cases must all pass)
+        run: pytest -q

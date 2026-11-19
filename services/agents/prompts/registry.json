@@ -1,0 +1,15 @@
+{
+  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. A Remote Config pointer (active version) comes later (T-AGT-04).",
+  "prompts": {
+    "coach_briefing": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_briefing/v0.1.md",
+          "review_status": "pending",
+          "sha256": "6acf5bdb16528423a3b183014e45b32b96de7d4a7655e7049f8969974e6da914"
+        }
+      }
+    }
+  }
+}

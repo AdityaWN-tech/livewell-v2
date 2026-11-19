@@ -39,6 +39,7 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/domain/splash_timing.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/track/presentation/track_screen.dart';
+import '../../features/travel/presentation/travel_screen.dart';
 import '../../features/track/presentation/weekly_wins_screen.dart';
 import '../../features/welcome/presentation/welcome_screen.dart';
 import '../../features/consent/domain/consent.dart';
@@ -152,6 +153,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'routine',
                         builder: (context, state) => const RoutineScreen(),
+                      ),
+                    // Travel Mode under Plan (T-TRV-01).
+                    if (path == '/plan')
+                      GoRoute(
+                        path: 'travel',
+                        builder: (context, state) => const TravelScreen(),
                       ),
                     // Weekly wins under Track (Step 4b).
                     if (path == '/track')

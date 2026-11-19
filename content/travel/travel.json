@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "note": "T-TRV-01 (FR-TRV-02, D-86). Basic Travel Mode content: the four travel pillars (Blueprint 6.10) with hotel-room routines and jet-lag tips, and the travel microhabits that replace the plan's daily step while a trip is on (FR-TRV-01). Plain text only, no placeholders. Invitations, never orders or guilt; about an 8th-grade reading level. Movement stays beginner or moderate; items marked movement show 'Check with your clinician first' and are never the daily step for people who said an activity limits them (FR-GOL-03). Not allowed in v2: fasting, calorie targets, weight loss, medication or supplements (including sleep aids), alcohol advice. review_status: pending until the clinical team approves; prod and staging show it only when approved (dev may use pending). Listed for review in REVIEW.md.",
+  "step_label": "Travel Mode",
+  "pillars": [
+    {
+      "id": "eat_well",
+      "title": "Eat Well",
+      "intro": "Simple ways to eat well away from your own kitchen.",
+      "icon": "eat",
+      "items": [
+        {
+          "id": "eat_plate",
+          "title": "Build a travel plate",
+          "body": "At a buffet or a menu, start with vegetables or salad, add a protein you enjoy, then a small side. Enjoy every bite.",
+          "minutes": 2,
+          "movement": false
+        },
+        {
+          "id": "eat_snacks",
+          "title": "Pack two easy snacks",
+          "body": "A piece of fruit and a small bag of nuts or roasted chickpeas keep you steady on long days and delays.",
+          "minutes": 5,
+          "movement": false
+        },
+        {
+          "id": "eat_water",
+          "title": "Keep a water bottle with you",
+          "body": "Planes and hotel rooms are dry. Refill a bottle when you can and sip through the day.",
+          "minutes": 1,
+          "movement": false
+        }
+      ]
+    },
+    {
+      "id": "move_well",
+      "title": "Move Well",
+      "intro": "Short routines you can do in a hotel room or an airport.",
+      "icon": "move",
+      "items": [
+        {
+          "id": "move_hotel_room",
+          "title": "10-minute hotel-room routine",
+          "body": "No equipment needed. March in place for 2 minutes. Do 10 slow sit-to-stands from the bed or a chair. Do 10 wall push-ups. Finish with gentle shoulder rolls and a calf stretch. Rest whenever you need to.",
+          "minutes": 10,
+          "movement": true
+        },
+        {
+          "id": "move_seat",
+          "title": "Seat stretches on the go",
+          "body": "On a plane, train or car seat: circle your ankles, lift your heels and toes, and roll your shoulders. Stand up and walk the aisle when it's safe.",
+          "minutes": 3,
+          "movement": true
+        },
+        {
+          "id": "move_explore",
+          "title": "Explore on foot",
+          "body": "Walk to a nearby park, market or sight at an easy pace. It's a gentle way to see a new place and get some daylight.",
+          "minutes": 15,
+          "movement": true
+        }
+      ]
+    },
+    {
+      "id": "sleep_recover",
+      "title": "Sleep and Recover",
+      "intro": "Rest well in a new bed and help your body clock catch up.",
+      "icon": "sleep",
+      "items": [
+        {
+          "id": "sleep_room",
+          "title": "Set up your room for sleep",
+          "body": "Make the room dark and a little cool. Turn the clock away, put your phone across the room, and keep the same bedtime steps you use at home.",
+          "minutes": 5,
+          "movement": false
+        },
+        {
+          "id": "sleep_jet_lag_light",
+          "title": "Jet lag: use daylight",
+          "body": "Daylight is the strongest signal for your body clock. Spend some time outside in the morning light at your destination, and keep evenings dim.",
+          "minutes": 15,
+          "movement": false
+        },
+        {
+          "id": "sleep_jet_lag_nap",
+          "title": "Jet lag: keep naps short",
+          "body": "If you need a nap, keep it to about 20 minutes and before mid-afternoon local time, so you can still sleep at night.",
+          "minutes": 20,
+          "movement": false
+        }
+      ]
+    },
+    {
+      "id": "breathe_reset",
+      "title": "Breathe and Reset",
+      "intro": "Calm moments for busy airports and long days.",
+      "icon": "breathe",
+      "items": [
+        {
+          "id": "breathe_gate",
+          "title": "One-minute reset at the gate",
+          "body": "Sit back, drop your shoulders and breathe in for 4, out for 6. Repeat for a minute. If you feel dizzy or unwell, stop and breathe normally.",
+          "minutes": 1,
+          "movement": false
+        },
+        {
+          "id": "breathe_arrive",
+          "title": "Arrive and settle",
+          "body": "When you reach your room, put your bag down, sit for a moment and notice five things you can see. Then unpack one small thing that feels like home.",
+          "minutes": 3,
+          "movement": false
+        }
+      ]
+    }
+  ],
+  "jet_lag": [
+    {
+      "id": "jl_small",
+      "direction": "small",
+      "title": "A small time change",
+      "body": "Your body will catch up quickly. Keep your usual bedtime steps and get some daylight in the morning."
+    },
+    {
+      "id": "jl_east",
+      "direction": "east",
+      "title": "You're travelling ahead in time",
+      "body": "Going east usually feels harder. Get morning daylight at your destination, keep evenings dim, and go to bed a little earlier for the first few nights."
+    },
+    {
+      "id": "jl_west",
+      "direction": "west",
+      "title": "You're travelling back in time",
+      "body": "Going west, try to stay up until a normal local bedtime. Afternoon daylight helps you stay awake a little longer."
+    }
+  ],
+  "microhabits": [
+    {
+      "id": "step_hotel_room",
+      "pillar": "move_well",
+      "title": "Do the 10-minute hotel-room routine",
+      "reason": "A short routine keeps you moving when your day looks different.",
+      "minutes": 10,
+      "smaller_title": "March in place for 3 minutes",
+      "smaller_minutes": 3,
+      "movement": true
+    },
+    {
+      "id": "step_water",
+      "pillar": "eat_well",
+      "title": "Refill your water bottle twice today",
+      "reason": "Travel days are dry. Water helps you feel more awake.",
+      "minutes": 2,
+      "smaller_title": "Drink one glass of water now",
+      "smaller_minutes": 1,
+      "movement": false
+    },
+    {
+      "id": "step_daylight",
+      "pillar": "sleep_recover",
+      "title": "Spend 15 minutes in morning daylight",
+      "reason": "Daylight helps your body clock settle into the new time zone.",
+      "minutes": 15,
+      "smaller_title": "Open the curtains and sit by the window for 5 minutes",
+      "smaller_minutes": 5,
+      "movement": false
+    },
+    {
+      "id": "step_breathe",
+      "pillar": "breathe_reset",
+      "title": "Take a one-minute breathing reset",
+      "reason": "A calm minute helps on busy travel days.",
+      "minutes": 1,
+      "movement": false
+    },
+    {
+      "id": "step_plate",
+      "pillar": "eat_well",
+      "title": "Start one meal with vegetables or salad",
+      "reason": "Adding something good is easier than cutting things out.",
+      "minutes": 5,
+      "smaller_title": "Add one piece of fruit to your day",
+      "smaller_minutes": 2,
+      "movement": false
+    },
+    {
+      "id": "step_walk",
+      "pillar": "move_well",
+      "title": "Take a 10-minute walk outside",
+      "reason": "An easy walk is a nice way to get to know a new place.",
+      "minutes": 10,
+      "smaller_title": "Take a 5-minute walk",
+      "smaller_minutes": 5,
+      "movement": true
+    },
+    {
+      "id": "step_wind_down",
+      "pillar": "sleep_recover",
+      "title": "Dim the lights an hour before bed",
+      "reason": "A calm, dark room helps you sleep in a new place.",
+      "minutes": 5,
+      "movement": false
+    }
+  ]
+}

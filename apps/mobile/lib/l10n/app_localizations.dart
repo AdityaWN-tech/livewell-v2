@@ -6488,6 +6488,342 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get healthTryAgain;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: travel day, streak protected'**
+  String trackDayTravel(String day);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel days keep your streak safe.'**
+  String get trackStreakTravelLegend;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Mode'**
+  String get planTravelRow;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Going away? Keep your day light and your streak safe.'**
+  String get planTravelRowBody;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'On until {date}'**
+  String planTravelRowOn(String date);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Trip planned from {date}'**
+  String planTravelRowNext(String date);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Mode. Opens it.'**
+  String get planTravelOpenLabel;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Mode'**
+  String get travelTitle;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us your trip dates. Each day you get a small travel step, and your streak stays safe while you are away.'**
+  String get travelIntro;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Your trip'**
+  String get travelTripTitle;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Dates'**
+  String get travelDates;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dates'**
+  String get travelDatesPick;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'{start} to {end}'**
+  String travelDatesValue(String start, String end);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone there'**
+  String get travelTimeZone;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Start Travel Mode'**
+  String get travelStart;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Mode is on'**
+  String get travelOnTitle;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Until {date}, {zone}. Your plan uses travel steps and your streak is protected.'**
+  String travelOnBody(String date, String zone);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Trip planned'**
+  String get travelNextTitle;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'{start} to {end}, {zone}. Travel Mode starts on the first day.'**
+  String travelNextBody(String start, String end, String zone);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'End Travel Mode'**
+  String get travelEnd;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this trip'**
+  String get travelCancel;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Mode is set. Safe travels!'**
+  String get travelStarted;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Mode is off. Welcome back!'**
+  String get travelEnded;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Trip cancelled.'**
+  String get travelCancelled;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'The last day can\'t be before the first day.'**
+  String get travelProblemEndBeforeStart;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dates from today on.'**
+  String get travelProblemPast;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Mode covers trips of up to {days} days.'**
+  String travelProblemTooLong(int days);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'These dates overlap a trip you\'ve already planned.'**
+  String get travelProblemOverlap;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Search time zones'**
+  String get travelZoneSearch;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'This phone\'s time zone'**
+  String get travelZonePhone;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'No time zone matches.'**
+  String get travelZoneNone;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Jet lag'**
+  String get travelJetLagEyebrow;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel pillars'**
+  String get travelPillarsTitle;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Travel tips are being reviewed by our clinical team and will appear here soon.'**
+  String get travelContentPending;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, {minutes} minutes. Opens it.'**
+  String travelItemLabel(String title, int minutes);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Near you'**
+  String get travelNearbyTitle;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Parks, grocery stores and plant-forward restaurants close by.'**
+  String get travelNearbyBody;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Parks'**
+  String get travelCategoryPark;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Grocery stores'**
+  String get travelCategoryGrocery;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Plant-forward food'**
+  String get travelCategoryPlant;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Show places near me'**
+  String get travelNearbyFind;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Uses your location once, only when you tap. It isn\'t saved.'**
+  String get travelNearbyLocationNote;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'{provider} listing'**
+  String travelListingTag(String provider);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Map-provider listings from {provider}, not endorsed by Live Well. Not medical or dietary advice.'**
+  String travelListingsSource(String provider);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {provider} listing, not endorsed by Live Well. Opens it in maps.'**
+  String travelListingOpenLabel(String name, String provider);
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found close by. Try another kind of place or your maps app.'**
+  String get travelNearbyNone;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Places couldn\'t load right now. Please try again later.'**
+  String get travelNearbyFailed;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Location is off for Live Well, so places nearby can\'t be shown.'**
+  String get travelNearbyDenied;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'To see places nearby, allow location for Live Well in Settings.'**
+  String get travelNearbyDeniedForever;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Location is turned off on this phone.'**
+  String get travelNearbyServiceOff;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get travelNearbyOpenSettings;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Search in maps'**
+  String get travelMapsSearch;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'Opens your maps app. Results come from the map provider and aren\'t endorsed by Live Well.'**
+  String get travelMapsNote;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'parks near me'**
+  String get travelMapsQueryPark;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'grocery stores near me'**
+  String get travelMapsQueryGrocery;
+
+  /// Travel Mode (T-TRV-01, D-86).
+  ///
+  /// In en, this message translates to:
+  /// **'vegetarian restaurants near me'**
+  String get travelMapsQueryPlant;
 }
 
 class _AppLocalizationsDelegate

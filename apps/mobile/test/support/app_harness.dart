@@ -40,11 +40,15 @@ import 'package:livewell/features/widget/data/widget_inbox.dart';
 import 'package:livewell/features/account/application/app_lock.dart';
 import 'package:livewell/features/track/data/health_source.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
+import 'package:livewell/features/travel/data/device_location.dart';
+import 'package:livewell/features/travel/data/places_source.dart';
+import 'package:livewell/features/travel/data/trip_repository.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
 import 'fake_onboarding_store.dart';
 import 'fakes.dart';
 import 'frames.dart';
+import 'travel_fakes.dart';
 
 /// Everything a test can look at after booting the app.
 class Harness {
@@ -111,6 +115,14 @@ class Harness {
   /// The 30-day goal and own habits, in memory (Step 4a).
   final goals = InMemoryGoalRepository();
 
+  /// Travel Mode trips, in memory (T-TRV-01).
+  final trips = InMemoryTripRepository();
+
+  /// Travel Mode's maps provider: none (the default build) unless set.
+  NearbyPlacesSource? places;
+  final location = FakeDeviceLocation();
+  final mapsOpened = <Uri>[];
+
   /// Items the coach already asked about (T-GOL-03d).
   final routineAsked = FakeRoutineAskStore();
   final reminders = FakeReminders();
@@ -175,6 +187,14 @@ class Harness {
           planRepositoryProvider.overrideWithValue(plans),
           routineRepositoryProvider.overrideWithValue(routines),
           goalRepositoryProvider.overrideWithValue(goals),
+          tripRepositoryProvider.overrideWithValue(trips),
+          nearbyPlacesSourceProvider.overrideWithValue(places),
+          deviceLocationProvider.overrideWithValue(location),
+          mapsLauncherProvider.overrideWithValue((uri) async {
+            mapsOpened.add(uri);
+            return true;
+          }),
+          openLocationSettingsProvider.overrideWithValue(() async => true),
           routineAskStoreProvider.overrideWithValue(routineAsked),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(reminderZone),

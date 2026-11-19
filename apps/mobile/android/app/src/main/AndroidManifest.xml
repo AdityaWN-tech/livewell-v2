@@ -6,6 +6,9 @@
          notification consent; the plan works without them. Inexact alarms
          only, so no exact-alarm permission. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Travel Mode nearby places (FR-TRV-03, D-86): approximate location only,
+         asked for when the person taps "Show places near me". -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <!-- Steps and sleep from Health Connect, read only, on the phone (Step 4f,
          D-59). Asked only after the in-app health data consent (FR-ONB-03). -->

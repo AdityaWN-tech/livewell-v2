@@ -8,11 +8,20 @@ import 'track_models.dart';
 /// to Sunday week is a rest day (the weekly grace) and doesn't break the
 /// streak; a second one does. Today not done yet never breaks it. Null
 /// when nothing was ever done (the card shows its start state).
-StreakSummary? streakFrom(Set<String> doneDates, DateTime now) {
+///
+/// [protectedDates] are Travel Mode days (FR-TRV-01): a done one counts, a
+/// missed one is skipped, never breaking the streak or using the week's
+/// rest day.
+StreakSummary? streakFrom(
+  Set<String> doneDates,
+  DateTime now, {
+  Set<String> protectedDates = const {},
+}) {
   if (doneDates.isEmpty) return null;
   final today = DateTime(now.year, now.month, now.day);
   DateTime day(int back) => DateTime(today.year, today.month, today.day - back);
   bool done(DateTime d) => doneDates.contains(localDateKey(d));
+  bool away(DateTime d) => protectedDates.contains(localDateKey(d));
   String weekOf(DateTime d) =>
       localDateKey(DateTime(d.year, d.month, d.day - (d.weekday - 1)));
 
@@ -31,6 +40,8 @@ StreakSummary? streakFrom(Set<String> doneDates, DateTime now) {
       run++;
     } else if (d == today) {
       // Not done yet today: the streak still stands.
+    } else if (away(d)) {
+      // A travel day: protected.
     } else if (graceUsed.add(weekOf(d))) {
       // The week's rest day.
     } else {
@@ -48,6 +59,7 @@ StreakSummary? streakFrom(Set<String> doneDates, DateTime now) {
         if (d.isAfter(today)) return StreakDay.upcoming;
         if (done(d)) return StreakDay.done;
         if (d == today) return StreakDay.today;
+        if (away(d)) return StreakDay.travel;
         return restInWeek.add(weekOf(d)) ? StreakDay.rest : StreakDay.restart;
       }(),
   ];

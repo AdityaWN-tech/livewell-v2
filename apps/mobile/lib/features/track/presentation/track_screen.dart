@@ -24,6 +24,7 @@ import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';
 import '../../profile/presentation/profile_button.dart';
 import '../../routine/application/routine_week_data.dart';
+import '../../travel/application/travel_data.dart';
 import '../application/track_data.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
@@ -39,7 +40,12 @@ final streakProvider = Provider<StreakSummary?>((ref) {
   if (ref.watch(previewModeProvider)) return PreviewSamples.streak;
   final dates = ref.watch(recentDoneDatesProvider).value;
   if (dates == null) return null;
-  return streakFrom(dates.toSet(), ref.watch(clockProvider)());
+  return streakFrom(
+    dates.toSet(),
+    ref.watch(clockProvider)(),
+    // Travel Mode days are protected (FR-TRV-01).
+    protectedDates: ref.watch(travelProtectedDatesProvider),
+  );
 });
 
 /// Today's reflection, live.
@@ -697,6 +703,7 @@ class _WeekStreakCard extends StatelessWidget {
                         StreakDay.done => l.trackDayDone(fullNames[i]),
                         StreakDay.rest => l.trackDayRest(fullNames[i]),
                         StreakDay.restart => l.trackDayRestart(fullNames[i]),
+                        StreakDay.travel => l.trackDayTravel(fullNames[i]),
                         StreakDay.today => l.trackDayToday(fullNames[i]),
                         StreakDay.upcoming => l.trackDayUpcoming(fullNames[i]),
                       },
@@ -706,6 +713,14 @@ class _WeekStreakCard extends StatelessWidget {
               if (s.week.contains(StreakDay.rest)) ...[
                 const SizedBox(height: LwSpacing.sm),
                 Text(l.trackStreakLegend, style: t.bodySmall),
+              ],
+              if (s.week.contains(StreakDay.travel)) ...[
+                const SizedBox(height: LwSpacing.sm),
+                Text(
+                  l.trackStreakTravelLegend,
+                  key: const Key('track-streak-travel'),
+                  style: t.bodySmall,
+                ),
               ],
             ],
           ],
@@ -747,6 +762,12 @@ class _DayMark extends StatelessWidget {
         p.outlineStrong,
         Icons.replay,
         p.onPrimaryTint,
+      ),
+      StreakDay.travel => (
+        p.sky,
+        p.outlineStrong,
+        Icons.luggage_outlined,
+        p.onTint,
       ),
       StreakDay.today => (p.surface, p.accent, null, null),
       StreakDay.upcoming => (p.surface, p.outlineStrong, null, null),

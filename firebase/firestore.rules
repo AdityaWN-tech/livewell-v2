@@ -343,6 +343,44 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // ---------- Travel Mode trips (T-TRV-01, FR-TRV-01, D-86) ----------
+      // One per start day (id = start). Kept after the trip so the streak
+      // stays protected for its days; a planned trip can be cancelled
+      // (deleted). Dates and time zones only: no place, no location.
+      match /trips/{tripId} {
+        function day(s) {
+          return timestamp.date(int(s[0:4]), int(s[5:7]), int(s[8:10]));
+        }
+        function zone(z) {
+          return z is string && z.size() > 0 && z.size() <= 64
+            && z.matches('^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+){0,2}$');
+        }
+        function validTrip(d) {
+          return d.keys().hasOnly(['start', 'end', 'tz', 'home_tz',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.start is string
+            && d.start.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+            && d.end is string
+            && d.end.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+            && tripId == d.start
+            && d.end >= d.start
+            // At most 60 days, first and last included.
+            && day(d.end) - day(d.start) <= duration.value(59, 'd')
+            && zone(d.tz)
+            && zone(d.home_tz);
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && validTrip(request.resource.data)
+          && hasMeta(request.resource.data);
+        // End early or change the zone; the start day never changes.
+        allow update: if isAdultOwner(uid)
+          && validTrip(request.resource.data)
+          && request.resource.data.start == resource.data.start
+          && request.resource.data.created_at == resource.data.created_at;
+        allow delete: if isAdultOwner(uid);
+      }
+
       // ---------- check-ins: one per date (FR-DLY-02) ----------
       // Mood first (T-DLY-02): mood required, the rest optional.
       match /checkins/{date} {

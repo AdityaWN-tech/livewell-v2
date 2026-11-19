@@ -45,6 +45,7 @@ import 'package:livewell/core/design/avatar/avatar_art.dart'
 import 'package:livewell/features/widget/data/widget_inbox.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 import 'package:livewell/features/widget/domain/widget_snapshot.dart';
+import 'package:livewell/core/local_db/local_db_providers.dart';
 
 /// In-memory sign-in for widget tests.
 class FakeAuthService implements AuthService {
@@ -797,6 +798,14 @@ class FakeDeletions implements Deletions {
 
   @override
   Future<void> deleteAccount() => _do('account');
+}
+
+/// The encrypted database wipe on log out (T-FND-08).
+class FakeLocalDatabaseWiper implements LocalDatabaseWiper {
+  int wipes = 0;
+
+  @override
+  Future<void> wipe() async => wipes++;
 }
 
 class FakeLocalData implements LocalData {

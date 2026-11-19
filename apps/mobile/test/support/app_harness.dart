@@ -14,6 +14,7 @@ import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/core/time/clock.dart';
+import 'package:livewell/core/local_db/local_db_providers.dart';
 import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
@@ -126,6 +127,7 @@ class Harness {
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
   final localData = FakeLocalData();
+  final localDb = FakeLocalDatabaseWiper();
 
   /// The coach blinks and breathes (off by default so screens settle).
   bool idleMotion = false;
@@ -182,6 +184,7 @@ class Harness {
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
           localDataProvider.overrideWithValue(localData),
+          localDatabaseWiperProvider.overrideWithValue(localDb),
           namePromptStoreProvider.overrideWithValue(namePrompt),
           coachSpeakerProvider.overrideWithValue(speaker),
           coachFacesProvider.overrideWithValue(faces),

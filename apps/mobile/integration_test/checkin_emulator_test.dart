@@ -6,13 +6,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/data/firestore.dart';
+import 'package:livewell/core/local_db/local_db_providers.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/checkin/data/checkin_repository.dart';
 import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/firebase/firebase_options.dart';
 
-/// T-DLY-02 integration: offline submit, then reconnect, syncs exactly once,
-/// through the real firestore.rules on the local emulators. Run from the
+/// T-DLY-02 / T-FND-08 integration: offline submit, then reconnect, syncs
+/// exactly once, through the encrypted local database (SQLCipher, key in the
+/// device keystore), its sync queue and the real firestore.rules on the
+/// local emulators. Run from the
 /// repo root:
 ///
 ///   firebase emulators:exec --only auth,firestore,functions
@@ -60,6 +63,8 @@ void main() {
 
   testWidgets('offline submit, then reconnect: synced exactly once', (_) async {
     final repo = container.read(checkInRepositoryProvider);
+    final engine = container.read(syncEngineProvider);
+    final queue = container.read(syncQueueProvider);
 
     await db.disableNetwork();
     // Offline: save returns (queued) instead of hanging.
@@ -78,8 +83,16 @@ void main() {
       ),
     );
 
+    expect(await queue.entries(uid), hasLength(1), reason: 'one queued');
+    // Still offline: the queue keeps it (a transaction needs the server).
+    expect((await engine.flushNow())!.offline, isTrue);
+    expect(await queue.entries(uid), hasLength(1));
+
     await db.enableNetwork();
-    await db.waitForPendingWrites();
+    final synced = await engine.flushNow();
+    expect(synced!.remaining, 0);
+    expect(await queue.entries(uid), isEmpty);
+    await engine.flushNow(); // nothing more to send
 
     final docs = await serverDocs();
     expect(docs, hasLength(1));
@@ -96,7 +109,7 @@ void main() {
     final before = (await serverDocs()).single['created_at'] as Timestamp;
 
     await repo.save(const CheckIn(date: day, mood: 2, gentleDay: true));
-    await db.waitForPendingWrites();
+    await container.read(syncEngineProvider).flushNow();
 
     final docs = await serverDocs();
     expect(docs, hasLength(1));

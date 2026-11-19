@@ -21,6 +21,10 @@ StreakSummary? streakFrom(Set<String> doneDates, DateTime now) {
   final start = DateTime.parse(first);
   var run = 0;
   var best = 0;
+  // Coming back after a missed day (rest or restart): the Restart badge
+  // (FR-DLY-07, FR-GAM-01).
+  var restarts = 0;
+  var missed = false;
   final graceUsed = <String>{};
   for (
     var d = start;
@@ -29,12 +33,16 @@ StreakSummary? streakFrom(Set<String> doneDates, DateTime now) {
   ) {
     if (done(d)) {
       run++;
+      if (missed) restarts++;
+      missed = false;
     } else if (d == today) {
       // Not done yet today: the streak still stands.
     } else if (graceUsed.add(weekOf(d))) {
       // The week's rest day.
+      missed = true;
     } else {
       run = 0;
+      missed = true;
     }
     if (run > best) best = run;
   }
@@ -51,7 +59,7 @@ StreakSummary? streakFrom(Set<String> doneDates, DateTime now) {
         return restInWeek.add(weekOf(d)) ? StreakDay.rest : StreakDay.restart;
       }(),
   ];
-  return StreakSummary(length: run, best: best, week: week);
+  return StreakSummary(length: run, best: best, week: week, restarts: restarts);
 }
 
 /// Habits done per day, Monday to Sunday of [now]'s week, from the done

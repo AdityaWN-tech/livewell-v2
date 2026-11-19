@@ -22,10 +22,14 @@ class StreakSummary {
     required this.length,
     required this.best,
     required this.week,
+    this.restarts = 0,
   });
 
   final int length;
   final int best;
+
+  /// Times the person came back after a missed day (the Restart badge).
+  final int restarts;
 
   /// Monday to Sunday.
   final List<StreakDay> week;

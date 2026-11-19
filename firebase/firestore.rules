@@ -200,7 +200,9 @@ service cloud.firestore {
                 || (d.coach_name is string
                     && d.coach_name.size() >= 1 && d.coach_name.size() <= 20))
             && (!('background' in d)
-                || (d.background is int && d.background >= 0 && d.background <= 5));
+                // 0..5 for everyone, 6..12 unlocked with badges (FR-GAM-03,
+                // cosmetic only, so not checked here; D-87).
+                || (d.background is int && d.background >= 0 && d.background <= 12));
         }
         allow read: if isOwner(uid);
         allow create: if isAdultOwner(uid) && docId == 'current'
@@ -546,6 +548,54 @@ service cloud.firestore {
           && hasMeta(request.resource.data);
         allow update: if isAdultOwner(uid)
           && validProgress(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
+      // ---------- rewards: badges earned and the chosen look (T-GAM-01, D-87) ----------
+      // One doc, `current`: badge ids -> local date earned, and the Done
+      // celebration style. Ids and dates only, never health data. Rewards
+      // are cosmetic, so the app writes them itself.
+      match /rewards/{docId} {
+        function validRewards(d) {
+          return d.keys().hasOnly(['earned', 'celebration',
+                   'created_at', 'updated_at', 'schema_version'])
+            && (!('earned' in d) || (d.earned is map && d.earned.size() <= 50))
+            && (!('celebration' in d)
+                || d.celebration in ['leaves', 'petals', 'stars', 'hearts',
+                                     'bubbles', 'confetti']);
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid) && docId == 'current'
+          && validRewards(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid) && docId == 'current'
+          && validRewards(request.resource.data)
+          && request.resource.data.created_at == resource.data.created_at
+          && request.resource.data.updated_at is timestamp;
+        allow delete: if false;
+      }
+
+      // ---------- weekly challenges: one doc per week, id = its Monday (T-GAM-01) ----------
+      // Which challenge and the days it was done; never an amount.
+      match /challenges/{week} {
+        function validChallenge(d) {
+          return d.keys().hasOnly(['challenge_id', 'days',
+                   'created_at', 'updated_at', 'schema_version'])
+            && d.challenge_id in ['post_meal_walk', 'plant_variety',
+                                  'steady_bedtime', 'strength_balance',
+                                  'travel_ready']
+            && d.days is list && d.days.size() <= 7
+            && week.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && validChallenge(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if isAdultOwner(uid)
+          && validChallenge(request.resource.data)
+          && request.resource.data.challenge_id == resource.data.challenge_id
           && request.resource.data.created_at == resource.data.created_at
           && request.resource.data.updated_at is timestamp;
         allow delete: if false;

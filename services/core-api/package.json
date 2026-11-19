@@ -8,13 +8,15 @@
     "node": "22"
   },
   "scripts": {
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "test": "npm run build && firebase emulators:exec --only auth,firestore,functions --project demo-livewell \"vitest run\""
+    "build": "npm run bundle-scripts && tsc",
+    "typecheck": "npm run bundle-scripts && tsc --noEmit",
+    "test": "npm run build && firebase emulators:exec --only auth,firestore,functions --project demo-livewell \"vitest run\"",
+    "bundle-scripts": "node scripts/bundle-scripts.mjs"
   },
   "dependencies": {
     "firebase-admin": "^14.5.0",
-    "firebase-functions": "^7.4.0"
+    "firebase-functions": "^7.4.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

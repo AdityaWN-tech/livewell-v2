@@ -33,6 +33,9 @@ The screen shows "Hi {first name}, …" as **text**. A bundled recording can't s
 
 **Speed:** the 0.8x–1.2x speed setting is applied at playback.
 
+## Server gateway (T-VOC-07, D-88)
+Every synthesis in a coach voice on the server goes through the Core API callable `speakMessage`: an approved `message_id` in, never text. Cloned voices also need active consent and the cloned-voices switch (off by default); Dr. Gokula's voice stays off until T-VOC-08. Safety messages answer "use the phone's neutral voice" without any check that could block them. No vendor is connected yet (T-VOC-01).
+
 ## Open (needs-product / legal)
 - **Legal review of these voices for commercial use.** Apache-2.0 covers the weights; the training-data provenance is described on the model card.
 - **12 voices by launch:** 6 more are needed. Which accents? An Indian English voice would help the India market.

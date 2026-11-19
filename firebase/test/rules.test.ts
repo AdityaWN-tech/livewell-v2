@@ -276,6 +276,22 @@ describe('voices (status and vendor ids server-only)', () => {
     await assertFails(deleteDoc(doc(as(ALICE), 'users/alice/voices/v1')));
     await assertFails(getDoc(doc(as(BOB), 'users/alice/voices/v1')));
   });
+  it('the voice gateway can trust kind and consent_id (T-VOC-07): the app sets neither', async () => {
+    await seed(env, {
+      'users/alice/voices/c1': { kind: 'loved_one', vendor_voice_id: 'v-c1', consent_id: 'vc_1', status: 'revoked', speed: 1, style: 'calm', ...meta() },
+    });
+    // A revoked clone can't be pointed at another consent or turned into a library voice.
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/c1'), { consent_id: 'vc_2' }));
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/c1'), { kind: 'library', status: 'active' }));
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/v1'), { kind: 'self_clone' }));
+    // Nor can a library voice be created carrying a consent id.
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/voices/lw-new'), {
+      kind: 'library', vendor_voice_id: 'x', consent_id: 'vc_1', status: 'inactive', speed: 1, style: 'calm', ...meta(),
+    }));
+    // Consent records and coach messages are server-only.
+    await assertFails(setDoc(doc(as(ALICE), 'voice_consents/vc_3'), { account_uid: 'alice', status: 'active' }));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/messages/m_new_0001'), { text: 'Say this', safety: { status: 'approved' } }));
+  });
 });
 
 describe('focus choices (T-ONB-03d)', () => {

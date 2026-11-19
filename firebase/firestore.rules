@@ -612,11 +612,20 @@ service cloud.firestore {
 
     // ---------- global catalogues: read-only, approved items only ----------
     // Rules are not filters: app queries must include these same conditions.
+    // Staff roles get nothing extra here: the Admin / CMS reads and writes
+    // the catalog only through the Core API (role + MFA checks, audit log;
+    // T-PRT-02, D-92).
     match /portal_offers/{offerId} {
       allow read: if signedIn()
         && resource.data.active == true
         && resource.data.review_status == 'approved';
       allow write: if false;
+    }
+
+    // Who edited, submitted, approved or published an offer (staff ids):
+    // server-only, so staff ids never reach app users (T-PRT-02, D-92).
+    match /portal_offer_workflow/{offerId} {
+      allow read, write: if false;
     }
 
     match /content_items/{itemId} {

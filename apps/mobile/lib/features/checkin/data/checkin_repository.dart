@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/data/firestore.dart';
+import '../../../core/local_db/local_database.dart';
+import '../../../core/local_db/local_db_providers.dart';
+import '../../../core/local_db/sync_queue.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../dev/application/preview_mode.dart';
 import '../domain/checkin.dart';
@@ -29,10 +33,9 @@ List<CheckIn> checkInsBetween(Iterable<CheckIn> all, String from, String to) =>
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
-/// Firestore implementation. Offline support comes from Firestore's own
-/// offline persistence for now.
-/// TODO(T-FND-08): move check-ins into the encrypted local database
-/// (Drift + SQLCipher) with its sync queue.
+/// Firestore implementation. The app uses it only to read the server copy
+/// (see [LocalFirstCheckInRepository]); saving goes through the encrypted
+/// local database and its sync queue (T-FND-08).
 class FirestoreCheckInRepository implements CheckInRepository {
   FirestoreCheckInRepository(this._db, this._uid);
 
@@ -132,14 +135,161 @@ class FirestoreCheckInRepository implements CheckInRepository {
   }
 }
 
+/// Offline-first check-ins (T-FND-08, NFR-05). A save goes into the
+/// encrypted local database and the sync queue in one transaction, so it is
+/// instant and survives a restart; the queue sends it when the server can
+/// be reached. Reads come from the local database, refreshed from the
+/// server copy unless a local change is still waiting to sync (the phone's
+/// newer value wins until it is sent; last writer wins).
+class LocalFirstCheckInRepository implements CheckInRepository {
+  LocalFirstCheckInRepository({
+    required this._db,
+    required this._queue,
+    required this._remote,
+    required this._uid,
+    void Function()? onQueued,
+    DateTime Function()? now,
+  }) : _onQueued = onQueued ?? (() {}),
+       _now = now ?? DateTime.now;
+
+  final LocalDatabase _db;
+  final SyncQueue _queue;
+  final CheckInRepository _remote;
+  final String Function() _uid;
+  final void Function() _onQueued;
+  final DateTime Function() _now;
+
+  /// How long a read waits for the server copy before showing the local one.
+  static const remoteWait = Duration(seconds: 3);
+
+  /// The outbox key: one queued write per person and day.
+  static String idempotencyKey(String uid, String date) => 'checkin:$uid:$date';
+
+  static CheckIn _toDomain(LocalCheckIn r) => CheckIn(
+    date: r.date,
+    mood: r.mood,
+    energy: r.energy,
+    sleep: r.sleep,
+    stress: r.stress,
+    timeAvailable: r.timeAvailable,
+    barrierText: r.barrierText,
+    gentleDay: r.gentleDay,
+    createdAt: r.createdAt,
+  );
+
+  LocalCheckInsCompanion _row(String uid, CheckIn c, DateTime? createdAt) =>
+      LocalCheckInsCompanion.insert(
+        uid: uid,
+        date: c.date,
+        mood: c.mood,
+        energy: Value(c.energy),
+        sleep: Value(c.sleep),
+        stress: Value(c.stress),
+        timeAvailable: Value(c.timeAvailable),
+        barrierText: Value(c.barrierText),
+        gentleDay: c.gentleDay,
+        createdAt: Value(createdAt),
+        updatedAt: _now(),
+      );
+
+  @override
+  Future<void> save(CheckIn c) async {
+    final uid = _uid();
+    await _db.transaction(() async {
+      final existing =
+          await (_db.select(_db.localCheckIns)
+                ..where((r) => r.uid.equals(uid) & r.date.equals(c.date)))
+              .getSingleOrNull();
+      await _db
+          .into(_db.localCheckIns)
+          .insertOnConflictUpdate(
+            _row(uid, c, existing?.createdAt ?? c.createdAt ?? _now()),
+          );
+      await _queue.enqueue(
+        idempotencyKey: idempotencyKey(uid, c.date),
+        uid: uid,
+        kind: 'checkin',
+        docPath: 'users/$uid/checkins/${c.date}',
+        fields: {
+          'mood': c.mood,
+          // Null: a skipped answer on a re-submit clears the earlier one.
+          'energy': c.energy,
+          'sleep': c.sleep,
+          'stress': c.stress,
+          'time_available': c.timeAvailable,
+          'barrier_text': c.barrierText,
+          'source': 'app',
+          'gentle_day': c.gentleDay,
+          'schema_version': 1,
+        },
+      );
+    });
+    _onQueued();
+  }
+
+  /// Copies the server's [c] into the local database, unless a local
+  /// change for that day is still waiting to sync.
+  Future<void> _adopt(String uid, CheckIn c) async {
+    if (await _queue.isPending(idempotencyKey(uid, c.date))) return;
+    await _db
+        .into(_db.localCheckIns)
+        .insertOnConflictUpdate(_row(uid, c, c.createdAt));
+  }
+
+  Future<void> _refreshDay(String uid, String date) async {
+    try {
+      final server = await _remote.watchDay(date).first.timeout(remoteWait);
+      if (server != null) await _adopt(uid, server);
+    } catch (_) {
+      // Offline: the local copy is what we have.
+    }
+  }
+
+  @override
+  Stream<CheckIn?> watchDay(String date) {
+    final uid = _uid();
+    unawaited(_refreshDay(uid, date));
+    return (_db.select(_db.localCheckIns)
+          ..where((r) => r.uid.equals(uid) & r.date.equals(date)))
+        .watchSingleOrNull()
+        .map((r) => r == null ? null : _toDomain(r));
+  }
+
+  @override
+  Future<List<CheckIn>> range(String from, String to) async {
+    final uid = _uid();
+    try {
+      for (final c in await _remote.range(from, to)) {
+        await _adopt(uid, c);
+      }
+    } catch (_) {
+      // Offline: the local copy is what we have.
+    }
+    final rows =
+        await (_db.select(_db.localCheckIns)..where(
+              (r) =>
+                  r.uid.equals(uid) &
+                  r.date.isBiggerOrEqualValue(from) &
+                  r.date.isSmallerOrEqualValue(to),
+            ))
+            .get();
+    return checkInsBetween(rows.map(_toDomain), from, to);
+  }
+}
+
 final checkInRepositoryProvider = Provider<CheckInRepository>((ref) {
   if (ref.watch(previewModeProvider)) {
     return ref.watch(previewCheckInRepositoryProvider);
   }
   final auth = ref.watch(authServiceProvider);
-  return FirestoreCheckInRepository(
-    ref.watch(firestoreProvider),
-    () => auth.currentUser!.uid,
+  String uid() => auth.currentUser!.uid;
+  final engine = ref.watch(syncEngineProvider);
+  return LocalFirstCheckInRepository(
+    db: ref.watch(localDatabaseProvider),
+    queue: ref.watch(syncQueueProvider),
+    remote: FirestoreCheckInRepository(ref.watch(firestoreProvider), uid),
+    uid: uid,
+    onQueued: engine.kick,
   );
 });
 

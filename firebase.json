@@ -30,6 +30,8 @@
         "node_modules",
         "test",
         "src",
+        "scripts",
+        "evals",
         "*.log",
         ".gitignore"
       ],

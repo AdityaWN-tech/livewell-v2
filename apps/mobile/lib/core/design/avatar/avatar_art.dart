@@ -360,6 +360,9 @@ class _Sparkles extends CustomPainter {
 /// Colours for the avatar's background. Avatar art, not UI colours, so they
 /// live here rather than in the palette tokens.
 abstract final class AvatarColours {
+  /// The first [baseBackgrounds] are everyone's; the rest are cosmetic
+  /// unlockables earned with badges (FR-GAM-03; index = the reward
+  /// catalogue's `background`).
   static const background = [
     Color(0xFFE8F9EE), // mint
     Color(0xFFFEEBDF), // peach
@@ -367,7 +370,17 @@ abstract final class AvatarColours {
     Color(0xFFE3ECF5), // sky
     Color(0xFFECE6F3), // lavender
     Color(0xFFFFF4D6), // sunshine
+    Color(0xFFE4F2D7), // meadow (unlockable)
+    Color(0xFFFDE2E4), // dawn (unlockable)
+    Color(0xFFD9F1F1), // lagoon (unlockable)
+    Color(0xFFF9E1EF), // blossom (unlockable)
+    Color(0xFFF3E7D3), // sand (unlockable)
+    Color(0xFFE6E9EF), // mist (unlockable)
+    Color(0xFFFFE3CC), // sunset (unlockable)
   ];
+
+  /// Backgrounds everyone can pick.
+  static const baseBackgrounds = 6;
 
   /// The ring around the initial circle (the default sweater's green).
   static const ring = Color(0xFF2E8B62);

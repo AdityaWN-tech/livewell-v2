@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'flavor.dart';
 import 'media_service.dart';
 
 /// Feature switches for things that are not built yet or need a kill switch
@@ -16,6 +17,8 @@ class FeatureFlags {
     this.coachChat = false,
     this.coachVoice = false,
     this.lovedOneVoice = false,
+    this.rewards = false,
+    this.driverWheel = false,
   });
 
   /// Morning briefing player (FR-DLY-01). Off until briefings are generated.
@@ -55,6 +58,16 @@ class FeatureFlags {
   /// "A loved one's voice" (FR-VOC-03, Phase 2). Off until its own consent
   /// and clone flow exist.
   final bool lovedOneVoice;
+
+  /// Badges, weekly challenges and avatar unlockables (T-GAM-01,
+  /// FR-GAM-01/03). Off until the reward copy is clinically reviewed
+  /// (D-87); the dev build has them anyway ([rewardsOnProvider]).
+  final bool rewards;
+
+  /// The Live Well Map's 30-day fill per driver (FR-GAM-02). Off until the
+  /// 8 driver names come from the clinical assessment content (T-ASM-01);
+  /// content/plan/drivers.json is provisional (D-87). Dev has it anyway.
+  final bool driverWheel;
 }
 
 /// Dev with a Media Service on the developer's computer (LW_MEDIA_URL,
@@ -64,3 +77,19 @@ final featureFlagsProvider = Provider<FeatureFlags>((ref) {
   final mediaDev = ref.watch(mediaServiceBaseProvider) != null;
   return FeatureFlags(avatarFromPhoto: mediaDev, avatarMaker: mediaDev);
 });
+
+/// Rewards (T-GAM-01): on with the flag, and always in the dev build so they
+/// can be tried; off in staging and prod until the copy is reviewed (D-87).
+final rewardsOnProvider = Provider<bool>(
+  (ref) =>
+      ref.watch(featureFlagsProvider).rewards ||
+      ref.watch(flavorProvider) == Flavor.dev,
+);
+
+/// The wheel's 30-day fill (FR-GAM-02): as [rewardsOnProvider], until the
+/// driver names are clinical content (D-87).
+final driverWheelOnProvider = Provider<bool>(
+  (ref) =>
+      ref.watch(featureFlagsProvider).driverWheel ||
+      ref.watch(flavorProvider) == Flavor.dev,
+);

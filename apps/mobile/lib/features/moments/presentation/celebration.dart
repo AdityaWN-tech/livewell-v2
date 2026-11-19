@@ -8,6 +8,9 @@ import '../../../core/design/avatar/avatar_art.dart';
 import '../../../core/design/components/speech_bubble.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../rewards/application/rewards_data.dart'
+    show celebrationStyleProvider;
+import '../../rewards/domain/reward_catalog.dart' show CelebrationStyle;
 import '../../avatar/presentation/coach_avatar.dart'
     show avatarIdleMotionProvider, coachBackgroundProvider, coachImagesProvider;
 import '../application/coach_state.dart';
@@ -137,14 +140,14 @@ class _CelebrationState extends ConsumerState<Celebration>
           children: [
             Positioned.fill(
               child: CustomPaint(
-                painter: _LeavesPainter(_leaves, [
-                  p.primary,
-                  p.mint,
-                  p.lime,
-                  p.butter,
-                  p.peach,
-                  p.sky,
-                ]),
+                key: Key(
+                  'celebration-${ref.watch(celebrationStyleProvider).name}',
+                ),
+                painter: _FallingPainter(
+                  _leaves,
+                  ref.watch(celebrationStyleProvider),
+                  [p.primary, p.mint, p.lime, p.butter, p.peach, p.sky],
+                ),
               ),
             ),
             SafeArea(
@@ -183,12 +186,14 @@ class _CelebrationState extends ConsumerState<Celebration>
   }
 }
 
-/// Leaves drifting down: small two-point leaf shapes, gently turning. With
-/// reduced motion they rest where they are (the controller doesn't run).
-class _LeavesPainter extends CustomPainter {
-  _LeavesPainter(this.t, this.colours) : super(repaint: t);
+/// Shapes drifting down, gently turning: leaves for everyone, or a style
+/// unlocked with a badge (FR-GAM-03, cosmetic only). With reduced motion
+/// they rest where they are (the controller doesn't run).
+class _FallingPainter extends CustomPainter {
+  _FallingPainter(this.t, this.style, this.colours) : super(repaint: t);
 
   final Animation<double> t;
+  final CelebrationStyle style;
   final List<Color> colours;
 
   static final _leaves = [
@@ -196,9 +201,39 @@ class _LeavesPainter extends CustomPainter {
       (x: r.nextDouble(), y: r.nextDouble(), spin: r.nextDouble() * 2 - 1),
   ];
 
+  static Path _star(double outer, double inner, int points) {
+    final path = Path();
+    for (var i = 0; i < points * 2; i++) {
+      final r = i.isEven ? outer : inner;
+      final a = -math.pi / 2 + i * math.pi / points;
+      final o = Offset(math.cos(a) * r, math.sin(a) * r);
+      i == 0 ? path.moveTo(o.dx, o.dy) : path.lineTo(o.dx, o.dy);
+    }
+    return path..close();
+  }
+
+  static final _shapes = <CelebrationStyle, Path>{
+    CelebrationStyle.leaves: Path()
+      ..moveTo(0, -9)
+      ..quadraticBezierTo(7, 0, 0, 9)
+      ..quadraticBezierTo(-7, 0, 0, -9),
+    CelebrationStyle.petals: Path()
+      ..addOval(Rect.fromCenter(center: Offset.zero, width: 9, height: 15)),
+    CelebrationStyle.stars: _star(9, 4, 5),
+    CelebrationStyle.hearts: Path()
+      ..moveTo(0, 8)
+      ..cubicTo(-12, 0, -6, -10, 0, -4)
+      ..cubicTo(6, -10, 12, 0, 0, 8),
+    CelebrationStyle.bubbles: Path()
+      ..addOval(Rect.fromCircle(center: Offset.zero, radius: 7)),
+    CelebrationStyle.confetti: Path()
+      ..addRect(Rect.fromCenter(center: Offset.zero, width: 6, height: 12)),
+  };
+
   @override
   void paint(Canvas canvas, Size size) {
     final v = t.isDismissed ? 0.5 : t.value;
+    final shape = _shapes[style]!;
     for (final (i, leaf) in _leaves.indexed) {
       final y = ((leaf.y - 1 + v * 1.4) % 1.2) * size.height;
       final x = leaf.x * size.width + math.sin((v * 4 + leaf.y) * math.pi) * 14;
@@ -207,21 +242,20 @@ class _LeavesPainter extends CustomPainter {
           // Fade out over the last fifth, so it ends calmly.
           alpha: t.isDismissed ? 1 : ((1 - v) * 5).clamp(0.0, 1.0),
         );
+      if (style == CelebrationStyle.bubbles) {
+        paint
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2;
+      }
       canvas
         ..save()
         ..translate(x, y)
         ..rotate(leaf.spin * math.pi * (1 + v));
-      canvas.drawPath(
-        Path()
-          ..moveTo(0, -9)
-          ..quadraticBezierTo(7, 0, 0, 9)
-          ..quadraticBezierTo(-7, 0, 0, -9),
-        paint,
-      );
+      canvas.drawPath(shape, paint);
       canvas.restore();
     }
   }
 
   @override
-  bool shouldRepaint(_LeavesPainter old) => false;
+  bool shouldRepaint(_FallingPainter old) => old.style != style;
 }

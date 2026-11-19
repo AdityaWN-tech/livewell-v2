@@ -19,8 +19,9 @@ enum CoachSource {
   final String id;
 }
 
-/// Number of background colours (core/design/avatar AvatarColours).
-const coachBackgrounds = 6;
+/// Number of background colours (core/design/avatar AvatarColours): six for
+/// everyone and seven unlockables (FR-GAM-03). The rules allow 0..12.
+const coachBackgrounds = 13;
 
 class CoachChoice {
   const CoachChoice({

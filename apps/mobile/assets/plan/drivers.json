@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "provisional": true,
+  "note": "T-GAM-01 (FR-GAM-02, D-87). The ONE source of the 8 drivers for the Live Well Map wheel. PROVISIONAL, PENDING CLINICAL REVIEW: Dr. Gokula's driver names and order come from the assessment content (T-ASM-01), which doesn't exist yet, so the labels are numbers only and must not be read as clinical names. `focus_drivers` lists which provisional driver keys of focus_to_driver.json count towards each segment; that placement is a placeholder too. When the clinical content arrives, replace this file (labels, order, keys) and set review_status to approved; no code changes needed. The wheel's 30-day fill is behind the `driverWheel` flag (dev only) until then.",
+  "drivers": [
+    { "id": "driver_1", "label": "Driver 1", "focus_drivers": ["movement"] },
+    { "id": "driver_2", "label": "Driver 2", "focus_drivers": ["sleep"] },
+    { "id": "driver_3", "label": "Driver 3", "focus_drivers": ["nutrition"] },
+    { "id": "driver_4", "label": "Driver 4", "focus_drivers": ["stress"] },
+    { "id": "driver_5", "label": "Driver 5", "focus_drivers": ["energy"] },
+    { "id": "driver_6", "label": "Driver 6", "focus_drivers": ["routine"] },
+    { "id": "driver_7", "label": "Driver 7", "focus_drivers": [] },
+    { "id": "driver_8", "label": "Driver 8", "focus_drivers": [] }
+  ]
+}

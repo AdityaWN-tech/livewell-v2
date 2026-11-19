@@ -951,6 +951,32 @@ describe('server-only collections are closed to clients (11.1)', () => {
       await assertFails(setDoc(doc(as(ALICE), `${col}/y`), { uid: ALICE }));
     });
   }
+  it('audit_log is append-only for the server: clients cannot tamper (T-FND-09)', async () => {
+    const entry = {
+      seq: 1,
+      actor: ALICE,
+      action: 'consent.granted',
+      target: `users/${ALICE}/consents/c1`,
+      details: { type: 'analytics' },
+      prev_hash: '0'.repeat(64),
+      hash: 'a'.repeat(64),
+      chain_version: 1,
+    };
+    await seed(env, {
+      'audit_log/consent_alice_c1': entry,
+      'audit_log/_head': { seq: 1, hash: 'a'.repeat(64) },
+    });
+    for (const db of [as(ALICE), as(BOB), anon()]) {
+      await assertFails(getDoc(doc(db, 'audit_log/consent_alice_c1')));
+      await assertFails(getDoc(doc(db, 'audit_log/_head')));
+      await assertFails(updateDoc(doc(db, 'audit_log/consent_alice_c1'), { details: { type: 'x' } }));
+      await assertFails(setDoc(doc(db, 'audit_log/consent_alice_c1'), { ...entry, actor: BOB }));
+      await assertFails(deleteDoc(doc(db, 'audit_log/consent_alice_c1')));
+      await assertFails(updateDoc(doc(db, 'audit_log/_head'), { seq: 0 }));
+      await assertFails(deleteDoc(doc(db, 'audit_log/_head')));
+      await assertFails(addDoc(collection(db, 'audit_log'), entry));
+    }
+  });
   it('unknown collections are denied by default', async () => {
     await assertFails(setDoc(doc(as(ALICE), 'anything/x'), { a: 1 }));
     await assertFails(setDoc(doc(as(ALICE), 'users/alice/unknown/x'), { a: 1 }));

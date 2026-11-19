@@ -3717,4 +3717,206 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthTryAgain => 'Try again';
+
+  @override
+  String trackDayTravel(String day) {
+    return '$day: travel day, streak protected';
+  }
+
+  @override
+  String get trackStreakTravelLegend => 'Travel days keep your streak safe.';
+
+  @override
+  String get planTravelRow => 'Travel Mode';
+
+  @override
+  String get planTravelRowBody =>
+      'Going away? Keep your day light and your streak safe.';
+
+  @override
+  String planTravelRowOn(String date) {
+    return 'On until $date';
+  }
+
+  @override
+  String planTravelRowNext(String date) {
+    return 'Trip planned from $date';
+  }
+
+  @override
+  String get planTravelOpenLabel => 'Travel Mode. Opens it.';
+
+  @override
+  String get travelTitle => 'Travel Mode';
+
+  @override
+  String get travelIntro =>
+      'Tell us your trip dates. Each day you get a small travel step, and your streak stays safe while you are away.';
+
+  @override
+  String get travelTripTitle => 'Your trip';
+
+  @override
+  String get travelDates => 'Dates';
+
+  @override
+  String get travelDatesPick => 'Choose dates';
+
+  @override
+  String travelDatesValue(String start, String end) {
+    return '$start to $end';
+  }
+
+  @override
+  String get travelTimeZone => 'Time zone there';
+
+  @override
+  String get travelStart => 'Start Travel Mode';
+
+  @override
+  String get travelOnTitle => 'Travel Mode is on';
+
+  @override
+  String travelOnBody(String date, String zone) {
+    return 'Until $date, $zone. Your plan uses travel steps and your streak is protected.';
+  }
+
+  @override
+  String get travelNextTitle => 'Trip planned';
+
+  @override
+  String travelNextBody(String start, String end, String zone) {
+    return '$start to $end, $zone. Travel Mode starts on the first day.';
+  }
+
+  @override
+  String get travelEnd => 'End Travel Mode';
+
+  @override
+  String get travelCancel => 'Cancel this trip';
+
+  @override
+  String get travelStarted => 'Travel Mode is set. Safe travels!';
+
+  @override
+  String get travelEnded => 'Travel Mode is off. Welcome back!';
+
+  @override
+  String get travelCancelled => 'Trip cancelled.';
+
+  @override
+  String get travelProblemEndBeforeStart =>
+      'The last day can\'t be before the first day.';
+
+  @override
+  String get travelProblemPast => 'Choose dates from today on.';
+
+  @override
+  String travelProblemTooLong(int days) {
+    return 'Travel Mode covers trips of up to $days days.';
+  }
+
+  @override
+  String get travelProblemOverlap =>
+      'These dates overlap a trip you\'ve already planned.';
+
+  @override
+  String get travelZoneSearch => 'Search time zones';
+
+  @override
+  String get travelZonePhone => 'This phone\'s time zone';
+
+  @override
+  String get travelZoneNone => 'No time zone matches.';
+
+  @override
+  String get travelJetLagEyebrow => 'Jet lag';
+
+  @override
+  String get travelPillarsTitle => 'Travel pillars';
+
+  @override
+  String get travelContentPending =>
+      'Travel tips are being reviewed by our clinical team and will appear here soon.';
+
+  @override
+  String travelItemLabel(String title, int minutes) {
+    return '$title, $minutes minutes. Opens it.';
+  }
+
+  @override
+  String get travelNearbyTitle => 'Near you';
+
+  @override
+  String get travelNearbyBody =>
+      'Parks, grocery stores and plant-forward restaurants close by.';
+
+  @override
+  String get travelCategoryPark => 'Parks';
+
+  @override
+  String get travelCategoryGrocery => 'Grocery stores';
+
+  @override
+  String get travelCategoryPlant => 'Plant-forward food';
+
+  @override
+  String get travelNearbyFind => 'Show places near me';
+
+  @override
+  String get travelNearbyLocationNote =>
+      'Uses your location once, only when you tap. It isn\'t saved.';
+
+  @override
+  String travelListingTag(String provider) {
+    return '$provider listing';
+  }
+
+  @override
+  String travelListingsSource(String provider) {
+    return 'Map-provider listings from $provider, not endorsed by Live Well. Not medical or dietary advice.';
+  }
+
+  @override
+  String travelListingOpenLabel(String name, String provider) {
+    return '$name, $provider listing, not endorsed by Live Well. Opens it in maps.';
+  }
+
+  @override
+  String get travelNearbyNone =>
+      'Nothing found close by. Try another kind of place or your maps app.';
+
+  @override
+  String get travelNearbyFailed =>
+      'Places couldn\'t load right now. Please try again later.';
+
+  @override
+  String get travelNearbyDenied =>
+      'Location is off for Live Well, so places nearby can\'t be shown.';
+
+  @override
+  String get travelNearbyDeniedForever =>
+      'To see places nearby, allow location for Live Well in Settings.';
+
+  @override
+  String get travelNearbyServiceOff => 'Location is turned off on this phone.';
+
+  @override
+  String get travelNearbyOpenSettings => 'Open Settings';
+
+  @override
+  String get travelMapsSearch => 'Search in maps';
+
+  @override
+  String get travelMapsNote =>
+      'Opens your maps app. Results come from the map provider and aren\'t endorsed by Live Well.';
+
+  @override
+  String get travelMapsQueryPark => 'parks near me';
+
+  @override
+  String get travelMapsQueryGrocery => 'grocery stores near me';
+
+  @override
+  String get travelMapsQueryPlant => 'vegetarian restaurants near me';
 }

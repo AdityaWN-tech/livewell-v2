@@ -12,6 +12,7 @@ import '../../dev/application/preview_samples.dart';
 import '../../goals/data/goal_repository.dart';
 import '../../goals/domain/goal.dart';
 import '../domain/home_models.dart';
+import '../../travel/application/travel_data.dart';
 import '../../avatar/presentation/coach_avatar.dart' show coachChoiceProvider;
 
 /// True when check-ins can be saved: signed in, or the dev preview.
@@ -63,9 +64,12 @@ final todayPlanProvider = StreamProvider<PlanDay?>((ref) {
   return ref.watch(planRepositoryProvider).watchDay(today);
 });
 
-/// Today's next step: the plan's step; sample data in the dev preview.
+/// Today's next step: the plan's step, or a travel microhabit while a trip
+/// is on (FR-TRV-01); sample data in the dev preview.
 final todayStepProvider = Provider<TodayStep?>((ref) {
   if (ref.watch(previewModeProvider)) return PreviewSamples.step;
+  final travel = ref.watch(travelStepProvider);
+  if (travel != null) return travel;
   final day = ref.watch(todayPlanProvider).value;
   if (day == null) return null;
   return TodayStep(

@@ -14,7 +14,16 @@ class Reflection {
 /// How one day of the week looks in the streak row. Missed days are never
 /// shown as an alarm (spec 4.1, FR-DLY-07): the first one in a week is a
 /// "rest" day (the weekly grace), later ones offer a "restart".
-enum StreakDay { done, rest, restart, today, upcoming }
+enum StreakDay {
+  done,
+  rest,
+  restart,
+
+  /// A Travel Mode day with nothing done: protected (FR-TRV-01).
+  travel,
+  today,
+  upcoming,
+}
 
 /// The streak card's data.
 class StreakSummary {

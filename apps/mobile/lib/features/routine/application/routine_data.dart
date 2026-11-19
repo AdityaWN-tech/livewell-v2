@@ -4,6 +4,7 @@ import '../../../core/time/clock.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../checkin/domain/checkin.dart';
+import '../../travel/application/travel_data.dart';
 import '../data/routine_repository.dart';
 import '../domain/routine.dart';
 import '../domain/routine_catalog.dart';
@@ -47,7 +48,15 @@ final routineModeProvider = Provider<RoutineMode?>((ref) {
   final local = ref.watch(_localModeProvider);
   if (local != null) return local.$1;
   final profile = ref.watch(currentProfileProvider).value;
-  return RoutineMode.fromData(profile?.settings[ProfileSettings.routineMode]);
+  final chosen = RoutineMode.fromData(
+    profile?.settings[ProfileSettings.routineMode],
+  );
+  final today = localDateKey(ref.watch(clockProvider)());
+  if (chosen != null && chosen.activeOn(today)) return chosen;
+  // A Travel Mode trip shrinks the routine like "Travelling" (FR-TRV-01).
+  final trip = ref.watch(currentTripProvider);
+  if (trip == null) return chosen;
+  return RoutineMode(kind: ModeKind.travel, until: trip.end);
 });
 
 /// The day's items, in order.

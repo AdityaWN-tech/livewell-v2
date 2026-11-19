@@ -24,6 +24,7 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `users/{uid}/messages/{id}` | CoachMessage (spec 9.5) | Owner read only | orchestrator |
 | `users/{uid}/memory_facts/{id}` | fact, category, confidence, source_message_id, status | Owner read; change status to saved/deleted only; deleted is final | Memory Agent proposals |
 | `users/{uid}/streaks/current` | length, grace_used_week, best, restart_count | Owner read only | streak engine |
+| `users/{uid}/trips/{start}` | start, end (yyyy-mm-dd, end ≥ start, ≤ 60 days), tz, home_tz (IANA zones) + meta | Owner read/create/update/delete, 18+; id = start, start and created_at fixed; no place or location fields | — (T-TRV-01, D-86: kept after the trip so the streak stays protected) |
 | `users/{uid}/portal_link/{doc}` | tagmango_customer_ref, matched_email_hash, status | Owner read only | link/unlink |
 | `users/{uid}/content_progress/{itemId}` | progress (0–1), completed (bool) (Step 4e, D-57). Feeds "Pick up where you left off". Not in spec section 11 | Owner read/create/update; id letters, digits, `_`, `-`; only these fields; created_at never changes; no delete | — |
 | `users/{uid}/portal_events/{id}` | event, offer_id, click_id, value | Owner read; **append-only** create of card_shown / clicked / dismissed | order / progress / completed (webhooks) |

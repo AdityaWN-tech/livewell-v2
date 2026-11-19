@@ -78,6 +78,8 @@
 	<string>Live Well reads your steps and sleep from Apple Health to show them in Track, only if you choose to connect. It stays on your phone.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Live Well does not write to Apple Health.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Live Well uses your location only when you tap Show places near me in Travel Mode, to find parks, grocery stores and restaurants close by. It isn't saved.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Live Well uses the microphone only when you choose to speak, for example to say your Why or talk to your coach.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

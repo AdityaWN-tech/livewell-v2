@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/illustration/illustration.dart';
@@ -19,6 +20,8 @@ import '../../routine/presentation/label_check_flow.dart';
 import '../../routine/presentation/routine_sheets.dart' show LabelOutcome;
 import '../../routine/presentation/routine_screen.dart';
 import '../../profile/presentation/profile_button.dart';
+import '../../travel/application/travel_data.dart';
+import '../../travel/presentation/travel_screen.dart';
 import '../application/plan_data.dart';
 import '../domain/plan_models.dart';
 import 'live_well_map.dart';
@@ -297,6 +300,8 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
           ),
         const SizedBox(height: LwSpacing.sectionGap),
         const _RoutineRow(),
+        const SizedBox(height: LwSpacing.sm),
+        const _TravelRow(),
         const SizedBox(height: LwSpacing.sm),
         const _FrameworkRow(),
         const SizedBox(height: LwSpacing.sm),
@@ -621,6 +626,74 @@ class _RoutineRow extends ConsumerWidget {
 }
 
 /// MY GOAL DO IT stays reachable from Plan (FR-GOL-06).
+/// Travel Mode (T-TRV-01): the trip's state, opens the Travel screen.
+class _TravelRow extends ConsumerWidget {
+  const _TravelRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    final l = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
+    String day(String date) =>
+        DateFormat.MMMd(locale).format(DateTime.parse(date));
+    final current = ref.watch(currentTripProvider);
+    final next = ref.watch(nextTripProvider);
+    final body = current != null
+        ? l.planTravelRowOn(day(current.end))
+        : next != null
+        ? l.planTravelRowNext(day(next.start))
+        : l.planTravelRowBody;
+    return Semantics(
+      button: true,
+      container: true,
+      label: l.planTravelOpenLabel,
+      child: Material(
+        key: const Key('plan-travel'),
+        color: p.sky,
+        borderRadius: LwRadius.lgAll,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.push(TravelScreen.path),
+          child: Padding(
+            padding: const EdgeInsets.all(LwSpacing.cardPadding),
+            child: Row(
+              children: [
+                ExcludeSemantics(
+                  child: Icon(
+                    Icons.luggage_outlined,
+                    color: p.onTint,
+                    size: LwSize.iconMd,
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.planTravelRow,
+                        style: t.titleSmall?.copyWith(color: p.onTint),
+                      ),
+                      Text(
+                        body,
+                        key: const Key('plan-travel-status'),
+                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: p.onTint),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _FrameworkRow extends StatelessWidget {
   const _FrameworkRow();
 

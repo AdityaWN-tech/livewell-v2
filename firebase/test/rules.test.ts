@@ -11,6 +11,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  Timestamp,
   updateDoc,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
@@ -538,6 +539,64 @@ describe('habit_logs (idempotent date_habitId)', () => {
     await assertFails(
       updateDoc(doc(as(ALICE), 'users/alice/habit_logs/2026-10-13_h1'), { date: '2026-10-14' }),
     );
+  });
+});
+
+describe('trips (T-TRV-01: Travel Mode, FR-TRV-01)', () => {
+  const trip = (o: Record<string, unknown> = {}) => ({
+    start: '2026-12-01', end: '2026-12-10', tz: 'Europe/London', home_tz: 'America/New_York',
+    ...meta(), ...o,
+  });
+  const path = 'users/alice/trips/2026-12-01';
+  it('owner plans, ends early, reads and cancels a trip', async () => {
+    await seedAdult(env);
+    const ref = doc(as(ALICE), path);
+    await assertSucceeds(setDoc(ref, trip()));
+    await assertSucceeds(updateDoc(ref, { end: '2026-12-05' }));
+    await assertSucceeds(updateDoc(ref, { tz: 'America/Argentina/Buenos_Aires' }));
+    await assertSucceeds(getDoc(ref));
+    await assertSucceeds(deleteDoc(ref));
+  });
+  it('a one-day trip and a 60-day trip are fine; 61 days is not', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(doc(as(ALICE), path), trip({ end: '2026-12-01' })));
+    await assertSucceeds(
+      setDoc(doc(as(ALICE), 'users/alice/trips/2027-01-01'), trip({ start: '2027-01-01', end: '2027-03-01' })),
+    );
+    await assertFails(
+      setDoc(doc(as(ALICE), 'users/alice/trips/2027-04-01'), trip({ start: '2027-04-01', end: '2027-05-31' })),
+    );
+  });
+  it('rejects a mismatched id, end before start, bad dates, zones or extra fields', async () => {
+    await seedAdult(env);
+    const ref = doc(as(ALICE), path);
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/trips/other'), trip()));
+    await assertFails(setDoc(ref, trip({ end: '2026-11-30' })));
+    await assertFails(setDoc(ref, trip({ end: '10 Dec' })));
+    await assertFails(setDoc(ref, trip({ tz: '' })));
+    await assertFails(setDoc(ref, trip({ tz: 'not a zone; drop' })));
+    await assertFails(setDoc(ref, trip({ home_tz: 42 })));
+    // No place or location is ever stored with a trip.
+    await assertFails(setDoc(ref, trip({ city: 'London' })));
+    await assertFails(setDoc(ref, trip({ lat: 51.5 })));
+    const { schema_version: _, ...noMeta } = trip();
+    await assertFails(setDoc(ref, noMeta));
+  });
+  it('the start day and created_at never change', async () => {
+    await seedAdult(env);
+    await seed(env, { [path]: trip() });
+    await assertFails(updateDoc(doc(as(ALICE), path), { start: '2026-12-02' }));
+    await assertFails(updateDoc(doc(as(ALICE), path), { created_at: Timestamp.fromMillis(0) }));
+  });
+  it('nobody else reads or writes them; not before the 18+ gate', async () => {
+    await seedAdult(env);
+    await seed(env, { [path]: trip() });
+    await assertFails(getDoc(doc(as(BOB), path)));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/trips/2026-12-20'), trip({ start: '2026-12-20', end: '2026-12-21' })));
+    await assertFails(deleteDoc(doc(as(BOB), path)));
+    await assertFails(getDoc(doc(anon(), path)));
+    await seed(env, { 'users/alice': profile({ age_confirmed: false }) });
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/trips/2026-12-20'), trip({ start: '2026-12-20', end: '2026-12-21' })));
   });
 });
 

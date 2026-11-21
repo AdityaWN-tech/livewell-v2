@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "note": "T-AGT-04 (D-98). The fixed texts the Coach Agent uses when it cannot use a model text in a mode: the model is unavailable, its draft failed Safety.post, the safety classifier failed, the prompt is not approved here, the main input looked like instructions, or a safety event happened in the last 72 hours. No placeholders: nothing personal, nothing the user typed. Never a safety message (red flags use the safety cards and the neutral voice). The morning briefing keeps its own fallback (content/coach/moments/morning.json m6). review_status: pending until the Clinical Content and Safety Committee approves; listed in REVIEW.md next to this file.",
+  "modes": {
+    "reply": {
+      "id": "reply_f1",
+      "emotion": "calm",
+      "text": "Thanks for telling me. I don't have a good answer for that right now. For questions about your health, your doctor is the best person to ask. Your plan for today is still here, and one small step is enough."
+    },
+    "nudge": {
+      "id": "nudge_f1",
+      "emotion": "encouraging",
+      "text": "It's a good moment for your step. Shall we start?"
+    },
+    "reflection": {
+      "id": "reflection_f1",
+      "emotion": "calm",
+      "text": "Thank you for sharing your evening with me. Every day teaches us something. Rest well, and we'll take the next small step together tomorrow."
+    },
+    "weekly_review": {
+      "id": "weekly_review_f1",
+      "emotion": "encouraging",
+      "text": "A new week is a fresh start. Want to look back at your week together?"
+    }
+  }
+}

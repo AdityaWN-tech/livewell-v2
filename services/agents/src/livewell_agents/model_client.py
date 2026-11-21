@@ -74,15 +74,95 @@ def default_fake_briefing(request: ModelRequest) -> str:
     return json.dumps({"text": " ".join(parts), "emotion": "encouraging"})
 
 
+def _block(tag: str, user: str) -> object:
+    m = re.search(rf"<{tag}>\s*(.*?)\s*</{tag}>", user, re.DOTALL)
+    return json.loads(m.group(1)) if m else None
+
+
+def _step(ctx: dict[str, object]) -> dict[str, object] | None:
+    step = ctx.get("plan_step")
+    return step if isinstance(step, dict) else None
+
+
+def default_fake_reply(request: ModelRequest) -> str:
+    """A policy-clean conversation turn; cites the first passage, if any,
+    without stating a health fact."""
+    ctx = _block("user_context", request.user)
+    ctx = ctx if isinstance(ctx, dict) else {}
+    passages = _block("passages", request.user)
+    passages = passages if isinstance(passages, list) else []
+    parts = [f"Thanks for asking, {ctx.get('first_name') or 'friend'}."]
+    cited: list[str] = []
+    if passages and isinstance(passages[0], dict):
+        parts.append(f"The lesson {passages[0].get('title')} has a few ideas you might like.")
+        cited.append(str(passages[0].get("source_id")))
+    step = _step(ctx)
+    if step:
+        parts.append(f"For today, your step is {step.get('title')}.")
+        if step.get("smaller_minutes"):
+            parts.append(f"Even {step.get('smaller_minutes')} minutes counts.")
+    else:
+        parts.append("Let's pick one small step that fits your day.")
+    return json.dumps({"text": " ".join(parts), "emotion": "encouraging", "source_ids": cited})
+
+
+def default_fake_nudge(request: ModelRequest) -> str:
+    ctx = _block("user_context", request.user)
+    step = _step(ctx) if isinstance(ctx, dict) else None
+    text = (
+        f"It's a good time for your step: {step.get('title')}. Want to start now?"
+        if step
+        else "It's a good moment for one small step. Want to start now?"
+    )
+    return json.dumps({"text": text, "emotion": "encouraging"})
+
+
+def default_fake_reflection(request: ModelRequest) -> str:
+    ctx = _block("user_context", request.user)
+    name = (ctx.get("first_name") if isinstance(ctx, dict) else None) or "friend"
+    text = (
+        f"Thank you for sharing, {name}. It sounds like today had some good moments. "
+        "Rest well tonight, and tomorrow is a fresh start."
+    )
+    return json.dumps({"text": text, "emotion": "calm", "barrier": "none"})
+
+
+def default_fake_weekly_review(request: ModelRequest) -> str:
+    ctx = _block("user_context", request.user)
+    ctx = ctx if isinstance(ctx, dict) else {}
+    week = _block("week", request.user)
+    week = week if isinstance(week, dict) else {}
+    parts = [
+        f"What a week, {ctx.get('first_name') or 'friend'}!",
+        f"You checked in on {week.get('days_checked_in', 0)} days and did your step on "
+        f"{week.get('habit_days_done', 0)} days.",
+        "Every step counts.",
+    ]
+    step = _step(ctx)
+    if step:
+        parts.append(f"Next week, let's keep {step.get('title')} easy and steady.")
+    return json.dumps({"text": " ".join(parts), "emotion": "celebrating"})
+
+
+#: Coach mode prompt ids (graph.MODES) -> the fake's unscripted answer.
+_FAKE_COACH: dict[str, Callable[[ModelRequest], str]] = {
+    "coach_briefing": default_fake_briefing,
+    "coach_reply": default_fake_reply,
+    "coach_nudge": default_fake_nudge,
+    "coach_reflection": default_fake_reflection,
+    "coach_weekly_review": default_fake_weekly_review,
+}
+
+
 def default_fake_answer(request: ModelRequest) -> str:
     """The fake's unscripted answer: a clean classifier verdict for the safety
-    classifier, else a briefing. (A clean verdict can't clear anything: the
-    classifier only escalates, and the rules run first.)"""
+    classifier, else a policy-clean draft for the Coach mode. (A clean verdict
+    can't clear anything: the classifier only escalates, and the rules run first.)"""
     if request.purpose == CLASSIFIER_INPUT_PURPOSE:
         return json.dumps({"category": "none", "fields": []})
     if request.purpose == CLASSIFIER_OUTPUT_PURPOSE:
         return json.dumps({"verdict": "ok", "reasons": []})
-    return default_fake_briefing(request)
+    return _FAKE_COACH.get(request.purpose, default_fake_briefing)(request)
 
 
 Scripted = str | ModelResult | Callable[[ModelRequest], str]

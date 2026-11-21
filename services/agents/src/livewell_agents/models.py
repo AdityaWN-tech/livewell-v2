@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Literal
+from typing import Literal, get_args
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -19,6 +19,16 @@ SafetyCategory = Literal[
     "emergency", "crisis", "disordered_eating", "medication", "pregnancy_complex"
 ]
 Route = Literal["coach", "fallback", "safety_template"]
+#: The Coach Agent's five modes (spec 9.3, T-AGT-04). Each has its own prompt
+#: in the registry (`coach_<mode>`), its own fixed fallback and actions.
+CoachMode = Literal["briefing", "reply", "nudge", "reflection", "weekly_review"]
+#: What stood in the way, as the reflection mode reads it (FR-DLY-05). A
+#: proposal only: code (the nightly plan builder) decides what to change.
+Barrier = Literal[
+    "none", "time", "energy", "motivation", "schedule", "weather", "social", "unwell", "other"
+]
+TimeOfDay = Literal["morning", "midday", "evening"]
+Trend = Literal["up", "steady", "down", "unknown"]
 
 
 class _Strict(BaseModel):
@@ -85,6 +95,11 @@ class CoachDraft(_Strict):
 
     text: str = Field(min_length=1, max_length=2000)
     emotion: Emotion
+    #: Passages the text relies on (reply mode). Code checks every id was
+    #: actually provided, and that a health claim cites at least one.
+    source_ids: tuple[str, ...] = ()
+    #: Reflection mode only: what got in the way, as a fixed code.
+    barrier: Barrier | None = None
 
 
 #: JSON Schema sent to the model as the structured-output format. Kept to the
@@ -102,6 +117,30 @@ COACH_DRAFT_JSON_SCHEMA: dict[str, object] = {
     "required": ["text", "emotion"],
     "additionalProperties": False,
 }
+
+_BARRIERS = list(get_args(Barrier))
+
+
+def draft_json_schema(*, sources: bool = False, barrier: bool = False) -> dict[str, object]:
+    """The structured-output schema for a mode: text + emotion, plus
+    `source_ids` for a grounded mode and `barrier` for the reflection mode."""
+    props: dict[str, object] = {
+        "text": {"type": "string"},
+        "emotion": {"type": "string", "enum": list(get_args(Emotion))},
+    }
+    required = ["text", "emotion"]
+    if sources:
+        props["source_ids"] = {"type": "array", "items": {"type": "string"}}
+        required.append("source_ids")
+    if barrier:
+        props["barrier"] = {"type": "string", "enum": list(_BARRIERS)}
+        required.append("barrier")
+    return {
+        "type": "object",
+        "properties": props,
+        "required": required,
+        "additionalProperties": False,
+    }
 
 
 # ---------------------------------------------------------------- CoachMessage
@@ -158,9 +197,67 @@ class BriefingRequest(_Strict):
     local_date: date | None = None
 
 
-class BriefingResponse(_Strict):
+class CoachResponse(_Strict):
+    """What every Coach Agent endpoint returns."""
+
     route: Route
     #: "neutral_device" for safety templates (FR-VOC-07); otherwise the app
     #: asks the voice gateway with message_id (closed-script rule).
     voice: Literal["neutral_device", "gateway"]
     message: CoachMessage
+    #: Reflection mode, coach route only: a proposal for the plan builder.
+    barrier: Barrier | None = None
+
+
+#: The morning briefing's response (T-AGT-01 name, kept for callers).
+BriefingResponse = CoachResponse
+
+
+class ConversationTurnRequest(_Strict):
+    """POST /v1/conversation/turn (spec 9.4, 12.1). Text only in this slice;
+    `audio_ref` (speech-to-text) comes with T-CNV-01."""
+
+    text: str = Field(min_length=1, max_length=1000)
+    session_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
+    local_date: date | None = None
+
+
+class ReflectionRequest(_Strict):
+    """POST /v1/reflections (spec 12.1, FR-DLY-05): the evening answer. The
+    app keeps saving it at users/{uid}/reflections/{date}; this returns the
+    Coach's reply and stores nothing."""
+
+    text: str = Field(min_length=1, max_length=500)
+    prompt: Literal["went_well"] = "went_well"
+    local_date: date | None = None
+
+
+class NudgeRequest(_Strict):
+    """POST /v1/nudges/copy: the words of one anchored nudge (FR-DLY-04,
+    FR-TCH-02). The scheduler (T-DLY-04) decides IF and WHEN, within the caps
+    and quiet hours; this only writes the copy."""
+
+    time_of_day: TimeOfDay
+    local_date: date | None = None
+
+
+class WeeklyStats(_Strict):
+    """Precomputed by code (the Insights Agent, T-AGT-06, is not built yet:
+    the caller passes the numbers). Counts and trend codes only."""
+
+    week_start: date
+    days_checked_in: int = Field(ge=0, le=7)
+    habit_days_done: int = Field(ge=0, le=7)
+    habit_days_planned: int = Field(ge=0, le=7)
+    streak_days: int = Field(ge=0, le=10_000)
+    restarts: int = Field(default=0, ge=0, le=7)
+    mood_trend: Trend = "unknown"
+    energy_trend: Trend = "unknown"
+    stress_trend: Trend = "unknown"
+
+
+class WeeklyReviewRequest(_Strict):
+    """POST /v1/reviews/weekly (FR-DLY-06; spec 9.7 Sunday job)."""
+
+    stats: WeeklyStats
+    local_date: date | None = None

@@ -1,5 +1,5 @@
 {
-  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. A Remote Config pointer (active version) comes later (T-AGT-04).",
+  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. One prompt per Coach mode (coach_briefing, coach_reply, coach_nudge, coach_reflection, coach_weekly_review; T-AGT-04, D-98). A Remote Config pointer for the active version is a follow-up (D-98): until then `active` here is the pointer.",
   "prompts": {
     "coach_briefing": {
       "active": "0.1",
@@ -28,6 +28,46 @@
           "file": "safety_classifier_output/v0.1.md",
           "review_status": "pending",
           "sha256": "8010c3cb8b99bf6d44a647c826fb12e55eb79288e769ce5f95d49d56c4562c0c"
+        }
+      }
+    },
+    "coach_reply": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_reply/v0.1.md",
+          "review_status": "pending",
+          "sha256": "3e0d1e3a11b3a9a1871ef2e2151d43fd9efbfa9a1790136184d2d160ae6890dc"
+        }
+      }
+    },
+    "coach_nudge": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_nudge/v0.1.md",
+          "review_status": "pending",
+          "sha256": "54e90ec65e92312c645e9e89a38e3e24b8a86b6e78a01614ec268516bab24863"
+        }
+      }
+    },
+    "coach_reflection": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_reflection/v0.1.md",
+          "review_status": "pending",
+          "sha256": "2651f1b728ece318272a89721a22fc5165e36371872abcba520a3d0f45e0b79c"
+        }
+      }
+    },
+    "coach_weekly_review": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_weekly_review/v0.1.md",
+          "review_status": "pending",
+          "sha256": "f2b46c605c2f89b953dba2e8ed1cdecd7663814bfd5d075324d8a49b9c1581b0"
         }
       }
     }

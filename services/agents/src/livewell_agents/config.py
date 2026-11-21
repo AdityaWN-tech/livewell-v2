@@ -37,6 +37,11 @@ class Settings:
     #: timeout: a slow classifier only costs a fixed fallback text.
     classifier_max_tokens: int = 4000
     classifier_timeout_s: float = 15.0
+    #: Fixed texts of the reply, nudge, reflection and weekly-review modes (T-AGT-04).
+    fallbacks_path: Path = REPO_ROOT / "content" / "coach" / "agent" / "fallbacks.json"
+    #: Content folders for approved-only retrieval (T-AGT-03); empty = no
+    #: retriever, so a conversation turn gets no passages and states no health facts.
+    content_dirs: tuple[Path, ...] = ()
 
     @property
     def allow_pending_prompts(self) -> bool:
@@ -76,4 +81,10 @@ def load_settings() -> Settings:
         fixtures_path=_path("LW_FIXTURES_PATH", SERVICE_DIR / "fixtures" / "synthetic_users.json"),
         classifier_max_tokens=int(os.environ.get("LW_SAFETY_CLASSIFIER_MAX_TOKENS", "4000")),
         classifier_timeout_s=float(os.environ.get("LW_SAFETY_CLASSIFIER_TIMEOUT_S", "15")),
+        fallbacks_path=_path(
+            "LW_AGENT_FALLBACKS_PATH", REPO_ROOT / "content" / "coach" / "agent" / "fallbacks.json"
+        ),
+        content_dirs=tuple(
+            Path(p) for p in os.environ.get("LW_CONTENT_DIRS", "").split(os.pathsep) if p
+        ),
     )

@@ -64,3 +64,11 @@ class PromptRegistry:
             return None
         text = _body(path.read_text(encoding="utf-8").replace("\r\n", "\n"))
         return Prompt(prompt_id, version, status, text)
+
+
+def tag_safe_json(value: object) -> str:
+    """JSON for a tagged block in a model message (<user_context>, <fields>,
+    <draft>). <, > and & are escaped (the result is still valid JSON), so no
+    user or model text can close or open the tag around it (D-96)."""
+    raw = json.dumps(value, ensure_ascii=False, sort_keys=True)
+    return raw.replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")

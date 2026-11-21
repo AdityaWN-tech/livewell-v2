@@ -31,7 +31,7 @@ from livewell_agents.model_client import (
     ModelRequest,
 )
 from livewell_agents.models import SafetyCategory
-from livewell_agents.prompts import PromptRegistry
+from livewell_agents.prompts import PromptRegistry, tag_safe_json
 from livewell_agents.tracing import set_attrs, span
 
 log = logging.getLogger("livewell_agents.safety.classifier")
@@ -155,8 +155,7 @@ class SafetyClassifier:
             return InputVerdict("ok", None, (), "clear")
         raw = self._call(
             INPUT_PROMPT_ID,
-            "Label these fields.\n<fields>\n"
-            f"{json.dumps(dict(fields), ensure_ascii=False, sort_keys=True)}\n</fields>",
+            f"Label these fields.\n<fields>\n{tag_safe_json(dict(fields))}\n</fields>",
             INPUT_JSON_SCHEMA,
         )
         if isinstance(raw, str):
@@ -195,7 +194,7 @@ class SafetyClassifier:
     def _classify_output(self, text: str) -> OutputVerdict:
         raw = self._call(
             OUTPUT_PROMPT_ID,
-            f"Review this draft.\n<draft>\n{json.dumps(text, ensure_ascii=False)}\n</draft>",
+            f"Review this draft.\n<draft>\n{tag_safe_json(text)}\n</draft>",
             OUTPUT_JSON_SCHEMA,
         )
         if isinstance(raw, str):

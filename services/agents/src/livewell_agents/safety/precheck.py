@@ -36,7 +36,23 @@ RECENT_EVENT_WINDOW = timedelta(hours=72)
 _INJECTION = re.compile(
     r"\b(?:repeat after me|say exactly|ignore (?:all |any |the )?(?:previous|prior|above|earlier)"
     r"|system prompt|you are now|new instructions?|disregard (?:all |the )?(?:previous|rules?)"
-    r"|developer mode|jailbreak)\b",
+    r"|developer mode|jailbreak)\b"
+    # D-96: paraphrases and role-play ("pretend you are my doctor").
+    r"|\b(?:ignore|forget|disregard|override|bypass) (?:all |any |every |the |your |these |those |"
+    r"my |previous |prior |earlier )*(?:instructions?|rules?|guidelines?|prompts?|restrictions?)\b"
+    r"|\bpretend (?:you are|you're|youre|to be|that you are)\b"
+    r"|\b(?:act|behave|respond|answer) (?:as|like) (?:if you (?:are|were) )?(?:my |a |an |the )?"
+    r"(?:doctor|physician|nurse|pharmacist|clinician|system|admin|administrator|developer)\b"
+    r"|\brole ?play\b|\bfrom now on,? you\b|\byou (?:may|must) now\b"
+    r"|\b(?:system|assistant|developer)\s*:"
+    # Romanised Hindi (DRAFT: Hindi-fluent clinician review): nirdesh = instructions,
+    # niyam = rules, bhool/bhul jao = forget, nazarandaz = ignore.
+    r"|\b(?:nirdesh|nirdeshon|niyam|niyamon)\b[^.!?]{0,20}"
+    r"\b(?:bhool|bhul|bhula|nazarandaz|ignore|chhod|chod|mat mano|mat maano|tod)\w*"
+    r"|\b(?:tum|aap) (?:ab )?(?:mere|meri|mera|ek) (?:doctor|daktar) "
+    r"(?:ho|hain|bano|ban jao|ban kar|banke|ki tarah)\b"
+    # Markup that could close or open the context tag (</user_context>, <system>).
+    r"|</?\s*[a-z_]*(?:context|system|instructions?|prompt|assistant|user)\b[^>]*>",
     re.IGNORECASE,
 )
 

@@ -6,9 +6,22 @@ out = sys.argv[1]
 MEDS = (r"(?:medicines?|medications?|meds|pills?|tablets?|doses?|dosage|insulin|metformin|glipizide|glimepiride|gliclazide|"
         r"sitagliptin|januvia|semaglutide|ozempic|wegovy|rybelsus|tirzepatide|mounjaro|jardiance|empagliflozin|dapagliflozin|"
         r"farxiga|statins?|atorvastatin|rosuvastatin|lipitor|crestor|lisinopril|amlodipine|losartan|telmisartan|metoprolol|"
-        r"warfarin|aspirin|blood thinners?|thyroxine|levothyroxine|thyronorm|antidepressants?|sertraline|prednisone|bp pills?)")
+        r"warfarin|aspirin|blood thinners?|thyroxine|levothyroxine|thyronorm|antidepressants?|sertraline|prednisone|bp pills?|"
+        r"prescriptions?|injections?|painkillers?|paracetamol|acetaminophen|tylenol|ibuprofen|advil|motrin|crocin|dolo|"
+        # Romanised Hindi (D-96; DRAFT: needs a Hindi-fluent clinician): goli = pill, dawai/dawa = medicine.
+        r"goli|goliyan|goliyaan|dawai|dawaai|dawa|dava|davai|dawaiyan)")
 CHANGE = (r"(?:stop|stopping|quit|quitting|skip|skipping|halve|double|increase|decrease|lower|lowering|reduce|reducing|cut down|"
-          r"cut back|come off|coming off|get off|getting off|taper|tapering|less|more|swap|replace|instead of)")
+          r"cut back|come off|coming off|get off|getting off|taper|tapering|less|more|swap|replace|instead of|"
+          # D-96: halving, and dosing-schedule changes ("every other week instead").
+          r"halving|halved|in half|every other|alternate days|alternate weeks|(?:once|twice) a (?:week|month) instead|"
+          # D-96: past tense and -ing forms of the same verbs ("I stopped my insulin").
+          r"stopped|quits|skipped|skips|halves|doubled|doubling|increased|increasing|decreased|decreasing|"
+          r"lowered|reduced|cutting down|cutting back|came off|got off|tapered|swapped|swapping|replaced|replacing)")
+#: Romanised Hindi change words (D-96; DRAFT: needs a Hindi-fluent clinician): band (kar) = stop,
+#: chhod/chod = quit, mat lo/lena = don't take, kam = less, aadhi = half, zyada = more.
+HI_CHANGE = (r"(?:band (?:kar|karo|karna|karni|karke|kardo|kardi|kardiya|ho|kiya|ki|kiye)\w*|chhod\w*|chod\w*|chhor\w*|"
+             r"mat (?:lo|lena|lun|loon|khao|khana)|na (?:lo|lena|khao|khana)|kam (?:kar|lo|lena|khao)\w*|"
+             r"(?:aadhi|adhi|aadha|adha|zyada|jyada|double) (?:kar|lo|lena|le|khao|goli|dose|tablet)\w*)")
 SUPPS = r"(?:supplements?|vitamins?|magnesium|berberine|fish oil|omega 3|turmeric|curcumin|zinc|ashwagandha|chromium|cinnamon pills?)"
 NT = r"(?:n ?'?t|not)"  # can't / cant / can not / cannot
 
@@ -39,6 +52,11 @@ rules = {
             r"\bchest (?:pain|pains|pressure|tightness|is tight|feels tight|hurts|is hurting|squeezing|crushing)\b",
             r"\b(?:crushing|squeezing|severe|sharp|bad) chest\b",
             r"\b(?:pain|pressure|tightness) in (?:my|the) chest\b",
+            # D-96: any word order, e.g. "tight squeezing feeling in my chest", "heavy weight on my chest".
+            r"\b(?:pains?|pressure|tight|tightness|squeez\w*|crush\w*|heaviness|burning|stabbing|aching)"
+            r"(?: [a-z']+){0,3} (?:in|on|across|around|of) (?:my|the|his|her) chest\b",
+            r"\b(?:heavy |a )?(?:weight|heaviness) (?:on|in) (?:my|the|his|her) chest\b",
+            r"\bheavy (?:feeling|sensation) (?:on|in) (?:my|the|his|her) chest\b",
             r"\b(?:having|have) a heart attack\b",
             r"\b(?:think|thinks|might be|could be|is this) (?:it'?s |i'?m having )?a heart attack\b"]},
         {"id": "EM-STROKE", "category": "emergency", "spec": "FR-SAF-01", "patterns": [
@@ -46,6 +64,10 @@ rules = {
             r"\bsigns? of (?:a )?stroke\b",
             r"\b(?:face|mouth) (?:is )?(?:drooping|droopy|droops)\b",
             r"\bdrooping (?:face|mouth)\b",
+            # D-96: one-sided face symptoms.
+            r"\b(?:half|one side|side|left side|right side) (?:of )?(?:my|his|her) face (?:is |went |has gone |feels |"
+            r"suddenly |just )*(?:numb|droop\w*|dead|weak|paraly[sz]ed|frozen)\b",
+            r"\b(?:ca" + NT + r"|unable to) smile (?:properly|normally|on one side|straight)\b",
             r"\bslurr(?:ed|ing) (?:speech|words)\b",
             r"\bsudden(?:ly)? (?:i )?(?:ca" + NT + r"|unable to) (?:speak|talk)\b",
             r"\b(?:ca" + NT + r"|unable to) (?:speak|talk) (?:properly|clearly|normally)\b",
@@ -57,6 +79,9 @@ rules = {
             r"\b(?:ca" + NT + r"|unable to|struggling to|hard to|barely) breathe?\b",
             r"\b(?:severe|extreme|really bad) (?:shortness of breath|breathlessness)\b",
             r"\bgasping (?:for )?(?:air|breath)\b",
+            # D-96: "I can hardly catch my breath".
+            r"\b(?:ca" + NT + r"|can hardly|can barely|hardly|barely|unable to|struggling to) (?:catch|get) my breath\b",
+            r"\bshort of breath (?:even )?(?:at rest|sitting|lying|when resting|while resting)\b",
             r"\bchoking\b"]},
         {"id": "EM-BLEED", "category": "emergency", "spec": "FR-SAF-01", "patterns": [
             r"\b(?:bleeding|blood) (?:wo" + NT + r"|will not|does" + NT + r"|is" + NT + r") stop",
@@ -84,7 +109,12 @@ rules = {
             r"\bno (?:reason|point) (?:to|in) (?:live|living|going on)\b",
             r"\btake my (?:own )?life\b",
             r"\b(?:hurt|hurting|harm|harming|cut|cutting) my ?self\b",
-            r"\bself ?harm\b"]},
+            r"\bself ?harm\b",
+            # D-96: indirect suicidal language and warning signs (FR-SAF-02).
+            r"\bdisappear(?:ing)? (?:forever|for good|and never come back|and never coming back)\b",
+            r"\b(?:sleep|go to sleep|fall asleep) and never (?:wake|waking) up\b",
+            r"\b(?:never|not) (?:want to )?wake up again\b",
+            r"\b(?:give|giving|given|gave) away (?:all )?(?:of )?my (?:things|stuff|belongings|possessions)\b"]},
         {"id": "CR-HINGLISH", "category": "crisis", "spec": "FR-SAF-02, D-03",
          "note": "Common romanised Hindi phrases. DRAFT: needs review by a clinician fluent in Hindi.",
          "patterns": [
@@ -96,9 +126,15 @@ rules = {
             r"\b[1-9][0-9]{1,2} (?:calories|cals|kcal|kcals) (?:a|per|each|every) day\b",
             r"\b(?:eat|eating|have|having) only [1-9][0-9]{1,2} (?:calories|cals|kcal)\b",
             r"\b(?:starve|starving) my ?self\b",
-            r"\b(?:stop|stopped|quit) eating (?:completely|entirely|altogether|for days)\b"]},
+            r"\b(?:stop|stopped|quit) eating (?:completely|entirely|altogether|for days)\b",
+            # D-96: going days without food; skipping every meal; restricting until a size or weight.
+            r"\b(?:have" + NT + r"|havent|have not|not|did" + NT + r"|didnt|did not) (?:eaten|eat|had (?:any )?food)"
+            r"(?: anything)? (?:in|for) (?:[2-9]|[1-9][0-9]|two|three|four|five|six|seven|several|a few|many) days\b",
+            r"\b(?:skip|skipping|skipped) (?:all|every) (?:of )?(?:my )?meals?\b",
+            r"\b(?:skip|skipping|not eating|no food|starv\w*)\b.*\buntil i (?:drop|lose|fit|weigh|get down)\b",
+            r"\b(?:drop|lose|go down) (?:a|one|two|three|[1-9]) (?:dress |jean |clothes |pant )?sizes?\b"]},
         {"id": "ED-PURGE", "category": "disordered_eating", "spec": "FR-SAF-04", "patterns": [
-            r"\b(?:make|making|force|forcing) my ?self (?:throw up|vomit|sick)\b",
+            r"\b(?:make|making|made|force|forcing|forced) my ?self (?:to )?(?:throw up|vomit|be sick|sick|puke)\b",
             r"\bpurg(?:ed|ing) (?:after|my|food|meals)\b",
             r"\b(?:binge|binging|bingeing) (?:and|then) (?:purge|purging|throw up|vomit)\b",
             r"\blaxatives? (?:to|for) (?:lose|losing|weight)\b"]},
@@ -111,6 +147,14 @@ rules = {
             r"\b" + CHANGE + r"\b.*\b" + MEDS + r"\b",
             r"\b" + MEDS + r"\b.*\b" + CHANGE + r"\b",
             r"\b(?:how much|how many|what dose|which dose|right dose|dosage of)\b.*\b" + MEDS + r"\b"]},
+        {"id": "MED-HINGLISH", "category": "medication", "spec": "FR-SAF-03, D-03, D-96",
+         "note": "Romanised Hindi medicine changes. DRAFT: needs review by a clinician fluent in Hindi.",
+         "patterns": [
+            r"\b" + MEDS + r"\b.*\b" + HI_CHANGE + r"\b",
+            r"\b" + HI_CHANGE + r"\b.*\b" + MEDS + r"\b",
+            r"\b(?:kitni|kitna|kitne)\b.*\b" + MEDS + r"\b",
+            r"\b(?:aadhi|adhi|aadha|adha|zyada|jyada|double) (?:goli|goliyan|dose|tablet|dawai|dawa|insulin)\b",
+            r"\b" + MEDS + r"\b.*\b(?:kitni|kitna|kitne)\b"]},
         {"id": "MED-SUPPLEMENT", "category": "medication", "spec": "FR-SAF-03, 15.3", "patterns": [
             r"\bsupplement (?:stack|protocol|regimen|plan)\b",
             r"\b(?:how much|how many mg|what dose|which dose|dosage of)\b.*\b" + SUPPS + r"\b",
@@ -119,7 +163,12 @@ rules = {
             r"\bpregnan(?:t|cy)\b",
             r"\bexpecting (?:a|our) baby\b",
             r"\bbreast ?feeding\b",
-            r"\btrying to (?:conceive|get pregnant)\b"]},
+            r"\btrying to (?:conceive|get pregnant)\b",
+            # D-96
+            r"\btrimester\b",
+            r"\bmorning sickness\b",
+            r"\b(?:prenatal|antenatal) (?:check ?up|appointment|visit|scan|class)\b",
+            r"\b(?:garbhvati|garbhavati|garbhwati)\b"]},
         {"id": "COMPLEX", "category": "pregnancy_complex", "spec": "FR-SAF-05", "patterns": [
             r"\bdialysis\b",
             r"\bchemo(?:therapy)?\b",

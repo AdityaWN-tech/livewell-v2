@@ -191,6 +191,41 @@ def test_classifier_failure_never_fails_open(make_service, fallback, case, mode)
     assert any(c.startswith("fallback:classifier_unavailable") for c in resp.message.safety.checks)
 
 
+@pytest.mark.critical
+@pytest.mark.parametrize("region", REGIONS)
+@pytest.mark.parametrize("case", CASES["classifier_escalates"], ids=lambda c: c["id"])
+def test_classifier_raises_a_less_urgent_rule_hit(make_service, engine, case, region):
+    """The rules catch a less urgent category (e.g. a medication stop); the
+    classifier must still raise it to the more urgent one (D-93 b, D-96)."""
+    finding = engine.check(case["text"])
+    assert finding.category == case["rules_category"]
+    assert engine.rank(finding.category) > engine.rank(case["category"])
+    classifier = says(case["category"], ("last_checkin.note",))
+    service, model, events = make_service(classifier_model=classifier)
+    resp = service.morning(
+        _ctx("last_checkin.note", case["text"], REGIONS[region]), has_ai_consent=True
+    )
+    assert resp.route == "safety_template" and resp.message.safety.category == case["category"]
+    assert model.calls == 0 and classifier.calls == 1
+    assert resp.voice == "neutral_device" and resp.message.contains_user_text is False
+    if case["category"] == "crisis":
+        assert {"US": "988", "IN": "14416", "unknown": "14416"}[region] in resp.message.text
+    assert [e.category for e in events.events] == [case["category"]]
+    assert f"CLS-{case['category'].upper()}" in events.events[0].rule_ids
+
+
+@pytest.mark.critical
+@pytest.mark.parametrize("mode", FAILURES)
+@pytest.mark.parametrize("case", CASES["classifier_escalates"], ids=lambda c: c["id"])
+def test_classifier_failure_keeps_the_rule_card(make_service, case, mode):
+    """The classifier is down: the rules' fixed card stands, never the model."""
+    service, model, _ = make_service(classifier_model=fails(mode))
+    resp = service.morning(_ctx("why", case["text"], "US"), has_ai_consent=True)
+    assert resp.route == "safety_template" and model.calls == 0
+    assert resp.message.safety.category == case["rules_category"]
+    assert resp.voice == "neutral_device" and resp.message.contains_user_text is False
+
+
 # ------------------------------------------------------------ coach-route 15.3 rows
 
 

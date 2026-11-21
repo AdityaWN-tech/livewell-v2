@@ -60,6 +60,37 @@ paths:
               schema: {$ref: "#/components/schemas/AvatarJob"}
         "401": {description: not_authorized}
         "404": {description: "not_found (also someone else's job)"}
+  /v1/briefings/morning:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: Today's morning briefing for the caller (Agent Service, T-AGT-01 / T-FND-03 spike)
+      description: >
+        Order (spec 9.4, 9.7): Safety.pre screens every free-text field of the
+        stored context with the shared red-flag rules (packages/safety-rules)
+        before anything else; a red flag returns the fixed template for that
+        category with no model call (emergency/crisis with the user's region
+        numbers, both regions when the region is unknown, D-03) and voice
+        neutral_device. Then the ai_disclosure consent is checked, then the
+        LangGraph flow (context, Coach draft, Safety.post, at most one retry)
+        returns an approved CoachMessage or the fixed fallback briefing. One
+        briefing per user and local day (repeat calls return the same one).
+        Spike: context comes from synthetic fixtures only (dev); D-91.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/BriefingRequest"}
+      responses:
+        "200":
+          description: The briefing (route coach), the fixed fallback (route fallback) or a safety template (route safety_template)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/BriefingResponse"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (ai_disclosure not granted; no model call was made)"}
+        "404": {description: "no_context (no stored context for this user; in this slice only synthetic dev users exist)"}
+        "422": {description: invalid body (unknown fields are refused)}
 components:
   securitySchemes:
     firebaseIdToken: {type: http, scheme: bearer}
@@ -101,3 +132,26 @@ components:
             The 14-frame set made from the portrait (T-AVT-08d), in Cloud
             Storage avatars/{uid}/{frames_version}/ with avatar_frames.json;
             also written to users/{uid}/avatar/current.frames_version
+    BriefingRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        local_date:
+          type: string
+          format: date
+          description: The user's local date; defaults to the date in the stored context
+    BriefingResponse:
+      type: object
+      required: [route, voice, message]
+      properties:
+        route: {type: string, enum: [coach, fallback, safety_template]}
+        voice:
+          type: string
+          enum: [neutral_device, gateway]
+          description: >
+            neutral_device for safety templates (FR-VOC-07); otherwise the app
+            asks the voice gateway with message.message_id (closed-script
+            rule, D-88). message.contains_user_text is true for model text, so
+            cloned voices refuse it.
+        message:
+          $ref: "../../packages/schemas/coach_message.schema.json"

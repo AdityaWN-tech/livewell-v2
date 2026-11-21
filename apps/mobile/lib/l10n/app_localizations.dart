@@ -682,17 +682,41 @@ abstract class AppLocalizations {
   /// **'Continue with phone'**
   String get phoneTitle;
 
-  /// No description provided for @phoneUsOnlyNote.
+  /// D-99: phone sign-in and Profile > Add a phone number accept any country.
   ///
   /// In en, this message translates to:
-  /// **'Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.'**
-  String get phoneUsOnlyNote;
+  /// **'Choose your country, then enter your mobile number.'**
+  String get phoneCountryNote;
 
-  /// No description provided for @countryUs.
+  /// No description provided for @phoneCountryLabel.
   ///
   /// In en, this message translates to:
-  /// **'United States (+1)'**
-  String get countryUs;
+  /// **'Country'**
+  String get phoneCountryLabel;
+
+  /// No description provided for @phoneCountryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your country'**
+  String get phoneCountryTitle;
+
+  /// No description provided for @phoneCountrySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by country or code'**
+  String get phoneCountrySearchHint;
+
+  /// No description provided for @phoneCountryNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No country matches that. Try its name or its code, like +44.'**
+  String get phoneCountryNoMatch;
+
+  /// Screen reader label of the country button on the phone screen (D-99).
+  ///
+  /// In en, this message translates to:
+  /// **'Country: {country}, {dialCode}'**
+  String phoneCountrySemantics(String country, String dialCode);
 
   /// No description provided for @phoneNumberLabel.
   ///
@@ -703,8 +727,8 @@ abstract class AppLocalizations {
   /// No description provided for @phoneInvalidMsg.
   ///
   /// In en, this message translates to:
-  /// **'Enter a valid US mobile number.'**
-  String get phoneInvalidMsg;
+  /// **'Enter a valid mobile number for {country}.'**
+  String phoneInvalidMsg(String country);
 
   /// No description provided for @phoneSendCode.
   ///

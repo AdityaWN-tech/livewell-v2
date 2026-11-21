@@ -70,6 +70,7 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-ONB-01 | Onboarding, 18+ check, sign-in | COMPLETED | Apple sign-in not yet tried on a device; fingerprint or face lock added | CONFLICTING: open sign-up vs invitation + allowlist (T-INV-03, D-97) | FND-04 | P0 | L | FR-ONB-01..06 acceptance criteria pass | - | 0 |
+| T-ONB-01b | Phone sign-in any country (searchable country picker, per-country validation, E.164; reverses D-66, D-99) | NEEDS REVIEW | PR_URL. Owner request 2026-11-21; `inferRegion` unchanged (D-03), new tests for +44/+61/+971/+977 | Unaffected | ONB-01 | P1 | S | Any country selectable on phone sign-in and Profile > Add a phone number; region never guessed | Owner: Firebase SMS region policy, SMS cost (Blaze) | 0 |
 | T-ONB-02 | Personal Why | COMPLETED | - | Unaffected | ONB-01 | P1 | S | Saved and displayed on Home | - | 0 |
 
 ### Assessment & safety
@@ -208,3 +209,4 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | 2026-11-21 | Owner approved the roadmap; T-AGT-04 started (IN PROGRESS). |
 | 2026-11-21 | T-AGT-04 built, PR #111 (NEEDS REVIEW). |
 | 2026-11-21 | T-AGT-04 merged (owner approved PR #111); AGT-05/06 READY. Roadmap PR #110 approved. |
+| 2026-11-21 | T-ONB-01b added (owner request: phone sign-in any country, D-99); PR_URL (NEEDS REVIEW). |

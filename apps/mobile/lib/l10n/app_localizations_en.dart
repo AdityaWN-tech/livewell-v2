@@ -337,17 +337,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneTitle => 'Continue with phone';
 
   @override
-  String get phoneUsOnlyNote =>
-      'Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.';
+  String get phoneCountryNote =>
+      'Choose your country, then enter your mobile number.';
 
   @override
-  String get countryUs => 'United States (+1)';
+  String get phoneCountryLabel => 'Country';
+
+  @override
+  String get phoneCountryTitle => 'Choose your country';
+
+  @override
+  String get phoneCountrySearchHint => 'Search by country or code';
+
+  @override
+  String get phoneCountryNoMatch =>
+      'No country matches that. Try its name or its code, like +44.';
+
+  @override
+  String phoneCountrySemantics(String country, String dialCode) {
+    return 'Country: $country, $dialCode. Double tap to change.';
+  }
 
   @override
   String get phoneNumberLabel => 'Mobile number';
 
   @override
-  String get phoneInvalidMsg => 'Enter a valid US mobile number.';
+  String phoneInvalidMsg(String country) {
+    return 'Enter a valid mobile number for $country.';
+  }
 
   @override
   String get phoneSendCode => 'Send code';

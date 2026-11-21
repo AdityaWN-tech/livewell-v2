@@ -22,6 +22,7 @@ The live progress page shows about 56% for the spec because it also counts partl
 
 | Date | Task | Change | Tests | Branch / PR | Review | Merge |
 |---|---|---|---|---|---|---|
+| 2026-11-21 | T-ONB-01b | Phone sign-in any country: searchable country picker, per-country validation (D-99, reverses D-66); safety region rule unchanged | mobile TESTCOUNT, CI pending | PR_URL | Needs review | No |
 | 2026-11-21 | T-AGT-04 | Coach Agent: 5 modes, new endpoints, crisis rule fix (D-98) | agents 2397, harness 676 PASS, CI green | PR #111 | Approved | Done |
 | 2026-11-21 | T-PLN-00 | Unified tracker, roadmap, audit, dependency map, status, this report; D-97 recorded | n/a (docs) | PR #110 | Approved | Done |
 | 2026-11-21 | T-AGT-02b | 35 of 36 eval safety gaps closed (PR #109) | agents 2050, mobile 1168, CI green | merged | Approved | Done |

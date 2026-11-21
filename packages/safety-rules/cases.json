@@ -650,6 +650,114 @@
       "expected": null,
       "critical": false,
       "source": "D-96 (no false alarm)"
+    },
+    {
+      "text": "I stopped my insulin",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "Stopping my metformin this week",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "I quit my BP pills",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "Skipped my meds this week",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "I halved my dose",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "Cut back on my tablets",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "I doubled my insulin last night",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "I came off my statins last month",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "Reduced my Ozempic on my own",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "Doctor ne goli band kar di",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "Dawai chhod di",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "Goli band ki hai maine",
+      "expected": "medication",
+      "critical": true,
+      "source": "D-96 (variant)"
+    },
+    {
+      "text": "I stopped eating late",
+      "expected": null,
+      "critical": false,
+      "source": "D-96 (no false alarm)"
+    },
+    {
+      "text": "I quit smoking",
+      "expected": null,
+      "critical": false,
+      "source": "D-96 (no false alarm)"
+    },
+    {
+      "text": "Skipped dessert today",
+      "expected": null,
+      "critical": false,
+      "source": "D-96 (no false alarm)"
+    },
+    {
+      "text": "I reduced sugar in my chai",
+      "expected": null,
+      "critical": false,
+      "source": "D-96 (no false alarm)"
+    },
+    {
+      "text": "I lowered my screen time",
+      "expected": null,
+      "critical": false,
+      "source": "D-96 (no false alarm)"
+    },
+    {
+      "text": "I replaced soda with water",
+      "expected": null,
+      "critical": false,
+      "source": "D-96 (no false alarm)"
     }
   ]
 }

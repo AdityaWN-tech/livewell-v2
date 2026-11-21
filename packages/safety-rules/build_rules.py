@@ -13,10 +13,13 @@ MEDS = (r"(?:medicines?|medications?|meds|pills?|tablets?|doses?|dosage|insulin|
 CHANGE = (r"(?:stop|stopping|quit|quitting|skip|skipping|halve|double|increase|decrease|lower|lowering|reduce|reducing|cut down|"
           r"cut back|come off|coming off|get off|getting off|taper|tapering|less|more|swap|replace|instead of|"
           # D-96: halving, and dosing-schedule changes ("every other week instead").
-          r"halving|halved|in half|every other|alternate days|alternate weeks|(?:once|twice) a (?:week|month) instead)")
+          r"halving|halved|in half|every other|alternate days|alternate weeks|(?:once|twice) a (?:week|month) instead|"
+          # D-96: past tense and -ing forms of the same verbs ("I stopped my insulin").
+          r"stopped|quits|skipped|skips|halves|doubled|doubling|increased|increasing|decreased|decreasing|"
+          r"lowered|reduced|cutting down|cutting back|came off|got off|tapered|swapped|swapping|replaced|replacing)")
 #: Romanised Hindi change words (D-96; DRAFT: needs a Hindi-fluent clinician): band (kar) = stop,
 #: chhod/chod = quit, mat lo/lena = don't take, kam = less, aadhi = half, zyada = more.
-HI_CHANGE = (r"(?:band (?:kar|karo|karna|karni|karke|kardo|kardi|kardiya|ho)\w*|chhod\w*|chod\w*|chhor\w*|"
+HI_CHANGE = (r"(?:band (?:kar|karo|karna|karni|karke|kardo|kardi|kardiya|ho|kiya|ki|kiye)\w*|chhod\w*|chod\w*|chhor\w*|"
              r"mat (?:lo|lena|lun|loon|khao|khana)|na (?:lo|lena|khao|khana)|kam (?:kar|lo|lena|khao)\w*|"
              r"(?:aadhi|adhi|aadha|adha|zyada|jyada|double) (?:kar|lo|lena|le|khao|goli|dose|tablet)\w*)")
 SUPPS = r"(?:supplements?|vitamins?|magnesium|berberine|fish oil|omega 3|turmeric|curcumin|zinc|ashwagandha|chromium|cinnamon pills?)"

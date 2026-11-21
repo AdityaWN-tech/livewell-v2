@@ -58,7 +58,7 @@ def test_briefing_case(make_service, case):
             assert all(s not in r.user for r in model.requests), s
 
 
-# The whole shared red-flag set (packages/safety-rules/cases.json, 117 cases),
+# The whole shared red-flag set (packages/safety-rules/cases.json, 135 cases),
 # placed in the two free-text fields a briefing reads.
 @pytest.mark.critical
 @pytest.mark.parametrize("field", ["why", "last_checkin.note"])

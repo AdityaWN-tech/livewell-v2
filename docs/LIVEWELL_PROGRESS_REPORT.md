@@ -22,7 +22,8 @@ The live progress page shows about 56% for the spec because it also counts partl
 
 | Date | Task | Change | Tests | Branch / PR | Review | Merge |
 |---|---|---|---|---|---|---|
-| 2026-11-21 | T-PLN-00 | Unified tracker, roadmap, audit, dependency map, status, this report; D-97 recorded | n/a (docs) | `task/T-PLN-00-unified-roadmap` (local, not pushed) | Pending | Pending |
+| 2026-11-21 | T-AGT-04 | Started (Coach Agent) | — | `task/T-AGT-04-coach-agent` | — | — |
+| 2026-11-21 | T-PLN-00 | Unified tracker, roadmap, audit, dependency map, status, this report; D-97 recorded | n/a (docs) | `task/T-PLN-00-unified-roadmap` | Roadmap approved | Pending |
 | 2026-11-21 | T-AGT-02b | 35 of 36 eval safety gaps closed (PR #109) | agents 2050, mobile 1168, CI green | merged | Approved | Done |
 | 2026-11-21 | T-AGT-02/03/08 | Classifier, content pipeline, eval harness (PRs #107, #106, #108) | CI green on `main` | merged | Approved | Done |
 | 2026-11-21 | T-AGT-01 | Agent service (PR #104) | 351 tests, CI green | merged | Approved | Done |

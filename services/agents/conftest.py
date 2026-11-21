@@ -19,6 +19,7 @@ from livewell_agents.config import REPO_ROOT, SERVICE_DIR, Settings
 from livewell_agents.model_client import FakeModelClient
 from livewell_agents.models import UserContext
 from livewell_agents.prompts import PromptRegistry
+from livewell_agents.safety.classifier import SafetyClassifier
 from livewell_agents.safety.events import ListSafetyEventSink
 from livewell_agents.safety.rules import RedFlagEngine
 from livewell_agents.safety.templates import FallbackBriefing
@@ -95,16 +96,27 @@ ServiceFactory = Callable[..., tuple[BriefingService, FakeModelClient, ListSafet
 @pytest.fixture
 def make_service(engine: RedFlagEngine, fallback: FallbackBriefing) -> ServiceFactory:
     def factory(
-        script: tuple[Any, ...] = (), allow_pending: bool = True
+        script: tuple[Any, ...] = (),
+        allow_pending: bool = True,
+        classifier_model: FakeModelClient | None = None,
     ) -> tuple[BriefingService, FakeModelClient, ListSafetyEventSink]:
+        """`model` is the Coach model only. The safety classifier has its own
+        fake (pass `classifier_model` to script or inspect it; by default it
+        answers "clear", which can never clear a rule hit)."""
         model = FakeModelClient(script=script)
         events = ListSafetyEventSink()
+        prompts = PromptRegistry(SERVICE_DIR / "prompts")
         service = BriefingService(
             engine=engine,
             model=model,
-            prompts=PromptRegistry(SERVICE_DIR / "prompts"),
+            prompts=prompts,
             fallback=fallback,
             events=events,
+            classifier=SafetyClassifier(
+                classifier_model if classifier_model is not None else FakeModelClient(),
+                prompts,
+                allow_pending,
+            ),
             allow_pending_prompts=allow_pending,
             clock=lambda: NOW,
         )

@@ -33,6 +33,10 @@ class Settings:
     prompts_dir: Path
     moments_path: Path
     fixtures_path: Path
+    #: The safety classifier (T-AGT-02) uses the same model with a shorter
+    #: timeout: a slow classifier only costs a fixed fallback text.
+    classifier_max_tokens: int = 4000
+    classifier_timeout_s: float = 15.0
 
     @property
     def allow_pending_prompts(self) -> bool:
@@ -70,4 +74,6 @@ def load_settings() -> Settings:
             "LW_MORNING_MOMENT_PATH", REPO_ROOT / "content" / "coach" / "moments" / "morning.json"
         ),
         fixtures_path=_path("LW_FIXTURES_PATH", SERVICE_DIR / "fixtures" / "synthetic_users.json"),
+        classifier_max_tokens=int(os.environ.get("LW_SAFETY_CLASSIFIER_MAX_TOKENS", "4000")),
+        classifier_timeout_s=float(os.environ.get("LW_SAFETY_CLASSIFIER_TIMEOUT_S", "15")),
     )

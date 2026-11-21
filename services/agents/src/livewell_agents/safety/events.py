@@ -22,6 +22,13 @@ class SafetyEvent:
     action: str
     source: str = "agents.briefing"
 
+    @property
+    def ed_safe_mode_on(self) -> bool:
+        """FR-SAF-04 / spec 15.3: a disordered-eating red flag turns on
+        ed_safe_mode. The server-side writer (D-22) applies it; until then it
+        is carried on the event."""
+        return self.category == "disordered_eating"
+
 
 class SafetyEventSink(Protocol):
     def record(self, event: SafetyEvent) -> None: ...
@@ -33,13 +40,15 @@ class LoggingSafetyEventSink:
 
     def record(self, event: SafetyEvent) -> None:
         log.warning(
-            "safety_event uid=%s category=%s rules=%s fields=%s action=%s source=%s",
+            "safety_event uid=%s category=%s rules=%s fields=%s action=%s source=%s "
+            "ed_safe_mode=%s",
             event.uid,
             event.category,
             ",".join(event.rule_ids),
             ",".join(event.fields),
             event.action,
             event.source,
+            event.ed_safe_mode_on,
         )
 
 

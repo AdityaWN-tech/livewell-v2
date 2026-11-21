@@ -20,6 +20,7 @@ def _client(consented=("demo-us", "demo-in", "demo-x"), contexts=None):
         consents=FakeConsents({u: {"ai_disclosure"} for u in consented}),
         contexts=contexts or FixtureContextSource(s.fixtures_path),
         model=model,
+        classifier_model=FakeModelClient(),
         events=ListSafetyEventSink(),
     )
     return TestClient(create_app(deps)), model

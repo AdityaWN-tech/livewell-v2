@@ -30,6 +30,7 @@ from livewell_agents.context import ContextSource, FixtureContextSource, NoConte
 from livewell_agents.model_client import FakeModelClient, ModelClient
 from livewell_agents.models import BriefingRequest, BriefingResponse
 from livewell_agents.prompts import PromptRegistry
+from livewell_agents.safety.classifier import SafetyClassifier
 from livewell_agents.safety.events import LoggingSafetyEventSink, SafetyEventSink
 from livewell_agents.safety.rules import RedFlagEngine
 from livewell_agents.safety.templates import FallbackBriefing
@@ -45,11 +46,14 @@ class Deps:
     consents: ConsentChecker
     contexts: ContextSource
     model: ModelClient
+    #: The safety classifier's own client (T-AGT-02): same provider, shorter timeout.
+    classifier_model: ModelClient
     events: SafetyEventSink
 
 
 def default_deps(settings: Settings) -> Deps:
     model: ModelClient
+    classifier_model: ModelClient
     if settings.model_provider == "anthropic":
         model = AnthropicModelClient(
             settings.anthropic_model,
@@ -57,8 +61,14 @@ def default_deps(settings: Settings) -> Deps:
             settings.anthropic_max_tokens,
             settings.anthropic_timeout_s,
         )
+        classifier_model = AnthropicModelClient(
+            settings.anthropic_model,
+            "low",
+            settings.classifier_max_tokens,
+            settings.classifier_timeout_s,
+        )
     else:
-        model = FakeModelClient()
+        model, classifier_model = FakeModelClient(), FakeModelClient()
     auth: Authenticator = NotConfiguredAuthenticator()
     consents: ConsentChecker = NotConfiguredConsents()
     project = os.environ.get("LW_FIREBASE_PROJECT")
@@ -83,7 +93,9 @@ def default_deps(settings: Settings) -> Deps:
     contexts: ContextSource = (
         FixtureContextSource(settings.fixtures_path) if settings.env == "dev" else NoContextSource()
     )
-    return Deps(settings, auth, consents, contexts, model, LoggingSafetyEventSink())
+    return Deps(
+        settings, auth, consents, contexts, model, classifier_model, LoggingSafetyEventSink()
+    )
 
 
 def create_app(deps: Deps | None = None) -> FastAPI:
@@ -93,12 +105,14 @@ def create_app(deps: Deps | None = None) -> FastAPI:
             configure_console_tracing()
         deps = default_deps(settings)
     s = deps.settings
+    prompts = PromptRegistry(s.prompts_dir)
     service = BriefingService(
         engine=RedFlagEngine(s.safety_rules_dir),
         model=deps.model,
-        prompts=PromptRegistry(s.prompts_dir),
+        prompts=prompts,
         fallback=FallbackBriefing(s.moments_path),
         events=deps.events,
+        classifier=SafetyClassifier(deps.classifier_model, prompts, s.allow_pending_prompts),
         allow_pending_prompts=s.allow_pending_prompts,
     )
     app = FastAPI(title="Live Well Agent Service", version="0.1.0")

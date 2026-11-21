@@ -9,15 +9,20 @@ no edge around it. Checks, all plain code:
     links, phone numbers (a model must never write an emergency number),
     money and payment words, markup or leftover placeholders, length.
 Reasons are short codes; they go to traces and to the one retry, never text.
+
+`escalate_post` then folds in the safety classifier (T-AGT-02) for a draft
+the rules approved: it can turn APPROVE into REWRITE or BLOCK, never the
+other way; a classifier that failed means BLOCK (the fixed fallback).
 """
 
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Literal
 
 from livewell_agents.models import CoachDraft
+from livewell_agents.safety.classifier import BLOCKING_REASONS, OutputVerdict
 from livewell_agents.safety.rules import RedFlagEngine
 
 Verdict = Literal["approve", "rewrite", "block"]
@@ -129,3 +134,34 @@ def post_check(draft: CoachDraft, engine: RedFlagEngine) -> PostCheckResult:
     if len(stripped) > MAX_CHARS:
         fail("too_long", "rewrite")
     return PostCheckResult(verdict, tuple(reasons), tuple(dict.fromkeys(rule_ids)))
+
+
+#: Reason-code prefix for a classifier finding (e.g. cls_medication_advice).
+CLASSIFIER_REASON_PREFIX = "cls_"
+CLASSIFIER_CHECK = "safety_classifier_output"
+
+
+def escalate_post(result: PostCheckResult, verdict: OutputVerdict) -> PostCheckResult:
+    """Combine the rules' verdict with the classifier's. Escalate only."""
+    checks = tuple(dict.fromkeys((*result.checks, CLASSIFIER_CHECK)))
+    if verdict.failed:
+        return replace(
+            result,
+            verdict="block",
+            reasons=tuple(dict.fromkeys((*result.reasons, "classifier_unavailable"))),
+            checks=checks,
+        )
+    if not verdict.unsafe:
+        return replace(result, checks=checks)
+    new: Verdict = (
+        "block"
+        if result.verdict == "block" or BLOCKING_REASONS.intersection(verdict.reasons)
+        else "rewrite"
+    )
+    codes = (CLASSIFIER_REASON_PREFIX + r for r in verdict.reasons)
+    return replace(
+        result,
+        verdict=new,
+        reasons=tuple(dict.fromkeys((*result.reasons, *codes))),
+        checks=checks,
+    )

@@ -108,9 +108,12 @@ def _crisis_actions(contacts: list[Contacts]) -> list[Action]:
     return out
 
 
-def safety_message(category: SafetyCategory, contacts: list[Contacts]) -> CoachMessage:
+def safety_message(
+    category: SafetyCategory, contacts: list[Contacts], checks: list[str] | None = None
+) -> CoachMessage:
     """The fixed message for a red flag. Emergency and crisis carry one-tap
-    calls for the user's region (both regions when unknown)."""
+    calls for the user's region (both regions when unknown). `checks` names
+    the checks that found it (default: the rules, "safety_pre")."""
     actions: list[Action]
     if category == "emergency":
         actions = _emergency_actions(contacts)
@@ -141,7 +144,9 @@ def safety_message(category: SafetyCategory, contacts: list[Contacts]) -> CoachM
         emotion="neutral",
         primary_action=actions[0] if actions else None,
         secondary_actions=actions[1:],
-        safety=SafetyInfo(status="safety_template", checks=["safety_pre"], category=category),
+        safety=SafetyInfo(
+            status="safety_template", checks=checks or ["safety_pre"], category=category
+        ),
         contains_user_text=False,
         model=NO_MODEL,
         prompt_version=TEMPLATE_VERSION,

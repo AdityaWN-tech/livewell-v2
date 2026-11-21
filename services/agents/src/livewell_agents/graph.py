@@ -6,8 +6,10 @@
                                      +-------(rewrite, once)-------+
                                          (anything else) -----------> fallback -> END
 
-Safety.pre has already run in plain code before this graph is invoked
-(briefing.py). `finalize` is reachable only from `safety_post`, so no model
+Safety.pre (rules, then the input classifier) has already run before this
+graph is invoked (briefing.py). `safety_post` runs the rules and, on a draft
+the rules approve, the output classifier, which can only escalate (a failed
+classifier blocks). `finalize` is reachable only from `safety_post`, so no model
 text leaves the graph without the post-check. The model is called at most
 MAX_MODEL_CALLS times per briefing (one retry, for invalid JSON or a rewrite).
 """
@@ -32,7 +34,8 @@ from livewell_agents.models import (
     UserContext,
 )
 from livewell_agents.prompts import Prompt
-from livewell_agents.safety.postcheck import PostCheckResult, post_check
+from livewell_agents.safety.classifier import SafetyClassifier
+from livewell_agents.safety.postcheck import PostCheckResult, escalate_post, post_check
 from livewell_agents.safety.rules import RedFlagEngine
 from livewell_agents.safety.templates import (
     BRIEFING_PRIMARY,
@@ -48,6 +51,8 @@ class BriefingState(TypedDict, total=False):
     uid: str
     context: UserContext
     withheld_fields: tuple[str, ...]
+    #: Checks already passed before the graph (e.g. safety_pre, the input classifier).
+    pre_checks: tuple[str, ...]
     prompt: Prompt
     model_context: dict[str, object]
     attempts: int
@@ -106,7 +111,10 @@ def user_message(model_ctx: dict[str, object], feedback: tuple[str, ...]) -> str
 
 
 def build_briefing_graph(
-    model: ModelClient, engine: RedFlagEngine, fallback: FallbackBriefing
+    model: ModelClient,
+    engine: RedFlagEngine,
+    fallback: FallbackBriefing,
+    classifier: SafetyClassifier,
 ) -> Any:
     def assemble_context(state: BriefingState) -> BriefingState:
         with span("graph.assemble_context", {"lw.node": "assemble_context"}):
@@ -172,6 +180,9 @@ def build_briefing_graph(
         assert draft is not None
         with span("graph.safety_post", {"lw.node": "safety_post"}) as s:
             result = post_check(draft, engine)
+            if result.verdict == "approve":
+                # A rule hit is final; only an approved draft needs the classifier.
+                result = escalate_post(result, classifier.classify_output(draft.text))
             set_attrs(
                 s,
                 {
@@ -201,7 +212,10 @@ def build_briefing_graph(
             emotion=draft.emotion,
             primary_action=BRIEFING_PRIMARY,
             secondary_actions=list(BRIEFING_SECONDARY),
-            safety=SafetyInfo(status="approved", checks=["safety_pre", *post.checks]),
+            safety=SafetyInfo(
+                status="approved",
+                checks=[*state.get("pre_checks", ("safety_pre",)), *post.checks],
+            ),
             contains_user_text=True,
             model=state.get("served_model") or "unknown",
             prompt_version=state["prompt"].tag,
@@ -212,7 +226,11 @@ def build_briefing_graph(
     def use_fallback(state: BriefingState) -> BriefingState:
         post = state.get("post")
         reason = state.get("failure") or (post.verdict if post else "unknown")
-        message = fallback.message(["safety_pre", f"fallback:{reason}"])
+        if post is not None and "classifier_unavailable" in post.reasons:
+            reason = "classifier_unavailable"
+        message = fallback.message(
+            [*state.get("pre_checks", ("safety_pre",)), f"fallback:{reason}"]
+        )
         with span(
             "graph.fallback",
             {"lw.node": "fallback", "lw.reason": reason, "lw.message_id": message.message_id},

@@ -29,6 +29,19 @@ Firebase ID token + App Check  ->  load context (synthetic fixtures, dev only)
 | `fixtures/synthetic_users.json` | Invented users. No real data, no PHI |
 | `../../packages/schemas/coach_message.schema.json` | The CoachMessage contract (spec 9.5) |
 
+## Approved-content retrieval (T-AGT-03, D-94)
+
+`src/livewell_agents/content/`: `Content.retrieve(query, driver_tags)` for the Coach (spec 9.4 step 5). **Only approved content, checked three times:** ingestion indexes only `review_status: approved` items not past `review_expires_at`; the index refuses to store anything else and filters it on every query; the retriever re-checks each hit against the live status and version (`StatusLookup`) and returns nothing if that check fails. Every ingest is a full sync, so a retired, re-reviewed, expired or deleted item leaves the index.
+
+```
+content items (JSON / Firestore content_items) -> ingest -> chunks (card / microhabit / book paragraphs)
+  -> Embedder (HashingEmbedder offline; production provider open, D-94)
+  -> VectorIndex (LocalVectorIndex JSON file; production store open, D-94)
+  -> ContentRetriever -> Passage[] with source_id, chunk_id, version
+```
+
+Build a local index (dev): `python -m livewell_agents.content.ingest ../../content/lessons --out .index/content.json` (`.index/` is git-ignored; prints ids and counts only). Tests and the retrieval eval use the **synthetic** corpus in `fixtures/content/` (no book text in the repo, A-10): `tests/test_content_*.py`, `evals/test_retrieval_precision_eval.py` (precision@5 >= 0.8, strict).
+
 ## Run locally
 
 ```bash

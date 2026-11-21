@@ -11,6 +11,7 @@ on:
       - "packages/safety-rules/**"
       - "packages/schemas/coach_message.schema.json"
       - "content/coach/moments/morning.json"
+      - "content/lessons/**"
       - "apps/mobile/lib/l10n/app_en.arb"
       - ".github/workflows/agents.yml"
   push:
@@ -20,6 +21,7 @@ on:
       - "packages/safety-rules/**"
       - "packages/schemas/coach_message.schema.json"
       - "content/coach/moments/morning.json"
+      - "content/lessons/**"
       - "apps/mobile/lib/l10n/app_en.arb"
       - ".github/workflows/agents.yml"
 

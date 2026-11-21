@@ -61,7 +61,7 @@ ignore = [
 python_version = "3.12"
 strict = true
 mypy_path = "src"
-packages = ["livewell_agents"]
+packages = ["livewell_agents", "evals.harness"]
 
 [[tool.mypy.overrides]]
 #: Optional deploy-only library (the `firebase` extra): CI installs only `dev`.

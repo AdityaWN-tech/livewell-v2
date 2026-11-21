@@ -12,8 +12,8 @@ Status as of 2026-11-21, checked against `main`, the open PRs and CI. Update thi
 | Status | Existing tasks | New tasks | Total |
 |---|---|---|---|
 | COMPLETED | 15 | 0 | 15 |
-| NEEDS REVIEW | 22 | 1 | 23 |
-| IN PROGRESS | 4 | 0 | 4 |
+| NEEDS REVIEW | 23 | 1 | 24 |
+| IN PROGRESS | 3 | 0 | 3 |
 | BLOCKED | 21 | 1 | 22 |
 | NOT STARTED | 9 | 18 | 27 |
 | **Total** | **71** | **20** | **91** |
@@ -109,7 +109,7 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | T-AGT-01 | Agent service | BLOCKED | FastAPI + LangGraph service with safety checks before and after the model, 351 tests, merged into main (PR #104); not deployed and doesn't save messages yet | NEEDS MODIFICATION: endpoints check org/role (T-PRM-03) | - | P0 | L | Hello-world turn traced end to end; invalid JSON is retried | Deploy needs Blaze + API credit | 1 |
 | T-AGT-02 | Safety checks before and after AI | COMPLETED | Rules plus an AI classifier that can only make a check stricter, 805 safety cases at 100%, merged (PR #107); still needs clinical sign-off on the classifier prompts | Unaffected; never configurable by Admin | AGT-01 | P0 | L | 15.3 critical cases at 100% | Clinical sign-off (D-93/D-96) | 0 |
 | T-AGT-03 | Content pipeline | BLOCKED | Approved-only pipeline, chunking and search with precision@5 of 0.86 on synthetic lessons, merged (PR #106); production search service and real lessons still to come | Decide: content global or per org (D-97) | AGT-01 | P1 | L | Unapproved item not retrievable (test); retrieval precision@5 of 0.8 or more on the eval set | Prod embedding/vector store choice (D-94) | 1 |
-| T-AGT-04 | Coach Agent | IN PROGRESS | - | Unaffected | AGT-02, AGT-03 | P0 | XL | Eval gates in 15.2 pass | - | 1 |
+| T-AGT-04 | Coach Agent | NEEDS REVIEW | PR #111. Five modes on one pipeline, 2397 tests, 676 golden cases (gate PASS); offline 15.2 gates met, live tone/grounding unmeasured (no API credit) | Unaffected | AGT-02, AGT-03 | P0 | XL | Eval gates in 15.2 pass | - | 1 |
 | T-AGT-05 | Memory Agent | NOT STARTED | - | Unaffected (memory is per user, never visible to Admin) | AGT-04 | P1 | L | FR-CNV-05 met; sensitive categories need opt-in | - | 1 |
 | T-AGT-06 | Insights Agent | NOT STARTED | - | Unaffected | AGT-04 | P1 | M | Matches the deterministic statistics on fixtures | - | 1 |
 | T-AGT-07 | Portal Agent | NOT STARTED | - | Decide: offers global or per org (D-97) | AGT-04, PRT-02 | P2 | L | All 13.3 rules have unit tests; zero hallucinated offers in eval | - | 1 |
@@ -205,3 +205,4 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 |---|---|
 | 2026-11-21 | Created: 71 spec tasks reconciled against `main`/PRs; 20 new tasks for the hierarchy requirements (T-PLN-00, T-IAM-*, T-SAD-*, T-ORG-*, T-INV-*, T-PRM-*, T-SEC-01). |
 | 2026-11-21 | Owner approved the roadmap; T-AGT-04 started (IN PROGRESS). |
+| 2026-11-21 | T-AGT-04 built, PR #111 (NEEDS REVIEW). |

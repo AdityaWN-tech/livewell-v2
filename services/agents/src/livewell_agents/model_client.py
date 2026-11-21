@@ -14,6 +14,11 @@ from typing import Literal, Protocol
 
 ModelStatus = Literal["ok", "refusal", "truncated", "error"]
 
+#: ModelRequest.purpose of the safety classifier calls (safety/classifier.py);
+#: also their prompt ids in the registry.
+CLASSIFIER_INPUT_PURPOSE = "safety_classifier_input"
+CLASSIFIER_OUTPUT_PURPOSE = "safety_classifier_output"
+
 
 @dataclass(frozen=True)
 class ModelRequest:
@@ -69,12 +74,23 @@ def default_fake_briefing(request: ModelRequest) -> str:
     return json.dumps({"text": " ".join(parts), "emotion": "encouraging"})
 
 
+def default_fake_answer(request: ModelRequest) -> str:
+    """The fake's unscripted answer: a clean classifier verdict for the safety
+    classifier, else a briefing. (A clean verdict can't clear anything: the
+    classifier only escalates, and the rules run first.)"""
+    if request.purpose == CLASSIFIER_INPUT_PURPOSE:
+        return json.dumps({"category": "none", "fields": []})
+    if request.purpose == CLASSIFIER_OUTPUT_PURPOSE:
+        return json.dumps({"verdict": "ok", "reasons": []})
+    return default_fake_briefing(request)
+
+
 Scripted = str | ModelResult | Callable[[ModelRequest], str]
 
 
 @dataclass
 class FakeModelClient:
-    """Deterministic stand-in. With no script it writes `default_fake_briefing`;
+    """Deterministic stand-in. With no script it answers `default_fake_answer`;
     with a script it returns each entry in turn (a raw string is an "ok"
     answer, so tests can feed invalid JSON or unsafe drafts), then repeats the
     last one. Records every request so tests can assert "no model call"."""
@@ -93,7 +109,7 @@ class FakeModelClient:
     def generate(self, request: ModelRequest) -> ModelResult:
         self.requests.append(request)
         if not self.script:
-            return ModelResult("ok", default_fake_briefing(request), FAKE_MODEL, 100, 40)
+            return ModelResult("ok", default_fake_answer(request), FAKE_MODEL, 100, 40)
         entry = self.script[min(len(self.requests), len(self.script)) - 1]
         if isinstance(entry, ModelResult):
             return entry

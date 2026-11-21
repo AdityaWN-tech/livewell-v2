@@ -48,6 +48,7 @@ from livewell_agents.models import (
     UserContext,
 )
 from livewell_agents.prompts import PromptRegistry
+from livewell_agents.safety.classifier import SafetyClassifier
 from livewell_agents.safety.events import ListSafetyEventSink
 from livewell_agents.safety.postcheck import Verdict, post_check
 from livewell_agents.safety.rules import RedFlagEngine
@@ -356,10 +357,18 @@ def run_briefing(case: GoldenCase, env: Env) -> Observation:
     factory = env.model_factory or _offline_model
     model = _Recording(factory(_script(inp)))
     events = ListSafetyEventSink()
+    prompts = PromptRegistry(env.prompts_dir)
+    # The safety classifier (T-AGT-02) has its own client. Offline it is a
+    # separate fake that answers "clear", so `model_calls` keeps counting Coach
+    # calls only; the classifier can only escalate, never clear a rule hit.
+    classifier_model: ModelClient = (
+        FakeModelClient() if isinstance(model.inner, FakeModelClient) else model.inner
+    )
     service = BriefingService(
         engine=env.engine,
         model=model,
-        prompts=PromptRegistry(env.prompts_dir),
+        prompts=prompts,
+        classifier=SafetyClassifier(classifier_model, prompts, allow_pending=True),
         fallback=env.fallback,
         events=events,
         allow_pending_prompts=True,

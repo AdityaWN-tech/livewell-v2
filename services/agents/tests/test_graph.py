@@ -109,7 +109,9 @@ def test_pending_prompt_outside_dev_uses_fallback_without_model(make_service):
     service, model, _ = make_service(allow_pending=False)
     resp = service.morning(make_context(), has_ai_consent=True)
     assert resp.route == "fallback" and model.calls == 0
-    assert "fallback:prompt_not_approved" in resp.message.safety.checks
+    # The safety classifier's prompt is pending too, so it is unavailable
+    # outside dev and the fixed text is used before the Coach prompt is read.
+    assert "fallback:classifier_unavailable:prompt_not_approved" in resp.message.safety.checks
 
 
 def test_no_consent_no_model_call(make_service):

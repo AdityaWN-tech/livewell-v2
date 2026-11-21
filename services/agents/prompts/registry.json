@@ -10,6 +10,26 @@
           "sha256": "6acf5bdb16528423a3b183014e45b32b96de7d4a7655e7049f8969974e6da914"
         }
       }
+    },
+    "safety_classifier_input": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "safety_classifier_input/v0.1.md",
+          "review_status": "pending",
+          "sha256": "aca7e7503b6cbb4f156ce76ddb0b70a11ab255699184891e04e83169a6c68109"
+        }
+      }
+    },
+    "safety_classifier_output": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "safety_classifier_output/v0.1.md",
+          "review_status": "pending",
+          "sha256": "8010c3cb8b99bf6d44a647c826fb12e55eb79288e769ce5f95d49d56c4562c0c"
+        }
+      }
     }
   }
 }

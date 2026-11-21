@@ -8,18 +8,26 @@ Python service for the in-app agents (spec 9, 10.2). This first slice is **T-AGT
 
 ```
 Firebase ID token + App Check  ->  load context (synthetic fixtures, dev only)
-  -> Safety.pre (plain code, shared red-flag rules, every free-text field)
-       red flag             -> fixed card for that category, region numbers, NO model call
-       safety event < 72 h  -> fixed morning briefing, no model call
+  -> Safety.pre rules (plain code, shared red-flag rules, every free-text field)
+       emergency / crisis   -> fixed card, region numbers, NO model call of any kind
+  -> safety classifier (only with ai_disclosure consent; T-AGT-02, D-93)
+       may only ESCALATE: a red flag the rules missed, or a more urgent one
+       fails (error, timeout, refusal, bad JSON, prompt not approved) -> fixed briefing
+  -> any red flag           -> fixed card for that category, safety event, no Coach call
+     safety event < 72 h    -> fixed morning briefing, no model call
   -> ai_disclosure consent?  no -> 403, no model call
   -> prompt registry (pending prompts only in dev)
   -> LangGraph: assemble_context -> coach_draft -> safety_post -> finalize
                                      (one retry: invalid JSON or REWRITE)  -> fallback
+     safety_post = rules, then (if they approve) the output classifier; it can
+     only turn APPROVE into REWRITE/BLOCK, and a failed classifier means BLOCK
 ```
+
+The Done-when of T-AGT-02 ("15.3 critical cases at 100%") is `evals/test_safety_15_3_eval.py`: every 15.3 row, in every region (US, IN, unknown), against every classifier behaviour (clear, a lower category, each failure mode). It runs in CI.
 
 | Path | What |
 |---|---|
-| `src/livewell_agents/safety/` | `rules.py` (typed port of `packages/safety-rules/check_cases.py`, same `rules.json`/`label_rules.json`), `precheck.py`, `postcheck.py`, `templates.py` (fixed texts = the app's ARB strings), `events.py` |
+| `src/livewell_agents/safety/` | `rules.py` (typed port of `packages/safety-rules/check_cases.py`, same `rules.json`/`label_rules.json`), `classifier.py` (LLM safety classifier through `ModelClient`, escalate-only, fail safe), `precheck.py` + `escalate_pre`, `postcheck.py` + `escalate_post`, `templates.py` (fixed texts = the app's ARB strings), `events.py` |
 | `src/livewell_agents/graph.py` | The LangGraph flow (core library only; no LangChain/LangSmith) |
 | `src/livewell_agents/model_client.py` | `ModelClient` protocol + `FakeModelClient` |
 | `src/livewell_agents/anthropic_client.py` | `AnthropicModelClient` (official `anthropic` SDK) |
@@ -28,6 +36,19 @@ Firebase ID token + App Check  ->  load context (synthetic fixtures, dev only)
 | `evals/` | Offline safety evals (pytest, FakeModelClient) and the opt-in live eval |
 | `fixtures/synthetic_users.json` | Invented users. No real data, no PHI |
 | `../../packages/schemas/coach_message.schema.json` | The CoachMessage contract (spec 9.5) |
+
+## Approved-content retrieval (T-AGT-03, D-94)
+
+`src/livewell_agents/content/`: `Content.retrieve(query, driver_tags)` for the Coach (spec 9.4 step 5). **Only approved content, checked three times:** ingestion indexes only `review_status: approved` items not past `review_expires_at`; the index refuses to store anything else and filters it on every query; the retriever re-checks each hit against the live status and version (`StatusLookup`) and returns nothing if that check fails. Every ingest is a full sync, so a retired, re-reviewed, expired or deleted item leaves the index.
+
+```
+content items (JSON / Firestore content_items) -> ingest -> chunks (card / microhabit / book paragraphs)
+  -> Embedder (HashingEmbedder offline; production provider open, D-94)
+  -> VectorIndex (LocalVectorIndex JSON file; production store open, D-94)
+  -> ContentRetriever -> Passage[] with source_id, chunk_id, version
+```
+
+Build a local index (dev): `python -m livewell_agents.content.ingest ../../content/lessons --out .index/content.json` (`.index/` is git-ignored; prints ids and counts only). Tests and the retrieval eval use the **synthetic** corpus in `fixtures/content/` (no book text in the repo, A-10): `tests/test_content_*.py`, `evals/test_retrieval_precision_eval.py` (precision@5 >= 0.8, strict).
 
 ## Run locally
 
@@ -75,6 +96,7 @@ The client uses adaptive thinking, explicit effort, structured output (`output_c
 | `AGENTS_MODEL_PROVIDER` | `fake` | `fake` (dev only) or `anthropic` |
 | `ANTHROPIC_API_KEY` | — | Only from env / Secret Manager |
 | `LW_ANTHROPIC_MODEL` / `_EFFORT` / `_MAX_TOKENS` / `_TIMEOUT_S` | `claude-opus-5-5` / `low` / `16000` / `60` | Model call |
+| `LW_SAFETY_CLASSIFIER_MAX_TOKENS` / `_TIMEOUT_S` | `4000` / `15` | Safety classifier call (same model, effort `low`); a timeout means the fixed text |
 | `LW_FIREBASE_PROJECT` | — | Turns on Firebase Admin auth + Firestore consents (`firebase` extra) |
 | `LW_REQUIRE_APP_CHECK` | `1` | `0` only for local Firebase testing |
 | `LW_DEV_FAKE_AUTH` | — | `1` = fake tokens (dev only) |
@@ -122,3 +144,10 @@ LW_LIVE_EVALS=1 python -m evals.harness --tier live        # owner only: real mo
 **Rules.** Synthetic text only. Every miss found in review becomes a case. Never weaken a case, its severity or a safety rule to make it pass (AGENTS.md rule 5): if it fails because of a real gap, add it to `known_gaps.json` (same severity, reason, owner task) and flag it for safety review. The older case files (`evals/cases/*.json`) still run through their own tests.
 
 **Live tier.** Tone and grounding need the real model and a judge. `--tier live` runs those cases with the real model and the deterministic checks; the rubric judge is not built yet, so they report `needs_judge` and never count as passing (D-95).
+
+**Older case files** (still run by their own tests):
+
+- Context red flags: `evals/cases/briefing_safety_cases.json`; the whole shared set `packages/safety-rules/cases.json` is also run in the Why and check-in note fields.
+- Spec 15.3 set: `evals/cases/safety_15_3_cases.json` (`input` red flags, `coach_input` rows, `output` drafts, `classifier_only` red flags the rules miss today; when a rule is added for one, the test asks you to move it). Scripted classifier answers and failure modes: `evals/classifier_fakes.py`.
+- Model outputs: `evals/cases/adversarial_outputs.json` (`unsafe` must be rejected and end as the fallback; `safe` must be approved).
+- Every miss found in review becomes a case. Critical cases must pass 100%; CI (`.github/workflows/agents.yml`) fails otherwise.

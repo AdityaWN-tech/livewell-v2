@@ -117,7 +117,7 @@ LW_LIVE_EVALS=1 python -m evals.harness --tier live        # owner only: real mo
 
 | Path | What |
 |---|---|
-| `evals/golden/*.jsonl` | The golden set: one case per line (388 cases: 372 offline, 16 live). Listed in `manifest.json` (version `1.0-draft`, pending clinical review) |
+| `evals/golden/*.jsonl` | The golden set: one case per line (445 cases: 429 offline, 16 live). Listed in `manifest.json` (version `1.0-draft`, pending clinical review) |
 | `evals/golden/known_gaps.json` | Cases that fail today because of a real gap, with reason and owner task. Never counted as passing |
 | `evals/harness/` | Loader (`cases.py`), runners (`targets.py`), gates and report (`runner.py`), CLI (`__main__.py`) |
 | `evals/test_golden_gate.py` | Every offline case as its own pytest test (`critical` marker on critical ones); known gaps are xfail |

@@ -16,7 +16,6 @@ MAX_MODEL_CALLS times per briefing (one retry, for invalid JSON or a rewrite).
 
 from __future__ import annotations
 
-import json
 import time
 import uuid
 from typing import Any, TypedDict
@@ -33,7 +32,7 @@ from livewell_agents.models import (
     SafetyInfo,
     UserContext,
 )
-from livewell_agents.prompts import Prompt
+from livewell_agents.prompts import Prompt, tag_safe_json
 from livewell_agents.safety.classifier import SafetyClassifier
 from livewell_agents.safety.postcheck import PostCheckResult, escalate_post, post_check
 from livewell_agents.safety.rules import RedFlagEngine
@@ -69,12 +68,14 @@ def model_context(ctx: UserContext, withheld: tuple[str, ...]) -> dict[str, obje
     """What the model sees: the screened context, minus withheld fields and
     minus check-in notes (free text the briefing doesn't need)."""
     out: dict[str, object] = {
-        "coach_name": ctx.coach_name,
         "local_date": ctx.local_date.isoformat(),
         "weekday": ctx.local_date.strftime("%A"),
         "streak_days": ctx.streak_days,
         "ed_safe_mode": ctx.ed_safe_mode,
     }
+    # D-96: an instruction-like coach name is withheld like any other field.
+    if "coach_name" not in withheld:
+        out["coach_name"] = ctx.coach_name
     if "first_name" not in withheld:
         out["first_name"] = ctx.first_name
     if ctx.why and "why" not in withheld:
@@ -99,7 +100,7 @@ def user_message(model_ctx: dict[str, object], feedback: tuple[str, ...]) -> str
     body = (
         "Write today's morning briefing for this person.\n"
         "<user_context>\n"
-        f"{json.dumps(model_ctx, ensure_ascii=False, sort_keys=True)}\n"
+        f"{tag_safe_json(model_ctx)}\n"
         "</user_context>"
     )
     if feedback:

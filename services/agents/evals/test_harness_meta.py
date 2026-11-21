@@ -151,8 +151,9 @@ def test_loader_rejects_duplicate_ids(golden_copy):
 
 def test_loader_rejects_gap_that_downgrades_severity(golden_copy):
     def downgrade(gaps):
-        crit = next(g for g in gaps if g["severity"] == "critical")
-        crit["severity"] = "normal"
+        # A gap entry for a critical case that claims a lower severity (no
+        # critical gap is left in the real list since D-96).
+        gaps.append({**gaps[0], "id": "em-chest-squeeze-us", "severity": "normal"})
 
     _edit_gaps(golden_copy, downgrade)
     with pytest.raises(GoldenSetError, match="severity"):

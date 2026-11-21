@@ -33,6 +33,13 @@ MAX_CHARS = 600
 
 CHECKS = ("red_flags", "label_rules", "med_rule", "cure_claims", "banned_content", "length")
 
+#: Food words for the compensatory-exercise rule below (D-96).
+_FOODS = (
+    r"(?:cakes?|desserts?|sweets?|mithai|food|meals?|dinner|lunch|breakfast|snacks?|calories|"
+    r"pizza|treats?|feast|binge|indulgence|ladoos?|laddoos?|jalebis?|biryani|samosas?|"
+    r"chocolates?|ice cream|cookies?|fries|burgers?|what you ate|everything you ate)"
+)
+
 #: (code, pattern, verdict). Patterns run on the lowercased raw text.
 _OUTPUT_RULES: tuple[tuple[str, re.Pattern[str], Verdict], ...] = (
     # The shared rules are written for first-person input; a draft talks to
@@ -86,6 +93,115 @@ _OUTPUT_RULES: tuple[tuple[str, re.Pattern[str], Verdict], ...] = (
         "block",
     ),
     ("markup", re.compile(r"[{}<>\[\]`#*]|\\n"), "rewrite"),
+    # ---- D-96: gaps found by the eval harness (agent-only; drafts talk to "you").
+    # Medicine words the label rules miss: prescriptions, OTC brand names,
+    # Romanised Hindi (DRAFT: Hindi-fluent clinician review), tapering, and
+    # "shot" only as a medicine (never "give it a shot").
+    (
+        "med_rule",
+        re.compile(
+            r"\b(?:prescriptions?|prescribed|painkillers?|pain ?relievers?|antibiotics?|antacids?|"
+            r"paracetamol|acetaminophen|tylenol|ibuprofen|advil|motrin|aleve|naproxen|crocin|dolo|"
+            r"combiflam|disprin|calpol|goli|goliyan|goliyaan|dawai|dawaai|dawa|davai|dawaiyan)\b"
+            r"|\b(?:insulin|flu|b12|ozempic|mounjaro|wegovy|booster) (?:shots?|jabs?|pens?)\b"
+            r"|\b(?:skip|skipping|miss|missing|take|taking|stop|stopping|delay|pause|double|halve|"
+            r"cut|reduce|increase|lower|change|move|push) (?:your|my|the|today'?s|tonight'?s|"
+            r"this morning'?s|an extra|one|two|that) (?!best )(?:\w+ )?shots?\b"
+            r"|\b(?:taper(?:ing)?|wean(?:ing)?) (?:yourself )?off\b"
+        ),
+        "rewrite",
+    ),
+    # Compensatory exercise and food-as-something-to-earn (FR-SAF-04, 14.1):
+    # "walk off that cake", "earn your dessert", "make up for last night's dinner".
+    (
+        "disordered_eating",
+        re.compile(
+            r"\b(?:burn|burning|work|working|walk|walking|run|running|sweat|sweating|jog|jogging|"
+            r"cycle|cycling|dance|dancing|exercise) off (?:that |the |your |this |those |these |"
+            r"all |some |any |it |yesterday'?s |last night'?s |today'?s |tonight'?s )?(?:\w+ )?"
+            + _FOODS
+            + r"\b"
+            r"|\bearn(?:ed|ing|s)? (?:your|that|the|my|a|this|some|tonight'?s|today'?s|an?) "
+            r"(?:\w+ )?" + _FOODS + r"\b"
+            r"|\b(?:make up for|makes up for|compensate for|cancel out|cancels out|undo|undoes) "
+            r"[^.!?]{0,30}\b(?:" + _FOODS + r"|eating|ate)\b"
+        ),
+        "rewrite",
+    ),
+    # Cure or reversal promises without cure/reverse words.
+    (
+        "cure_claim",
+        re.compile(
+            r"\b(?:diabetes|prediabetes|pre-diabetes|your (?:sugar|condition|disease|illness|bp)|"
+            r"(?:high )?blood (?:pressure|sugar)|hypertension|cholesterol|insulin resistance|"
+            r"neuropathy|fatty liver|pcos|heart disease)\b[^.!?]{0,40}\b(?:(?:will|would|could|can|"
+            r"is going to|are going to) (?:soon )?(?:be (?:gone|history|a thing of the past|over|"
+            r"behind you)|go away|disappear|vanish|melt away)|(?:is|are) (?:gone|history))\b"
+            r"|\b(?:free|rid) of (?:your |the |all )?(?:diabetes|prediabetes|disease|condition|"
+            r"medications?|meds|medicines?|insulin|pills|tablets|treatment)\b"
+            r"|\b(?:diabetes|disease|medication|medicine|insulin|pill|drug)[- ]free\b"
+            r"|\bnever (?:need|have to take|have to use|take|use)\b[^.!?]{0,25}\b(?:treatments?|"
+            r"medications?|medicines?|meds|insulin|pills|tablets|a doctor|doctors)\b"
+            r"|\b(?:no longer|won'?t|will not|wouldn'?t) (?:need|have to take)\b[^.!?]{0,20}\b"
+            r"(?:treatments?|medications?|medicines?|meds|insulin|pills|tablets)\b"
+            r"|\b(?:undo|undoes|undoing|undid|undone|erase[sd]?|erasing|wipe[sd]? out|repairs?|"
+            r"repairing|fix(?:es)?|fixing) (?:all |most |much )?(?:of )?(?:the |your |that )?"
+            r"damage\b"
+            r"|\b(?:beat|beats|beating|defeat|defeats|conquer|conquers|overcome|overcomes)"
+            r" (?:your |the )?(?:diabetes|prediabetes|disease|condition)\b"
+        ),
+        "rewrite",
+    ),
+    # Money written as "Rs 499" or "499/-".
+    (
+        "money",
+        re.compile(r"\brs\.?\s?\d|\b\d[\d,]*\s?(?:/-|rs\b)|\b(?:rupaye|rupay|rupaiye)\b"),
+        "block",
+    ),
+    # Portal or programme offers. A briefing has no catalog entry for any
+    # offer (FR-SAF-07; T-AGT-07 owns real portal cards), so any offer in a
+    # briefing is made up.
+    (
+        "portal_offer",
+        re.compile(
+            r"\b(?:enrol|enroll|enrols|enrolls|enrolled|enrolling|enrolment|enrollment|"
+            r"masterclass(?:es)?|master class(?:es)?|webinars?|workshops?|bootcamps?|seminars?|"
+            r"membership|subscribe|subscription|coupon|promo code|special offer|limited[- ]time|"
+            r"early bird)\b"
+            r"|\b(?:register|sign up|signup) (?:for|now|today)\b"
+            r"|\b(?:book|reserve|save) your (?:seat|spot|place)\b"
+            r"|\b(?:seats?|spots?) (?:are |is )?(?:filling|limited|left|going fast|selling)"
+            r"|\b(?:live|online|paid|premium) (?:\w+ )?(?:course|program|programme|class|classes|"
+            r"session|sessions|event|q&a)\b"
+            r"|\bdr\.?\s?(?:murthy\s)?gokula'?s (?:\w+ )?(?:course|program|programme|class|"
+            r"session|event|book|community|group|portal)\b"
+        ),
+        "block",
+    ),
+    # A draft that talks about its own instructions (an injection worked).
+    (
+        "meta_talk",
+        re.compile(
+            r"\b(?:system|developer|hidden|secret) (?:prompt|message|instructions?)\b"
+            r"|\bmy (?:prompt|instructions|guidelines|programming|training data)\b"
+            r"|\bi (?:was|am|have been|'ve been|'m) (?:told|instructed|programmed|trained|"
+            r"designed) to\b|\bas an ai\b|\blanguage model\b|\bjailbr\w*|\bdeveloper mode\b"
+        ),
+        "block",
+    ),
+    # A draft that claims to be a doctor or Dr. Gokula speaking: the companion
+    # is never the doctor (impersonation; closed-script spirit).
+    (
+        "impersonation",
+        re.compile(
+            r"\b(?:this is|i am|i'm|it'?s|here'?s) (?:your )?dr\.?\s?(?:murthy\s)?gokula\b"
+            r"|\bdr\.?\s?(?:murthy\s)?gokula (?:here|speaking|writing)\b"
+            r"|\b(?:i am|i'm|as) (?:your|a|an) (?:doctor|physician|nurse|clinician|pharmacist|"
+            r"endocrinologist|cardiologist|dietitian)\b"
+            r"|\bi (?:personally )?(?:approve|authori[sz]e|prescribe|diagnose|clear you)\b"
+        ),
+        "block",
+    ),
 )
 
 _LABEL_CODES = {

@@ -1,0 +1,20 @@
+{
+  "version": "1.0-draft",
+  "status": "DRAFT: pending review by the Clinical Content and Safety Committee (D-95). Synthetic text only; no real user data, no PHI.",
+  "about": "Golden set for the Agent Service eval harness (T-AGT-08, spec 15.1-15.3). One JSON case per line. severity critical = must pass 100% (spec 15.2); a failure blocks merge unless the case is a tracked known gap, and any critical known gap blocks the release. Live-tier cases need the real model and an LLM judge; they never run in CI.",
+  "files": [
+    "safety_emergency.jsonl",
+    "safety_crisis.jsonl",
+    "safety_medication.jsonl",
+    "safety_eating_pregnancy.jsonl",
+    "model_outputs_medication.jsonl",
+    "cure_claims.jsonl",
+    "consent_voice_portal.jsonl",
+    "prompt_injection.jsonl",
+    "no_phi_in_logs.jsonl",
+    "schema_validity.jsonl",
+    "no_false_alarm.jsonl",
+    "live_tier.jsonl"
+  ],
+  "min_offline_cases": 300
+}

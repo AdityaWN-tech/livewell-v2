@@ -1,19 +1,19 @@
-# Agent Service (T-AGT-01): lint, types, tests and the offline safety evals.
-# No secrets: every test uses FakeModelClient. The live eval (evals/live) is
-# opt-in and never runs here. A failing critical safety case fails this job,
-# which blocks merge (spec 15.2).
+# Agent Service (T-AGT-01, T-AGT-08): lint, types, tests and the eval gate.
+# No secrets: every test uses FakeModelClient. Live evals (evals/live and the
+# golden set's live tier) are opt-in and never run here.
+#
+# Merge gate (spec 15.2, D-95): `eval-gate` runs the golden set
+# (services/agents/evals/golden) and fails on any critical-case failure, any
+# unlisted non-critical failure, a stale known gap or fewer than 300 offline
+# cases. Make "agents / eval-gate" (and "agents / test") required checks in
+# branch protection for main. The workflow runs on every pull request (no
+# `paths:` filter, which would leave a required check pending forever); the
+# `changes` job skips the real work when nothing relevant changed, and a
+# skipped job counts as passed.
 name: agents
 
 on:
   pull_request:
-    paths:
-      - "services/agents/**"
-      - "packages/safety-rules/**"
-      - "packages/schemas/coach_message.schema.json"
-      - "content/coach/moments/morning.json"
-      - "content/lessons/**"
-      - "apps/mobile/lib/l10n/app_en.arb"
-      - ".github/workflows/agents.yml"
   push:
     branches: [main]
     paths:
@@ -30,7 +30,37 @@ defaults:
     working-directory: services/agents
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      agents: ${{ steps.diff.outputs.agents }}
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then
+            echo "agents=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          changed=$(git diff --name-only "$BASE"...HEAD)
+          echo "$changed"
+          if echo "$changed" | grep -qE '^(services/agents/|packages/safety-rules/|packages/schemas/coach_message\.schema\.json$|content/coach/moments/morning\.json$|content/lessons/|apps/mobile/lib/l10n/app_en\.arb$|\.github/workflows/agents\.yml$)'; then
+            echo "agents=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "agents=false" >> "$GITHUB_OUTPUT"
+          fi
+
   test:
+    needs: changes
+    if: needs.changes.outputs.agents == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,5 +72,31 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy
-      - name: tests and offline evals (critical safety cases must all pass)
+      - name: tests and offline evals (every golden case is its own test)
         run: pytest -q
+
+  eval-gate:
+    needs: changes
+    if: needs.changes.outputs.agents == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - name: golden set, offline tier (fails on a critical failure)
+        run: python -m evals.harness --json eval-summary.json --markdown eval-summary.md
+      - name: job summary
+        if: always()
+        run: cat eval-summary.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-summary
+          path: |
+            services/agents/eval-summary.json
+            services/agents/eval-summary.md
+          if-no-files-found: warn
+          retention-days: 30

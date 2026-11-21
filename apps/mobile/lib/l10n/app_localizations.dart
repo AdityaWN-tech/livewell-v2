@@ -715,7 +715,7 @@ abstract class AppLocalizations {
   /// Screen reader label of the country button on the phone screen (D-99).
   ///
   /// In en, this message translates to:
-  /// **'Country: {country}, {dialCode}. Double tap to change.'**
+  /// **'Country: {country}, {dialCode}'**
   String phoneCountrySemantics(String country, String dialCode);
 
   /// No description provided for @phoneNumberLabel.

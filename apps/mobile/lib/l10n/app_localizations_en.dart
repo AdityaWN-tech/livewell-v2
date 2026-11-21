@@ -355,7 +355,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String phoneCountrySemantics(String country, String dialCode) {
-    return 'Country: $country, $dialCode. Double tap to change.';
+    return 'Country: $country, $dialCode';
   }
 
   @override

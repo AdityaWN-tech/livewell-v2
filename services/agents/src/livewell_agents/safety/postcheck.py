@@ -18,6 +18,7 @@ other way; a classifier that failed means BLOCK (the fixed fallback).
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from typing import Literal
 
@@ -202,6 +203,44 @@ _OUTPUT_RULES: tuple[tuple[str, re.Pattern[str], Verdict], ...] = (
         ),
         "block",
     ),
+    # ---- T-AGT-04 (D-98): reading numbers or trends as a condition (spec 9.3
+    # Insights "never interpret metrics diagnostically"; the weekly review and
+    # replies see trends): "could mean depression", "a sign of thyroid
+    # trouble", "means you are depressed", "your diabetes is improving".
+    (
+        "diagnosis",
+        re.compile(
+            r"\b(?:could|may|might|can|would|does|do|will)? ?(?:mean|means|indicate|indicates|"
+            r"signal|signals|point to|points to|suggest|suggests)\b[^.!?]{0,30}\b(?:depress\w*|"
+            r"anxiety|disorders?|diseases?|thyroid|diabet\w*|illness|deficien\w*|syndromes?|"
+            r"infections?|burnout|hypertension|insomnia|neuropathy)\b"
+            r"|\b(?:sign|signs|symptom|symptoms|signal|indicator|warning sign)s? of (?:a |an )?"
+            r"(?:\w+ )?(?:diseases?|disorders?|conditions?|illness|depression|anxiety|"
+            r"deficiency|thyroid|diabetes|infection|syndrome|burnout|insomnia)\b"
+            r"|\b(?:means?|meaning|suggests?|indicates?|shows?) (?:that )?you(?:'re| are| have|"
+            r" might be| may be| could be| might have| may have) (?:\w+ )?(?:depressed|"
+            r"depression|anxious|diabetic|ill|sick|deficient|burn(?:ed|t) out|insomnia|"
+            r"hypertensive)\b"
+            r"|\byour (?:diabetes|prediabetes|sugars?|blood sugar|glucose|a1c|hba1c|blood pressure|"
+            r"bp|cholesterol|condition|thyroid|heart)\b[^.!?]{0,20}\b(?:is|are|looks?|seems?)"
+            r" (?:improving|getting better|better|worse|getting worse|under control|normal|"
+            r"healthy|fine|fixed)\b"
+        ),
+        "rewrite",
+    ),
+    # ---- T-AGT-04 (D-98): guilt and shame the label words miss (spec 9.3
+    # Coach "must never shame the user"; FR-DLY-07 streak forgiveness).
+    (
+        "shaming",
+        re.compile(
+            r"\b(?:ashamed|shameful|shame on you|embarrassing|embarrassed of you)\b"
+            r"|\b(?:try|work|push) harder\b|\b(?:disappointed|disappointing) (?:in|with) you\b"
+            r"|\byou (?:failed|let (?:yourself|me|us) down|keep failing|gave up again|"
+            r"should have known better|have no willpower|lack willpower)\b"
+            r"|\b(?:lost|broke|ruined|blew) your streak again\b"
+        ),
+        "rewrite",
+    ),
 )
 
 _LABEL_CODES = {
@@ -220,7 +259,11 @@ class PostCheckResult:
     checks: tuple[str, ...] = CHECKS
 
 
-def post_check(draft: CoachDraft, engine: RedFlagEngine) -> PostCheckResult:
+def post_check(
+    draft: CoachDraft, engine: RedFlagEngine, max_chars: int = MAX_CHARS
+) -> PostCheckResult:
+    """`max_chars`: the mode's length limit (T-AGT-04: a nudge is shorter
+    than a weekly review); the morning briefing's MAX_CHARS by default."""
     text = draft.text
     lower = text.lower()
     reasons: list[str] = []
@@ -247,9 +290,87 @@ def post_check(draft: CoachDraft, engine: RedFlagEngine) -> PostCheckResult:
     stripped = text.strip()
     if len(stripped) < MIN_CHARS:
         fail("too_short", "rewrite")
-    if len(stripped) > MAX_CHARS:
+    if len(stripped) > max_chars:
         fail("too_long", "rewrite")
     return PostCheckResult(verdict, tuple(reasons), tuple(dict.fromkeys(rule_ids)))
+
+
+# ------------------------------------------------------------ grounding (T-AGT-04)
+
+#: Spec 9.1 rule 4 / 9.6: health facts only from approved passages, with
+#: their source ids. A draft that states a health fact must cite at least one
+#: passage it was given; one that cites an id it was not given is rewritten.
+#: The detector is deliberately broad (a missed claim is worse than a retry);
+#: the live-tier judge (spec 15.2, "health claims with a valid approved
+#: source >= 95%") measures what it misses.
+GROUNDING_CHECK = "source_presence"
+
+_HEALTH_TERMS = (
+    r"(?:blood sugar|blood glucose|glucose|insulin|a1c|hba1c|blood pressure|cholesterol|"
+    r"triglycerides|inflammation|metabolism|cortisol|hormones?|immune system|immunity|"
+    r"heart health|heart disease|diabetes|prediabetes|digestion|gut health|"
+    r"(?:the )?risk of|your risk|arteries|liver|kidneys?)"
+)
+_HEALTH_CLAIM = re.compile(
+    r"\b(?:studies|research|researchers|evidence|science|scientists|experts|data|trials?)"
+    r" (?:shows?|suggests?|says?|found|finds|proves?|confirms?|has shown|have shown)\b"
+    r"|\b(?:clinically|scientifically|medically) (?:proven|shown|tested)\b"
+    r"|\b(?:is|are|has been|have been) (?:proven|shown) to\b"
+    r"|\b(?:lowers?|lowering|reduces?|reducing|improves?|improving|raises?|raising|boosts?|"
+    r"boosting|controls?|controlling|regulates?|regulating|balances?|balancing|stabili[sz]es?|"
+    r"stabili[sz]ing|spikes?|spiking|protects?|protecting|strengthens?|strengthening|"
+    r"helps? (?:to )?(?:lower|reduce|control|manage|regulate|balance|improve))\b"
+    r"[^.!?]{0,40}\b" + _HEALTH_TERMS + r"\b"
+    r"|\b(?:helps?|helping|good for|great for|better for|bad for|harmful to|works on)\b"
+    r"[^.!?]{0,25}\b" + _HEALTH_TERMS + r"\b"
+    r"|\b" + _HEALTH_TERMS + r"\b[^.!?]{0,30}\b(?:drops?|falls?|rises?|spikes?|goes (?:up|down)|"
+    r"improves?|gets? better|comes? down)\b"
+)
+
+
+def grounding_check(draft: CoachDraft, provided: frozenset[str] | set[str]) -> PostCheckResult:
+    """APPROVE, or REWRITE with `unknown_source` (a cited id that was not
+    provided) / `unsourced_health_claim` (a health fact with no cited
+    passage). With no passages provided, any health fact is unsourced."""
+    reasons: list[str] = []
+    cited = set(draft.source_ids)
+    if cited - set(provided):
+        reasons.append("unknown_source")
+    if _HEALTH_CLAIM.search(draft.text.lower()) and not (cited & set(provided)):
+        reasons.append("unsourced_health_claim")
+    return PostCheckResult(
+        "rewrite" if reasons else "approve", tuple(reasons), (), (GROUNDING_CHECK,)
+    )
+
+
+#: A nudge may show on a lock screen (AGENTS.md, FR-TCH-02): nothing personal.
+PRIVACY_CHECK = "lock_screen_privacy"
+
+
+def personal_text_check(draft: CoachDraft, personal: Sequence[str]) -> PostCheckResult:
+    """REWRITE (`personal_in_nudge`) when the draft carries the person's name,
+    Why or other personal text. The nudge model is never sent these; this
+    catches it anyway (defence in depth)."""
+    lower = draft.text.lower()
+    hit = any(len(p.strip()) >= 3 and p.strip().lower() in lower for p in personal)
+    return PostCheckResult(
+        "rewrite" if hit else "approve",
+        ("personal_in_nudge",) if hit else (),
+        (),
+        (PRIVACY_CHECK,),
+    )
+
+
+def combine_post(first: PostCheckResult, second: PostCheckResult) -> PostCheckResult:
+    """Both checks' findings; the stricter verdict wins (block > rewrite > approve)."""
+    order = {"approve": 0, "rewrite": 1, "block": 2}
+    verdict = first.verdict if order[first.verdict] >= order[second.verdict] else second.verdict
+    return PostCheckResult(
+        verdict,
+        tuple(dict.fromkeys((*first.reasons, *second.reasons))),
+        tuple(dict.fromkeys((*first.rule_ids, *second.rule_ids))),
+        tuple(dict.fromkeys((*first.checks, *second.checks))),
+    )
 
 
 #: Reason-code prefix for a classifier finding (e.g. cls_medication_advice).

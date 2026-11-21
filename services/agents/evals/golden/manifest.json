@@ -14,7 +14,12 @@
     "no_phi_in_logs.jsonl",
     "schema_validity.jsonl",
     "no_false_alarm.jsonl",
-    "live_tier.jsonl"
+    "live_tier.jsonl",
+    "coach_reply.jsonl",
+    "coach_nudge.jsonl",
+    "coach_reflection.jsonl",
+    "coach_weekly_review.jsonl",
+    "live_tier_coach.jsonl"
   ],
   "min_offline_cases": 300
 }

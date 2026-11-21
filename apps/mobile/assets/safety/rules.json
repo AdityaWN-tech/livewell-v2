@@ -131,7 +131,7 @@
       "patterns": [
         "\\bsuicid(?:e|al)\\b",
         "\\bkill(?:ing)? my ?self\\b",
-        "\\bend (?:my life|it all)\\b",
+        "\\bend(?:ing)? (?:my (?:own )?life|it all)\\b",
         "\\b(?:do(?:n ?'?t|not)|dont) want to (?:live|be alive|be here|exist|wake up)\\b",
         "\\bwant to die\\b",
         "\\bwish (?:i|i ?'?d) (?:was|were|had) (?:dead|never been born)\\b",

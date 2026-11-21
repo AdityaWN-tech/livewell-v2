@@ -21,6 +21,7 @@ on:
       - "packages/safety-rules/**"
       - "packages/schemas/coach_message.schema.json"
       - "content/coach/moments/morning.json"
+      - "content/coach/agent/**"
       - "content/lessons/**"
       - "apps/mobile/lib/l10n/app_en.arb"
       - ".github/workflows/agents.yml"
@@ -52,7 +53,7 @@ jobs:
           fi
           changed=$(git diff --name-only "$BASE"...HEAD)
           echo "$changed"
-          if echo "$changed" | grep -qE '^(services/agents/|packages/safety-rules/|packages/schemas/coach_message\.schema\.json$|content/coach/moments/morning\.json$|content/lessons/|apps/mobile/lib/l10n/app_en\.arb$|\.github/workflows/agents\.yml$)'; then
+          if echo "$changed" | grep -qE '^(services/agents/|packages/safety-rules/|packages/schemas/coach_message\.schema\.json$|content/coach/moments/morning\.json$|content/coach/agent/|content/lessons/|apps/mobile/lib/l10n/app_en\.arb$|\.github/workflows/agents\.yml$)'; then
             echo "agents=true" >> "$GITHUB_OUTPUT"
           else
             echo "agents=false" >> "$GITHUB_OUTPUT"

@@ -81,3 +81,74 @@ def test_local_date_is_used():
     client, _ = _client()
     r = client.post("/v1/briefings/morning", json={"local_date": "2026-11-20"}, headers=H)
     assert r.status_code == 200
+
+
+# ---------------------------------------------------------------- T-AGT-04 modes
+
+MODE_CALLS = [
+    ("/v1/conversation/turn", {"text": "How can I sleep better?", "session_id": "s1"}, "reply"),
+    ("/v1/reflections", {"text": "I walked after lunch and felt good."}, "reply"),
+    ("/v1/nudges/copy", {"time_of_day": "midday"}, "nudge"),
+    (
+        "/v1/reviews/weekly",
+        {
+            "stats": {
+                "week_start": "2026-11-16",
+                "days_checked_in": 5,
+                "habit_days_done": 4,
+                "habit_days_planned": 7,
+                "streak_days": 4,
+            }
+        },
+        "weekly_review",
+    ),
+]
+
+
+@pytest.mark.parametrize(("path", "body", "mtype"), MODE_CALLS)
+def test_mode_endpoints_end_to_end(path, body, mtype):
+    client, model = _client()
+    r = client.post(path, json=body, headers=H)
+    assert r.status_code == 200, r.text
+    out = r.json()
+    assert out["route"] == "coach" and out["message"]["type"] == mtype
+    assert model.calls == 1
+
+
+@pytest.mark.parametrize(("path", "body", "mtype"), MODE_CALLS)
+def test_mode_endpoints_need_auth_consent_and_context(path, body, mtype):
+    client, model = _client(consented=())
+    assert client.post(path, json=body).status_code == 401
+    assert client.post(path, json=body, headers=H).status_code == 403
+    h = {**H, "Authorization": "Bearer token-nobody"}
+    assert client.post(path, json=body, headers=h).status_code == 404
+    assert client.post(path, json={**body, "extra": 1}, headers=H).status_code == 422
+    assert model.calls == 0
+
+
+def test_conversation_turn_red_flag_is_a_template_without_model():
+    client, model = _client()
+    r = client.post(
+        "/v1/conversation/turn",
+        json={"text": "I have crushing chest pain and my left arm is numb", "session_id": "s1"},
+        headers=H,
+    )
+    body = r.json()
+    assert body["route"] == "safety_template" and body["voice"] == "neutral_device"
+    assert "Call 911." in body["message"]["text"] and model.calls == 0
+
+
+def test_conversation_turn_limits():
+    client, _ = _client()
+    r = client.post(
+        "/v1/conversation/turn", json={"text": "x" * 1001, "session_id": "s1"}, headers=H
+    )
+    assert r.status_code == 422
+    r = client.post("/v1/reflections", json={"text": "x" * 501}, headers=H)
+    assert r.status_code == 422
+
+
+def test_reflection_returns_barrier_field():
+    client, _ = _client()
+    r = client.post("/v1/reflections", json={"text": "Felt good today."}, headers=H)
+    assert r.json()["barrier"] == "none"

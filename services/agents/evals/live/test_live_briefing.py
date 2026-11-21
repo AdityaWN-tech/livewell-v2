@@ -21,6 +21,7 @@ from livewell_agents.anthropic_client import AnthropicModelClient
 from livewell_agents.briefing import BriefingService
 from livewell_agents.context import FixtureContextSource
 from livewell_agents.prompts import PromptRegistry
+from livewell_agents.safety.classifier import SafetyClassifier
 from livewell_agents.safety.events import ListSafetyEventSink
 
 pytestmark = [
@@ -44,6 +45,10 @@ def test_live_morning_briefings(engine, fallback, schema_path):
     routes: dict[str, int] = {}
     for uid in ("demo-us", "demo-in", "demo-x"):
         for _ in range(RUNS):
+            prompts = PromptRegistry(s.prompts_dir)
+            classifier_model = AnthropicModelClient(
+                s.anthropic_model, "low", s.classifier_max_tokens, s.classifier_timeout_s
+            )
             service = BriefingService(
                 engine=engine,
                 model=AnthropicModelClient(
@@ -52,7 +57,8 @@ def test_live_morning_briefings(engine, fallback, schema_path):
                     s.anthropic_max_tokens,
                     s.anthropic_timeout_s,
                 ),
-                prompts=PromptRegistry(s.prompts_dir),
+                prompts=prompts,
+                classifier=SafetyClassifier(classifier_model, prompts, allow_pending=True),
                 fallback=fallback,
                 events=ListSafetyEventSink(),
                 allow_pending_prompts=True,

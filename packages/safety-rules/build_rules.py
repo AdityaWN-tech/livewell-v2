@@ -101,7 +101,8 @@ rules = {
         {"id": "CR-SUICIDE", "category": "crisis", "spec": "FR-SAF-02", "patterns": [
             r"\bsuicid(?:e|al)\b",
             r"\bkill(?:ing)? my ?self\b",
-            r"\bend (?:my life|it all)\b",
+            r"\bend(?:ing)? (?:my (?:own )?life|it all)\b",
+            # T-AGT-04 (D-98): "ending my life", "ending it all" were missed.
             r"\b(?:do" + NT + r"|dont) want to (?:live|be alive|be here|exist|wake up)\b",
             r"\bwant to die\b",
             r"\bwish (?:i|i ?'?d) (?:was|were|had) (?:dead|never been born)\b",

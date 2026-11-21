@@ -16,6 +16,9 @@ from pathlib import Path
 from livewell_agents.models import (
     Action,
     CoachMessage,
+    CoachMode,
+    Emotion,
+    MessageType,
     Region,
     SafetyCategory,
     SafetyInfo,
@@ -109,11 +112,15 @@ def _crisis_actions(contacts: list[Contacts]) -> list[Action]:
 
 
 def safety_message(
-    category: SafetyCategory, contacts: list[Contacts], checks: list[str] | None = None
+    category: SafetyCategory,
+    contacts: list[Contacts],
+    checks: list[str] | None = None,
+    message_type: MessageType = "briefing",
 ) -> CoachMessage:
     """The fixed message for a red flag. Emergency and crisis carry one-tap
     calls for the user's region (both regions when unknown). `checks` names
-    the checks that found it (default: the rules, "safety_pre")."""
+    the checks that found it (default: the rules, "safety_pre"). The text is
+    the same in every mode; only `type` follows the mode."""
     actions: list[Action]
     if category == "emergency":
         actions = _emergency_actions(contacts)
@@ -139,7 +146,7 @@ def safety_message(
         text = f"{_s(title)}. {_s(body)}"
     return CoachMessage(
         message_id=str(uuid.uuid4()),
-        type="briefing",
+        type=message_type,
         text=text,
         emotion="neutral",
         primary_action=actions[0] if actions else None,
@@ -194,4 +201,79 @@ class FallbackBriefing:
             contains_user_text=False,
             model=NO_MODEL,
             prompt_version=self.version,
+        )
+
+
+# ------------------------------------------------------------ other modes (T-AGT-04)
+
+#: The CoachMessage type of each mode (spec 9.5 has no separate type for the
+#: reply to an evening reflection: it is a "reply"; D-98).
+MESSAGE_TYPES: dict[CoachMode, MessageType] = {
+    "briefing": "briefing",
+    "reply": "reply",
+    "nudge": "nudge",
+    "reflection": "reply",
+    "weekly_review": "weekly_review",
+}
+
+#: Fixed buttons per mode (app copy, never model output).
+MODE_ACTIONS: dict[CoachMode, tuple[Action | None, tuple[Action, ...]]] = {
+    "briefing": (BRIEFING_PRIMARY, BRIEFING_SECONDARY),
+    "reply": (None, ()),
+    "nudge": (
+        Action(label="Start my step", action_id="start_step"),
+        (
+            Action(label="Done", action_id="done"),
+            Action(label="Make it smaller", action_id="make_smaller"),
+            Action(label="Not today", action_id="not_today"),
+        ),
+    ),
+    "reflection": (Action(label="Done", action_id="close"), ()),
+    "weekly_review": (Action(label="See my week", action_id="see_week"), ()),
+}
+
+
+class CoachFallbacks:
+    """The fixed safe text of every mode: the briefing's morning moment
+    (FallbackBriefing) and content/coach/agent/fallbacks.json for the other
+    four (review_status pending; no placeholders, nothing personal)."""
+
+    def __init__(self, briefing: FallbackBriefing, fallbacks_path: Path | None) -> None:
+        """`fallbacks_path` None: the briefing only (other modes refuse)."""
+        self.briefing = briefing
+        self._texts: dict[str, tuple[str, Emotion, str]] = {}
+        if fallbacks_path is None:
+            return
+        data = json.loads(fallbacks_path.read_text(encoding="utf-8"))
+        for mode, entry in data["modes"].items():
+            text = str(entry["text"])
+            if _PLACEHOLDER.search(text):
+                raise ValueError(f"fallback for {mode} must not need personal placeholders")
+            version = f"agent_fallback_v{data['version']}_{entry['id']}"
+            self._texts[mode] = (text, entry["emotion"], version)
+        missing = set(MESSAGE_TYPES) - {"briefing"} - set(self._texts)
+        if missing:
+            raise ValueError(f"no fallback text for {sorted(missing)}")
+
+    def text(self, mode: CoachMode) -> str:
+        if mode == "briefing":
+            return self.briefing.text
+        return self._texts[mode][0]
+
+    def message(self, mode: CoachMode, checks: list[str]) -> CoachMessage:
+        if mode == "briefing":
+            return self.briefing.message(checks)
+        text, emotion, version = self._texts[mode]
+        primary, secondary = MODE_ACTIONS[mode]
+        return CoachMessage(
+            message_id=str(uuid.uuid4()),
+            type=MESSAGE_TYPES[mode],
+            text=text,
+            emotion=emotion,
+            primary_action=primary,
+            secondary_actions=list(secondary),
+            safety=SafetyInfo(status="fallback", checks=checks),
+            contains_user_text=False,
+            model=NO_MODEL,
+            prompt_version=version,
         )

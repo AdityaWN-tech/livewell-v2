@@ -15,6 +15,7 @@ lowers a rule hit.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from typing import Literal
@@ -73,11 +74,26 @@ class PreCheckResult:
     sources: tuple[str, ...] = ("rules",)
 
 
-def safety_pre(ctx: UserContext, engine: RedFlagEngine, now: datetime) -> PreCheckResult:
+def screened_fields(ctx: UserContext, extra: Mapping[str, str] | None = None) -> dict[str, str]:
+    """Every free-text field of a run: the stored context plus what the
+    request brings (a chat message, a reflection), by field name."""
+    return {**ctx.free_text(), **(extra or {})}
+
+
+def safety_pre(
+    ctx: UserContext,
+    engine: RedFlagEngine,
+    now: datetime,
+    extra: Mapping[str, str] | None = None,
+) -> PreCheckResult:
+    """`extra`: free text from the request itself (T-AGT-04: "message" for a
+    conversation turn, "reflection.text" for an evening reflection). It is
+    screened exactly like the stored context."""
     best: SafetyCategory | None = None
     rule_ids: list[str] = []
     flagged: list[str] = []
-    for name, text in ctx.free_text().items():
+    fields = screened_fields(ctx, extra)
+    for name, text in fields.items():
         finding = engine.check(text)
         if finding.category is None:
             continue
@@ -85,7 +101,7 @@ def safety_pre(ctx: UserContext, engine: RedFlagEngine, now: datetime) -> PreChe
         rule_ids.extend(finding.rule_ids)
         if best is None or engine.rank(finding.category) < engine.rank(best):
             best = finding.category
-    withheld = tuple(name for name, text in ctx.free_text().items() if _INJECTION.search(text))
+    withheld = tuple(name for name, text in fields.items() if _INJECTION.search(text))
     if best is not None:
         return PreCheckResult(
             "safety_template",

@@ -46,6 +46,8 @@ ALLOWED_KEYS = frozenset(
         "lw.message_id",
         "lw.duration_ms",
         "lw.cached",
+        "lw.passages",
+        "lw.source_ids",
     }
 )
 

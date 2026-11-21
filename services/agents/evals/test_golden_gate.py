@@ -104,3 +104,49 @@ def test_portal_during_distress_is_covered():
     ids = {c.id for c in GOLDEN.cases if c.category == "portal_policy"}
     assert any(i.startswith("portal-distress") for i in ids)
     assert "recent-event-distress-no-portal" in ids
+
+
+# T-AGT-04: every new Coach mode has its own safety, consent, injection,
+# schema, logging and 72 h cases, and a live tone case.
+COACH_MODES = ("reply", "nudge", "reflection", "weekly_review")
+PER_MODE = {
+    "emergency": 3,
+    "crisis": 3,
+    "medication_input": 3,
+    "medication_output": 3,
+    "cure_claim": 2,
+    "disordered_eating": 1,
+    "pregnancy_complex": 1,
+    "ai_consent": 3,
+    "recent_safety_event": 3,
+    "prompt_injection": 3,
+    "schema_validity": 6,
+    "no_phi_in_logs": 2,
+    "portal_policy": 1,
+    "grounding": 2,
+}
+
+
+@pytest.mark.parametrize("mode", COACH_MODES)
+def test_every_coach_mode_is_covered(mode):
+    mine = [c for c in GOLDEN.cases if c.input.get("mode") == mode]
+    offline = [c for c in mine if c.tier == "offline"]
+    cats = Counter(c.category for c in offline)
+    for cat, n in PER_MODE.items():
+        assert cats[cat] >= n, (mode, cat, cats[cat])
+    for cat in ("emergency", "crisis"):
+        regions = {c.region for c in offline if c.category == cat}
+        assert regions >= {"US", "IN", "unknown"}, (mode, cat, regions)
+    assert any(c.tier == "live" and c.category == "tone" for c in mine), mode
+
+
+@pytest.mark.parametrize("text", SPEC_15_3)
+def test_spec_15_3_rows_in_conversation_turns(text):
+    replies = [c for c in GOLDEN.cases if c.input.get("mode") == "reply"]
+    hits = [c for c in replies if c.severity == "critical" and text in json.dumps(c.input)]
+    assert hits, text
+
+
+def test_live_grounding_cases_exist_for_replies():
+    live = [c for c in GOLDEN.cases if c.tier == "live" and c.input.get("mode") == "reply"]
+    assert sum(c.feeds("health_claims_sourced") for c in live) >= 2

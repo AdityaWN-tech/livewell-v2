@@ -28,6 +28,8 @@ def default_env(model_factory: ModelFactory | None = None) -> Env:
         moments_path=REPO_ROOT / "content" / "coach" / "moments" / "morning.json",
         prompts_dir=SERVICE_DIR / "prompts",
         schema_path=REPO_ROOT / "packages" / "schemas" / "coach_message.schema.json",
+        fallbacks_path=REPO_ROOT / "content" / "coach" / "agent" / "fallbacks.json",
+        corpus_path=SERVICE_DIR / "fixtures" / "content" / "synthetic_corpus.json",
         model_factory=model_factory,
     )
 

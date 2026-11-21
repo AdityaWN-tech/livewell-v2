@@ -41,6 +41,9 @@ CATEGORIES: tuple[str, ...] = (
     "no_false_alarm",
     "tone",
     "grounding",
+    # T-AGT-04: reading numbers or trends as a condition (spec 9.3 "never
+    # diagnose"; Insights "never interpret metrics diagnostically").
+    "diagnosis",
 )
 
 #: Spec 15.2 gates a case can feed (runner.py computes them).

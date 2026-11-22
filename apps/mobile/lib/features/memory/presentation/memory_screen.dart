@@ -217,6 +217,14 @@ class _FactTile extends ConsumerWidget {
     final p = LwPalette.of(context);
     final repo = ref.read(memoryRepositoryProvider);
     final proposed = fact.status == MemoryStatus.proposed;
+    // One callback for the button and its screen-reader node: the Semantics
+    // wrapper replaces the button's own semantics (to name the fact), so it
+    // must carry the enabled state and the tap action itself.
+    final VoidCallback? onKeep = proposed && block == KeepBlock.none
+        ? () => _guard(context, l, () => repo.keep(fact.id))
+        : null;
+    void onDelete() =>
+        _guard(context, l, () => repo.delete(fact.id), done: l.memoryDeleted);
     return Padding(
       key: Key('memory-fact-${fact.id}'),
       padding: const EdgeInsets.symmetric(vertical: LwSpacing.xs),
@@ -249,11 +257,11 @@ class _FactTile extends ConsumerWidget {
                   container: true,
                   excludeSemantics: true,
                   button: true,
+                  enabled: onKeep != null,
+                  onTap: onKeep,
                   child: FilledButton.tonal(
                     key: Key('memory-keep-${fact.id}'),
-                    onPressed: block == KeepBlock.none
-                        ? () => _guard(context, l, () => repo.keep(fact.id))
-                        : null,
+                    onPressed: onKeep,
                     child: Text(l.memoryKeep),
                   ),
                 ),
@@ -262,14 +270,11 @@ class _FactTile extends ConsumerWidget {
                 container: true,
                 excludeSemantics: true,
                 button: true,
+                enabled: true,
+                onTap: onDelete,
                 child: TextButton(
                   key: Key('memory-delete-${fact.id}'),
-                  onPressed: () => _guard(
-                    context,
-                    l,
-                    () => repo.delete(fact.id),
-                    done: l.memoryDeleted,
-                  ),
+                  onPressed: onDelete,
                   child: Text(l.memoryDelete),
                 ),
               ),

@@ -248,6 +248,52 @@ void main() {
       expect(find.byKey(const Key('memory-delete-all')), findsNothing);
     });
 
+    testWidgets('screen readers hear a disabled Keep as disabled and can '
+        'activate Keep and Delete', (tester) async {
+      final handle = tester.ensureSemantics();
+      final (repo, _) = await pumpMemory(tester);
+      // b is a health detail without the opt-in: Keep is disabled.
+      expect(
+        tester.getSemantics(
+          find.bySemanticsLabel('Keep: takes a morning tablet'),
+        ),
+        matchesSemantics(
+          label: 'Keep: takes a morning tablet',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: false,
+        ),
+      );
+      final keepA = tester.getSemantics(
+        find.bySemanticsLabel('Keep: prefers walking after dinner'),
+      );
+      expect(
+        keepA,
+        matchesSemantics(
+          label: 'Keep: prefers walking after dinner',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+      // Activate through the semantics tree, as TalkBack does.
+      tester.semantics.tap(
+        find.semantics.byLabel('Keep: prefers walking after dinner'),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        (await current(repo)).firstWhere((f) => f.id == 'a').status,
+        MemoryStatus.saved,
+      );
+      tester.semantics.tap(
+        find.semantics.byLabel('Delete: knee gets sore on stairs'),
+      );
+      await tester.pumpAndSettle();
+      expect((await current(repo)).map((f) => f.id), isNot(contains('c')));
+      handle.dispose();
+    });
+
     testWidgets('Keep and Delete buttons name the fact for screen readers', (
       tester,
     ) async {

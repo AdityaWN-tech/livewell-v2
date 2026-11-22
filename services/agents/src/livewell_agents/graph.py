@@ -136,14 +136,28 @@ def _briefing_ctx(ctx: UserContext, withheld: tuple[str, ...], _: Mapping[str, o
     return model_context(ctx, withheld), {}
 
 
+def with_memory(
+    out: dict[str, object], ctx: UserContext, withheld: tuple[str, ...]
+) -> dict[str, object]:
+    """Saved memory facts (T-AGT-05) for the conversation modes only. A
+    briefing or weekly review may be played aloud and a nudge may be on a
+    lock screen, so they never carry memory (D-100)."""
+    facts = [f for i, f in enumerate(ctx.memory) if f"memory.{i}" not in withheld]
+    if facts:
+        out["memory"] = facts
+    return out
+
+
 def _reply_ctx(ctx: UserContext, withheld: tuple[str, ...], inp: Mapping[str, object]) -> Blocks:
-    return model_context(ctx, withheld), {"message": inp[MESSAGE_FIELD]}
+    return with_memory(model_context(ctx, withheld), ctx, withheld), {"message": inp[MESSAGE_FIELD]}
 
 
 def _reflection_ctx(
     ctx: UserContext, withheld: tuple[str, ...], inp: Mapping[str, object]
 ) -> Blocks:
-    return model_context(ctx, withheld), {"reflection": inp[REFLECTION_FIELD]}
+    return with_memory(model_context(ctx, withheld), ctx, withheld), {
+        "reflection": inp[REFLECTION_FIELD]
+    }
 
 
 def _nudge_ctx(ctx: UserContext, withheld: tuple[str, ...], inp: Mapping[str, object]) -> Blocks:

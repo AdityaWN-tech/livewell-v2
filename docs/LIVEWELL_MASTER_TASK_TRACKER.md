@@ -12,10 +12,10 @@ Status as of 2026-11-21, checked against `main`, the open PRs and CI. Update thi
 | Status | Existing tasks | New tasks | Total |
 |---|---|---|---|
 | COMPLETED | 16 | 0 | 16 |
-| NEEDS REVIEW | 22 | 1 | 23 |
+| NEEDS REVIEW | 23 | 1 | 24 |
 | IN PROGRESS | 3 | 0 | 3 |
 | BLOCKED | 21 | 1 | 22 |
-| READY | 2 | 0 | 2 |
+| READY | 1 | 0 | 1 |
 | NOT STARTED | 7 | 18 | 25 |
 | **Total** | **71** | **20** | **91** |
 
@@ -70,7 +70,7 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-ONB-01 | Onboarding, 18+ check, sign-in | COMPLETED | Apple sign-in not yet tried on a device; fingerprint or face lock added | CONFLICTING: open sign-up vs invitation + allowlist (T-INV-03, D-97) | FND-04 | P0 | L | FR-ONB-01..06 acceptance criteria pass | - | 0 |
-| T-ONB-01b | Phone sign-in any country (searchable country picker, per-country validation, E.164; reverses D-66, D-99) | NEEDS REVIEW | PR #112. Owner request 2026-11-21; `inferRegion` unchanged (D-03), new tests for +44/+61/+971/+977 | Unaffected | ONB-01 | P1 | S | Any country selectable on phone sign-in and Profile > Add a phone number; region never guessed | Owner: Firebase SMS region policy, SMS cost (Blaze) | 0 |
+| T-ONB-01b | Phone sign-in any country (searchable country picker, per-country validation, E.164; reverses D-66, D-99) | COMPLETED | Merged (PR #112). Owner request 2026-11-21; `inferRegion` unchanged (D-03), new tests for +44/+61/+971/+977 | Unaffected | ONB-01 | P1 | S | Any country selectable on phone sign-in and Profile > Add a phone number; region never guessed | Owner: Firebase SMS region policy, SMS cost (Blaze) | 0 |
 | T-ONB-02 | Personal Why | COMPLETED | - | Unaffected | ONB-01 | P1 | S | Saved and displayed on Home | - | 0 |
 
 ### Assessment & safety
@@ -112,7 +112,7 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | T-AGT-02 | Safety checks before and after AI | COMPLETED | Rules plus an AI classifier that can only make a check stricter, 805 safety cases at 100%, merged (PR #107); still needs clinical sign-off on the classifier prompts | Unaffected; never configurable by Admin | AGT-01 | P0 | L | 15.3 critical cases at 100% | Clinical sign-off (D-93/D-96) | 0 |
 | T-AGT-03 | Content pipeline | BLOCKED | Approved-only pipeline, chunking and search with precision@5 of 0.86 on synthetic lessons, merged (PR #106); production search service and real lessons still to come | Decide: content global or per org (D-97) | AGT-01 | P1 | L | Unapproved item not retrievable (test); retrieval precision@5 of 0.8 or more on the eval set | Prod embedding/vector store choice (D-94) | 1 |
 | T-AGT-04 | Coach Agent | COMPLETED | Merged (PR #111). Five modes on one pipeline, 2397 tests, 676 golden cases (gate PASS); offline 15.2 gates met, live tone/grounding unmeasured (no API credit) | Unaffected | AGT-02, AGT-03 | P0 | XL | Eval gates in 15.2 pass | - | 1 |
-| T-AGT-05 | Memory Agent | READY | - | Unaffected (memory is per user, never visible to Admin) | AGT-04 | P1 | L | FR-CNV-05 met; sensitive categories need opt-in | - | 1 |
+| T-AGT-05 | Memory Agent | NEEDS REVIEW | PR (T-AGT-05). Server side: propose/approve/delete API, consents `memory` + `memory_sensitive`, sensitive facts need opt-in, deleted facts wiped and never re-proposed, Coach uses saved facts in reply/reflection (D-100). App list + toggles = T-AGT-05b | Unaffected (memory is per user, never visible to Admin) | AGT-04 | P1 | L | FR-CNV-05 met; sensitive categories need opt-in | Mobile list (T-AGT-05b); clinical/privacy review | 1 |
 | T-AGT-06 | Insights Agent | READY | - | Unaffected | AGT-04 | P1 | M | Matches the deterministic statistics on fixtures | - | 1 |
 | T-AGT-07 | Portal Agent | NOT STARTED | - | Decide: offers global or per org (D-97) | AGT-04, PRT-02 | P2 | L | All 13.3 rules have unit tests; zero hallucinated offers in eval | - | 1 |
 | T-AGT-08 | AI evaluation tests | COMPLETED | 388-case golden set and a CI gate merged (PR #108); it found 36 real safety gaps; 35 are fixed (all 28 critical, PR #109), one harmless over-block is left for a clinician | Extend with authz cases later (T-SEC-01) | AGT-02 | P0 | L | CI blocks merge on a critical failure Done when | - | 0 |
@@ -210,3 +210,5 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | 2026-11-21 | T-AGT-04 built, PR #111 (NEEDS REVIEW). |
 | 2026-11-21 | T-AGT-04 merged (owner approved PR #111); AGT-05/06 READY. Roadmap PR #110 approved. |
 | 2026-11-21 | T-ONB-01b added (owner request: phone sign-in any country, D-99); PR #112 (NEEDS REVIEW). |
+| 2026-11-21 | T-ONB-01b merged (owner approved PR #112). |
+| 2026-11-23 | T-AGT-05 Memory Agent built, server side (D-100); NEEDS REVIEW. Mobile list split out as T-AGT-05b. |

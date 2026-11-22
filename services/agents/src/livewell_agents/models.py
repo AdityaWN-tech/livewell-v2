@@ -70,6 +70,9 @@ class UserContext(_Strict):
     streak_days: int = Field(default=0, ge=0, le=10_000)
     ed_safe_mode: bool = False
     last_safety_event_at: datetime | None = None
+    #: Saved memory facts (T-AGT-05): only facts the person saved, only with
+    #: the memory consent; filled per request, used by reply and reflection.
+    memory: tuple[str, ...] = Field(default=(), max_length=20)
 
     def free_text(self) -> dict[str, str]:
         """Every field a person typed, by name. All of it is screened by
@@ -83,6 +86,8 @@ class UserContext(_Strict):
             out["plan_step.title"] = self.plan_step.title
         if self.last_checkin and self.last_checkin.note:
             out["last_checkin.note"] = self.last_checkin.note
+        for i, fact in enumerate(self.memory):
+            out[f"memory.{i}"] = fact
         return out
 
 

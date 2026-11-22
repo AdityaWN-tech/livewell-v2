@@ -1,5 +1,5 @@
 {
-  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. One prompt per Coach mode (coach_briefing, coach_reply, coach_nudge, coach_reflection, coach_weekly_review; T-AGT-04, D-98). A Remote Config pointer for the active version is a follow-up (D-98): until then `active` here is the pointer.",
+  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. One prompt per Coach mode (coach_briefing, coach_reply, coach_nudge, coach_reflection, coach_weekly_review; T-AGT-04, D-98). Memory Agent: memory_extract (T-AGT-05, D-100); coach_reply and coach_reflection 0.2 add the saved-memory line. A Remote Config pointer for the active version is a follow-up (D-98): until then `active` here is the pointer.",
   "prompts": {
     "coach_briefing": {
       "active": "0.1",
@@ -32,12 +32,17 @@
       }
     },
     "coach_reply": {
-      "active": "0.1",
+      "active": "0.2",
       "versions": {
         "0.1": {
           "file": "coach_reply/v0.1.md",
           "review_status": "pending",
           "sha256": "3e0d1e3a11b3a9a1871ef2e2151d43fd9efbfa9a1790136184d2d160ae6890dc"
+        },
+        "0.2": {
+          "file": "coach_reply/v0.2.md",
+          "review_status": "pending",
+          "sha256": "e38d734ea0d2584130e128d0f52c3812b0ce5b8adf5e821a1dd975f0a832e9db"
         }
       }
     },
@@ -52,12 +57,17 @@
       }
     },
     "coach_reflection": {
-      "active": "0.1",
+      "active": "0.2",
       "versions": {
         "0.1": {
           "file": "coach_reflection/v0.1.md",
           "review_status": "pending",
           "sha256": "2651f1b728ece318272a89721a22fc5165e36371872abcba520a3d0f45e0b79c"
+        },
+        "0.2": {
+          "file": "coach_reflection/v0.2.md",
+          "review_status": "pending",
+          "sha256": "ce9b4309ea3fdc755b20bffa2d99864f1d3d83e32041dfb96fa29dfec7cb6e3a"
         }
       }
     },
@@ -68,6 +78,16 @@
           "file": "coach_weekly_review/v0.1.md",
           "review_status": "pending",
           "sha256": "f2b46c605c2f89b953dba2e8ed1cdecd7663814bfd5d075324d8a49b9c1581b0"
+        }
+      }
+    },
+    "memory_extract": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "memory_extract/v0.1.md",
+          "review_status": "pending",
+          "sha256": "4baea745127b1da9bb05eca32fc4e4771b4c113a71b9fb6b12a90430de69ab85"
         }
       }
     }

@@ -57,6 +57,13 @@ _INJECTION = re.compile(
     re.IGNORECASE,
 )
 
+
+def instruction_like(text: str) -> bool:
+    """The same instruction-like test Safety.pre uses to withhold a field
+    (also used by the Memory Agent, T-AGT-05: such text is never remembered)."""
+    return _INJECTION.search(text) is not None
+
+
 Decision = Literal["ok", "safety_template", "fallback"]
 
 

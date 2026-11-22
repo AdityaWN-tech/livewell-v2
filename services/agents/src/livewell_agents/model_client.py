@@ -144,6 +144,39 @@ def default_fake_weekly_review(request: ModelRequest) -> str:
     return json.dumps({"text": " ".join(parts), "emotion": "celebrating"})
 
 
+_FAKE_MEMORY = (
+    (
+        re.compile(r"\bi (?:really )?(?:prefer|like|love|enjoy) ([a-z ]{3,40}?)(?:[.!,]|$)"),
+        "likes {}",
+        "preference",
+    ),
+    (re.compile(r"\bi (?:work|do) (night shifts?|early shifts?)\b"), "works {}", "routine"),
+    (
+        re.compile(r"\bmy (knee|back|hip|shoulder|ankle) (?:gets sore|hurts|is sore)\b"),
+        "{} gets sore",
+        "physical",
+    ),
+)
+
+
+def default_fake_memory(request: ModelRequest) -> str:
+    """Deterministic memory candidates from simple first-person phrases."""
+    src = _block("source", request.user)
+    text = str(src.get("text", "")).lower() if isinstance(src, dict) else ""
+    facts = []
+    for pattern, template, category in _FAKE_MEMORY:
+        m = pattern.search(text)
+        if m:
+            facts.append(
+                {
+                    "fact": template.format(m.group(1).strip()),
+                    "category": category,
+                    "confidence": 0.9,
+                }
+            )
+    return json.dumps({"facts": facts})
+
+
 #: Coach mode prompt ids (graph.MODES) -> the fake's unscripted answer.
 _FAKE_COACH: dict[str, Callable[[ModelRequest], str]] = {
     "coach_briefing": default_fake_briefing,
@@ -151,6 +184,7 @@ _FAKE_COACH: dict[str, Callable[[ModelRequest], str]] = {
     "coach_nudge": default_fake_nudge,
     "coach_reflection": default_fake_reflection,
     "coach_weekly_review": default_fake_weekly_review,
+    "memory_extract": default_fake_memory,
 }
 
 

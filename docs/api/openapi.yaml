@@ -212,6 +212,96 @@ paths:
         "403": {description: "consent_required (no model call was made)"}
         "404": {description: no_context}
         "422": {description: invalid body}
+  /v1/memory:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    get:
+      summary: The caller's memory list, "What my coach remembers" (Agent Service, T-AGT-05; FR-CNV-05)
+      description: >
+        Proposed and saved facts, newest first; deleted facts are never
+        returned. Works whatever the consents, so a person can always see and
+        delete (D-100). memory_on / sensitive_on are the `memory` and
+        `memory_sensitive` consents.
+      responses:
+        "200":
+          description: The list
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MemoryListResponse"}
+        "401": {description: not_authorized}
+        "503": {description: memory_unavailable (store not configured)}
+    delete:
+      summary: Delete every memory fact of the caller (final)
+      responses:
+        "200":
+          description: How many facts were deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [deleted]
+                properties: {deleted: {type: integer, minimum: 0}}
+        "401": {description: not_authorized}
+        "503": {description: memory_unavailable}
+  /v1/memory/propose:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: Memory Agent proposals after a conversation turn or a reflection (job endpoint; spec 9.3, 9.7)
+      description: >
+        Needs the `memory` and `ai_disclosure` consents, else status skipped
+        and no model call. A red flag, a safety event in the last 72 h,
+        instruction-like text, or a classifier hit or failure also skip. The
+        model suggests at most 3 facts; code drops unsafe ones and sensitive
+        ones (medication, diagnosis, mental_health) without the
+        `memory_sensitive` consent, and anything already known or deleted
+        before. Kept facts are stored as `proposed`; only the person saves
+        them. Caller auth is the user's token in this slice (D-100).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/MemoryProposeRequest"}
+      responses:
+        "200":
+          description: proposed (facts), nothing or skipped, with a reason code
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MemoryProposeResponse"}
+        "401": {description: not_authorized}
+        "404": {description: no_context}
+        "422": {description: invalid body}
+        "503": {description: memory_unavailable}
+  /v1/memory/{fact_id}/approve:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: Save a proposed fact (the person decides; spec 9.1 rule 3)
+      parameters:
+        - {name: fact_id, in: path, required: true, schema: {type: string}}
+      responses:
+        "200":
+          description: The saved fact (idempotent)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MemoryFact"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (memory off, or a sensitive fact without memory_sensitive)"}
+        "404": {description: not_found}
+        "409": {description: fact_deleted (a deleted fact can never be saved)}
+        "503": {description: memory_unavailable}
+  /v1/memory/{fact_id}:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    delete:
+      summary: Delete one fact (final; the text is wiped; never proposed or used again)
+      parameters:
+        - {name: fact_id, in: path, required: true, schema: {type: string}}
+      responses:
+        "204": {description: Deleted (idempotent)}
+        "401": {description: not_authorized}
+        "404": {description: not_found}
+        "503": {description: memory_unavailable}
 components:
   securitySchemes:
     firebaseIdToken: {type: http, scheme: bearer}
@@ -330,3 +420,37 @@ components:
       properties:
         stats: {$ref: "#/components/schemas/WeeklyStats"}
         local_date: {type: string, format: date}
+    MemoryFact:
+      type: object
+      required: [fact_id, fact, category, sensitive, status, source, created_at]
+      properties:
+        fact_id: {type: string}
+        fact: {type: string, maxLength: 120}
+        category: {type: string, enum: [preference, routine, barrier, win, goal, physical, medication, diagnosis, mental_health]}
+        sensitive: {type: boolean, description: "medication, diagnosis or mental_health"}
+        status: {type: string, enum: [proposed, saved]}
+        source: {type: string, enum: [conversation, reflection]}
+        created_at: {type: string, format: date-time}
+    MemoryListResponse:
+      type: object
+      required: [facts, memory_on, sensitive_on]
+      properties:
+        facts: {type: array, items: {$ref: "#/components/schemas/MemoryFact"}}
+        memory_on: {type: boolean}
+        sensitive_on: {type: boolean}
+    MemoryProposeRequest:
+      type: object
+      additionalProperties: false
+      required: [text, source, source_message_id]
+      properties:
+        text: {type: string, minLength: 1, maxLength: 1000}
+        source: {type: string, enum: [conversation, reflection]}
+        source_message_id: {type: string, pattern: "^[A-Za-z0-9_-]+$", maxLength: 128}
+        local_date: {type: string, format: date}
+    MemoryProposeResponse:
+      type: object
+      required: [status, reason, facts]
+      properties:
+        status: {type: string, enum: [proposed, nothing, skipped]}
+        reason: {type: string, description: "code only (memory_off, no_ai_consent, red_flag, recent_safety_event, instruction_like, red_flag_classifier, classifier_unavailable, prompt_not_approved, too_many_pending, model_failed, no_fact_kept, ok)"}
+        facts: {type: array, items: {$ref: "#/components/schemas/MemoryFact"}}

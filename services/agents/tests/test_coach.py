@@ -98,7 +98,8 @@ def test_happy_path_every_mode(make_agent, schema_path, mode):
     assert resp.route == "coach" and resp.voice == "gateway"
     msg = resp.message
     assert msg.type == TYPES[mode]
-    assert msg.prompt_version == f"coach_{mode}@0.1"
+    version = "0.2" if mode in ("reply", "reflection") else "0.1"  # 0.2: memory line (D-100)
+    assert msg.prompt_version == f"coach_{mode}@{version}"
     assert msg.safety.status == "approved" and msg.contains_user_text
     assert msg.portal_card is None
     assert model.calls == 1 and model.requests[0].purpose == f"coach_{mode}"

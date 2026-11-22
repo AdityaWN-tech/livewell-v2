@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from livewell_agents.auth import NotAuthorized
+from livewell_agents.memory.models import MemoryFact, MemoryStatus
+from livewell_agents.memory.store import FactNotFound
 
 
 def firebase_app(project_id: str) -> Any:
@@ -67,3 +69,44 @@ class FirestoreConsents:
         docs = self.db.collection("users").document(uid).collection("consents").stream()
         current = _latest_granted([d.to_dict() or {} for d in docs])
         return all(current.get(c, False) for c in consents)
+
+
+#: users/{uid}/memory_facts schema version (docs/data-model.md).
+MEMORY_SCHEMA_VERSION = 1
+
+
+@dataclass
+class FirestoreMemoryStore:
+    """users/{uid}/memory_facts/{fact_id} (T-AGT-05). The server writes with
+    the Admin SDK; the rules let the owner only read, save or delete."""
+
+    db: Any
+
+    def _col(self, uid: str) -> Any:
+        return self.db.collection("users").document(uid).collection("memory_facts")
+
+    def list(self, uid: str) -> list[MemoryFact]:
+        out: list[MemoryFact] = []
+        for d in self._col(uid).stream():
+            raw = d.to_dict() or {}
+            raw.pop("schema_version", None)
+            out.append(MemoryFact.model_validate({**raw, "fact_id": d.id}))
+        return out
+
+    def add(self, uid: str, fact: MemoryFact) -> None:
+        data = fact.model_dump(exclude={"fact_id"})
+        data["schema_version"] = MEMORY_SCHEMA_VERSION
+        self._col(uid).document(fact.fact_id).create(data)
+
+    def set_status(self, uid: str, fact_id: str, status: MemoryStatus, now: Any) -> MemoryFact:
+        ref = self._col(uid).document(fact_id)
+        snap = ref.get()
+        if not snap.exists:
+            raise FactNotFound(fact_id)
+        update: dict[str, Any] = {"status": status, "updated_at": now}
+        if status == "deleted":
+            update["fact"] = ""
+        ref.update(update)
+        raw = {**(snap.to_dict() or {}), **update}
+        raw.pop("schema_version", None)
+        return MemoryFact.model_validate({**raw, "fact_id": fact_id})

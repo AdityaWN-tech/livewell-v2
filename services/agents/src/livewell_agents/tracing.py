@@ -48,6 +48,10 @@ ALLOWED_KEYS = frozenset(
         "lw.cached",
         "lw.passages",
         "lw.source_ids",
+        # Memory Agent (T-AGT-05): source kind and counts/codes only.
+        "lw.source",
+        "lw.proposed",
+        "lw.dropped",
     }
 )
 

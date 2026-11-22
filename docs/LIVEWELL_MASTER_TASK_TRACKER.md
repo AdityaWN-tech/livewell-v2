@@ -214,3 +214,4 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | 2026-11-23 | T-AGT-05 Memory Agent built, server side (D-100); NEEDS REVIEW. Mobile list split out as T-AGT-05b. |
 | 2026-11-23 | T-AGT-05 server side merged (owner approved PR #113). T-AGT-05b app screen built (D-101); NEEDS REVIEW. |
 | 2026-11-23 | T-AGT-05b merged (PR #114) after a phone test; dev Firestore rules redeployed; screen-reader fix for Keep/Delete (D-102). |
+| 2026-11-23 | Fix: cold start always showed "We couldn't start Live Well" (Firebase used before init); signed-in start reads the cached profile, Home in 1.3–1.9 s on the owner's phone (D-103). |

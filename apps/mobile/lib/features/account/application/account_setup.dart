@@ -81,7 +81,10 @@ class SignInCompletion {
 
   final Ref _ref;
 
-  Future<String> complete(AuthUser user) async {
+  /// [restored]: the sign-in was restored from this phone on app start (not
+  /// a fresh sign-in). A profile cached on the phone then counts, so startup
+  /// doesn't wait for the server (NFR-01: Home in under 2 s).
+  Future<String> complete(AuthUser user, {bool restored = false}) async {
     final progress = await _ref.read(onboardingProvider.future);
     // (After an await: this can run while the startup provider is still
     // being created, when changing another provider isn't allowed; the app
@@ -93,14 +96,17 @@ class SignInCompletion {
       ..invalidate(voiceRepositoryProvider);
     // Everything that depends on who is signed in follows the new account.
     _ref.read(signedInUidProvider.notifier).refresh();
-    final status = await _ref
-        .read(accountSetupProvider)
-        .afterSignIn(user, progress);
+    final profiles = _ref.read(profileRepositoryProvider);
+    // A restored sign-in with a profile on this phone is ready: one local
+    // read instead of two server round trips.
+    final cached = restored ? await profiles.getCached(user.uid) : null;
+    final status = cached != null
+        ? AccountStatus.ready
+        : await _ref.read(accountSetupProvider).afterSignIn(user, progress);
     switch (status) {
       case AccountStatus.ready:
         await _ref.read(onboardingProvider.notifier).finish();
-        final profiles = _ref.read(profileRepositoryProvider);
-        final profile = await profiles.get(user.uid);
+        final profile = cached ?? await profiles.get(user.uid);
         // No name yet but Google or Apple gave one (for example an account
         // made by phone, then Google linked): use it, so Home can say
         // "Hi, {first name}" without asking (T-UI-02c).

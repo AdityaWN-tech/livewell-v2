@@ -193,10 +193,12 @@ paths:
       summary: This week's review (Agent Service, T-AGT-04; FR-DLY-06; job endpoint, not in spec 12.1)
       description: >
         Coach Agent mode `weekly_review` (D-98). The week's numbers are
-        precomputed by the caller (the Insights Agent, T-AGT-06, is not built
-        yet) and sent as `stats`: counts and trend codes only. Same safety
-        order as every mode; reading numbers as a condition is refused. No
-        portal card (always null until T-AGT-07). Caller auth as for nudges.
+        counts and trend codes only. Send `stats`, or only `local_date`: then
+        the Insights Agent (T-AGT-06, D-104) computes them for the 7 days
+        before `local_date`, after the context and AI-consent checks (nothing
+        is read without them). Same safety order as every mode; reading
+        numbers as a condition is refused. No portal card (always null until
+        T-AGT-07). Caller auth as for nudges.
       requestBody:
         required: true
         content:
@@ -211,7 +213,42 @@ paths:
         "401": {description: not_authorized}
         "403": {description: "consent_required (no model call was made)"}
         "404": {description: no_context}
+        "422": {description: "invalid body (neither stats nor local_date)"}
+        "503": {description: "insights_unavailable (no stats sent and no activity store configured)"}
+  /v1/insights/weekly:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: The week's statistics (Agent Service, Insights Agent, T-AGT-06; spec 9.3, 9.7; job endpoint, not in spec 12.1)
+      description: >
+        Deterministic, no model call (D-104). The week is the 7 days before
+        `local_date` (required: the time zone is never guessed). Reads only
+        check-in scores (mood, energy, stress), habit-log dates and status,
+        the primary goal's days_per_week and status, and the current streak
+        length; never barrier text, notes or reflections. Metrics are not
+        read yet (D-104). Definitions in
+        services/agents/src/livewell_agents/insights/stats.py. For the
+        nightly plan builder and the weekly review (spec 9.7). Caller auth
+        as for nudges.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_date]
+              properties:
+                local_date: {type: string, format: date}
+      responses:
+        "200":
+          description: The statistics
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/WeeklyStats"}
+        "401": {description: not_authorized}
         "422": {description: invalid body}
+        "503": {description: insights_unavailable (activity store not configured)}
   /v1/memory:
     servers:
       - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
@@ -416,7 +453,10 @@ components:
     WeeklyReviewRequest:
       type: object
       additionalProperties: false
-      required: [stats]
+      description: stats, or local_date for the Insights Agent (at least one)
+      anyOf:
+        - required: [stats]
+        - required: [local_date]
       properties:
         stats: {$ref: "#/components/schemas/WeeklyStats"}
         local_date: {type: string, format: date}

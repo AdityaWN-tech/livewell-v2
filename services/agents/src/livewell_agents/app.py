@@ -6,6 +6,7 @@
     POST /v1/reflections           -> CoachResponse, mode reflection (spec 12.1, FR-DLY-05)
     POST /v1/nudges/copy           -> CoachResponse, mode nudge (FR-DLY-04; job endpoint)
     POST /v1/reviews/weekly        -> CoachResponse, mode weekly_review (FR-DLY-06; job endpoint)
+    POST /v1/insights/weekly       -> WeeklyStats, the Insights Agent (T-AGT-06; job endpoint)
     GET    /v1/memory              -> the person's memory list (FR-CNV-05; T-AGT-05)
     POST   /v1/memory/propose      -> Memory Agent proposals (job endpoint, after a turn/reflection)
     POST   /v1/memory/{id}/approve -> save a proposed fact
@@ -40,6 +41,14 @@ from livewell_agents.briefing import BriefingService
 from livewell_agents.coach import ConsentRequired, ModeInputs, PassageSource
 from livewell_agents.config import Settings, load_settings
 from livewell_agents.context import ContextSource, FixtureContextSource, NoContextSource
+from livewell_agents.insights import (
+    ActivitySource,
+    InMemoryActivitySource,
+    InsightsAgent,
+    InsightsRequest,
+    InsightsUnavailable,
+    NotConfiguredActivitySource,
+)
 from livewell_agents.memory import (
     MEMORY_CONSENT,
     MEMORY_SENSITIVE_CONSENT,
@@ -67,6 +76,7 @@ from livewell_agents.models import (
     NudgeRequest,
     ReflectionRequest,
     WeeklyReviewRequest,
+    WeeklyStats,
 )
 from livewell_agents.prompts import PromptRegistry
 from livewell_agents.safety.classifier import SafetyClassifier
@@ -93,6 +103,8 @@ class Deps:
     events: SafetyEventSink
     #: Memory facts (T-AGT-05). Refuses every call until Firestore is wired.
     memory_store: MemoryStore = field(default_factory=NotConfiguredMemoryStore)
+    #: Check-ins, habit logs, goal, streak (T-AGT-06). Refuses until Firestore is wired.
+    activity: ActivitySource = field(default_factory=NotConfiguredActivitySource)
 
 
 def default_deps(settings: Settings) -> Deps:
@@ -116,10 +128,12 @@ def default_deps(settings: Settings) -> Deps:
     auth: Authenticator = NotConfiguredAuthenticator()
     consents: ConsentChecker = NotConfiguredConsents()
     memory_store: MemoryStore = NotConfiguredMemoryStore()
+    activity: ActivitySource = NotConfiguredActivitySource()
     project = os.environ.get("LW_FIREBASE_PROJECT")
     if project:
         from livewell_agents.firebase_store import (
             FirebaseAuthenticator,
+            FirestoreActivitySource,
             FirestoreConsents,
             FirestoreMemoryStore,
             firebase_app,
@@ -134,6 +148,7 @@ def default_deps(settings: Settings) -> Deps:
         db = firestore.client(app=fb)
         consents = FirestoreConsents(db)
         memory_store = FirestoreMemoryStore(db)
+        activity = FirestoreActivitySource(db)
     elif settings.env == "dev" and os.environ.get("LW_DEV_FAKE_AUTH") == "1":
         # Local dev only: fake tokens, and the synthetic users have AI consent.
         auth = FakeAuthenticator()
@@ -141,6 +156,7 @@ def default_deps(settings: Settings) -> Deps:
             {u: {"ai_disclosure", MEMORY_CONSENT} for u in ("demo-us", "demo-in", "demo-x")}
         )
         memory_store = InMemoryMemoryStore()
+        activity = InMemoryActivitySource()
     contexts: ContextSource = (
         FixtureContextSource(settings.fixtures_path) if settings.env == "dev" else NoContextSource()
     )
@@ -153,6 +169,7 @@ def default_deps(settings: Settings) -> Deps:
         classifier_model,
         LoggingSafetyEventSink(),
         memory_store,
+        activity,
     )
 
 
@@ -205,6 +222,7 @@ def create_app(deps: Deps | None = None) -> FastAPI:
         classifier=SafetyClassifier(deps.classifier_model, prompts, s.allow_pending_prompts),
         allow_pending_prompts=s.allow_pending_prompts,
     )
+    insights = InsightsAgent(deps.activity)
     app = FastAPI(title="Live Well Agent Service", version="0.2.0")
 
     def caller(
@@ -276,7 +294,29 @@ def create_app(deps: Deps | None = None) -> FastAPI:
     def weekly_review(
         body: WeeklyReviewRequest, uid: Annotated[str, Depends(caller)]
     ) -> CoachResponse:
-        return coach("weekly_review", uid, body.local_date, ModeInputs(stats=body.stats))
+        stats = body.stats
+        if stats is None:
+            if body.local_date is None:  # the request model already refuses this
+                raise HTTPException(422, "stats_or_local_date")
+            # Same answers as coach() gives, before any of the week is read.
+            if deps.contexts.load(uid, body.local_date) is None:
+                raise HTTPException(404, "no_context")
+            if not deps.consents.has(uid, AI_CONSENTS):
+                raise HTTPException(403, "consent_required")
+            stats = weekly_insights(uid, body.local_date)
+        return coach("weekly_review", uid, body.local_date, ModeInputs(stats=stats))
+
+    # ---------------------------------------------------------------- insights (T-AGT-06)
+
+    def weekly_insights(uid: str, local_date: date) -> WeeklyStats:
+        try:
+            return insights.weekly(uid, local_date)
+        except InsightsUnavailable:
+            raise HTTPException(503, "insights_unavailable") from None
+
+    @app.post("/v1/insights/weekly")
+    def insights_weekly(body: InsightsRequest, uid: Annotated[str, Depends(caller)]) -> WeeklyStats:
+        return weekly_insights(uid, body.local_date)
 
     # ---------------------------------------------------------------- memory (T-AGT-05)
 

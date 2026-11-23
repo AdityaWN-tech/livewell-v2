@@ -8,9 +8,12 @@ the repo. Not exercised in CI (the `firebase` extra isn't installed there).
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date, timedelta
 from typing import Any
 
 from livewell_agents.auth import NotAuthorized
+from livewell_agents.insights.models import WeekActivity
+from livewell_agents.insights.store import checkin_from, goal_from, habit_log_from, streak_from
 from livewell_agents.memory.models import MemoryFact, MemoryStatus
 from livewell_agents.memory.store import FactNotFound
 
@@ -110,3 +113,38 @@ class FirestoreMemoryStore:
         raw = {**(snap.to_dict() or {}), **update}
         raw.pop("schema_version", None)
         return MemoryFact.model_validate({**raw, "fact_id": fact_id})
+
+
+@dataclass
+class FirestoreActivitySource:
+    """Reads one week for the Insights Agent (T-AGT-06): checkins/{date},
+    habit_logs by date, goals/primary and streaks/current. Read only; only the
+    numeric fields and codes are kept (barrier_text is never read out)."""
+
+    db: Any
+
+    def week(self, uid: str, start: date, end: date) -> WeekActivity:
+        from google.cloud.firestore_v1.base_query import FieldFilter
+
+        user = self.db.collection("users").document(uid)
+        days = [start + timedelta(days=i) for i in range((end - start).days + 1)]
+        refs = [user.collection("checkins").document(d.isoformat()) for d in days]
+        checkins = [
+            c
+            for snap in self.db.get_all(refs)
+            if snap.exists and (c := checkin_from(snap.id, snap.to_dict() or {})) is not None
+        ]
+        query = (
+            user.collection("habit_logs")
+            .where(filter=FieldFilter("date", ">=", start.isoformat()))
+            .where(filter=FieldFilter("date", "<=", end.isoformat()))
+        )
+        logs = [h for d in query.stream() if (h := habit_log_from(d.to_dict() or {})) is not None]
+        goal = user.collection("goals").document("primary").get()
+        streak = user.collection("streaks").document("current").get()
+        return WeekActivity(
+            checkins=tuple(checkins),
+            habit_logs=tuple(logs),
+            goal=goal_from(goal.to_dict() if goal.exists else None),
+            streak_days=streak_from(streak.to_dict() if streak.exists else None),
+        )

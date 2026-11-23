@@ -249,6 +249,39 @@ paths:
         "401": {description: not_authorized}
         "422": {description: invalid body}
         "503": {description: insights_unavailable (activity store not configured)}
+  /v1/portal/recommend:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: One portal card or none for a surface (Agent Service, Portal Agent, T-AGT-07; spec 13.3, 13.4)
+      description: >
+        Step 1 eligibility and step 2 relevance are plain code (D-105).
+        No card: kill switch off (LW_PORTAL_CARDS, default off), a surface
+        other than evening_reflection, weekly_review, lesson_end, milestone
+        or user_question, no `portal_linking` consent, not 18+, safety
+        events unknown (always the case until they are recorded, D-22) or
+        one in the last 72 h, ed_safe_mode, a gentle day, the first 48 h,
+        already bought, 14-day cooldown after Not now (offer or topic),
+        another card in the last 24 h, 3 in the last 7 days, or a score
+        below the threshold (0.6). The first reason is returned as a code.
+        The card is copied from the approved catalog; only `bridge_line` is
+        written by a model (needs `ai_disclosure`; any failed check means no
+        line). The service writes nothing: the app records card_shown,
+        clicked and dismissed. Caller auth as for nudges.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/PortalRecommendRequest"}
+      responses:
+        "200":
+          description: A card, or none with the reason
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PortalRecommendResponse"}
+        "401": {description: not_authorized}
+        "422": {description: invalid body (unknown surface, a topic that is not a tag)}
+        "503": {description: portal_unavailable (source not configured)}
   /v1/memory:
     servers:
       - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
@@ -460,6 +493,39 @@ components:
       properties:
         stats: {$ref: "#/components/schemas/WeeklyStats"}
         local_date: {type: string, format: date}
+    PortalRecommendRequest:
+      type: object
+      additionalProperties: false
+      required: [surface, local_date]
+      properties:
+        surface: {type: string, enum: [evening_reflection, weekly_review, lesson_end, milestone, user_question, morning_briefing, nudge, safety_message]}
+        local_date: {type: string, format: date}
+        asked_topics:
+          type: array
+          maxItems: 8
+          description: Covered topic tags the person asked about just now (never the question's text)
+          items: {type: string, pattern: "^[a-z0-9_]{1,40}$"}
+    PortalCard:
+      type: object
+      required: [offer_id, title, description, offer_type, label, price_label, url, click_id, surface, score]
+      properties:
+        offer_id: {type: string}
+        title: {type: string, description: as entered in the CMS}
+        description: {type: [string, "null"], description: as entered in the CMS}
+        offer_type: {type: string, enum: [course, program, free_lesson, coaching]}
+        label: {type: string, enum: ["From the Live Well Portal"]}
+        price_label: {type: string, description: "Free, the CMS price as entered, or Paid course"}
+        url: {type: string, description: "offer URL + utm_source, utm_medium, utm_campaign, utm_content, lw_cid only"}
+        click_id: {type: string}
+        surface: {type: string}
+        bridge_line: {type: [string, "null"], description: "1-2 sentences, or null (then no lead-in)"}
+        score: {type: number, minimum: 0, maximum: 1}
+    PortalRecommendResponse:
+      type: object
+      required: [reason]
+      properties:
+        card: {oneOf: [{$ref: "#/components/schemas/PortalCard"}, {type: "null"}]}
+        reason: {type: string, description: "ok, or the first reason for no card (a fixed code)"}
     MemoryFact:
       type: object
       required: [fact_id, fact, category, sensitive, status, source, created_at]

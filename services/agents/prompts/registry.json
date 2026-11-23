@@ -1,5 +1,5 @@
 {
-  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. One prompt per Coach mode (coach_briefing, coach_reply, coach_nudge, coach_reflection, coach_weekly_review; T-AGT-04, D-98). Memory Agent: memory_extract (T-AGT-05, D-100); coach_reply and coach_reflection 0.2 add the saved-memory line. A Remote Config pointer for the active version is a follow-up (D-98): until then `active` here is the pointer.",
+  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. One prompt per Coach mode (coach_briefing, coach_reply, coach_nudge, coach_reflection, coach_weekly_review; T-AGT-04, D-98). Memory Agent: memory_extract (T-AGT-05, D-100); Portal Agent: portal_bridge (T-AGT-07, D-105); coach_reply and coach_reflection 0.2 add the saved-memory line. A Remote Config pointer for the active version is a follow-up (D-98): until then `active` here is the pointer.",
   "prompts": {
     "coach_briefing": {
       "active": "0.1",
@@ -88,6 +88,16 @@
           "file": "memory_extract/v0.1.md",
           "review_status": "pending",
           "sha256": "4baea745127b1da9bb05eca32fc4e4771b4c113a71b9fb6b12a90430de69ab85"
+        }
+      }
+    },
+    "portal_bridge": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "portal_bridge/v0.1.md",
+          "review_status": "pending",
+          "sha256": "6d2408cec8cfc433eb0f30c1fb6cf52dd230beace3d6d8aeedaa312f1aa1da5a"
         }
       }
     }

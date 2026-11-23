@@ -7,6 +7,7 @@
     POST /v1/nudges/copy           -> CoachResponse, mode nudge (FR-DLY-04; job endpoint)
     POST /v1/reviews/weekly        -> CoachResponse, mode weekly_review (FR-DLY-06; job endpoint)
     POST /v1/insights/weekly       -> WeeklyStats, the Insights Agent (T-AGT-06; job endpoint)
+    POST /v1/portal/recommend      -> one portal card or none, the Portal Agent (T-AGT-07)
     GET    /v1/memory              -> the person's memory list (FR-CNV-05; T-AGT-05)
     POST   /v1/memory/propose      -> Memory Agent proposals (job endpoint, after a turn/reflection)
     POST   /v1/memory/{id}/approve -> save a proposed fact
@@ -21,6 +22,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import date
+from fractions import Fraction
 from pathlib import Path
 from typing import Annotated
 
@@ -78,6 +80,18 @@ from livewell_agents.models import (
     WeeklyReviewRequest,
     WeeklyStats,
 )
+from livewell_agents.portal import (
+    PORTAL_CONSENT,
+    BridgeWriter,
+    InMemoryPortalSource,
+    NotConfiguredPortalSource,
+    PortalAgent,
+    PortalConsents,
+    PortalRecommendRequest,
+    PortalRecommendResponse,
+    PortalSource,
+    PortalUnavailable,
+)
 from livewell_agents.prompts import PromptRegistry
 from livewell_agents.safety.classifier import SafetyClassifier
 from livewell_agents.safety.events import LoggingSafetyEventSink, SafetyEventSink
@@ -105,6 +119,8 @@ class Deps:
     memory_store: MemoryStore = field(default_factory=NotConfiguredMemoryStore)
     #: Check-ins, habit logs, goal, streak (T-AGT-06). Refuses until Firestore is wired.
     activity: ActivitySource = field(default_factory=NotConfiguredActivitySource)
+    #: Portal catalog and the person's portal state (T-AGT-07).
+    portal: PortalSource = field(default_factory=NotConfiguredPortalSource)
 
 
 def default_deps(settings: Settings) -> Deps:
@@ -129,6 +145,7 @@ def default_deps(settings: Settings) -> Deps:
     consents: ConsentChecker = NotConfiguredConsents()
     memory_store: MemoryStore = NotConfiguredMemoryStore()
     activity: ActivitySource = NotConfiguredActivitySource()
+    portal: PortalSource = NotConfiguredPortalSource()
     project = os.environ.get("LW_FIREBASE_PROJECT")
     if project:
         from livewell_agents.firebase_store import (
@@ -136,6 +153,7 @@ def default_deps(settings: Settings) -> Deps:
             FirestoreActivitySource,
             FirestoreConsents,
             FirestoreMemoryStore,
+            FirestorePortalSource,
             firebase_app,
         )
 
@@ -149,6 +167,7 @@ def default_deps(settings: Settings) -> Deps:
         consents = FirestoreConsents(db)
         memory_store = FirestoreMemoryStore(db)
         activity = FirestoreActivitySource(db)
+        portal = FirestorePortalSource(db)
     elif settings.env == "dev" and os.environ.get("LW_DEV_FAKE_AUTH") == "1":
         # Local dev only: fake tokens, and the synthetic users have AI consent.
         auth = FakeAuthenticator()
@@ -157,6 +176,7 @@ def default_deps(settings: Settings) -> Deps:
         )
         memory_store = InMemoryMemoryStore()
         activity = InMemoryActivitySource()
+        portal = InMemoryPortalSource()
     contexts: ContextSource = (
         FixtureContextSource(settings.fixtures_path) if settings.env == "dev" else NoContextSource()
     )
@@ -170,6 +190,7 @@ def default_deps(settings: Settings) -> Deps:
         LoggingSafetyEventSink(),
         memory_store,
         activity,
+        portal,
     )
 
 
@@ -223,6 +244,18 @@ def create_app(deps: Deps | None = None) -> FastAPI:
         allow_pending_prompts=s.allow_pending_prompts,
     )
     insights = InsightsAgent(deps.activity)
+    portal = PortalAgent(
+        source=deps.portal,
+        bridge=BridgeWriter(
+            engine=RedFlagEngine(s.safety_rules_dir),
+            model=deps.model,
+            prompts=prompts,
+            classifier=SafetyClassifier(deps.classifier_model, prompts, s.allow_pending_prompts),
+            allow_pending_prompts=s.allow_pending_prompts,
+        ),
+        enabled=s.portal_cards_enabled,
+        threshold=Fraction(s.portal_min_score),
+    )
     app = FastAPI(title="Live Well Agent Service", version="0.2.0")
 
     def caller(
@@ -317,6 +350,21 @@ def create_app(deps: Deps | None = None) -> FastAPI:
     @app.post("/v1/insights/weekly")
     def insights_weekly(body: InsightsRequest, uid: Annotated[str, Depends(caller)]) -> WeeklyStats:
         return weekly_insights(uid, body.local_date)
+
+    # ---------------------------------------------------------------- portal (T-AGT-07)
+
+    @app.post("/v1/portal/recommend")
+    def portal_recommend(
+        body: PortalRecommendRequest, uid: Annotated[str, Depends(caller)]
+    ) -> PortalRecommendResponse:
+        consents = PortalConsents(
+            portal=deps.consents.has(uid, frozenset({PORTAL_CONSENT})),
+            ai=deps.consents.has(uid, AI_CONSENTS),
+        )
+        try:
+            return portal.recommend(uid, body, consents)
+        except PortalUnavailable:
+            raise HTTPException(503, "portal_unavailable") from None
 
     # ---------------------------------------------------------------- memory (T-AGT-05)
 

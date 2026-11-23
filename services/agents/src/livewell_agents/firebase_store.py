@@ -8,7 +8,7 @@ the repo. Not exercised in CI (the `firebase` extra isn't installed there).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from livewell_agents.auth import NotAuthorized
@@ -16,6 +16,8 @@ from livewell_agents.insights.models import WeekActivity
 from livewell_agents.insights.store import checkin_from, goal_from, habit_log_from, streak_from
 from livewell_agents.memory.models import MemoryFact, MemoryStatus
 from livewell_agents.memory.store import FactNotFound
+from livewell_agents.portal.models import OWNED_EVENTS, PortalEvent, PortalOffer, PortalState
+from livewell_agents.portal.store import event_from, offer_from
 
 
 def firebase_app(project_id: str) -> Any:
@@ -147,4 +149,65 @@ class FirestoreActivitySource:
             habit_logs=tuple(logs),
             goal=goal_from(goal.to_dict() if goal.exists else None),
             streak_days=streak_from(streak.to_dict() if streak.exists else None),
+        )
+
+
+#: Portal events kept per person besides the owned ones (newest first).
+MAX_PORTAL_EVENTS = 500
+
+
+@dataclass
+class FirestorePortalSource:
+    """The portal catalog and one person's portal state (T-AGT-07). Read only.
+
+    `safety_known` is always False here: safety events are not recorded on
+    the server yet (D-22), so "no event in the last 72 hours" can't be
+    known and no card is shown until they are (the same as the app, D-26)."""
+
+    db: Any
+
+    def offers(self) -> list[PortalOffer]:
+        from google.cloud.firestore_v1.base_query import FieldFilter
+
+        query = (
+            self.db.collection("portal_offers")
+            .where(filter=FieldFilter("active", "==", True))
+            .where(filter=FieldFilter("review_status", "==", "approved"))
+        )
+        return [o for d in query.stream() if (o := offer_from(d.id, d.to_dict() or {})) is not None]
+
+    def state(self, uid: str, local_date: date) -> PortalState:
+        from google.cloud.firestore_v1.base_query import FieldFilter
+
+        user = self.db.collection("users").document(uid)
+        snap = user.get()
+        profile = (snap.to_dict() or {}) if snap.exists else {}
+        today = user.collection("checkins").document(local_date.isoformat()).get()
+        days = [local_date - timedelta(days=i) for i in range(7)]
+        refs = [user.collection("checkins").document(d.isoformat()) for d in days]
+        checkin_days = sum(1 for c in self.db.get_all(refs) if c.exists)
+        streak = user.collection("streaks").document("current").get()
+        lessons = user.collection("content_progress").where(
+            filter=FieldFilter("completed", "==", True)
+        )
+        events: list[PortalEvent] = [
+            e
+            for d in user.collection("portal_events").stream()
+            if (e := event_from(d.to_dict() or {})) is not None
+        ]
+        owned = [e for e in events if e.event in OWNED_EVENTS]
+        others = sorted((e for e in events if e.event not in OWNED_EVENTS), key=lambda e: e.at)
+        created = profile.get("created_at")
+        focus = profile.get("focus_driver")
+        return PortalState(
+            age_confirmed=profile.get("age_confirmed") is True,
+            account_created_at=created if isinstance(created, datetime) else None,
+            ed_safe_mode=profile.get("ed_safe_mode") is True,
+            gentle_day=today.exists and (today.to_dict() or {}).get("gentle_day") is True,
+            safety_known=False,
+            events=tuple(owned + others[-MAX_PORTAL_EVENTS:]),
+            focus_driver=focus if isinstance(focus, str) and len(focus) <= 40 else None,
+            streak_days=streak_from(streak.to_dict() if streak.exists else None),
+            checkin_days_7=checkin_days,
+            lessons_completed=min(sum(1 for _ in lessons.stream()), 10_000),
         )

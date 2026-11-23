@@ -54,9 +54,9 @@ export '../application/home_data.dart'
 import '../data/name_prompt.dart';
 import '../domain/home_models.dart';
 
-/// Home tab (T-UI-02c, illustrated design): greeting header, the coach
-/// hero with a speech bubble, the Why, Today's Next Step, the 4 Quick
-/// Check-in tiles, the streak and the milestone.
+/// Home tab (T-UI-02c illustrated design, T-UI-03 layout): the greeting
+/// with the streak card beside it, the 4 Quick Check-in tiles, the coach
+/// with a speech bubble, Today's Next Step, the milestone and the Why.
 ///
 /// Actions (FR-DLY-03, at most 1 primary and 2 secondary): the step card
 /// opens Done (the primary) and "Make it N min" (a secondary); the check-in
@@ -476,14 +476,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ],
       profile: const ProfileButton(),
       actions: [if (day != null) _DayPill(day)],
+      // The streak sits beside the greeting (T-UI-03).
+      aside: LwStreakCard(ref.watch(streakProvider)),
+      showEyebrow: false,
       children: [
-        if (ref.watch(morningCardProvider) case final moment?) ...[
-          _MomentCard(onPlay: () => _playMoment(moment)),
-          const SizedBox(height: LwSpacing.sm),
+        if (ref.watch(canCheckInProvider)) ...[
+          _CheckInCard(checkIn: checkIn, onTap: _openCheckIn),
+          if (checkIn != null) ...[
+            const SizedBox(height: LwSpacing.sm),
+            _CheckInResponse(checkIn),
+          ],
+          const SizedBox(height: LwSpacing.md),
         ],
         if (askName) ...[
           _NamePrompt(onSave: _saveName, onSkip: _skipName),
-          const SizedBox(height: LwSpacing.sm),
+          const SizedBox(height: LwSpacing.md),
+        ],
+        if (ref.watch(morningCardProvider) case final moment?) ...[
+          _MomentCard(onPlay: () => _playMoment(moment)),
+          const SizedBox(height: LwSpacing.md),
         ],
         _HeroCard(
           coach: ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,
@@ -516,11 +527,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : () => _playMoment(hero),
           showBriefing: ref.watch(featureFlagsProvider).briefings,
         ),
-        // The Why is shown on Home (FR-ONB-05).
-        if (why != null && why.isNotEmpty) ...[
-          const SizedBox(height: LwSpacing.sm),
-          _WhyCard(why),
-        ],
         LwSectionHeader(l.homeNextStepTitle),
         _StepCard(
           step: step,
@@ -541,18 +547,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ref.read(routineActionsProvider).mark(next, RoutineStatus.done),
           ),
         ],
-        if (ref.watch(canCheckInProvider)) ...[
-          LwSectionHeader(l.homeCheckInTitle),
-          _CheckInTiles(checkIn: checkIn, onTap: _openCheckIn),
-          if (checkIn != null) ...[
-            const SizedBox(height: LwSpacing.sm),
-            _CheckInResponse(checkIn),
-          ],
-        ],
-        const SizedBox(height: LwSpacing.sectionGap),
-        LwStreakCard(ref.watch(streakProvider)),
-        const SizedBox(height: LwSpacing.sm),
+        const SizedBox(height: LwSpacing.md),
         _MilestoneCard(ref.watch(milestoneProvider)),
+        // The Why is shown on Home (FR-ONB-05).
+        if (why != null && why.isNotEmpty) ...[
+          const SizedBox(height: LwSpacing.md),
+          _WhyCard(why),
+        ],
       ],
     );
   }
@@ -733,6 +734,14 @@ class _HeroCard extends StatelessWidget {
               placeholderIcon: false,
             ),
           ),
+          // Leaves in the corner (decoration).
+          const Positioned(
+            right: LwSpacing.sm,
+            bottom: LwSpacing.sm,
+            child: ExcludeSemantics(
+              child: Illustration('leaf', width: 48, height: 48),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(LwSpacing.cardPadding),
             child: Column(
@@ -755,22 +764,21 @@ class _HeroCard extends StatelessWidget {
                 const SizedBox(height: LwSpacing.sm),
                 if (showBriefing)
                   _BriefingRow()
-                else
-                  // Wraps on small phones and large text.
-                  Wrap(
-                    spacing: LwSpacing.sm,
-                    runSpacing: LwSpacing.xs,
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        l.homeTagline,
-                        key: const Key('home-tagline'),
-                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
-                      ),
-                      if (onPlay != null) _PlayPill(onPlay: onPlay!),
-                    ],
+                else ...[
+                  Text(
+                    l.homeTagline,
+                    key: const Key('home-tagline'),
+                    style: t.bodySmall?.copyWith(color: p.onTintSecondary),
                   ),
+                  if (onPlay != null) ...[
+                    const SizedBox(height: LwSpacing.sm),
+                    // Room on the right for the leaves.
+                    Padding(
+                      padding: const EdgeInsets.only(right: LwSize.inputHeight),
+                      child: _PlayPill(onPlay: onPlay!),
+                    ),
+                  ],
+                ],
               ],
             ),
           ),
@@ -1221,6 +1229,51 @@ class _CheckInTiles extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Quick Check-in (T-UI-03): the title and the 4 tiles on one white card,
+/// right under the greeting.
+class _CheckInCard extends StatelessWidget {
+  const _CheckInCard({required this.checkIn, required this.onTap});
+
+  final CheckIn? checkIn;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    return Container(
+      key: const Key('home-checkin-section'),
+      padding: const EdgeInsets.all(LwSpacing.sm),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: LwRadius.lgAll,
+        boxShadow: LwShadow.of(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              LwSpacing.xxs,
+              0,
+              LwSpacing.xxs,
+              LwSpacing.sm,
+            ),
+            child: Semantics(
+              header: true,
+              child: Text(
+                AppLocalizations.of(context).homeCheckInTitle,
+                style: t.titleMedium,
+              ),
+            ),
+          ),
+          _CheckInTiles(checkIn: checkIn, onTap: onTap),
+        ],
+      ),
     );
   }
 }

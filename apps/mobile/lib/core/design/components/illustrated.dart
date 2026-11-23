@@ -197,11 +197,15 @@ class _LwCheckinTileState extends State<LwCheckinTile> {
   }
 }
 
-/// N Day Streak (T-UI-02c). Grace and restart wording only: no red, no
-/// alarm for missed days (FR-DLY-07).
+/// N Day Streak (T-UI-02c; peach and upright when narrow, T-UI-03). Grace
+/// and restart wording only: no red, no alarm for missed days (FR-DLY-07).
 class LwStreakCard extends StatelessWidget {
   const LwStreakCard(this.streak, {super.key});
   final StreakSummary? streak;
+
+  /// Narrower than this, the card stands upright: the flame above the
+  /// words, as beside Home's greeting.
+  static const double uprightBelow = 280;
 
   @override
   Widget build(BuildContext context) {
@@ -209,40 +213,77 @@ class LwStreakCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
     final s = streak;
-    return Container(
-      key: const Key('home-streak'),
-      padding: const EdgeInsets.all(LwSpacing.cardPadding),
-      decoration: BoxDecoration(color: p.butter, borderRadius: LwRadius.lgAll),
-      child: Row(
-        children: [
-          const LwOnceMotion(
-            kind: LwMotionKind.flicker,
-            child: Illustration('icon_streak', width: 48, height: 48),
-          ),
-          const SizedBox(width: LwSpacing.sm),
-          Expanded(
-            child: s == null || s.length == 0
-                ? Text(
-                    l.homeStreakEmpty,
-                    style: t.bodyMedium?.copyWith(color: p.onTint),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l.homeStreakTitle(s.length),
-                        style: t.titleMedium?.copyWith(color: p.onTint),
-                      ),
-                      Text(
-                        l.homeStreakKeepGoing,
-                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
-                      ),
-                    ],
+    final empty = s == null || s.length == 0;
+    return LayoutBuilder(
+      builder: (context, box) {
+        final upright = box.maxWidth < uprightBelow;
+        final align = upright ? TextAlign.center : TextAlign.start;
+        final words = empty
+            ? Text(
+                l.homeStreakEmpty,
+                textAlign: align,
+                style: t.bodyMedium?.copyWith(color: p.onTint),
+              )
+            : Column(
+                crossAxisAlignment: upright
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.homeStreakTitle(s.length),
+                    textAlign: align,
+                    style: t.titleMedium?.copyWith(color: p.onTint),
                   ),
+                  Text(
+                    l.homeStreakKeepGoing,
+                    textAlign: align,
+                    style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                  ),
+                ],
+              );
+        const flame = LwOnceMotion(
+          kind: LwMotionKind.flicker,
+          child: Illustration('icon_streak', width: 48, height: 48),
+        );
+        return Container(
+          key: const Key('home-streak'),
+          width: double.infinity,
+          padding: const EdgeInsets.all(LwSpacing.cardPadding),
+          decoration: BoxDecoration(
+            color: p.peach,
+            borderRadius: LwRadius.lgAll,
+            boxShadow: LwShadow.of(context),
           ),
-          const Illustration('lesson_driver_1', width: 40, height: 40),
-        ],
-      ),
+          child: upright
+              ? Column(
+                  key: const Key('home-streak-upright'),
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(LwSpacing.xs),
+                      decoration: BoxDecoration(
+                        color: p.surface,
+                        borderRadius: LwRadius.mdAll,
+                      ),
+                      child: flame,
+                    ),
+                    const SizedBox(height: LwSpacing.sm),
+                    words,
+                  ],
+                )
+              : Row(
+                  children: [
+                    flame,
+                    const SizedBox(width: LwSpacing.sm),
+                    Expanded(child: words),
+                    const Illustration(
+                      'lesson_driver_1',
+                      width: 40,
+                      height: 40,
+                    ),
+                  ],
+                ),
+        );
+      },
     );
   }
 }

@@ -58,6 +58,22 @@ Future<Harness> bootPreview(WidgetTester tester, {CheckIn? checkIn}) async {
 Finder inHome(Finder f) =>
     find.descendant(of: find.byType(HomeScreen), matching: f);
 
+/// Scrolls Home until [f] is fully on screen (T-UI-03: the step, milestone
+/// and Why sit below Quick Check-in and the coach). [delta] < 0 scrolls up.
+Future<void> scrollHomeTo(
+  WidgetTester tester,
+  Finder f, {
+  double delta = 200,
+}) async {
+  await tester.scrollUntilVisible(
+    f,
+    delta,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.ensureVisible(f);
+  await tester.pumpAndSettle();
+}
+
 /// FR-DLY-03: at most 1 primary and 2 secondary actions on Home. The step
 /// card (it opens Done) and the 4 check-in tiles (one check-in) are the two
 /// secondaries; Done itself is in the step's sheet.
@@ -110,7 +126,9 @@ void main() {
       tester,
     ) async {
       await signedIn(name: 'Robert Hall').boot(tester);
-      expect(find.text('HOME'), findsOneWidget);
+      // T-UI-03: no "HOME" eyebrow; the streak sits beside the greeting.
+      expect(find.text('HOME'), findsNothing);
+      expect(find.byKey(const Key('tab-header-aside-beside')), findsOneWidget);
       expect(find.textContaining('Good morning, Robert!'), findsOneWidget);
       expect(find.text('Ready for a healthier, happier you?'), findsOneWidget);
       expect(
@@ -118,12 +136,6 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Coach'), findsOneWidget);
-      expect(
-        find.text(
-          'Check in first. Then a small step picked for you will appear here.',
-        ),
-        findsOneWidget,
-      );
       expect(find.byKey(const Key('home-checkin-card')), findsOneWidget);
       for (final id in ['mood', 'energy', 'sleep', 'stress']) {
         expect(tileValue(tester, id), 'Tap to log');
@@ -132,6 +144,12 @@ void main() {
         find.text('Your streak starts with your first step.'),
         findsOneWidget,
       );
+      final beforeCheckIn = find.text(
+        'Check in first. Then a small step picked for you will appear here.',
+      );
+      await scrollHomeTo(tester, beforeCheckIn);
+      expect(beforeCheckIn, findsOneWidget);
+      await scrollHomeTo(tester, find.byKey(const Key('home-milestone')));
       expect(
         find.text(
           'Your progress will show here once you start your first habit.',
@@ -256,6 +274,7 @@ void main() {
 
     testWidgets('the Why is shown in a compact card', (tester) async {
       await signedIn(why: 'To play with my grandkids').boot(tester);
+      await scrollHomeTo(tester, find.text('YOUR WHY'));
       expect(find.text('YOUR WHY'), findsOneWidget);
       expect(find.text('To play with my grandkids'), findsOneWidget);
     });
@@ -379,14 +398,18 @@ void main() {
         find.text('Hi, Priya! Let\'s make today a good day.'),
         findsOneWidget,
       );
-      expect(find.byKey(const Key('coach-avatar-waving')), findsOneWidget);
-      expect(find.text('10-min walk after lunch'), findsOneWidget);
-      expect(find.text('Driver 3'), findsOneWidget);
-      // The coach's morning card sits on top (T-DLY-03c).
-      expect(find.byKey(const Key('home-moment-card')), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('14 Day Streak'), 200);
+      // The streak beside the greeting (T-UI-03).
       expect(find.text('14 Day Streak'), findsOneWidget);
       expect(find.text('Keep going!'), findsOneWidget);
+      expect(find.byKey(const Key('home-streak-upright')), findsOneWidget);
+      // The coach's morning card sits above the coach (T-DLY-03c).
+      await scrollHomeTo(tester, find.byKey(const Key('home-moment-card')));
+      expect(find.byKey(const Key('home-moment-card')), findsOneWidget);
+      await scrollHomeTo(tester, find.byKey(const Key('coach-avatar-waving')));
+      expect(find.byKey(const Key('coach-avatar-waving')), findsOneWidget);
+      await scrollHomeTo(tester, find.text('10-min walk after lunch'));
+      expect(find.text('10-min walk after lunch'), findsOneWidget);
+      expect(find.text('Driver 3'), findsOneWidget);
       await tester.scrollUntilVisible(
         find.text('Phase 1 of 3'),
         200,
@@ -400,6 +423,7 @@ void main() {
 
     testWidgets('the step opens with Done and "Make it 5 min"', (tester) async {
       await bootPreview(tester);
+      await scrollHomeTo(tester, find.byKey(const Key('step-open')));
       await tester.tap(find.byKey(const Key('step-open')));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('step-sheet')), findsOneWidget);
@@ -409,6 +433,7 @@ void main() {
 
     testWidgets('"Make it 5 min" swaps in the smaller step', (tester) async {
       await bootPreview(tester);
+      await scrollHomeTo(tester, find.byKey(const Key('step-open')));
       await tester.tap(find.byKey(const Key('step-open')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('step-smaller')));
@@ -421,6 +446,7 @@ void main() {
 
     testWidgets('Done: a kind confirmation on the card', (tester) async {
       await bootPreview(tester);
+      await scrollHomeTo(tester, find.byKey(const Key('step-open')));
       await tester.tap(find.byKey(const Key('step-open')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('step-done')));
@@ -451,6 +477,7 @@ void main() {
         tester,
       ) async {
         await bootPreview(tester, checkIn: checkIn);
+        await scrollHomeTo(tester, find.byKey(const Key('step-open')));
         expect(find.text('5-min walk after lunch'), findsOneWidget);
         expect(find.text(reason), findsOneWidget);
         expectActionLimit();
@@ -481,6 +508,8 @@ void main() {
             find.bySemanticsLabel('Mood: Tap to log. Opens the check-in.'),
             findsOneWidget,
           );
+          await scrollHomeTo(tester, find.byKey(const Key('step-open')));
+          await expectLater(tester, meetsGuideline(textContrastGuideline));
           expect(
             find.bySemanticsLabel(
               'Today\'s next step: 10-min walk after lunch. Opens Done and a '
@@ -519,6 +548,69 @@ void main() {
           );
         },
       );
+    }
+
+    // T-UI-03 layout at common widths: streak beside the greeting, the 4
+    // check-in tiles on one row, nothing cut off, the last card above the
+    // tab bar.
+    for (final (width, scale, beside) in [
+      (360.0, 1.0, true),
+      (390.0, 1.0, true),
+      (430.0, 1.0, true),
+      (768.0, 1.0, true),
+      (1280.0, 1.0, true),
+      (360.0, 1.3, false),
+    ]) {
+      testWidgets('layout at ${width.toInt()} wide, text $scale', (
+        tester,
+      ) async {
+        final h = signedIn(name: 'Aditya', why: 'To play with my grandkids');
+        await h.boot(tester);
+        tester.view
+          ..physicalSize = Size(width * 2, 1700)
+          ..devicePixelRatio = 2;
+        tester.platformDispatcher.textScaleFactorTestValue = scale;
+        addTearDown(tester.platformDispatcher.clearAllTestValues);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+        expect(
+          find.byKey(Key('tab-header-aside-${beside ? 'beside' : 'below'}')),
+          findsOneWidget,
+        );
+        // Order: greeting/streak, Quick Check-in, coach, step, milestone.
+        double top(String key) => tester.getTopLeft(find.byKey(Key(key))).dy;
+        expect(top('home-streak'), lessThan(top('home-checkin-section')));
+        if (beside) {
+          final greeting = tester.getRect(
+            find.byKey(const Key('tab-header-title')),
+          );
+          final streak = tester.getRect(find.byKey(const Key('home-streak')));
+          expect(streak.left, greaterThan(greeting.right));
+          // Upright on phones; on wider screens the card lies flat.
+          expect(
+            find.byKey(const Key('home-streak-upright')),
+            width < 600 ? findsOneWidget : findsNothing,
+          );
+          final rows = {
+            for (final id in ['mood', 'energy', 'sleep', 'stress'])
+              tester.getTopLeft(find.byKey(Key('home-tile-$id'))).dy,
+          };
+          expect(rows, hasLength(1), reason: '4 tiles on one row');
+        }
+        await scrollHomeTo(tester, find.byKey(const Key('home-coach')));
+        expect(top('home-checkin-section'), lessThan(top('home-coach')));
+        await scrollHomeTo(tester, find.byKey(const Key('today-step')));
+        expect(top('home-coach'), lessThan(top('today-step')));
+        await scrollHomeTo(tester, find.byKey(const Key('home-why')));
+        expect(top('home-milestone'), lessThan(top('home-why')));
+        expect(tester.takeException(), isNull);
+        // The tab bar never covers the end of Home.
+        final bar = tester.getRect(find.byType(NavigationBar));
+        expect(
+          tester.getRect(find.byKey(const Key('home-why'))).bottom,
+          lessThanOrEqualTo(bar.top),
+        );
+      });
     }
 
     // Small phone and large text: tiles go 2 across so words never break.

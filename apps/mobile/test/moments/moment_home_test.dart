@@ -15,7 +15,8 @@ import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
 import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/track/presentation/track_screen.dart';
 
-import '../home/home_screen_test.dart' show bootPreview, signedIn, today;
+import '../home/home_screen_test.dart'
+    show bootPreview, scrollHomeTo, signedIn, today;
 import '../support/app_harness.dart';
 import 'moment_reminders_test.dart' show close, playing, previewAt, settle;
 
@@ -117,6 +118,7 @@ void main() {
         tester,
         checkIn: const CheckIn(date: today, mood: 1, gentleDay: true),
       );
+      await scrollHomeTo(tester, play);
       expect(heroFace(AvatarExpression.calm), findsOneWidget);
       await tester.tap(play);
       await settle(tester);

@@ -24,7 +24,16 @@ class LwScreen extends StatelessWidget {
     this.bottom,
     this.subtitle,
     this.titleIcon,
+    this.aside,
+    this.showEyebrow = true,
   });
+
+  /// Tab screens: a card beside the title, under [icons] (Home's streak).
+  /// Moves below the title when there is no room for both.
+  final Widget? aside;
+
+  /// Tab screens: whether the small eyebrow line shows above the title.
+  final bool showEyebrow;
 
   /// Tab screens: a short line under the title.
   final String? subtitle;
@@ -84,6 +93,8 @@ class LwScreen extends StatelessWidget {
                           icons: icons,
                           profile: profile,
                           actions: actions,
+                          aside: aside,
+                          showEyebrow: showEyebrow,
                         ),
                         const SizedBox(height: LwSpacing.md),
                         ...children,
@@ -123,6 +134,8 @@ class LwTabHeader extends StatelessWidget {
     this.actions = const [],
     this.subtitle,
     this.titleIcon,
+    this.aside,
+    this.showEyebrow = true,
   });
 
   final String eyebrow;
@@ -133,59 +146,136 @@ class LwTabHeader extends StatelessWidget {
   final Widget? profile;
   final List<Widget> actions;
 
+  /// A card beside the title, under the icons (Home's streak, T-UI-03).
+  /// Below the title instead when the row is too narrow for both: small
+  /// phones with large text.
+  final Widget? aside;
+  final bool showEyebrow;
+
+  /// Room the title needs beside [aside], in unscaled logical pixels.
+  static const double asideMinWidth = 320;
+
+  /// Share of the row the [aside] column takes when beside the title.
+  static const double asideShare = 0.46;
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
+    final heading = Semantics(
+      header: true,
+      child: Column(
+        key: const Key('tab-header-title'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (showEyebrow) Text(eyebrow.toUpperCase(), style: t.labelSmall),
+          if (titleIcon == null)
+            Text(title, style: t.headlineSmall)
+          else
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: '$title '),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: titleIcon!,
+                  ),
+                ],
+              ),
+              style: t.headlineSmall,
+            ),
+          if (subtitle != null) ...[
+            const SizedBox(height: LwSpacing.xxs),
+            Text(subtitle!, style: t.bodyMedium),
+          ],
+        ],
+      ),
+    );
+    final actionRow = actions.isEmpty
+        ? null
+        : Wrap(
+            key: const Key('tab-header-actions'),
+            spacing: LwSpacing.xs,
+            runSpacing: LwSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: actions,
+          );
+    final aside = this.aside;
+    if (aside != null) {
+      return LayoutBuilder(
+        builder: (context, box) {
+          final scale = MediaQuery.textScalerOf(context).scale(1);
+          if (box.maxWidth / scale >= asideMinWidth) {
+            return Row(
+              key: const Key('tab-header-aside-beside'),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      heading,
+                      if (actionRow != null) ...[
+                        const SizedBox(height: LwSpacing.xs),
+                        actionRow,
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.xs),
+                SizedBox(
+                  width: box.maxWidth * asideShare,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [...icons, ?profile],
+                      ),
+                      const SizedBox(height: LwSpacing.xs),
+                      aside,
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }
+          return Column(
+            key: const Key('tab-header-aside-below'),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: heading),
+                  ...icons,
+                  ?profile,
+                ],
+              ),
+              if (actionRow != null) ...[
+                const SizedBox(height: LwSpacing.xs),
+                actionRow,
+              ],
+              const SizedBox(height: LwSpacing.sm),
+              aside,
+            ],
+          );
+        },
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Semantics(
-                header: true,
-                child: Column(
-                  key: const Key('tab-header-title'),
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(eyebrow.toUpperCase(), style: t.labelSmall),
-                    if (titleIcon == null)
-                      Text(title, style: t.headlineSmall)
-                    else
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(text: '$title '),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: titleIcon!,
-                            ),
-                          ],
-                        ),
-                        style: t.headlineSmall,
-                      ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: LwSpacing.xxs),
-                      Text(subtitle!, style: t.bodyMedium),
-                    ],
-                  ],
-                ),
-              ),
-            ),
+            Expanded(child: heading),
             ...icons,
             ?profile,
           ],
         ),
-        if (actions.isNotEmpty) ...[
+        if (actionRow != null) ...[
           const SizedBox(height: LwSpacing.xs),
-          Wrap(
-            key: const Key('tab-header-actions'),
-            spacing: LwSpacing.xs,
-            runSpacing: LwSpacing.xs,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: actions,
-          ),
+          actionRow,
         ],
       ],
     );

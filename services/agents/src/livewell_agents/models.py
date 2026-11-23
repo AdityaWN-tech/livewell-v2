@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Literal, get_args
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Region = Literal["US", "IN"]
 Emotion = Literal["encouraging", "happy", "calm", "neutral", "celebrating"]
@@ -247,8 +247,9 @@ class NudgeRequest(_Strict):
 
 
 class WeeklyStats(_Strict):
-    """Precomputed by code (the Insights Agent, T-AGT-06, is not built yet:
-    the caller passes the numbers). Counts and trend codes only."""
+    """Computed by code: the Insights Agent (T-AGT-06, D-104;
+    livewell_agents/insights/stats.py has the definitions). Counts and trend
+    codes only."""
 
     week_start: date
     days_checked_in: int = Field(ge=0, le=7)
@@ -262,7 +263,15 @@ class WeeklyStats(_Strict):
 
 
 class WeeklyReviewRequest(_Strict):
-    """POST /v1/reviews/weekly (FR-DLY-06; spec 9.7 Sunday job)."""
+    """POST /v1/reviews/weekly (FR-DLY-06; spec 9.7 Sunday job). Without
+    `stats` the Insights Agent computes them for the week before
+    `local_date`, which is then required (the time zone is never guessed)."""
 
-    stats: WeeklyStats
+    stats: WeeklyStats | None = None
     local_date: date | None = None
+
+    @model_validator(mode="after")
+    def _stats_or_date(self) -> WeeklyReviewRequest:
+        if self.stats is None and self.local_date is None:
+            raise ValueError("send stats, or local_date for the Insights Agent")
+        return self

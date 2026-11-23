@@ -132,6 +132,9 @@ class LwCheckinTile extends StatefulWidget {
   final String value;
   final VoidCallback onTap;
 
+  /// Room the tile's padding takes from its words, left and right.
+  static const double textInset = LwSpacing.xxs * 2;
+
   @override
   State<LwCheckinTile> createState() => _LwCheckinTileState();
 }
@@ -168,7 +171,7 @@ class _LwCheckinTileState extends State<LwCheckinTile> {
               constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: LwSpacing.xs,
+                  horizontal: LwSpacing.xxs,
                   vertical: LwSpacing.sm,
                 ),
                 child: Column(
@@ -197,11 +200,15 @@ class _LwCheckinTileState extends State<LwCheckinTile> {
   }
 }
 
-/// N Day Streak (T-UI-02c). Grace and restart wording only: no red, no
-/// alarm for missed days (FR-DLY-07).
+/// N Day Streak (T-UI-02c; peach and upright when narrow, T-UI-03). Grace
+/// and restart wording only: no red, no alarm for missed days (FR-DLY-07).
 class LwStreakCard extends StatelessWidget {
   const LwStreakCard(this.streak, {super.key});
   final StreakSummary? streak;
+
+  /// Narrower than this, the card stands upright: the flame above the
+  /// words, as beside Home's greeting.
+  static const double uprightBelow = 280;
 
   @override
   Widget build(BuildContext context) {
@@ -209,40 +216,129 @@ class LwStreakCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
     final s = streak;
-    return Container(
-      key: const Key('home-streak'),
-      padding: const EdgeInsets.all(LwSpacing.cardPadding),
-      decoration: BoxDecoration(color: p.butter, borderRadius: LwRadius.lgAll),
-      child: Row(
-        children: [
-          const LwOnceMotion(
-            kind: LwMotionKind.flicker,
-            child: Illustration('icon_streak', width: 48, height: 48),
+    final empty = s == null || s.length == 0;
+    return LayoutBuilder(
+      builder: (context, box) {
+        final upright = box.maxWidth < uprightBelow;
+        final align = upright ? TextAlign.center : TextAlign.start;
+        final words = empty
+            ? Text(
+                l.homeStreakEmpty,
+                textAlign: align,
+                style: t.bodyMedium?.copyWith(color: p.onTint),
+              )
+            : Column(
+                crossAxisAlignment: upright
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.homeStreakTitle(s.length),
+                    textAlign: align,
+                    style: t.titleMedium?.copyWith(
+                      color: p.onTint,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: LwSpacing.xxs),
+                  Text(
+                    l.homeStreakKeepGoing,
+                    textAlign: align,
+                    style: t.bodyMedium?.copyWith(color: p.onTintSecondary),
+                  ),
+                ],
+              );
+        // The flame on a white rounded tile (owner's reference, T-UI-03).
+        final tile = Container(
+          width: LwSize.avatarSm + LwSpacing.xxs,
+          height: LwSize.avatarSm + LwSpacing.xxs,
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: LwRadius.mdAll,
+            boxShadow: LwShadow.of(context),
           ),
-          const SizedBox(width: LwSpacing.sm),
-          Expanded(
-            child: s == null || s.length == 0
-                ? Text(
-                    l.homeStreakEmpty,
-                    style: t.bodyMedium?.copyWith(color: p.onTint),
-                  )
-                : Column(
+          child: Icon(
+            Icons.local_fire_department_rounded,
+            color: p.flame,
+            size: LwSize.iconMd + LwSpacing.xxs,
+          ),
+        );
+        // Two short sparkle strokes at the tile's top right (decoration).
+        Widget stroke(double angle) => Transform.rotate(
+          angle: angle,
+          child: Container(
+            width: LwSpacing.xs,
+            height: 2,
+            decoration: BoxDecoration(
+              color: p.flame,
+              borderRadius: LwRadius.pillAll,
+            ),
+          ),
+        );
+        final flame = LwOnceMotion(
+          kind: LwMotionKind.flicker,
+          child: ExcludeSemantics(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                tile,
+                Positioned(
+                  right: -LwSpacing.sm,
+                  top: -LwSpacing.xxs,
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l.homeStreakTitle(s.length),
-                        style: t.titleMedium?.copyWith(color: p.onTint),
-                      ),
-                      Text(
-                        l.homeStreakKeepGoing,
-                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      stroke(-0.9),
+                      const SizedBox(height: LwSpacing.xxs),
+                      Padding(
+                        padding: const EdgeInsets.only(left: LwSpacing.xxs),
+                        child: stroke(-0.3),
                       ),
                     ],
                   ),
+                ),
+              ],
+            ),
           ),
-          const Illustration('lesson_driver_1', width: 40, height: 40),
-        ],
-      ),
+        );
+        return Container(
+          key: const Key('home-streak'),
+          width: double.infinity,
+          padding: upright
+              ? const EdgeInsets.fromLTRB(
+                  LwSpacing.xs,
+                  LwSpacing.sm,
+                  LwSpacing.xs,
+                  LwSpacing.md,
+                )
+              : const EdgeInsets.all(LwSpacing.cardPadding),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [p.warmTop, p.warmBottom],
+            ),
+            borderRadius: LwRadius.lgAll,
+            boxShadow: LwShadow.of(context),
+          ),
+          child: upright
+              ? Column(
+                  key: const Key('home-streak-upright'),
+                  children: [
+                    flame,
+                    const SizedBox(height: LwSpacing.sm),
+                    words,
+                  ],
+                )
+              : Row(
+                  children: [
+                    flame,
+                    const SizedBox(width: LwSpacing.sm),
+                    Expanded(child: words),
+                  ],
+                ),
+        );
+      },
     );
   }
 }

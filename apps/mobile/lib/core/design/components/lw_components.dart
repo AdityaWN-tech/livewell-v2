@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -152,11 +154,29 @@ class LwTabHeader extends StatelessWidget {
   final Widget? aside;
   final bool showEyebrow;
 
-  /// Room the title needs beside [aside], in unscaled logical pixels.
-  static const double asideMinWidth = 320;
-
-  /// Share of the row the [aside] column takes when beside the title.
+  /// Share of the row the [aside] column takes when beside the title; at
+  /// least the width of the [icons] and [profile] buttons above it.
   static const double asideShare = 0.46;
+
+  /// Width of the widest word in [text] at [style]: the title may wrap
+  /// between words but must never break inside one.
+  static double widestWord(
+    BuildContext context,
+    String text,
+    TextStyle? style,
+  ) {
+    var widest = 0.0;
+    for (final word in text.split(RegExp(r'\s+'))) {
+      final tp = TextPainter(
+        text: TextSpan(text: word, style: style),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      if (tp.width > widest) widest = tp.width;
+    }
+    return widest;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,8 +223,23 @@ class LwTabHeader extends StatelessWidget {
     if (aside != null) {
       return LayoutBuilder(
         builder: (context, box) {
-          final scale = MediaQuery.textScalerOf(context).scale(1);
-          if (box.maxWidth / scale >= asideMinWidth) {
+          final buttons = icons.length + (profile == null ? 0 : 1);
+          final asideWidth = math.max(
+            box.maxWidth * asideShare,
+            buttons * LwSize.minTapTarget + LwSpacing.xxs,
+          );
+          final room = box.maxWidth - asideWidth - LwSpacing.xs;
+          // The icon follows the last word, so it only widens that one.
+          final lastWord = title.trim().split(RegExp(r'\s+')).last;
+          final titleWord = math.max(
+            widestWord(context, title, t.headlineSmall),
+            widestWord(context, lastWord, t.headlineSmall) +
+                (titleIcon == null ? 0 : LwSize.iconSm + LwSpacing.xs),
+          );
+          final subtitleWord = subtitle == null
+              ? 0.0
+              : widestWord(context, subtitle!, t.bodyMedium);
+          if (math.max(titleWord, subtitleWord) <= room) {
             return Row(
               key: const Key('tab-header-aside-beside'),
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,19 +257,19 @@ class LwTabHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: LwSpacing.xs),
-                SizedBox(
-                  width: box.maxWidth * asideShare,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [...icons, ?profile],
-                      ),
-                      const SizedBox(height: LwSpacing.xs),
-                      aside,
-                    ],
-                  ),
+                // As wide as the buttons need (never cut off), the card at
+                // its share of the row below them.
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [...icons, ?profile],
+                    ),
+                    // Right under the buttons, as in the reference.
+                    const SizedBox(height: LwSpacing.xxs),
+                    SizedBox(width: asideWidth, child: aside),
+                  ],
                 ),
               ],
             );

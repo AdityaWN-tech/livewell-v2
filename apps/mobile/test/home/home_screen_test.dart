@@ -554,20 +554,24 @@ void main() {
     // check-in tiles on one row, nothing cut off, the last card above the
     // tab bar.
     for (final (width, scale, beside) in [
+      // The owner's phone: 1080 px at display size 540 dpi, font 0.9.
+      (320.0, 0.9, true),
       (360.0, 1.0, true),
       (390.0, 1.0, true),
       (430.0, 1.0, true),
       (768.0, 1.0, true),
       (1280.0, 1.0, true),
-      (360.0, 1.3, false),
+      // Large text: the greeting's words no longer fit beside the card.
+      (360.0, 2.0, false),
     ]) {
       testWidgets('layout at ${width.toInt()} wide, text $scale', (
         tester,
       ) async {
         final h = signedIn(name: 'Aditya', why: 'To play with my grandkids');
         await h.boot(tester);
+        // Taller with larger text, so the sections compared are all built.
         tester.view
-          ..physicalSize = Size(width * 2, 1700)
+          ..physicalSize = Size(width * 2, 1700 * scale)
           ..devicePixelRatio = 2;
         tester.platformDispatcher.textScaleFactorTestValue = scale;
         addTearDown(tester.platformDispatcher.clearAllTestValues);
@@ -591,6 +595,8 @@ void main() {
             find.byKey(const Key('home-streak-upright')),
             width < 600 ? findsOneWidget : findsNothing,
           );
+        }
+        if (scale <= 1) {
           final rows = {
             for (final id in ['mood', 'energy', 'sleep', 'stress'])
               tester.getTopLeft(find.byKey(Key('home-tile-$id'))).dy,

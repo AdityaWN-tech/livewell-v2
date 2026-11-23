@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -734,12 +735,16 @@ class _HeroCard extends StatelessWidget {
               placeholderIcon: false,
             ),
           ),
-          // Leaves in the corner (decoration).
-          const Positioned(
+          // Two soft leaves in the corner (decoration).
+          Positioned(
             right: LwSpacing.sm,
             bottom: LwSpacing.sm,
             child: ExcludeSemantics(
-              child: Illustration('leaf', width: 48, height: 48),
+              child: Icon(
+                Icons.eco_rounded,
+                size: LwSize.inputHeight,
+                color: p.accent.withValues(alpha: 0.45),
+              ),
             ),
           ),
           Padding(
@@ -759,6 +764,8 @@ class _HeroCard extends StatelessWidget {
                     expression: faceForMoment(moment),
                     bubble: bubble,
                     size: 104,
+                    // Beside the face, as in the owner's reference (T-UI-03).
+                    minBubbleWidth: 136,
                   ),
                 ),
                 const SizedBox(height: LwSpacing.sm),
@@ -1142,6 +1149,19 @@ class _CheckInTiles extends StatelessWidget {
     final p = LwPalette.of(context);
     final l = AppLocalizations.of(context);
     final c = checkIn;
+    final t = Theme.of(context).textTheme;
+    // Every word a tile can show, so the layout doesn't change after a
+    // check-in: the names and all the answers.
+    final allValues = [
+      l.homeTileEmpty,
+      l.homeTileSkipped,
+      for (final i in [1, 2, 3, 4, 5]) ...[
+        _answer(l, 'mood', i),
+        _answer(l, 'energy', i),
+        _answer(l, 'sleep', i),
+        _answer(l, 'stress', i),
+      ],
+    ];
     String value(int? v, List<String> words) => c == null
         ? l.homeTileEmpty
         : v == null
@@ -1203,11 +1223,20 @@ class _CheckInTiles extends StatelessWidget {
     ];
     return LayoutBuilder(
       builder: (context, box) {
-        // 4 across normally; 2 across on small phones or with large text,
-        // so values like "Very high" never break mid-word.
-        final scale = MediaQuery.textScalerOf(context).scale(1);
-        final columns = box.maxWidth / scale >= 300 ? 4 : 2;
+        // 4 across when every word fits a quarter-width tile; else 2
+        // across (small phones, large text), so values like "Moderate"
+        // never break mid-word.
         final gap = LwSpacing.xs;
+        final widest = math.max(
+          LwTabHeader.widestWord(
+            context,
+            tiles.map((x) => x.$2).join(' '),
+            t.labelMedium,
+          ),
+          LwTabHeader.widestWord(context, allValues.join(' '), t.labelSmall),
+        );
+        final quarter = (box.maxWidth - gap * 3) / 4 - LwCheckinTile.textInset;
+        final columns = widest <= quarter ? 4 : 2;
         final width = (box.maxWidth - gap * (columns - 1)) / columns;
         return Wrap(
           key: const Key('home-checkin-card'),
@@ -1233,6 +1262,30 @@ class _CheckInTiles extends StatelessWidget {
   }
 }
 
+/// One answer word for a tile, 1 (lowest) to 5.
+String _answer(AppLocalizations l, String tile, int v) => switch ((tile, v)) {
+  ('mood', 1) => l.checkinMood1,
+  ('mood', 2) => l.checkinMood2,
+  ('mood', 3) => l.checkinMood3,
+  ('mood', 4) => l.checkinMood4,
+  ('mood', _) => l.checkinMood5,
+  ('energy', 1) => l.checkinEnergy1,
+  ('energy', 2) => l.checkinEnergy2,
+  ('energy', 3) => l.checkinEnergy3,
+  ('energy', 4) => l.checkinEnergy4,
+  ('energy', _) => l.checkinEnergy5,
+  ('sleep', 1) => l.checkinSleep1,
+  ('sleep', 2) => l.checkinSleep2,
+  ('sleep', 3) => l.checkinSleep3,
+  ('sleep', 4) => l.checkinSleep4,
+  ('sleep', _) => l.checkinSleep5,
+  ('stress', 1) => l.checkinStress1,
+  ('stress', 2) => l.checkinStress2,
+  ('stress', 3) => l.checkinStress3,
+  ('stress', 4) => l.checkinStress4,
+  (_, _) => l.checkinStress5,
+};
+
 /// Quick Check-in (T-UI-03): the title and the 4 tiles on one white card,
 /// right under the greeting.
 class _CheckInCard extends StatelessWidget {
@@ -1247,7 +1300,12 @@ class _CheckInCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Container(
       key: const Key('home-checkin-section'),
-      padding: const EdgeInsets.all(LwSpacing.sm),
+      padding: const EdgeInsets.fromLTRB(
+        LwSpacing.xs,
+        LwSpacing.sm,
+        LwSpacing.xs,
+        LwSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: p.surface,
         borderRadius: LwRadius.lgAll,
@@ -1258,9 +1316,9 @@ class _CheckInCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(
-              LwSpacing.xxs,
+              LwSpacing.xs,
               0,
-              LwSpacing.xxs,
+              LwSpacing.xs,
               LwSpacing.sm,
             ),
             child: Semantics(

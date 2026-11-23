@@ -53,11 +53,7 @@ Future<void> choose(WidgetTester tester, MomentAction a) async {
 
 /// Opens today's step and taps Done.
 Future<void> tapDone(WidgetTester tester) async {
-  await tester.scrollUntilVisible(
-    find.byKey(const Key('step-open')),
-    200,
-    scrollable: find.byType(Scrollable).first,
-  );
+  await scrollHomeTo(tester, find.byKey(const Key('step-open')));
   await tester.tap(find.byKey(const Key('step-open')));
   await tester.pumpAndSettle();
   await tester.scrollUntilVisible(

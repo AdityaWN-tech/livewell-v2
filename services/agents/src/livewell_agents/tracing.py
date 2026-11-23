@@ -52,6 +52,9 @@ ALLOWED_KEYS = frozenset(
         "lw.source",
         "lw.proposed",
         "lw.dropped",
+        # Portal Agent (T-AGT-07): the surface code and the catalog offer id.
+        "lw.surface",
+        "lw.offer_id",
     }
 )
 

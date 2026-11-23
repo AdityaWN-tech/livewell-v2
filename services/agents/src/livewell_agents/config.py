@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from fractions import Fraction
 from pathlib import Path
 from typing import Literal
 
@@ -42,6 +43,10 @@ class Settings:
     #: Content folders for approved-only retrieval (T-AGT-03); empty = no
     #: retriever, so a conversation turn gets no passages and states no health facts.
     content_dirs: tuple[Path, ...] = ()
+    #: Portal cards kill switch (spec 10.2, T-AGT-07): off unless LW_PORTAL_CARDS=1.
+    portal_cards_enabled: bool = False
+    #: Step 2 threshold (spec 13.3: 0.6, Remote Config later), as text "0.6".
+    portal_min_score: str = "0.6"
 
     @property
     def allow_pending_prompts(self) -> bool:
@@ -87,4 +92,18 @@ def load_settings() -> Settings:
         content_dirs=tuple(
             Path(p) for p in os.environ.get("LW_CONTENT_DIRS", "").split(os.pathsep) if p
         ),
+        portal_cards_enabled=os.environ.get("LW_PORTAL_CARDS") == "1",
+        portal_min_score=_score(os.environ.get("LW_PORTAL_MIN_SCORE", "0.6")),
     )
+
+
+def _score(raw: str) -> str:
+    try:
+        value = Fraction(raw)
+    except (ValueError, ZeroDivisionError):
+        raise ConfigError("LW_PORTAL_MIN_SCORE must be a number from 0.5 to 1") from None
+    # Readiness and novelty alone reach at most 0.4. At 0.5 or more every
+    # card also matches the person's focus, recent lessons or question.
+    if not Fraction(1, 2) <= value <= 1:
+        raise ConfigError("LW_PORTAL_MIN_SCORE must be a number from 0.5 to 1")
+    return raw

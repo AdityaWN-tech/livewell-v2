@@ -177,6 +177,12 @@ def default_fake_memory(request: ModelRequest) -> str:
     return json.dumps({"facts": facts})
 
 
+def default_fake_portal_bridge(request: ModelRequest) -> str:
+    """A policy-clean bridge line (T-AGT-07): no title, numbers or claims."""
+    line = "Here is something from the Live Well Portal, if you'd like a look."
+    return json.dumps({"text": line})
+
+
 #: Coach mode prompt ids (graph.MODES) -> the fake's unscripted answer.
 _FAKE_COACH: dict[str, Callable[[ModelRequest], str]] = {
     "coach_briefing": default_fake_briefing,
@@ -185,6 +191,7 @@ _FAKE_COACH: dict[str, Callable[[ModelRequest], str]] = {
     "coach_reflection": default_fake_reflection,
     "coach_weekly_review": default_fake_weekly_review,
     "memory_extract": default_fake_memory,
+    "portal_bridge": default_fake_portal_bridge,
 }
 
 

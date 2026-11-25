@@ -6885,6 +6885,18 @@ abstract class AppLocalizations {
   /// **'On the lock screen the widget shows general text only, never your answers or health details.'**
   String get dailyPlanWidgetPrivate;
 
+  /// T-AVT-08g-e: Profile > Daily plan switch for the home/lock-screen widget. On by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide details on lock screen'**
+  String get profileWidgetHideDetails;
+
+  /// T-AVT-08g-e: subtitle of the widget privacy switch.
+  ///
+  /// In en, this message translates to:
+  /// **'The widget says \"Your next step is ready\" instead of naming it.'**
+  String get profileWidgetHideDetailsBody;
+
   /// T-REL-01 caption: the rest of what greeting.m4a says (docs/voices.md), so the whole recording is captioned (NFR-06).
   ///
   /// In en, this message translates to:

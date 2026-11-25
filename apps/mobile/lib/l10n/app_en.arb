@@ -3205,6 +3205,14 @@
   "@dailyPlanWidgetPrivate": {
     "description": "Profile > Daily plan (T-DLY-03e)."
   },
+  "profileWidgetHideDetails": "Hide details on lock screen",
+  "@profileWidgetHideDetails": {
+    "description": "T-AVT-08g-e: Profile > Daily plan switch for the home/lock-screen widget. On by default."
+  },
+  "profileWidgetHideDetailsBody": "The widget says \"Your next step is ready\" instead of naming it.",
+  "@profileWidgetHideDetailsBody": {
+    "description": "T-AVT-08g-e: subtitle of the widget privacy switch."
+  },
   "voiceGreetingRest": "I’m here to help, one small step at a time.",
   "@voiceGreetingRest": {
     "description": "T-REL-01 caption: the rest of what greeting.m4a says (docs/voices.md), so the whole recording is captioned (NFR-06)."

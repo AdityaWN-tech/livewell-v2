@@ -3961,6 +3961,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'On the lock screen the widget shows general text only, never your answers or health details.';
 
   @override
+  String get profileWidgetHideDetails => 'Hide details on lock screen';
+
+  @override
+  String get profileWidgetHideDetailsBody =>
+      'The widget says \"Your next step is ready\" instead of naming it.';
+
+  @override
   String get voiceGreetingRest => 'I’m here to help, one small step at a time.';
 
   @override

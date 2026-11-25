@@ -494,6 +494,9 @@ class FakeLearnRepository implements LearnRepository {
   List<PortalOffer> offers = [];
   final events = <PortalEventRecord>[];
   final clickIds = <String>[];
+
+  /// The surface of each logged event, in order.
+  final surfaces = <String>[];
   final _changes = StreamController<void>.broadcast();
 
   @override
@@ -534,8 +537,14 @@ class FakeLearnRepository implements LearnRepository {
   }
 
   @override
-  Future<void> logEvent(String event, String offerId, {String? clickId}) async {
+  Future<void> logEvent(
+    String event,
+    String offerId, {
+    String? clickId,
+    String surface = 'learn',
+  }) async {
     if (clickId != null) clickIds.add(clickId);
+    surfaces.add(surface);
     events.add(PortalEventRecord(event: event, offerId: offerId, at: _now()));
     _changes.add(null);
   }

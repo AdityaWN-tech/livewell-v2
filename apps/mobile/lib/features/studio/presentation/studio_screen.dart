@@ -16,6 +16,7 @@ import '../../avatar/presentation/photo_consent.dart';
 import '../../avatar/presentation/selfie_screen.dart';
 import '../../voice/data/voice_repository.dart';
 import '../../voice/domain/voice.dart';
+import '../../voice/presentation/voice_how_made.dart';
 import '../../voice/presentation/voice_screen.dart'
     show AiVoiceLabel, showOwnVoiceSheet;
 import 'avatar_options_picker.dart';
@@ -529,6 +530,9 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
         ),
         const SizedBox(height: LwSpacing.sm),
         VoiceSampleTranscript(style: _voice.style),
+        // How the chosen voice is made (FR-VOC-08, D-75).
+        const SizedBox(height: LwSpacing.md),
+        VoiceHowMade(voiceId: _voice.voiceId),
         const SizedBox(height: LwSpacing.md),
         FilledButton(
           key: const Key('studio-save-voice'),

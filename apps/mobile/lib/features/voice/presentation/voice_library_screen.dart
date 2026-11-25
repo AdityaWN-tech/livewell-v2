@@ -10,6 +10,7 @@ import '../../../core/config/feature_flags.dart';
 import '../../studio/presentation/studio_screen.dart'
     show clonedVoiceConsentProvider;
 import '../../studio/presentation/studio_widgets.dart';
+import 'voice_how_made.dart';
 import 'voice_screen.dart' show AiVoiceLabel, showOwnVoiceSheet;
 
 /// The voice library (FR-VOC-01), in the Studio's "Choose Your Voice"
@@ -121,28 +122,15 @@ class _VoiceLibraryScreenState extends ConsumerState<VoiceLibraryScreen> {
                     },
                     onOwnVoice: () => showOwnVoiceSheet(context),
                   ),
+<<<<<<< HEAD
                   const SizedBox(height: LwSpacing.sm),
                   VoiceSampleTranscript(style: _c.style),
                   // How the voice is made (FR-VOC-08).
+=======
+                  // How the chosen voice is made (FR-VOC-08, D-75).
+>>>>>>> old-origin/main
                   const SizedBox(height: LwSpacing.md),
-                  Semantics(
-                    container: true,
-                    child: Column(
-                      key: const Key('voice-how-made'),
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l.voiceHowMadeTitle,
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: LwSpacing.xxs),
-                        Text(
-                          l.voiceHowMadeBody,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
+                  VoiceHowMade(voiceId: _c.voiceId),
                 ],
               ),
             ),

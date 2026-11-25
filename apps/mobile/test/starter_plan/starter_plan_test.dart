@@ -346,6 +346,9 @@ void main() {
           planRepositoryProvider.overrideWithValue(plans),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(zone),
+          reminderLedgerStoreProvider.overrideWithValue(
+            FakeReminderLedgerStore(),
+          ),
           consentRepositoryProvider.overrideWithValue(consents),
           avatarRepositoryProvider.overrideWithValue(avatars),
           coachFacesProvider.overrideWithValue(faces),

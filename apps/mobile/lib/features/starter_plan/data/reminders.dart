@@ -8,6 +8,7 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../routine/domain/routine_reminders.dart';
+import '../domain/daily_cap.dart';
 import '../domain/touchpoints.dart';
 
 /// What a reminder says, in the coach's voice. Generic on purpose: nothing
@@ -80,12 +81,14 @@ abstract class Reminders {
 
   /// Shows a notification now (T-AVT-08: "Your coach is ready"). Generic
   /// words only, hidden on a locked screen like the reminders; tapping it
-  /// just opens the app.
+  /// just opens the app, or hands [payload] to [taps] (a push shown while
+  /// the app is open, T-TCH-01).
   Future<void> showNow({
     required int id,
     required String title,
     required String body,
     required String channelName,
+    String? payload,
   });
 
   /// The payload (a [TouchpointKind] name, or a routine payload) of each
@@ -232,12 +235,14 @@ class LocalReminders implements Reminders {
     required String title,
     required String body,
     required String channelName,
+    String? payload,
   }) async {
     await _init();
     await _plugin.show(
       id: id,
       title: title,
       body: body,
+      payload: payload,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'coach',
@@ -274,4 +279,38 @@ class SharedPrefsReminderZoneStore implements ReminderZoneStore {
 
 final reminderZoneStoreProvider = Provider<ReminderZoneStore>(
   (ref) => SharedPrefsReminderZoneStore(),
+);
+
+/// Today's notification times from the last reschedule (D-71), so the daily
+/// cap counts what was already shown. Times only, nothing personal.
+abstract class ReminderLedgerStore {
+  Future<ReminderLedger?> load();
+  Future<void> save(ReminderLedger ledger);
+}
+
+class SharedPrefsReminderLedgerStore implements ReminderLedgerStore {
+  static const _key = 'reminders_today';
+
+  /// Stored as [date, epoch millis...].
+  @override
+  Future<ReminderLedger?> load() async {
+    final v = (await SharedPreferences.getInstance()).getStringList(_key);
+    if (v == null || v.isEmpty) return null;
+    return ReminderLedger(v.first, [
+      for (final s in v.skip(1))
+        if (int.tryParse(s) case final ms?)
+          DateTime.fromMillisecondsSinceEpoch(ms),
+    ]);
+  }
+
+  @override
+  Future<void> save(ReminderLedger ledger) async =>
+      (await SharedPreferences.getInstance()).setStringList(_key, [
+        ledger.date,
+        for (final t in ledger.times) '${t.millisecondsSinceEpoch}',
+      ]);
+}
+
+final reminderLedgerStoreProvider = Provider<ReminderLedgerStore>(
+  (ref) => SharedPrefsReminderLedgerStore(),
 );

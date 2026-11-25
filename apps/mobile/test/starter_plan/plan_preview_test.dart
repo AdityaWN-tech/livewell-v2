@@ -108,6 +108,11 @@ void main() {
     await meetCoach(tester, h);
     expect(find.byType(HomeScreen), findsOneWidget);
     // Home's step now comes from the plan (5 min: the check-in was skipped).
+    await tester.scrollUntilVisible(
+      find.text('Walk for 5 minutes after lunch'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Walk for 5 minutes after lunch'), findsOneWidget);
     expect(find.text('After lunch'), findsOneWidget);
   });

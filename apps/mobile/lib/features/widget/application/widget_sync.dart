@@ -24,6 +24,7 @@ import '../../track/presentation/track_screen.dart'
 import '../data/widget_publisher.dart';
 import '../domain/widget_builder.dart';
 import '../domain/widget_snapshot.dart';
+import 'widget_settings.dart';
 
 /// The faces the widget can show.
 const widgetExpressions = [
@@ -74,7 +75,9 @@ final widgetInputsProvider = Provider<WidgetInputs>((ref) {
     times: ref.watch(reminderTimesProvider).value ?? const TouchpointTimes(),
     streakDays: ref.watch(streakProvider)?.length,
     avatarThumbs: ref.watch(widgetFacesProvider).value ?? const {},
-    // TODO(T-AVT-08g-e): the "Hide details on lock screen" setting.
+    // "Hide details on lock screen" (T-AVT-08g-e): hidden until the
+    // setting has loaded, and whenever it can't be read.
+    hideDetails: ref.watch(widgetHideDetailsProvider).value ?? true,
     // My Daily Routine's next item (T-GOL-03e). A custom item's words
     // never go to the widget: it shows the generic line instead.
     nextRoutine: next == null

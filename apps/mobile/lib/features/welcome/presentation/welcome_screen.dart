@@ -66,10 +66,13 @@ class WelcomeScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: LwSpacing.lg),
-                          Text(
-                            l10n.welcomeTitle,
-                            textAlign: TextAlign.center,
-                            style: t.headlineSmall,
+                          Semantics(
+                            header: true,
+                            child: Text(
+                              l10n.welcomeTitle,
+                              textAlign: TextAlign.center,
+                              style: t.headlineSmall,
+                            ),
                           ),
                           const SizedBox(height: LwSpacing.xs),
                           Text(

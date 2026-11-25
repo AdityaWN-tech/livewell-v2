@@ -8,8 +8,8 @@ import '../../../l10n/app_localizations.dart';
 import '../data/firebase_auth_service.dart';
 import 'auth_copy.dart';
 
-/// Choose how to sign in (FR-ONB-01, D-02). Phone sign-in takes US (+1)
-/// numbers only (D-66); everyone else uses email, Google or Apple. Google and Apple are one-tap logo
+/// Choose how to sign in (FR-ONB-01, D-02). Phone sign-in takes numbers
+/// from any country (D-99). Google and Apple are one-tap logo
 /// buttons (T-ONB-03a): one tap signs in, or signs up if there's no account.
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
@@ -45,7 +45,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           child: ListView(
             padding: const EdgeInsets.all(LwSpacing.screenGutter),
             children: [
-              Text(l.signInTitle, style: t.displaySmall),
+              Semantics(
+                header: true,
+                child: Text(l.signInTitle, style: t.displaySmall),
+              ),
               const SizedBox(height: LwSpacing.sm),
               Text(l.signInBody, style: t.bodyMedium),
               const SizedBox(height: LwSpacing.xl),
@@ -64,11 +67,18 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               Row(
                 children: [
                   const Expanded(child: Divider()),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: LwSpacing.sm,
+                  // Flexible: wraps at the largest text sizes (T-REL-01).
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: LwSpacing.sm,
+                      ),
+                      child: Text(
+                        l.signInOrContinueWith,
+                        style: t.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    child: Text(l.signInOrContinueWith, style: t.bodySmall),
                   ),
                   const Expanded(child: Divider()),
                 ],

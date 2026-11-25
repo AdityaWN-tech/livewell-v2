@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/consents_screen.dart';
+import '../../features/memory/application/memory_enabled.dart';
+import '../../features/memory/presentation/memory_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
 import '../../features/dev/presentation/illustration_gallery.dart';
 import '../../features/dev/presentation/avatar_frames_gallery.dart';
@@ -44,6 +46,7 @@ import '../../features/rewards/presentation/rewards_screen.dart';
 import '../config/feature_flags.dart' show rewardsOnProvider;
 import '../../features/welcome/presentation/welcome_screen.dart';
 import '../../features/consent/domain/consent.dart';
+import '../../features/starter_plan/presentation/daily_plan_screen.dart';
 import '../config/flavor.dart';
 import 'app_shell.dart';
 
@@ -51,6 +54,7 @@ import 'app_shell.dart';
 /// (new users) or the 5-tab shell at /home (signed in).
 final routerProvider = Provider<GoRouter>((ref) {
   final flavor = ref.watch(flavorProvider);
+  final memoryEnabled = ref.watch(coachMemoryEnabledProvider);
   // Badges and challenges (T-GAM-01): not even routable while off (D-87).
   final rewardsOn = ref.watch(rewardsOnProvider);
   return GoRouter(
@@ -232,6 +236,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'phone',
             builder: (context, state) => const PhoneSignInScreen(linking: true),
           ),
+          // Profile > Daily plan (T-DLY-03e).
+          GoRoute(
+            path: 'daily-plan',
+            builder: (context, state) => const DailyPlanScreen(),
+          ),
         ],
       ),
       GoRoute(
@@ -242,6 +251,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'consents',
             builder: (context, state) => const ConsentsScreen(),
           ),
+          // Registered only while the screen is enabled (D-101).
+          if (memoryEnabled)
+            GoRoute(
+              path: 'memory',
+              builder: (context, state) => const MemoryScreen(),
+            ),
         ],
       ),
       if (flavor == Flavor.dev)

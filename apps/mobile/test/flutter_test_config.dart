@@ -23,7 +23,7 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 
   final flutterRoot = Platform.environment['FLUTTER_ROOT'];
   final icons = File(
-    '$flutterRoot/bin/cache/artifacts/material_fonts/materialicons-regular.otf',
+    '$flutterRoot/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
   );
   if (flutterRoot != null && icons.existsSync()) {
     await (FontLoader(

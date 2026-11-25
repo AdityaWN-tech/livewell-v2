@@ -877,8 +877,16 @@ class _WeekStreakCard extends StatelessWidget {
                     ),
                 ],
               ),
+              const SizedBox(height: LwSpacing.sm),
+              // The streak counts habits, not check-ins (D-60), so the
+              // cards above can say "No check-ins yet" on a done day.
+              Text(
+                l.trackStreakCounts,
+                key: const Key('track-streak-counts'),
+                style: t.bodySmall,
+              ),
               if (s.week.contains(StreakDay.rest)) ...[
-                const SizedBox(height: LwSpacing.sm),
+                const SizedBox(height: LwSpacing.xxs),
                 Text(l.trackStreakLegend, style: t.bodySmall),
               ],
             ],

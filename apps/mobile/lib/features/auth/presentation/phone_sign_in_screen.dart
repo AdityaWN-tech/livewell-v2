@@ -11,9 +11,10 @@ import '../../../l10n/app_localizations.dart';
 import '../data/firebase_auth_service.dart';
 import '../domain/auth.dart';
 import 'auth_copy.dart';
+import 'country_picker.dart';
 
-/// Phone sign-in with a one-time SMS code (D-02). Two stages: number, then
-/// code. "Resend" unlocks after [resendDelay]. With [linking], the same
+/// Phone sign-in with a one-time SMS code (D-02), any country (D-99). Two
+/// stages: country and number, then code. "Resend" unlocks after [resendDelay]. With [linking], the same
 /// screen adds a number to the signed-in account (Profile, Step 4c) and
 /// goes back with true once it's added.
 class PhoneSignInScreen extends ConsumerStatefulWidget {
@@ -35,8 +36,12 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
   final _codeForm = GlobalKey<FormState>();
   final _number = TextEditingController();
   final _code = TextEditingController();
-  // US numbers only (D-66).
-  static const _country = PhoneCountry.us;
+  // Pre-selected from the device's country, else the US (D-99). Only shapes
+  // the number; the safety region comes from inferRegion (D-03).
+  PhoneCountry? _selected;
+  PhoneCountry get _country => _selected ??= PhoneCountry.initial(
+    View.of(context).platformDispatcher.locale.countryCode,
+  );
   PhoneVerification? _verification;
   bool _busy = false;
   int _resendIn = 0;
@@ -126,23 +131,33 @@ class _PhoneSignInScreenState extends ConsumerState<PhoneSignInScreen> {
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
           LwPageTitle(widget.linking ? l.profileLinkPhone : l.phoneTitle),
-          Text(l.phoneUsOnlyNote, style: t.bodyMedium),
+          Text(l.phoneCountryNote, style: t.bodyMedium),
           const SizedBox(height: LwSpacing.lg),
+          CountryField(
+            country: _country,
+            enabled: !_busy,
+            onChanged: (c) => setState(() => _selected = c),
+          ),
+          const SizedBox(height: LwSpacing.md),
           TextFormField(
             key: const Key('phone'),
             controller: _number,
             keyboardType: TextInputType.phone,
-            autofillHints: const [AutofillHints.telephoneNumberNational],
+            autofillHints: const [AutofillHints.telephoneNumber],
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[0-9 +\-()]')),
             ],
             onFieldSubmitted: (_) => _sendCode(),
             decoration: InputDecoration(
               labelText: l.phoneNumberLabel,
-              prefixText: '${_country.dialCode} ',
+              prefixText: _number.text.trimLeft().startsWith('+')
+                  ? null
+                  : '${_country.dialCode} ',
             ),
-            validator: (value) =>
-                _country.toE164(value ?? '') == null ? l.phoneInvalidMsg : null,
+            onChanged: (_) => setState(() {}),
+            validator: (value) => _country.toE164(value ?? '') == null
+                ? l.phoneInvalidMsg(countryName(_country))
+                : null,
           ),
           const SizedBox(height: LwSpacing.xs),
           Text(l.phoneSmsNote, style: t.bodySmall),

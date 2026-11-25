@@ -1,0 +1,654 @@
+{
+ "about": "SYNTHETIC content for tests and the retrieval eval (T-AGT-03, D-94). Written for this repo; not from the Live Well book or any copyrighted source. Driver keys are provisional (needs-product). reviewed_by is a placeholder. Items whose id starts with pending_/retired_/rejected_/draft_/expired_ are deliberately on-topic distractors that must never be retrieved.",
+ "items": [
+  {
+   "id": "move_walk_after_meals",
+   "type": "lesson",
+   "title": "A short walk after meals",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "movement"
+   ],
+   "category": "movement",
+   "cards": [
+    "A gentle walk after a meal is one of the easiest ways to move more during the day.",
+    "Start with five minutes at an easy pace. You should be able to talk while you walk.",
+    "Pick one meal, like lunch, and pair your walk with it so it becomes a habit.",
+    "On busy days a slow walk around the house or office still counts."
+   ],
+   "microhabit": {
+    "title": "Walk for five minutes after lunch",
+    "minutes": 5
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01",
+   "pillar_tags": [
+    "move_well"
+   ]
+  },
+  {
+   "id": "move_desk_stretch",
+   "type": "lesson",
+   "title": "Stretch breaks at your desk",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "movement"
+   ],
+   "category": "movement",
+   "cards": [
+    "Sitting for long hours makes the body feel stiff. Short stretch breaks help you move more.",
+    "Stand up, roll your shoulders back and reach your arms up slowly.",
+    "Stretch only as far as feels good. Gentle movement is the goal, never pain.",
+    "Set a reminder to stand and stretch every hour while you work."
+   ],
+   "microhabit": {
+    "title": "Stand and stretch once every hour",
+    "minutes": 2
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01",
+   "pillar_tags": [
+    "move_well"
+   ]
+  },
+  {
+   "id": "book_movement_everyday",
+   "type": "book",
+   "title": "Movement in everyday life",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "movement"
+   ],
+   "source_ref": "synthetic:book_movement_everyday",
+   "sections": [
+    "Movement does not have to mean a gym. Walking to the shop, taking the stairs and stretching while the kettle boils all add up across a day.",
+    "Begin small. A few minutes of easy walking that you repeat every day matters more than one long, hard workout that you never repeat.",
+    "Choose movement you enjoy, such as dancing in the kitchen, gardening or a walk with a friend, so moving more feels like a gift and not a chore."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "sleep_wind_down",
+   "type": "lesson",
+   "title": "A calm wind-down before bed",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "sleep"
+   ],
+   "category": "sleep",
+   "cards": [
+    "A regular wind-down routine tells your body it is time to sleep.",
+    "Dim the lights and put screens away about thirty minutes before bed.",
+    "Try a warm shower, light reading or slow breathing to relax.",
+    "Going to bed at the same time each night helps you fall asleep more easily."
+   ],
+   "microhabit": {
+    "title": "Screens off thirty minutes before bed",
+    "minutes": 5
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "sleep_bedroom",
+   "type": "lesson",
+   "title": "Make your bedroom sleep friendly",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "sleep"
+   ],
+   "category": "sleep",
+   "cards": [
+    "A cool, dark and quiet bedroom makes it easier to sleep through the night.",
+    "Use curtains or an eye mask to block light, and keep the room comfortably cool.",
+    "Keep the bed for sleep and rest, not for work or scrolling on your phone.",
+    "If you cannot fall asleep after a while, get up, do something calm and return when sleepy."
+   ],
+   "microhabit": {
+    "title": "Charge your phone outside the bedroom tonight",
+    "minutes": 2
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "book_sleep_rhythm",
+   "type": "book",
+   "title": "Sleep and your daily rhythm",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "sleep"
+   ],
+   "source_ref": "synthetic:book_sleep_rhythm",
+   "sections": [
+    "Your body likes rhythm. Waking up and going to bed at about the same time every day, even at weekends, helps your sleep feel deeper and more restful.",
+    "Morning daylight helps set your body clock. A few minutes outside after waking can make it easier to feel sleepy at night.",
+    "Heavy meals and caffeine late in the evening can keep you awake. A lighter evening and a calm bedtime routine support good sleep."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "eat_more_vegetables",
+   "type": "lesson",
+   "title": "Add a vegetable to every meal",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "nutrition"
+   ],
+   "category": "nutrition",
+   "cards": [
+    "Eating more vegetables is a simple way to eat better without strict rules.",
+    "Add one vegetable to a meal you already eat, like spinach in an omelette or carrots with lunch.",
+    "Fill half your plate with colourful vegetables when you can.",
+    "Frozen vegetables are quick, cheap and just as good for busy days."
+   ],
+   "microhabit": {
+    "title": "Add one vegetable to dinner today",
+    "minutes": 5
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01",
+   "pillar_tags": [
+    "eat_well"
+   ]
+  },
+  {
+   "id": "eat_mindful_meals",
+   "type": "lesson",
+   "title": "Eat slowly and enjoy your food",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "nutrition"
+   ],
+   "category": "nutrition",
+   "cards": [
+    "Eating slowly helps you notice when you are full and enjoy your meal more.",
+    "Sit down to eat, away from screens, and take a breath before your first bite.",
+    "Put your fork down between bites and chew your food well.",
+    "Notice the taste, colour and smell of your food. Meals are a time to slow down."
+   ],
+   "microhabit": {
+    "title": "Eat one meal today without a screen",
+    "minutes": 10
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01",
+   "pillar_tags": [
+    "eat_well"
+   ]
+  },
+  {
+   "id": "book_nutrition_plate",
+   "type": "book",
+   "title": "Building a balanced plate",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "nutrition"
+   ],
+   "source_ref": "synthetic:book_nutrition_plate",
+   "sections": [
+    "A balanced plate has vegetables, whole grains and a source of protein such as lentils, beans, eggs, fish or paneer. Simple home cooked meals make it easier to eat well.",
+    "Drinking water through the day and choosing whole fruit over sweet drinks are small food habits that are easy to keep.",
+    "Eating better is about adding good foods, not about strict diets. Small changes to the meals you already enjoy last longer."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "stress_breathing",
+   "type": "lesson",
+   "title": "Slow breathing for stressful moments",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "stress"
+   ],
+   "category": "stress",
+   "cards": [
+    "When you feel stressed, slow breathing can help your body calm down.",
+    "Breathe in gently through your nose for a count of four, then breathe out slowly for six.",
+    "Repeat for one or two minutes. Let your shoulders drop as you breathe out.",
+    "You can use slow breathing anywhere: before a meeting, in traffic or before sleep."
+   ],
+   "microhabit": {
+    "title": "Take one minute of slow breathing at lunch",
+    "minutes": 1
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01",
+   "pillar_tags": [
+    "rest_well"
+   ]
+  },
+  {
+   "id": "stress_worry_time",
+   "type": "lesson",
+   "title": "Put your worries on paper",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "stress",
+    "mindset"
+   ],
+   "category": "stress",
+   "cards": [
+    "Worries can feel smaller when you write them down instead of carrying them in your head.",
+    "Set aside ten minutes a day as worry time. Write each worry and one small step you could take.",
+    "When a worry comes back later, remind yourself it has a place in tomorrow's worry time.",
+    "Writing things down can lower stress and help you feel more in control."
+   ],
+   "microhabit": {
+    "title": "Write down one worry and one small step",
+    "minutes": 10
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "book_stress_pause",
+   "type": "book",
+   "title": "The power of a pause",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "stress"
+   ],
+   "source_ref": "synthetic:book_stress_pause",
+   "sections": [
+    "Stress is a normal part of life, but long stretches of stress without rest wear us down. Short pauses during the day help the body and mind recover.",
+    "A pause can be three slow breaths, a stretch, a cup of tea in silence or a short walk outside. What matters is that you step away for a moment.",
+    "Notice your early signs of stress, such as tight shoulders or a racing mind, and use them as a signal to pause and breathe."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "energy_afternoon_slump",
+   "type": "lesson",
+   "title": "Beat the afternoon energy slump",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "energy"
+   ],
+   "category": "energy",
+   "cards": [
+    "Many people feel tired and low on energy in the afternoon.",
+    "Instead of another coffee, try a glass of water and a short walk to lift your energy.",
+    "Natural light and fresh air can help you feel more awake and alert.",
+    "A lighter lunch with vegetables and protein can keep your energy steadier."
+   ],
+   "microhabit": {
+    "title": "Drink a glass of water at three o'clock",
+    "minutes": 2
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "energy_morning_boost",
+   "type": "lesson",
+   "title": "Start the morning with energy",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "energy",
+    "routine"
+   ],
+   "category": "energy",
+   "cards": [
+    "How you start your morning can shape your energy for the whole day.",
+    "Open the curtains for daylight and drink a glass of water soon after waking.",
+    "A few minutes of gentle movement in the morning helps you feel more awake.",
+    "A simple breakfast gives your body fuel and steady energy until lunch."
+   ],
+   "microhabit": {
+    "title": "Open the curtains and drink water after waking",
+    "minutes": 2
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "book_energy_sources",
+   "type": "book",
+   "title": "Where your energy comes from",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "energy"
+   ],
+   "source_ref": "synthetic:book_energy_sources",
+   "sections": [
+    "Energy comes from many small things: sleep, food, movement, water and rest. When you feel tired, look at these everyday sources first.",
+    "Short breaks across the day protect your energy. Pushing on without rest often leaves you drained by evening.",
+    "Notice the activities and people that give you energy and those that take it away, and plan your day to include more of what lifts you."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "routine_habit_stacking",
+   "type": "lesson",
+   "title": "Stack a new habit on an old one",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "routine"
+   ],
+   "category": "routine",
+   "cards": [
+    "A new habit is easier to keep when you link it to something you already do every day.",
+    "Use the pattern: after I brush my teeth, I will stretch for two minutes.",
+    "Pick an anchor that happens at the same time each day, like your morning tea.",
+    "Keep the new habit tiny at first so it is easy to repeat, even on hard days."
+   ],
+   "microhabit": {
+    "title": "Pick one anchor for a two minute habit",
+    "minutes": 2
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "routine_plan_your_day",
+   "type": "lesson",
+   "title": "Plan tomorrow the night before",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "routine"
+   ],
+   "category": "routine",
+   "cards": [
+    "A simple daily routine makes healthy habits feel automatic.",
+    "Each evening, write down the three most important things for tomorrow.",
+    "Put your healthy habit, like a walk or a glass of water, at a fixed time in your daily plan.",
+    "A steady routine lowers the number of decisions you need to make each day."
+   ],
+   "microhabit": {
+    "title": "Write three things to do tomorrow",
+    "minutes": 5
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "book_routine_consistency",
+   "type": "book",
+   "title": "Small habits, done daily",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "routine"
+   ],
+   "source_ref": "synthetic:book_routine_consistency",
+   "sections": [
+    "Habits grow through repetition. Doing a small action at the same time every day matters more than doing a big action once in a while.",
+    "When you miss a day, simply start again the next day. One missed day does not break a habit; giving up does.",
+    "Write your daily routine where you can see it and tick off each habit as you complete it. Seeing progress keeps you going."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "connect_call_a_friend",
+   "type": "lesson",
+   "title": "Reach out to someone you care about",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "connection"
+   ],
+   "category": "connection",
+   "cards": [
+    "Feeling connected to other people is an important part of living well.",
+    "Call or message a friend or family member you have not spoken to in a while.",
+    "Ask how they are and really listen. Short conversations still build strong bonds.",
+    "Make it a weekly habit to reach out to one person you care about."
+   ],
+   "microhabit": {
+    "title": "Send a kind message to one friend today",
+    "minutes": 2
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "connect_shared_meals",
+   "type": "lesson",
+   "title": "Share a meal with family",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "connection",
+    "nutrition"
+   ],
+   "category": "connection",
+   "cards": [
+    "Eating together is a simple way to feel closer to family and friends.",
+    "Plan one shared meal this week, at home or with neighbours.",
+    "Put phones away at the table and talk about the best part of your day.",
+    "Shared meals help everyone slow down, connect and enjoy their food."
+   ],
+   "microhabit": {
+    "title": "Plan one family meal this week",
+    "minutes": 5
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "book_connection_belonging",
+   "type": "book",
+   "title": "Belonging and community",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "connection"
+   ],
+   "source_ref": "synthetic:book_connection_belonging",
+   "sections": [
+    "People who feel they belong to a family, group or community often find it easier to keep healthy habits. Friends and family can encourage us on hard days.",
+    "Join a walking group, a class or a place of worship, or volunteer in your neighbourhood. Shared activities create friendships over time.",
+    "Loneliness is common and nothing to be ashamed of. Reaching out to one person is a brave and healthy first step."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "mindset_gratitude",
+   "type": "lesson",
+   "title": "A daily gratitude moment",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "mindset"
+   ],
+   "category": "mindset",
+   "cards": [
+    "Noticing what is going well can lift your mood and build a more hopeful mindset.",
+    "Each night, write down three good things that happened today, however small.",
+    "They can be simple: a warm cup of tea, a kind word or a sunny walk.",
+    "Over time, a gratitude habit trains your mind to notice the good in each day."
+   ],
+   "microhabit": {
+    "title": "Write three good things before bed",
+    "minutes": 5
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "mindset_kind_self_talk",
+   "type": "lesson",
+   "title": "Talk to yourself like a friend",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "mindset"
+   ],
+   "category": "mindset",
+   "cards": [
+    "The way you talk to yourself shapes how you feel and act.",
+    "When you slip up, notice harsh self talk and ask what you would say to a friend.",
+    "Replace 'I always fail' with 'I am learning, and I can try again tomorrow'.",
+    "Kind self talk keeps you going when change feels hard."
+   ],
+   "microhabit": {
+    "title": "Say one kind sentence to yourself today",
+    "minutes": 1
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "book_mindset_hope",
+   "type": "book",
+   "title": "A hopeful mindset",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "mindset"
+   ],
+   "source_ref": "synthetic:book_mindset_hope",
+   "sections": [
+    "Change starts with a hopeful mindset: believing that small steps can make a difference in how you feel each day.",
+    "Celebrate small wins. Every walk, glass of water or early night is progress worth noticing and enjoying.",
+    "Setbacks are part of every journey. A kind and curious mindset helps you learn from a hard day instead of giving up."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "eat_well_indian_kitchen",
+   "type": "lesson",
+   "title": "Eat well from an Indian kitchen",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "nutrition"
+   ],
+   "category": "nutrition",
+   "cards": [
+    "Dal, sabzi and roti or rice make a balanced everyday plate.",
+    "Add a bowl of curd or a salad of cucumber and tomato to lunch.",
+    "Choose roasted snacks like chana over fried ones most days."
+   ],
+   "microhabit": {
+    "title": "Add a salad to lunch",
+    "minutes": 5
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01",
+   "region": "IN",
+   "pillar_tags": [
+    "eat_well"
+   ]
+  },
+  {
+   "id": "pending_sleep_secrets",
+   "type": "lesson",
+   "title": "Pending: sleep tips",
+   "review_status": "pending",
+   "version": 1,
+   "driver_tags": [
+    "sleep"
+   ],
+   "category": "sleep",
+   "cards": [
+    "Sleep better tonight: a wind-down routine before bed, screens off, dim lights, same bedtime, calm sleep.",
+    "Sleep sleep sleep: bedroom dark and cool for deep sleep and falling asleep easily."
+   ],
+   "microhabit": {
+    "title": "Go to bed early",
+    "minutes": 5
+   }
+  },
+  {
+   "id": "retired_walking_plan",
+   "type": "lesson",
+   "title": "Retired: walking plan",
+   "review_status": "retired",
+   "version": 1,
+   "driver_tags": [
+    "movement"
+   ],
+   "category": "movement",
+   "cards": [
+    "Walk after meals every day. A short walk after lunch at an easy pace helps you move more.",
+    "Walking walking walking: take a gentle walk after each meal."
+   ],
+   "microhabit": {
+    "title": "Walk after each meal",
+    "minutes": 10
+   },
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01"
+  },
+  {
+   "id": "rejected_stress_cure",
+   "type": "lesson",
+   "title": "Rejected: stress",
+   "review_status": "rejected",
+   "version": 1,
+   "driver_tags": [
+    "stress"
+   ],
+   "category": "stress",
+   "cards": [
+    "Slow breathing for stress: breathe in for four and out for six whenever you feel stressed, to calm down."
+   ],
+   "microhabit": {
+    "title": "Breathe slowly",
+    "minutes": 1
+   }
+  },
+  {
+   "id": "draft_energy_tips",
+   "type": "lesson",
+   "title": "Draft: energy",
+   "review_status": "draft",
+   "version": 1,
+   "driver_tags": [
+    "energy"
+   ],
+   "category": "energy",
+   "cards": [
+    "Afternoon energy slump? Drink water, take a short walk, get daylight to lift your energy."
+   ],
+   "microhabit": {
+    "title": "Drink water",
+    "minutes": 2
+   }
+  },
+  {
+   "id": "expired_vegetables",
+   "type": "book",
+   "title": "Expired: vegetables",
+   "review_status": "approved",
+   "version": 1,
+   "driver_tags": [
+    "nutrition"
+   ],
+   "source_ref": "synthetic:expired_vegetables",
+   "sections": [
+    "Add a vegetable to every meal. Fill half your plate with colourful vegetables to eat better."
+   ],
+   "reviewed_by": "synthetic-reviewer",
+   "reviewed_at": "2026-11-01",
+   "review_expires_at": "2026-06-30"
+  }
+ ]
+}

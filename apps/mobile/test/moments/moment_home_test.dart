@@ -15,7 +15,8 @@ import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
 import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/track/presentation/track_screen.dart';
 
-import '../home/home_screen_test.dart' show bootPreview, signedIn, today;
+import '../home/home_screen_test.dart'
+    show bootPreview, scrollHomeTo, signedIn, today;
 import '../support/app_harness.dart';
 import 'moment_reminders_test.dart' show close, playing, previewAt, settle;
 
@@ -52,11 +53,7 @@ Future<void> choose(WidgetTester tester, MomentAction a) async {
 
 /// Opens today's step and taps Done.
 Future<void> tapDone(WidgetTester tester) async {
-  await tester.scrollUntilVisible(
-    find.byKey(const Key('step-open')),
-    200,
-    scrollable: find.byType(Scrollable).first,
-  );
+  await scrollHomeTo(tester, find.byKey(const Key('step-open')));
   await tester.tap(find.byKey(const Key('step-open')));
   await tester.pumpAndSettle();
   await tester.scrollUntilVisible(
@@ -117,6 +114,7 @@ void main() {
         tester,
         checkIn: const CheckIn(date: today, mood: 1, gentleDay: true),
       );
+      await scrollHomeTo(tester, play);
       expect(heroFace(AvatarExpression.calm), findsOneWidget);
       await tester.tap(play);
       await settle(tester);

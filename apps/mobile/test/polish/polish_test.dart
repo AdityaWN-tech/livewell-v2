@@ -11,7 +11,7 @@ import 'package:livewell/features/notifications/presentation/notifications_scree
 import 'package:livewell/features/profile/presentation/profile_screen.dart';
 import 'package:livewell/features/welcome/presentation/welcome_screen.dart';
 
-import '../home/home_screen_test.dart' show bootPreview;
+import '../home/home_screen_test.dart' show bootPreview, scrollHomeTo;
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
 
@@ -255,6 +255,7 @@ void main() {
 
     testWidgets('Done: the coach celebrates', (tester) async {
       await bootPreview(tester);
+      await scrollHomeTo(tester, find.byKey(const Key('step-open')));
       await tester.tap(find.byKey(const Key('step-open')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('step-done')));

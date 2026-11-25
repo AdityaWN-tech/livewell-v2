@@ -159,7 +159,12 @@ class CoachAvatar extends ConsumerWidget {
     this.bubble,
     this.size = 120,
     this.animate = true,
+    this.minBubbleWidth = 180,
   });
+
+  /// The bubble sits beside the face when it gets at least this much room,
+  /// else above it.
+  final double minBubbleWidth;
 
   final AvatarExpression expression;
   final String? bubble;
@@ -184,7 +189,7 @@ class CoachAvatar extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final scale = MediaQuery.textScalerOf(context).scale(1);
-        final beside = c.maxWidth >= size + 180 && scale <= 1.3;
+        final beside = c.maxWidth >= size + minBubbleWidth && scale <= 1.3;
         final speech = SpeechBubble(
           key: const Key('coach-bubble'),
           text: bubble!,

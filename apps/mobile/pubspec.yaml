@@ -67,6 +67,7 @@ dependencies:
   drift: ^2.35.4
   sqlite3: ^3.9.1
   flutter_secure_storage: ^11.2.0
+  phone_numbers_parser: ^9.0.29
 
 dev_dependencies:
   flutter_test:

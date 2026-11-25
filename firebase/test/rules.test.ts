@@ -978,4 +978,13 @@ describe('server-only collections are closed to clients (11.1)', () => {
     await assertFails(setDoc(doc(as(ALICE), 'anything/x'), { a: 1 }));
     await assertFails(setDoc(doc(as(ALICE), 'users/alice/unknown/x'), { a: 1 }));
   });
+  // T-FND-07 (D-83): copies of the prototype's users arrays are server-only
+  // until the product decides how the app shows them.
+  for (const col of ['legacy_goals', 'legacy_affirmations', 'legacy_favorites']) {
+    it(`users/{uid}/${col} (T-FND-07 migration copies)`, async () => {
+      await seed(env, { [`users/alice/${col}/0000`]: { index: 0, value: 'x', ...meta() } });
+      await assertFails(getDoc(doc(as(ALICE), `users/alice/${col}/0000`)));
+      await assertFails(setDoc(doc(as(ALICE), `users/alice/${col}/0001`), { index: 1, value: 'y', ...meta() }));
+    });
+  }
 });

@@ -372,6 +372,139 @@ paths:
         "401": {description: not_authorized}
         "404": {description: not_found}
         "503": {description: memory_unavailable}
+  # ---------- Core API: portal catalog for the Admin / CMS (T-PRT-02, D-92) ----------
+  # Firebase callable functions (Cloud Functions 2nd gen, us-central1 until
+  # regions are decided). Callable protocol: POST {"data": <request>}, reply
+  # {"result": <response>} or {"error": {"status", "message", "details":
+  # {"reason"}}}. Staff only: the ID token must carry `staff_roles` and pass
+  # the MFA gate (a second factor, or the owner's time-limited
+  # `staff_mfa_waiver_until`); otherwise 403 with reason not_staff,
+  # mfa_required or role. Every write is audited (ids, statuses and field
+  # names only). App Check is not enforced yet (owner follow-up).
+  /adminListPortalOffers:
+    servers: [{url: "https://us-central1-{project}.cloudfunctions.net", variables: {project: {default: my-livewell}}}]
+    post:
+      summary: Every portal offer with its workflow (any staff role)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, properties: {data: {type: object, additionalProperties: false}}}
+      responses:
+        "200":
+          description: The catalog, newest change first (at most 500)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      offers: {type: array, items: {$ref: "#/components/schemas/AdminPortalOffer"}}
+        "401": {description: unauthenticated}
+        "403": {description: "not_staff | mfa_required | role"}
+  /adminCreatePortalOffer:
+    servers: [{url: "https://us-central1-{project}.cloudfunctions.net", variables: {project: {default: my-livewell}}}]
+    post:
+      summary: New offer as a draft, not live (content_editor, admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  required: [fields]
+                  additionalProperties: false
+                  properties:
+                    fields: {$ref: "#/components/schemas/PortalOfferFields"}
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema: {type: object, properties: {result: {type: object, properties: {id: {type: string}, rev: {type: integer}}}}}
+        "400": {description: invalid (field errors in details.issues)}
+        "401": {description: unauthenticated}
+        "403": {description: "not_staff | mfa_required | role"}
+  /adminUpdatePortalOffer:
+    servers: [{url: "https://us-central1-{project}.cloudfunctions.net", variables: {project: {default: my-livewell}}}]
+    post:
+      summary: Edit an offer (content_editor, admin). Any change takes it offline and back to draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  required: [id, expected_rev, fields]
+                  additionalProperties: false
+                  properties:
+                    id: {type: string, pattern: "^[A-Za-z0-9_-]{1,64}$"}
+                    expected_rev: {type: integer, minimum: 1, description: "The rev the editor saw; a newer one means someone else changed it"}
+                    fields: {$ref: "#/components/schemas/PortalOfferFields"}
+      responses:
+        "200":
+          description: Saved (changed false when nothing differed; nothing is written or logged then)
+          content:
+            application/json:
+              schema: {type: object, properties: {result: {type: object, properties: {id: {type: string}, rev: {type: integer}, changed: {type: boolean}}}}}
+        "400": {description: "invalid | wrong_status (archived)"}
+        "403": {description: "not_staff | mfa_required | role"}
+        "404": {description: not_found}
+        "409": {description: stale}
+  /adminTransitionPortalOffer:
+    servers: [{url: "https://us-central1-{project}.cloudfunctions.net", variables: {project: {default: my-livewell}}}]
+    post:
+      summary: A review step
+      description: >
+        submit / withdraw / publish / archive / restore: content_editor, admin.
+        approve / reject: clinical_reviewer, admin; nobody approves a version
+        they edited or submitted (own_offer). publish only when approved
+        (editors publish, spec 17.4). unpublish: any staff role.
+        draft|rejected -submit-> in_review -approve-> approved -publish-> live
+        (active); in_review -reject-> rejected; in_review -withdraw-> draft;
+        any -archive-> archived -restore-> draft.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  required: [id, expected_rev, action]
+                  additionalProperties: false
+                  properties:
+                    id: {type: string}
+                    expected_rev: {type: integer, minimum: 1}
+                    action: {type: string, enum: [submit, withdraw, approve, reject, publish, unpublish, archive, restore]}
+      responses:
+        "200":
+          description: Done
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      id: {type: string}
+                      rev: {type: integer}
+                      review_status: {$ref: "#/components/schemas/ReviewStatus"}
+                      active: {type: boolean}
+        "400": {description: "invalid | wrong_status | own_offer | not_active | already_active"}
+        "403": {description: "not_staff | mfa_required | role"}
+        "404": {description: not_found}
+        "409": {description: stale}
   /speakMessage:
     post:
       summary: Closed-script TTS gateway (Core API callable `speakMessage`, T-VOC-07)
@@ -422,6 +555,72 @@ components:
     firebaseIdToken: {type: http, scheme: bearer}
     appCheck: {type: apiKey, in: header, name: X-Firebase-AppCheck}
   schemas:
+    SpeakRequest:
+      type: object
+      additionalProperties: false
+      required: [message_id, voice_id]
+      properties:
+        message_id:
+          type: string
+          maxLength: 400
+          description: "{file}.{variant}@v{n} | routine.{a}.{line}+…@v{n} | lesson.{item}.{c1…|habit}@v{n} | orchestrator id | safety.…"
+        voice_id: {type: string, pattern: "^[A-Za-z0-9_-]{1,64}$"}
+        params:
+          type: object
+          maxProperties: 12
+          description: >
+            Closed-set values for the line's placeholders only: step_minutes,
+            smaller_minutes, streak_days, weekly_count, routine_win_days
+            (whole numbers 0-999), time_of_day (morning | afternoon |
+            evening), time ("HH:MM"), routine_win (a catalog activity id).
+            Lines with first_name, coach_name, why or step_title are refused.
+          additionalProperties:
+            oneOf:
+              - {type: integer}
+              - {type: string, pattern: "^[a-z0-9_:]{1,40}$"}
+    SpeakResult:
+      type: object
+      required: [status, message_id]
+      properties:
+        status: {type: string, enum: [ok, neutral_device]}
+        message_id: {type: string}
+        voice_kind: {type: string, enum: [library, cloned, licensed]}
+        ai_voice_label: {type: boolean, description: "FR-VOC-08: true for cloned and licensed voices"}
+        mime: {type: string}
+        audio_base64: {type: string, description: "Played in the app only; never offered for export (FR-VOC-05)"}
+    PortalOfferFields:
+      type: object
+      description: What an editor writes (T-PRT-02). Shown to app users exactly as entered.
+      required: [title, url, offer_type]
+      additionalProperties: false
+      properties:
+        title: {type: string, minLength: 3, maxLength: 80, description: One line}
+        description: {type: string, maxLength: 240, default: "", description: One line; no health-outcome claims (13.4, checked in clinical review)}
+        url:
+          type: string
+          maxLength: 500
+          description: https on livewell.conciergeconnectedcare.net only; no port, credentials, fragment, utm_* or lw_cid (the app adds attribution)
+        offer_type: {type: string, enum: [course, program, free_lesson, coaching]}
+        driver_tags: {type: array, maxItems: 8, items: {type: string, pattern: "^[a-z][a-z0-9_]{0,31}$"}}
+        topic_tags: {type: array, maxItems: 8, items: {type: string, pattern: "^[a-z][a-z0-9_]{0,31}$"}}
+        price_display: {type: string, maxLength: 24, default: "", description: Empty for free_lesson; empty on a paid offer shows "Paid course"}
+    ReviewStatus: {type: string, enum: [draft, in_review, approved, rejected, archived]}
+    AdminPortalOffer:
+      allOf:
+        - $ref: "#/components/schemas/PortalOfferFields"
+        - type: object
+          properties:
+            id: {type: string}
+            review_status: {$ref: "#/components/schemas/ReviewStatus"}
+            active: {type: boolean, description: Live in the app only when true and approved}
+            version: {type: integer, description: Content version, +1 per edit}
+            rev: {type: integer, description: Revision, +1 per write; send as expected_rev}
+            version_editors: {type: array, items: {type: string}, description: Staff uids who changed this version (two-person rule)}
+            submitted_by: {type: [string, "null"]}
+            created_by: {type: [string, "null"]}
+            last_action: {type: [string, "null"]}
+            last_actor: {type: [string, "null"]}
+            updated_at: {type: [string, "null"], format: date-time}
     AvatarRequest:
       type: object
       required: [source]
@@ -605,36 +804,3 @@ components:
         status: {type: string, enum: [proposed, nothing, skipped]}
         reason: {type: string, description: "code only (memory_off, no_ai_consent, red_flag, recent_safety_event, instruction_like, red_flag_classifier, classifier_unavailable, prompt_not_approved, too_many_pending, model_failed, no_fact_kept, ok)"}
         facts: {type: array, items: {$ref: "#/components/schemas/MemoryFact"}}
-    SpeakRequest:
-      type: object
-      additionalProperties: false
-      required: [message_id, voice_id]
-      properties:
-        message_id:
-          type: string
-          maxLength: 400
-          description: "{file}.{variant}@v{n} | routine.{a}.{line}+…@v{n} | lesson.{item}.{c1…|habit}@v{n} | orchestrator id | safety.…"
-        voice_id: {type: string, pattern: "^[A-Za-z0-9_-]{1,64}$"}
-        params:
-          type: object
-          maxProperties: 12
-          description: >
-            Closed-set values for the line's placeholders only: step_minutes,
-            smaller_minutes, streak_days, weekly_count, routine_win_days
-            (whole numbers 0-999), time_of_day (morning | afternoon |
-            evening), time ("HH:MM"), routine_win (a catalog activity id).
-            Lines with first_name, coach_name, why or step_title are refused.
-          additionalProperties:
-            oneOf:
-              - {type: integer}
-              - {type: string, pattern: "^[a-z0-9_:]{1,40}$"}
-    SpeakResult:
-      type: object
-      required: [status, message_id]
-      properties:
-        status: {type: string, enum: [ok, neutral_device]}
-        message_id: {type: string}
-        voice_kind: {type: string, enum: [library, cloned, licensed]}
-        ai_voice_label: {type: boolean, description: "FR-VOC-08: true for cloned and licensed voices"}
-        mime: {type: string}
-        audio_base64: {type: string, description: "Played in the app only; never offered for export (FR-VOC-05)"}

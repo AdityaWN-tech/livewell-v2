@@ -10,7 +10,8 @@ on a developer's computer. Never in the repo.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from typing import Any
 
 from .auth import NotAuthorized
@@ -103,3 +104,33 @@ class FirestoreAvatarDocs:
         doc = self.db.collection("users").document(uid).collection("avatar").document("current")
         doc.set(fields, merge=True)
         log.info("avatar doc updated (frames_version=%s)", frames_version)
+
+
+@dataclass
+class FirestorePushOutbox:
+    """The JobNotifier at deploy (T-TCH-01, D-77): asks core-api for a push
+    by writing push_outbox/{id} (server-only). core-api's onPushRequest
+    checks the notifications consent, quiet hours and the daily cap, and
+    picks the fixed generic words; this only says which person, which
+    category and which job. One request per job (the id is fixed)."""
+
+    db: Any
+    #: Firestore's server time (replaced in tests, which don't install it).
+    now: Callable[[], Any] = field(default_factory=lambda: _server_timestamp)
+
+    def job_done(self, uid: str, job_id: str, made: bool) -> None:
+        self.db.collection("push_outbox").document(f"coach_{job_id}").set(
+            {
+                "uid": uid,
+                "category": "coach_ready" if made else "coach_not_made",
+                "ref_id": job_id,
+                "created_at": self.now(),
+            }
+        )
+        log.info("push requested for avatar job %s", job_id)
+
+
+def _server_timestamp() -> Any:
+    from google.cloud.firestore import SERVER_TIMESTAMP
+
+    return SERVER_TIMESTAMP

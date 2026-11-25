@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../../../core/config/flavor.dart';
+import '../domain/widget_interaction.dart';
+import '../domain/widget_snapshot.dart' show WidgetActionId;
 import 'widget_publisher.dart';
 
 /// What a widget button asks the app to do (T-AVT-08g-b).
@@ -35,6 +37,30 @@ WidgetLink? parseWidgetLink(Uri? uri) {
   };
 }
 
+/// The analytics action id of [link] (the widget's button ids).
+String widgetActionIdOf(WidgetLink link) => switch (link) {
+  WidgetLink.checkIn => WidgetActionId.checkIn.id,
+  WidgetLink.step => WidgetActionId.openStep.id,
+  WidgetLink.makeSmaller => WidgetActionId.makeSmaller.id,
+  WidgetLink.done => WidgetActionId.done.id,
+  WidgetLink.reflect => WidgetActionId.reflect.id,
+  WidgetLink.home => WidgetActionId.openHome.id,
+  WidgetLink.routine => WidgetActionId.openRoutine.id,
+  WidgetLink.routineDone => WidgetActionId.routineDone.id,
+};
+
+/// The tap behind a widget link: its action, and the `size` and `slot` the
+/// native widget adds (T-AVT-08g-e). Null when it isn't a widget link.
+WidgetInteraction? widgetInteractionOf(Uri? uri) {
+  final link = parseWidgetLink(uri);
+  if (link == null) return null;
+  return WidgetInteraction(
+    action: widgetActionIdOf(link),
+    size: uri!.queryParameters['size'],
+    slot: uri.queryParameters['slot'],
+  );
+}
+
 /// What the widget hands back to the app: the link that opened it, and a
 /// Done tapped on the widget itself (iOS 17+, Android 12+), which the app
 /// applies once, the next time it runs.
@@ -52,6 +78,10 @@ abstract class WidgetInbox {
   /// The routine item of the last [WidgetLink.routineDone] (its routine
   /// payload), once; then null.
   String? takeRoutinePayload();
+
+  /// The tap behind the last link or widget Done read, once; then null
+  /// (for `widget_interaction`).
+  WidgetInteraction? takeInteraction();
 }
 
 /// The routine payload a routine Done link carries, or null.
@@ -65,13 +95,26 @@ class HomeWidgetInbox implements WidgetInbox {
 
   /// Written by the widget's Done (iOS App Intent, Android action).
   static const doneKey = 'lw_done_date';
+
+  /// The size and slot the widget's own Done was tapped in.
+  static const doneSizeKey = 'lw_done_size';
+  static const doneSlotKey = 'lw_done_slot';
   bool _launchRead = false;
   String? _routinePayload;
+  WidgetInteraction? _interaction;
 
   WidgetLink? _read(Uri? uri) {
     final link = parseWidgetLink(uri);
     if (link == WidgetLink.routineDone) _routinePayload = routinePayloadOf(uri);
+    if (link != null) _interaction = widgetInteractionOf(uri);
     return link;
+  }
+
+  @override
+  WidgetInteraction? takeInteraction() {
+    final i = _interaction;
+    _interaction = null;
+    return i;
   }
 
   @override
@@ -104,7 +147,15 @@ class HomeWidgetInbox implements WidgetInbox {
     try {
       await HomeWidget.setAppGroupId(appGroupId);
       final date = await HomeWidget.getWidgetData<String>(doneKey);
-      if (date != null) await HomeWidget.saveWidgetData<String>(doneKey, null);
+      if (date != null) {
+        _interaction = WidgetInteraction.doneOnWidget(
+          size: await HomeWidget.getWidgetData<String>(doneSizeKey),
+          slot: await HomeWidget.getWidgetData<String>(doneSlotKey),
+        );
+        await HomeWidget.saveWidgetData<String>(doneKey, null);
+        await HomeWidget.saveWidgetData<String>(doneSizeKey, null);
+        await HomeWidget.saveWidgetData<String>(doneSlotKey, null);
+      }
       return date;
     } catch (_) {
       return null;

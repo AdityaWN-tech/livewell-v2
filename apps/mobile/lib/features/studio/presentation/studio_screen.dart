@@ -528,6 +528,8 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
           },
           onOwnVoice: () => showOwnVoiceSheet(context),
         ),
+        const SizedBox(height: LwSpacing.sm),
+        VoiceSampleTranscript(style: _voice.style),
         // How the chosen voice is made (FR-VOC-08, D-75).
         const SizedBox(height: LwSpacing.md),
         VoiceHowMade(voiceId: _voice.voiceId),

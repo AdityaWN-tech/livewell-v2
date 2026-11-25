@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell/features/safety/data/safety_event_store.dart';
 import 'package:livewell/features/goals/data/goal_repository.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
@@ -14,6 +16,7 @@ import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/core/time/clock.dart';
+import 'package:livewell/core/local_db/local_db_providers.dart';
 import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
@@ -28,9 +31,12 @@ import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
     show avatarIdleMotionProvider;
 import 'package:livewell/features/learn/data/learn_repository.dart';
+import 'package:livewell/features/learn/application/learn_data.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
+import 'package:livewell/features/notifications/data/device_registry.dart';
+import 'package:livewell/features/notifications/data/push_messaging.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
 import 'package:livewell/features/routine/application/routine_moment.dart';
@@ -61,6 +67,8 @@ class Harness {
     DateTime? now,
     FakeCheckInRepository? checkIns,
     FakeCheckInPromptStore? checkInPrompt,
+    InMemorySafetyEventStore? safetyEvents,
+    this.overrides = const [],
     FakeAnalytics? analytics,
     this.flags = const FeatureFlags(),
     FakeReflectionRepository? reflections,
@@ -76,6 +84,7 @@ class Harness {
        // Default: already asked today, so tests that aren't about the
        // check-in aren't interrupted by its sheet.
        checkInPrompt = checkInPrompt ?? FakeCheckInPromptStore('2026-10-14'),
+       safetyEvents = safetyEvents ?? InMemorySafetyEventStore(),
        analytics = analytics ?? FakeAnalytics(),
        dictation = dictation ?? FakeDictation(),
        phone = phone ?? FakePhoneLauncher(),
@@ -127,9 +136,18 @@ class Harness {
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
   final localData = FakeLocalData();
+  final localDb = FakeLocalDatabaseWiper();
+
+  /// Server push (T-TCH-01): FCM and the device documents, in memory.
+  final push = FakePushMessaging();
+  final devices = FakeDeviceRegistry();
 
   /// The coach blinks and breathes (off by default so screens settle).
   bool idleMotion = false;
+
+  /// Whether we know there was no safety event in the last 72 hours. Null
+  /// keeps the app's own answer (unknown, so not clear, until D-22).
+  bool? safetyClear;
   final FakePortalBrowser browser;
 
   /// Feature flags (Remote Config later).
@@ -143,6 +161,13 @@ class Harness {
   DateTime now;
   final FakeCheckInRepository checkIns;
   final FakeCheckInPromptStore checkInPrompt;
+
+  /// This phone's record of the last safety event (D-70).
+  final InMemorySafetyEventStore safetyEvents;
+
+  /// Extra provider overrides for one test (e.g. a failing safety rules
+  /// load), applied last.
+  final List<Override> overrides;
   final FakeAnalytics analytics;
 
   /// Cold start the real app: signed out resumes at the saved onboarding
@@ -184,6 +209,12 @@ class Harness {
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
           localDataProvider.overrideWithValue(localData),
+          localDatabaseWiperProvider.overrideWithValue(localDb),
+          pushMessagingProvider.overrideWithValue(push),
+          deviceRegistryProvider.overrideWithValue(devices),
+          pushInstallIdStoreProvider.overrideWithValue(
+            FakePushInstallIdStore(),
+          ),
           namePromptStoreProvider.overrideWithValue(namePrompt),
           coachSpeakerProvider.overrideWithValue(speaker),
           coachFacesProvider.overrideWithValue(faces),
@@ -194,6 +225,8 @@ class Harness {
           widgetPublisherProvider.overrideWithValue(widget),
           widgetInboxProvider.overrideWithValue(widgetInbox),
           avatarIdleMotionProvider.overrideWithValue(idleMotion),
+          if (safetyClear != null)
+            safetyClearProvider.overrideWithValue(safetyClear!),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(
             (ref) => ref.watch(previewModeProvider)
@@ -201,6 +234,8 @@ class Harness {
                 : learn,
           ),
           checkInPromptStoreProvider.overrideWithValue(checkInPrompt),
+          safetyEventStoreProvider.overrideWithValue(safetyEvents),
+          ...overrides,
           analyticsProvider.overrideWithValue(analytics),
           // Same decisions as the real startup, minus Firebase.
           appStartupProvider.overrideWith((ref) async {

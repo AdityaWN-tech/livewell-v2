@@ -24,6 +24,7 @@ import 'package:livewell/features/routine/application/routine_moment.dart';
 import 'package:livewell/features/routine/domain/routine_reminders.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
+import 'package:livewell/features/starter_plan/domain/daily_cap.dart';
 import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
 import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
@@ -772,6 +773,16 @@ class FakeReminderZoneStore implements ReminderZoneStore {
 
   @override
   Future<void> save(String z) async => zone = z;
+}
+
+class FakeReminderLedgerStore implements ReminderLedgerStore {
+  ReminderLedger? ledger;
+
+  @override
+  Future<ReminderLedger?> load() async => ledger;
+
+  @override
+  Future<void> save(ReminderLedger l) async => ledger = l;
 }
 
 class FakeAppearanceStore implements AppearanceStore {

@@ -343,8 +343,9 @@ void main() {
         'D-82): never a greyed-out "Coming soon" row', (tester) async {
       await signedIn().boot(tester);
       await openProfile(tester);
+      // Delete my avatar moved into My coach (D-78); scroll to the row itself.
       await tester.scrollUntilVisible(
-        find.byKey(const Key('profile-delete-avatar')),
+        find.byKey(const Key('profile-export')),
         300,
         scrollable: find.byType(Scrollable).first,
       );

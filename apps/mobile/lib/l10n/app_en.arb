@@ -46,6 +46,22 @@
   "consentLegalWithdrawNote": "These are needed to use Live Well. To withdraw, close your account from My data.",
   "consentSaveError": "We couldn't save that change. Please try again.",
   "consentLoadError": "We couldn't load your choices. Please try again.",
+  "consentRevokeTitle": "Turn off {name}?",
+  "@consentRevokeTitle": {
+    "description": "Confirming a revoke that deletes or stops something on our side (FR-ONB-03, D-76).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "consentRevokeKeep": "Keep it on",
+  "consentRevokeConfirm": "Turn off",
+  "consentRevokeCamera": "Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach's name stays. This can't be undone.",
+  "consentRevokeMicrophone": "Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can't be undone.",
+  "consentRevokeBiometric": "Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can't be undone.",
+  "consentRevokePortalLinking": "We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.",
+  "consentRevokeMarketing": "We stop sending news and offers. It can take up to 24 hours.",
   "consentNotificationsTitle": "Reminders and nudges",
   "consentNotificationsBody": "Lets Live Well send your briefing, check-in and habit reminders. You choose the times and quiet hours.",
   "consentHealthDataTitle": "Health data",
@@ -3076,6 +3092,116 @@
         "type": "String"
       }
     }
+  },
+  "dailyPlanSubtitle": "Moment times, your coach's voice and the widget",
+  "@dailyPlanSubtitle": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanIntro": "Choose when your coach checks in and how your moments play.",
+  "@dailyPlanIntro": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanTimesHeader": "Moment times",
+  "@dailyPlanTimesHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanChangeTime": "Change the {moment} time",
+  "@dailyPlanChangeTime": {
+    "description": "Profile > Daily plan (T-DLY-03e).",
+    "placeholders": {
+      "moment": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyPlanNotToday": "Not today",
+  "@dailyPlanNotToday": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanNotTodayDone": "No {moment} reminder today. It's back tomorrow.",
+  "@dailyPlanNotTodayDone": {
+    "description": "Profile > Daily plan (T-DLY-03e).",
+    "placeholders": {
+      "moment": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyPlanInQuiet": "This time is during quiet hours, so no reminder is sent. Pick a time outside them.",
+  "@dailyPlanInQuiet": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanQuietHeader": "Quiet hours",
+  "@dailyPlanQuietHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCoachHeader": "Your coach in moments",
+  "@dailyPlanCoachHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanAutoSpeak": "Coach speaks automatically when I open a moment",
+  "@dailyPlanAutoSpeak": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanTextOnly": "Show text only. Tap play to hear your coach.",
+  "@dailyPlanTextOnly": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanSpeedNote": "The same speed as in your voice settings.",
+  "@dailyPlanSpeedNote": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCaptions": "Captions always on",
+  "@dailyPlanCaptions": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCaptionsOn": "The words appear as your coach speaks.",
+  "@dailyPlanCaptionsOn": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCaptionsOff": "The words appear when your coach has finished.",
+  "@dailyPlanCaptionsOff": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreview": "Preview tomorrow's morning",
+  "@dailyPlanPreview": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreviewTag": "Preview",
+  "@dailyPlanPreviewTag": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreviewNone": "There's no morning message to preview yet.",
+  "@dailyPlanPreviewNone": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreviewPaused": "Let's keep today quiet. Previews are back tomorrow.",
+  "@dailyPlanPreviewPaused": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetHeader": "Home-screen widget",
+  "@dailyPlanWidgetHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetTitle": "Add the widget",
+  "@dailyPlanWidgetTitle": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetBody": "See your next small step without opening the app.",
+  "@dailyPlanWidgetBody": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetAndroid": "Android: touch and hold an empty spot on your home screen, tap Widgets, then find Live Well.",
+  "@dailyPlanWidgetAndroid": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetIos": "iPhone: touch and hold your home screen, tap Edit or +, then search for Live Well.",
+  "@dailyPlanWidgetIos": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetPrivate": "On the lock screen the widget shows general text only, never your answers or health details.",
+  "@dailyPlanWidgetPrivate": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
   },
   "voiceGreetingRest": "I’m here to help, one small step at a time.",
   "@voiceGreetingRest": {

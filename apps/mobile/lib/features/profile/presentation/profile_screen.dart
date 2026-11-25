@@ -20,12 +20,7 @@ import '../../auth/domain/auth.dart';
 import '../../auth/presentation/auth_copy.dart';
 import '../../auth/presentation/phone_sign_in_screen.dart';
 import '../../home/application/home_data.dart';
-import '../../routine/domain/routine_reminders.dart';
-import '../../starter_plan/application/plan_scheduler.dart';
-import '../../starter_plan/data/plan_repository.dart';
-import '../../starter_plan/domain/touchpoints.dart';
-import '../../starter_plan/presentation/plan_preview_screen.dart'
-    show reminderTexts;
+import '../../starter_plan/presentation/daily_plan_screen.dart';
 import '../data/account_actions.dart';
 import '../data/appearance.dart';
 import 'profile_button.dart';
@@ -123,16 +118,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _reschedule() async {
-    try {
-      await ref
-          .read(planSchedulerProvider)
-          .reschedule(reminderTexts(AppLocalizations.of(context)));
-    } catch (_) {
-      // Reminders are best effort; the settings are saved.
-    }
   }
 
   Future<void> _photo() async {
@@ -296,69 +281,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (mounted) _say(l.profileSaved);
   }
 
-  Future<ClockTime?> _pickTime(ClockTime current) async {
-    final t = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: current.hour, minute: current.minute),
-    );
-    return t == null ? null : ClockTime(t.hour, t.minute);
-  }
-
-  Future<void> _editTouchpoint(TouchpointKind k, QuietHours quiet) async {
-    if (!_signedIn) return;
-    final l = AppLocalizations.of(context);
-    final plans = ref.read(planRepositoryProvider);
-    final times = await plans.loadTimes();
-    final t = await _pickTime(times.of(k));
-    if (t == null || !mounted) return;
-    if (quiet.contains(t)) {
-      _say(l.planQuietHours(_fmt(quiet.start), _fmt(quiet.end)));
-      return;
-    }
-    await plans.saveTimes(times.copyWith(k, t));
-    await _reschedule();
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _editQuiet(QuietHours quiet, {required bool start}) async {
-    if (!_signedIn) return;
-    final t = await _pickTime(start ? quiet.start : quiet.end);
-    if (t == null) return;
-    final next = start
-        ? QuietHours(start: t, end: quiet.end)
-        : QuietHours(start: quiet.start, end: t);
-    await ref.read(profileRepositoryProvider).updateSettings(_uid, {
-      ProfileSettings.quietHours: next.toMap(),
-    });
-    ref.invalidate(currentProfileProvider);
-    await _reschedule();
-  }
-
-  /// "Routine reminders per day" (T-GOL-03d): 0 (off) to 10.
-  Future<void> _setRoutinePerDay(int n) async {
-    if (!_signedIn) return;
-    await ref.read(profileRepositoryProvider).updateSettings(_uid, {
-      ProfileSettings.routineRemindersPerDay: n,
-    });
-    ref.invalidate(currentProfileProvider);
-    await _reschedule();
-  }
-
-  Future<void> _toggleCategory(
-    Set<TouchpointKind> enabled,
-    TouchpointKind k,
-    bool on,
-  ) async {
-    if (!_signedIn) return;
-    final next = {...enabled};
-    on ? next.add(k) : next.remove(k);
-    await ref.read(profileRepositoryProvider).updateSettings(_uid, {
-      ProfileSettings.notificationCategories: enabledToMap(next),
-    });
-    ref.invalidate(currentProfileProvider);
-    await _reschedule();
-  }
-
   Future<void> _delete(String what) async {
     if (!_signedIn) return;
     final l = AppLocalizations.of(context);
@@ -385,25 +307,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  String _fmt(ClockTime c) =>
-      MaterialLocalizations.of(context)
-          .formatTimeOfDay(TimeOfDay(hour: c.hour, minute: c.minute));
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final p = LwPalette.of(context);
     final user = _user;
-    final profile = ref.watch(currentProfileProvider).value;
-    final settings = profile?.settings ?? const <String, dynamic>{};
+    // Rebuilds when the profile (name, sign-in methods) changes.
+    ref.watch(currentProfileProvider);
     final appearance = ref.watch(appearanceProvider);
-    final quiet = QuietHours.fromMap(
-      settings[ProfileSettings.quietHours] as Map<String, dynamic>?,
-    );
-    final enabled = enabledFromMap(
-      settings[ProfileSettings.notificationCategories] as Map<String, dynamic>?,
-    );
     final isDev = ref.watch(flavorProvider) == Flavor.dev;
     final providers = user?.providers ?? const <String>[];
 
@@ -411,12 +323,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       padding: const EdgeInsets.only(top: LwSpacing.lg, bottom: LwSpacing.xs),
       child: Semantics(header: true, child: Text(text, style: t.titleSmall)),
     );
-
-    final moments = [
-      (TouchpointKind.greeting, l.planMorning),
-      (TouchpointKind.nudge, l.planMidday),
-      (TouchpointKind.reflection, l.planEvening),
-    ];
 
     return Scaffold(
       appBar: AppBar(),
@@ -617,70 +523,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 .set(appearance.copyWith(textScale: s.single)),
           ),
 
-          // ---- Daily plan ----
+          // ---- Daily plan: its own screen (T-DLY-03e) ----
           header(l.profileDailyPlan),
           Card(
-            child: FutureBuilder<TouchpointTimes>(
-              future: ref.read(planRepositoryProvider).loadTimes(),
-              builder: (context, snap) {
-                final times = snap.data ?? const TouchpointTimes();
-                return Column(
-                  children: [
-                    for (final (k, name) in moments)
-                      SwitchListTile(
-                        key: Key('profile-touchpoint-${k.name}'),
-                        title: Text(name),
-                        subtitle: InkWell(
-                          onTap: () => _editTouchpoint(k, quiet),
-                          child: Text(
-                            _fmt(times.of(k)),
-                            style: t.labelLarge?.copyWith(
-                              color: p.accentStrong,
-                            ),
-                          ),
-                        ),
-                        value: enabled.contains(k),
-                        onChanged: (on) => _toggleCategory(enabled, k, on),
-                      ),
-                    ListTile(
-                      key: const Key('profile-quiet-start'),
-                      leading: const Icon(Icons.bedtime_outlined),
-                      title: Text(l.profileQuietStart),
-                      trailing: Text(_fmt(quiet.start), style: t.labelLarge),
-                      onTap: () => _editQuiet(quiet, start: true),
-                    ),
-                    ListTile(
-                      key: const Key('profile-quiet-end'),
-                      leading: const Icon(Icons.wb_twilight_outlined),
-                      title: Text(l.profileQuietEnd),
-                      trailing: Text(_fmt(quiet.end), style: t.labelLarge),
-                      onTap: () => _editQuiet(quiet, start: false),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.wb_sunny_outlined),
-                      title: Text(l.profileRoutineReminders),
-                      trailing: DropdownButton<int>(
-                        key: const Key('profile-routine-reminders'),
-                        value: routineRemindersPerDay(
-                          settings[ProfileSettings.routineRemindersPerDay],
-                        ),
-                        underline: const SizedBox.shrink(),
-                        onChanged: (n) =>
-                            n == null ? null : _setRoutinePerDay(n),
-                        items: [
-                          for (var n = 0; n <= routineRemindersMax; n++)
-                            DropdownMenuItem(
-                              value: n,
-                              child: Text(
-                                n == 0 ? l.profileRoutineRemindersOff : '$n',
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
+            child: ListTile(
+              key: const Key('profile-daily-plan'),
+              leading: const Icon(Icons.schedule_outlined),
+              title: Text(l.profileDailyPlan),
+              subtitle: Text(l.dailyPlanSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push(DailyPlanScreen.path),
             ),
           ),
 

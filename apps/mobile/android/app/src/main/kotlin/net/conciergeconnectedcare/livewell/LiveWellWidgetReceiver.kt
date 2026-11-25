@@ -29,6 +29,10 @@ import java.util.Locale
  * "done" entry at once; the app saves it to habit_logs the next time it
  * runs, for that day (D-60). With "hide details" on, only the generic line
  * shows. No health values are ever in the snapshot.
+ *
+ * Every link it opens carries `size` (small, or medium when wider) and the
+ * entry's `slot`, and its own Done keeps them, for the app's
+ * `widget_interaction` analytics (T-AVT-08g-e). Fixed names only.
  */
 class LiveWellWidgetReceiver : HomeWidgetProvider() {
 
@@ -57,6 +61,10 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
   companion object {
     const val SNAPSHOT_KEY = "lw_snapshot"
     const val DONE_KEY = "lw_done_date"
+    const val DONE_SIZE_KEY = "lw_done_size"
+    const val DONE_SLOT_KEY = "lw_done_slot"
+    const val EXTRA_SIZE = "size"
+    const val EXTRA_SLOT = "slot"
     private val TODO_SLOTS = setOf("morning_checkin", "step", "step_window", "gentle")
 
     fun today(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
@@ -110,6 +118,7 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
       val doneHere = data.getString(DONE_KEY, null) == today()
       val entry = snapshot?.let { current(it, doneHere) }
       val wide = (options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) ?: 0) >= 250
+      val size = if (wide) "medium" else "small"
 
       if (snapshot == null || entry == null) {
         views.setTextViewText(R.id.widget_headline, context.getString(R.string.widget_open_app))
@@ -117,8 +126,9 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
         views.setViewVisibility(R.id.widget_streak, View.GONE)
         views.setViewVisibility(R.id.widget_secondary, View.GONE)
         views.setTextViewText(R.id.widget_primary, context.getString(R.string.widget_open))
-        views.setOnClickPendingIntent(R.id.widget_primary, open(context, "livewell://home"))
-        views.setOnClickPendingIntent(R.id.widget_root, open(context, "livewell://home"))
+        val home = open(context, "livewell://home", size, null)
+        views.setOnClickPendingIntent(R.id.widget_primary, home)
+        views.setOnClickPendingIntent(R.id.widget_root, home)
         return views
       }
 
@@ -140,19 +150,27 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
         views.setViewVisibility(R.id.widget_streak, View.GONE)
       }
 
-      bind(context, views, R.id.widget_primary, entry.optJSONObject("primary_action"))
+      val slot = entry.optString("slot")
+      bind(context, views, R.id.widget_primary, entry.optJSONObject("primary_action"), size, slot)
       val secondary = if (wide) entry.optJSONObject("secondary_action") else null
       if (secondary == null) {
         views.setViewVisibility(R.id.widget_secondary, View.GONE)
       } else {
         views.setViewVisibility(R.id.widget_secondary, View.VISIBLE)
-        bind(context, views, R.id.widget_secondary, secondary)
+        bind(context, views, R.id.widget_secondary, secondary, size, slot)
       }
-      views.setOnClickPendingIntent(R.id.widget_root, open(context, "livewell://home"))
+      views.setOnClickPendingIntent(R.id.widget_root, open(context, "livewell://home", size, slot))
       return views
     }
 
-    private fun bind(context: Context, views: RemoteViews, id: Int, action: JSONObject?) {
+    private fun bind(
+        context: Context,
+        views: RemoteViews,
+        id: Int,
+        action: JSONObject?,
+        size: String,
+        slot: String,
+    ) {
       if (action == null) {
         views.setViewVisibility(id, View.GONE)
         return
@@ -162,28 +180,44 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
       val intent = if (action.optString("id") == "done") {
         // Logged here, without opening the app.
         val done = Intent(context, LiveWellDoneReceiver::class.java)
+            .putExtra(EXTRA_SIZE, size)
+            .putExtra(EXTRA_SLOT, slot)
+        // One request code per size, so each size keeps its own extras.
         PendingIntent.getBroadcast(
-            context, 1, done, PendingIntent.FLAG_UPDATE_CURRENT or immutable())
+            context, if (size == "medium") 2 else 1, done,
+            PendingIntent.FLAG_UPDATE_CURRENT or immutable())
       } else {
-        open(context, action.optString("link"))
+        open(context, action.optString("link"), size, slot)
       }
       views.setOnClickPendingIntent(id, intent)
     }
 
-    private fun open(context: Context, link: String): PendingIntent =
-        HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse(link))
+    private fun open(context: Context, link: String, size: String, slot: String?): PendingIntent {
+      val uri = Uri.parse(link).buildUpon().appendQueryParameter(EXTRA_SIZE, size)
+      if (!slot.isNullOrEmpty()) uri.appendQueryParameter(EXTRA_SLOT, slot)
+      return HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, uri.build())
+    }
 
     private fun immutable(): Int =
         if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
   }
 }
 
-/** Done tapped on the widget: remember today's date, redraw (idempotent). */
+/**
+ * Done tapped on the widget: remember today's date, and the size and slot it
+ * was tapped in (for analytics), redraw (idempotent).
+ */
 class LiveWellDoneReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     HomeWidgetPlugin.getData(context)
         .edit()
         .putString(LiveWellWidgetReceiver.DONE_KEY, LiveWellWidgetReceiver.today())
+        .putString(
+            LiveWellWidgetReceiver.DONE_SIZE_KEY,
+            intent.getStringExtra(LiveWellWidgetReceiver.EXTRA_SIZE))
+        .putString(
+            LiveWellWidgetReceiver.DONE_SLOT_KEY,
+            intent.getStringExtra(LiveWellWidgetReceiver.EXTRA_SLOT))
         .apply()
     LiveWellWidgetReceiver.refreshAll(context)
   }

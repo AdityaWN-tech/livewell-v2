@@ -3997,4 +3997,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dailyPlanWidgetPrivate =>
       'On the lock screen the widget shows general text only, never your answers or health details.';
+
+  @override
+  String get profileWidgetHideDetails => 'Hide details on lock screen';
+
+  @override
+  String get profileWidgetHideDetailsBody =>
+      'The widget says \"Your next step is ready\" instead of naming it.';
 }

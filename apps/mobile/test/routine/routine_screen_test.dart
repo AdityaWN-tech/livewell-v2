@@ -162,6 +162,14 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('1 of 1 done today'), findsOneWidget);
+      // ...and its ring shows the same share (T-UI-04).
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('plan-routine-ring')),
+          matching: find.text('100%'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('custom: needs words, saves the label and icon', (

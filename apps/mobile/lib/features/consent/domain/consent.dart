@@ -16,17 +16,31 @@ enum ConsentType {
   biometric('biometric'),
   portalLinking('portal_linking'),
   marketing('marketing'),
-  analytics('analytics');
+  analytics('analytics'),
 
-  const ConsentType(this.key, {this.required = false});
+  // Memory (spec 9.3, 9.8; T-AGT-05b, D-100/D-101). Shown on the "What my
+  // coach remembers" screen, not in the general list. Appended last: the
+  // legal screen indexes values by position.
+  /// The coach may remember things (memory can be switched off entirely).
+  memory('memory', isMemory: true),
+
+  /// Health details too: medicines, conditions, mental health (explicit
+  /// opt-in; only together with [memory]).
+  memorySensitive('memory_sensitive', isMemory: true);
+
+  const ConsentType(this.key, {this.required = false, this.isMemory = false});
 
   final String key;
 
   /// Legal acceptance rather than an optional permission.
   final bool required;
 
+  /// A memory consent, managed on the memory screen.
+  final bool isMemory;
+
+  /// The FR-ONB-03 list shown in Privacy and consents.
   static List<ConsentType> get granular =>
-      values.where((t) => !t.required).toList();
+      values.where((t) => !t.required && !t.isMemory).toList();
 
   static ConsentType? fromKey(String key) {
     for (final t in values) {

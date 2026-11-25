@@ -4,7 +4,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import { FirestoreAuditLog } from '../src/audit/audit-log.js';
 import { GatewayRefusal, speakMessageFor, type GatewayDeps } from '../src/voice/gateway.js';
+import { LIBRARY_VOICES } from '../src/voice/library-voices.js';
 import { parseMessageId } from '../src/voice/scripts.js';
+import { readFileSync } from 'node:fs';
 import { UnconfiguredTts } from '../src/voice/tts-adapter.js';
 import { allOn, FakeTts, fixtureScripts, MemoryAuditLog, newUid, seed } from './voice-fixtures.js';
 
@@ -128,6 +130,38 @@ describe('closed-script voice gateway (T-VOC-07, FR-VOC-05/07)', () => {
     const r = await attempt(uid, { message_id: 'hello.a@v2', voice_id: 'lw-warm' }, { scripts: fixtureScripts, tts: new UnconfiguredTts(), log, config: allOn });
     expect(r).toEqual({ refused: 'tts_unavailable' });
     expect(log.entries[0]!.details).toMatchObject({ reason: 'tts_unavailable', voice_kind: 'library' });
+  });
+
+  it("a library voice speaks only with the server's vendor id, never the document's (no clone via a library doc)", async () => {
+    // The app may write any vendor_voice_id on a library voice; copying a
+    // clone's id there must not make the clone speak (consent, kill switch
+    // and closed-script checks would all be skipped).
+    await db().doc(`users/${uid}/voices/lw-bright`).set({
+      kind: 'library', status: 'active', vendor_voice_id: 'vendor-x', speed: 1, style: 'calm',
+    });
+    const off = deps({ config: { clonedVoicesEnabled: false, gokulaVoiceEnabled: false } });
+    const r = await attempt(uid, { message_id: 'hello.a@v2', voice_id: 'lw-bright' }, off.d);
+    expect(r).toMatchObject({ status: 'ok', voice_kind: 'library' });
+    expect(off.tts.calls.map((c) => c.vendorVoiceId)).toEqual(['kokoro:af_bella']);
+  });
+
+  it('a library-kind document under an id outside the catalogue is refused, nothing synthesized', async () => {
+    await db().doc(`users/${uid}/voices/lw-sneaky`).set({
+      kind: 'library', status: 'active', vendor_voice_id: 'vendor-x', speed: 1, style: 'calm',
+    });
+    const { tts, log, d } = deps();
+    expect(await attempt(uid, { message_id: 'hello.a@v2', voice_id: 'lw-sneaky' }, d)).toEqual({ refused: 'unknown_voice' });
+    expect(tts.calls).toEqual([]);
+    expect(log.entries.map((e) => e.action)).toEqual(['voice.tts_refused']);
+  });
+
+  it("the server's library catalogue matches the app's (VoiceLibrary.all)", () => {
+    const dart = readFileSync('../../apps/mobile/lib/features/voice/domain/voice.dart', 'utf8');
+    const app: Record<string, string> = {};
+    for (const m of dart.matchAll(/LibraryVoice\(\s*'(lw-[a-z0-9-]+)',\s*'([^']+)'/g)) app[m[1]!] = m[2]!;
+    expect(Object.keys(app).length).toBeGreaterThan(0);
+    expect(app).toEqual({ ...LIBRARY_VOICES });
+    expect(Object.keys(LIBRARY_VOICES)).not.toContain('lw-dr-gokula');
   });
 
   it('writes to the real audit log: ids and counts, never text', async () => {

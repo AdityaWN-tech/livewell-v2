@@ -11,6 +11,7 @@ import {
   type ScriptBundle,
 } from './scripts.js';
 import type { TtsAdapter } from './tts-adapter.js';
+import { libraryVendorVoiceId } from './library-voices.js';
 
 /**
  * The closed-script voice gateway (T-VOC-07, FR-VOC-05, FR-VOC-07).
@@ -204,6 +205,18 @@ export async function speakMessageFor(
   trail.voiceKind = kind;
   if (voice.status !== 'active') return refuse('voice_inactive');
 
+  // A library voice speaks only with the server's own vendor id for that
+  // catalogue id; the document's vendor_voice_id is written by the app and
+  // is never trusted (else a "library" voice could name a clone).
+  let vendorVoiceId: string;
+  if (kind === 'library') {
+    const known = libraryVendorVoiceId(req.voice_id);
+    if (known === null) return refuse('unknown_voice');
+    vendorVoiceId = known;
+  } else {
+    vendorVoiceId = String(voice.vendor_voice_id ?? '');
+  }
+
   if (kind === 'cloned') {
     if (!deps.config.clonedVoicesEnabled) return refuse('cloned_voices_off');
     const consentId = voice.consent_id;
@@ -248,7 +261,7 @@ export async function speakMessageFor(
   let audio: { audio: Buffer; mime: string };
   try {
     audio = await deps.tts.synthesize({
-      vendorVoiceId: String(voice.vendor_voice_id ?? ''),
+      vendorVoiceId,
       text,
       speed: typeof voice.speed === 'number' ? voice.speed : 1,
     });

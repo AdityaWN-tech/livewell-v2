@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && firebase emulators:exec --only auth,firestore,functions --project demo-livewell \"vitest run\"",
+    "test": "npm run build && firebase emulators:exec --only auth,firestore,functions,storage --project demo-livewell \"vitest run\"",
     "migrate:user-arrays": "npm run build && node lib/migrations/user-arrays-cli.js"
   },
   "dependencies": {

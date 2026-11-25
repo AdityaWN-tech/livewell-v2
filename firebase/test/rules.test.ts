@@ -352,6 +352,20 @@ describe('profile settings (T-ONB-03f)', () => {
     await assertSucceeds(upd({ appearance: { theme: 'dark', text_scale: 1.15 } }));
     await assertSucceeds(upd({ quiet_hours: { start: '21:30', end: '06:30' } }));
     await assertSucceeds(upd({ notification_categories: { greeting: true, nudge: false, reflection: true } }));
+    // The app sends the weekly review's switch too (T-DLY-03c).
+    await assertSucceeds(upd({ notification_categories: { greeting: true, nudge: false, reflection: true, weekly: false } }));
+  });
+  it('moment playback and "Not today" (T-DLY-03e)', async () => {
+    await seedAdult(env);
+    await assertSucceeds(upd({ moment_playback: { auto_speak: false, captions: true } }));
+    await assertSucceeds(upd({ not_today: { date: '2026-10-15', kinds: ['greeting'] } }));
+    await assertSucceeds(upd({ not_today: { date: '2026-10-15', kinds: [] } }));
+    await assertFails(upd({ moment_playback: { auto_speak: 'no', captions: true } }));
+    await assertFails(upd({ moment_playback: { auto_speak: true } }));
+    await assertFails(upd({ moment_playback: { auto_speak: true, captions: true, volume: 3 } }));
+    await assertFails(upd({ not_today: { date: 'today', kinds: ['greeting'] } }));
+    await assertFails(upd({ not_today: { date: '2026-10-15', kinds: ['marketing'] } }));
+    await assertFails(upd({ not_today: { date: '2026-10-15', kinds: ['greeting'], note: 'x' } }));
   });
   it('rejects bad values', async () => {
     await seedAdult(env);
@@ -362,6 +376,7 @@ describe('profile settings (T-ONB-03f)', () => {
     await assertFails(upd({ quiet_hours: { start: '9pm', end: '06:30' } }));
     await assertFails(upd({ notification_categories: { greeting: 'yes', nudge: true, reflection: true } }));
     await assertFails(upd({ notification_categories: { marketing: true } }));
+    await assertFails(upd({ notification_categories: { greeting: true, nudge: true, reflection: true, weekly: 'yes' } }));
   });
 });
 
@@ -955,7 +970,14 @@ describe('global catalogues (approved and active only)', () => {
 });
 
 describe('server-only collections are closed to clients (11.1)', () => {
-  for (const col of ['voice_consents', 'safety_events', 'audit_log']) {
+  for (const col of [
+    'voice_consents',
+    'safety_events',
+    'audit_log',
+    'consent_revocations',
+    'vendor_requests',
+    'marketing_suppressions',
+  ]) {
     it(col, async () => {
       await seed(env, { [`${col}/x`]: { uid: ALICE, ...meta() } });
       await assertFails(getDoc(doc(as(ALICE), `${col}/x`)));

@@ -10,8 +10,11 @@ import {
   deleteField,
   doc,
   getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
@@ -1012,4 +1015,106 @@ describe('server-only collections are closed to clients (11.1)', () => {
       await assertFails(setDoc(doc(as(ALICE), `users/alice/${col}/0001`), { index: 1, value: 'y', ...meta() }));
     });
   }
+});
+
+// ---------- portal catalog (T-PRT-02, D-92; spec 11.1) ----------
+// App users read only live offers (active + approved); nobody writes from a
+// client, staff included (the Admin uses the Core API); the workflow
+// collection (staff ids) is server-only.
+const asStaff = (uid: string) =>
+  env
+    .authenticatedContext(uid, {
+      staff_roles: ['admin', 'content_editor', 'clinical_reviewer'],
+      staff_mfa_waiver_until: Math.floor(Date.now() / 1000) + 3600,
+    })
+    .firestore();
+
+const offer = (o: Record<string, unknown>) => ({
+  title: 'Gut health in 30 days',
+  url: 'https://livewell.conciergeconnectedcare.net/web/courses/gut-health',
+  offer_type: 'course',
+  driver_tags: [],
+  topic_tags: [],
+  price_display: '$49',
+  version: 1,
+  ...meta(),
+  ...o,
+});
+
+async function seedOffers() {
+  await seed(env, {
+    'portal_offers/live': offer({ active: true, review_status: 'approved' }),
+    'portal_offers/approved_not_live': offer({ active: false, review_status: 'approved' }),
+    'portal_offers/draft': offer({ active: false, review_status: 'draft' }),
+    'portal_offers/in_review': offer({ active: false, review_status: 'in_review' }),
+    'portal_offers/rejected': offer({ active: false, review_status: 'rejected' }),
+    'portal_offers/archived': offer({ active: false, review_status: 'archived' }),
+    // Inconsistent states the API never writes, still hidden.
+    'portal_offers/archived_active': offer({ active: true, review_status: 'archived' }),
+    'portal_offers/draft_active': offer({ active: true, review_status: 'draft' }),
+    'portal_offers/active_string': offer({ active: 'true', review_status: 'approved' }),
+    'portal_offer_workflow/live': { rev: 3, created_by: 'staff1', version_editors: [], ...meta() },
+  });
+}
+
+describe('portal_offers: clients see live offers only (T-PRT-02, D-92)', () => {
+  beforeEach(seedOffers);
+  it('a signed-in user reads only the active + approved offer', async () => {
+    await assertSucceeds(getDoc(doc(as(ALICE), 'portal_offers/live')));
+    for (const id of [
+      'approved_not_live',
+      'draft',
+      'in_review',
+      'rejected',
+      'archived',
+      'archived_active',
+      'draft_active',
+      'active_string',
+    ]) {
+      await assertFails(getDoc(doc(as(ALICE), `portal_offers/${id}`)));
+    }
+  });
+
+  it("the app's filtered query works; an unfiltered list is refused", async () => {
+    const q = query(
+      collection(as(ALICE), 'portal_offers'),
+      where('active', '==', true),
+      where('review_status', '==', 'approved'),
+    );
+    await assertSucceeds(getDocs(q));
+    await assertFails(getDocs(collection(as(ALICE), 'portal_offers')));
+    await assertFails(getDocs(query(collection(as(ALICE), 'portal_offers'), where('active', '==', true))));
+  });
+
+  it('signed-out readers see nothing', async () => {
+    await assertFails(getDoc(doc(anon(), 'portal_offers/live')));
+  });
+
+  it('staff claims give no extra client access: reads and writes go through the Core API', async () => {
+    const staff = asStaff('staff1');
+    await assertSucceeds(getDoc(doc(staff, 'portal_offers/live')));
+    await assertFails(getDoc(doc(staff, 'portal_offers/draft')));
+    await assertFails(setDoc(doc(staff, 'portal_offers/new'), offer({ active: false, review_status: 'draft' })));
+    await assertFails(updateDoc(doc(staff, 'portal_offers/live'), { title: 'Changed' }));
+    await assertFails(updateDoc(doc(staff, 'portal_offers/draft'), { active: true, review_status: 'approved' }));
+    await assertFails(deleteDoc(doc(staff, 'portal_offers/live')));
+  });
+
+  it('app users cannot create, publish, edit or delete offers', async () => {
+    const db = as(ALICE);
+    await assertFails(setDoc(doc(db, 'portal_offers/new'), offer({ active: true, review_status: 'approved' })));
+    await assertFails(updateDoc(doc(db, 'portal_offers/live'), { price_display: '$1' }));
+    await assertFails(deleteDoc(doc(db, 'portal_offers/live')));
+  });
+});
+
+describe('portal_offer_workflow: server-only (D-92)', () => {
+  beforeEach(seedOffers);
+  it('nobody reads or writes it from a client', async () => {
+    for (const db of [as(ALICE), asStaff('staff1'), anon()]) {
+      await assertFails(getDoc(doc(db, 'portal_offer_workflow/live')));
+      await assertFails(setDoc(doc(db, 'portal_offer_workflow/x'), { rev: 1 }));
+      await assertFails(updateDoc(doc(db, 'portal_offer_workflow/live'), { version_editors: [] }));
+    }
+  });
 });

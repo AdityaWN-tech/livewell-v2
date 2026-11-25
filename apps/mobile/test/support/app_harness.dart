@@ -206,7 +206,7 @@ class Harness {
             if (user != null) {
               final next = await ref
                   .read(signInCompletionProvider)
-                  .complete(user);
+                  .complete(user, restored: true);
               return StartDestination(next, signedIn: true);
             }
             return signedOutDestination(

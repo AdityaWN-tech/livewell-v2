@@ -514,6 +514,12 @@ void main() {
       await scrollTo(tester, find.byKey(const Key('track-streak')));
       expect(find.text('14-day streak'), findsOneWidget);
       expect(find.text('Personal best'), findsOneWidget);
+      // Says what the streak counts, so a done day next to "No check-ins
+      // yet" isn't read as a contradiction.
+      expect(
+        text(tester, 'track-streak-counts'),
+        'A day counts when you finish at least one habit.',
+      );
       expect(find.bySemanticsLabel('Wednesday: rest day'), findsOneWidget);
       expect(find.bySemanticsLabel('Monday: done'), findsOneWidget);
       expect(

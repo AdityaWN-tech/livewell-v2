@@ -867,8 +867,16 @@ describe('memory_facts (user approves or deletes, FR-CNV-05)', () => {
     const ref = doc(as(ALICE), 'users/alice/memory_facts/f1');
     await assertSucceeds(getDoc(ref));
     await assertSucceeds(updateDoc(ref, { status: 'saved' }));
-    await assertSucceeds(updateDoc(ref, { status: 'deleted' }));
+    await assertSucceeds(updateDoc(ref, { status: 'deleted', fact: '' }));
     await assertFails(updateDoc(ref, { status: 'saved' }));
+  });
+  it('deleting must wipe the text; saving must keep it (D-100)', async () => {
+    const ref = doc(as(ALICE), 'users/alice/memory_facts/f1');
+    await assertFails(updateDoc(ref, { status: 'deleted' }));
+    await assertFails(updateDoc(ref, { status: 'deleted', fact: 'kept' }));
+    await assertFails(updateDoc(ref, { status: 'saved', fact: '' }));
+    await assertSucceeds(updateDoc(ref, { status: 'deleted', fact: '' }));
+    await assertFails(updateDoc(ref, { fact: 'back again' }));
   });
   it('cannot edit the fact text, create facts or hard-delete', async () => {
     const ref = doc(as(ALICE), 'users/alice/memory_facts/f1');
@@ -955,4 +963,13 @@ describe('server-only collections are closed to clients (11.1)', () => {
     await assertFails(setDoc(doc(as(ALICE), 'anything/x'), { a: 1 }));
     await assertFails(setDoc(doc(as(ALICE), 'users/alice/unknown/x'), { a: 1 }));
   });
+  // T-FND-07 (D-83): copies of the prototype's users arrays are server-only
+  // until the product decides how the app shows them.
+  for (const col of ['legacy_goals', 'legacy_affirmations', 'legacy_favorites']) {
+    it(`users/{uid}/${col} (T-FND-07 migration copies)`, async () => {
+      await seed(env, { [`users/alice/${col}/0000`]: { index: 0, value: 'x', ...meta() } });
+      await assertFails(getDoc(doc(as(ALICE), `users/alice/${col}/0000`)));
+      await assertFails(setDoc(doc(as(ALICE), `users/alice/${col}/0001`), { index: 1, value: 'y', ...meta() }));
+    });
+  }
 });

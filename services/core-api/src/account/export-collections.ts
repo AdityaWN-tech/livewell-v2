@@ -28,11 +28,18 @@ export const EXPORTED_USER_COLLECTIONS = [
   'portal_link',
   'content_progress',
   'portal_events',
+  // The prototype's goals, affirmations and favourites (T-FND-07, D-83).
+  'legacy_goals',
+  'legacy_affirmations',
+  'legacy_favorites',
 ] as const;
 
 /** Sub-collections of users/{uid} left out, and why. */
 export const EXCLUDED_USER_COLLECTIONS: Record<string, string> = {
   data_exports: 'The export requests themselves (status only, no personal data).',
+  devices:
+    'Push delivery token, platform and time zone (T-TCH-01): technical, and a token is a credential. Needs counsel (D-82).',
+  push_days: 'Server counter for the daily push cap (a number per day), no content.',
 };
 
 /** Top-level collections: none holds only this person's data. */
@@ -45,6 +52,14 @@ export const EXCLUDED_TOP_LEVEL_COLLECTIONS: Record<string, string> = {
     'Restricted safety-review records (spec 11.1). Needs counsel (D-82).',
   audit_log:
     'Security record, no health content (spec 16.3). Needs counsel (D-82).',
+  portal_offer_workflow: 'Staff review workflow for the shared catalogue (T-PRT-02), not personal data.',
+  consent_revocations:
+    'Server task records for revoke handling (D-76); the consents themselves are exported. Needs counsel (D-82).',
+  vendor_requests:
+    'Server queue of vendor-side deletions (D-76): ids and status only. Needs counsel (D-82).',
+  marketing_suppressions:
+    'Marketing stop-list entry (D-76); the marketing consent records are exported.',
+  push_outbox: 'Server queue of push requests (category and an id only), consumed on sending.',
 };
 
 /**

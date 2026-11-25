@@ -39,15 +39,18 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `consent_revocations/{uid}_{consentId}` | uid, consent_id, type, steps[], status (pending/done/failed), attempts, requested_at, due_by (+24 h), completed_at, counts{}, last_error (code only), followed_up (D-76) | **None** | `onConsentCreated`, `consentRevokeSweep` |
 | `vendor_requests/{kind_uid_hash}` | uid, kind (avatar_model_delete / voice_model_delete / portal_unlink / marketing_unsubscribe), vendor, vendor_ref, source, status (pending), requested_at, due_by (D-76). Queue for vendor adapters; no vendor is connected yet | **None** | revoke handling (adds); vendor adapters (drain, log confirmation) |
 | `marketing_suppressions/{uid}` | uid, suppressed (bool), since, source (D-76). Any marketing sender checks the consent **and** this list | **None** | revoke handling / new marketing grant |
+| `push_outbox/{id}` | uid, category (fixed list), ref_id (an id, never text); then result {status, reason}, processed_at, expire_at (TTL, 7 days) | **None** | other servers ask for a push (Media Service: `coach_{jobId}`); `onPushRequest` sends it through `sendPush` (D-77) |
+
 ## Cloud Storage (D-76)
+
 Rules: `firebase/storage.rules`, nothing open to clients (the server uses the Admin SDK and signed URLs). Reserved prefixes for personal media; revoke handling deletes them:
+
 | Prefix | Holds | Deleted when revoked |
 |---|---|---|
 | `selfies/{uid}/` | raw selfie photos/video (16.3: 7 days max; the Media Service keeps selfies in memory only today) | camera, biometric |
 | `avatars/{uid}/` | approved portraits (`portraits/`) and frame sets (`{version}/`) (D-64, T-AVT-08d) | camera, biometric |
 | `voice_samples/{uid}/` | raw voice samples and raw consent audio (16.3) | microphone, biometric |
 | `exports/{uid}/{jobId}.zip` | data export zips (T-CMP-03, D-82), downloaded only through a short-lived signed link; deleted after 7 days by the bucket's lifecycle rule (`firebase/storage-lifecycle.json`) | — (the person's own copy) |
-| `push_outbox/{id}` | uid, category (fixed list), ref_id (an id, never text); then result {status, reason}, processed_at, expire_at (TTL, 7 days) | **None** | other servers ask for a push (Media Service: `coach_{jobId}`); `onPushRequest` sends it through `sendPush` (D-77) |
 
 Anything not listed is denied.
 

@@ -18,10 +18,18 @@ import {
   type ExportData,
 } from '../src/account/export-files.js';
 
-/** Collection paths in the first column of docs/data-model.md's table. */
+/** Collection paths in the first column of docs/data-model.md's Firestore
+ * tables (every `path` in that cell; the Cloud Storage section is not
+ * Firestore and is classified by USER_STORAGE_PREFIXES). */
 function dataModelPaths(): string[] {
   const md = readFileSync(new URL('../../../docs/data-model.md', import.meta.url), 'utf8');
-  return [...md.matchAll(/^\| `([^`]+)`/gm)].map((m) => m[1]!);
+  const firestore = md.split(/^## Cloud Storage/m)[0]!;
+  return [...firestore.matchAll(/^\| ((?:\\\||[^|])*`(?:\\\||[^|])*)\|/gm)].flatMap((m) => {
+    const cell = [...m[1]!.matchAll(/`([^`]+)`/g)].map((c) => c[1]!);
+    // `users/{uid}/a/{x}`, `b/{x}`: later paths in a cell share the first's parent.
+    const parent = /^(users\/\{uid\}\/)/.exec(cell[0]!)?.[1] ?? '';
+    return cell.map((c, i) => (i > 0 && !c.startsWith('users/') ? parent + c : c));
+  });
 }
 
 describe('every collection in docs/data-model.md is classified (D-82)', () => {

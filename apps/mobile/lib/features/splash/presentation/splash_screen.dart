@@ -87,7 +87,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           );
         }
       });
-    } catch (_) {
+    } catch (e) {
+      // Error type and code only: never a message that could hold user data.
+      StartupTrace.mark('startup_failed ${startupErrorCode(e)}');
       if (mounted) setState(() => _failed = true);
     }
   }

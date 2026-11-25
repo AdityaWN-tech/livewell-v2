@@ -120,6 +120,7 @@ class Harness {
   final routineAsked = FakeRoutineAskStore();
   final reminders = FakeReminders();
   final reminderZone = FakeReminderZoneStore();
+  final reminderLedger = FakeReminderLedgerStore();
   final faces = FakeCoachFaces();
   final selfieCapture = FakeSelfieCapture();
   final avatarMaker = FakeAvatarMaker();
@@ -190,6 +191,7 @@ class Harness {
           routineAskStoreProvider.overrideWithValue(routineAsked),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(reminderZone),
+          reminderLedgerStoreProvider.overrideWithValue(reminderLedger),
           appearanceStoreProvider.overrideWithValue(appearance),
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
@@ -220,7 +222,7 @@ class Harness {
             if (user != null) {
               final next = await ref
                   .read(signInCompletionProvider)
-                  .complete(user);
+                  .complete(user, restored: true);
               return StartDestination(next, signedIn: true);
             }
             return signedOutDestination(

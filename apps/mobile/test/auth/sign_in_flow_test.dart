@@ -43,14 +43,19 @@ void main() {
 
     await tester.enterText(find.byKey(const Key('phone')), '12345');
     await tapText(tester, 'Send code');
-    expect(find.text('Enter a valid US mobile number.'), findsOneWidget);
+    expect(
+      find.text('Enter a valid mobile number for United States.'),
+      findsOneWidget,
+    );
     expect(h.auth.codesSent, 0);
 
-    // A number with India's +91 code is rejected: phone sign-in is +1 only
-    // (D-66). (The bare 10 digits 98765 43210 are also a valid US number.)
-    await tester.enterText(find.byKey(const Key('phone')), '+91 98765 43210');
+    // An area code can't start with 1 (NANP), so this isn't a US number.
+    await tester.enterText(find.byKey(const Key('phone')), '112 555 0123');
     await tapText(tester, 'Send code');
-    expect(find.text('Enter a valid US mobile number.'), findsOneWidget);
+    expect(
+      find.text('Enter a valid mobile number for United States.'),
+      findsOneWidget,
+    );
     expect(h.auth.codesSent, 0);
 
     await tester.enterText(find.byKey(const Key('phone')), '(212) 555-0123');
@@ -193,15 +198,143 @@ void main() {
     expect(h.store.saved, isNull);
   });
 
-  testWidgets('phone screen is US (+1) only, no India option (D-66)', (
-    tester,
-  ) async {
-    await Harness(store: readyStore()).boot(tester);
-    await tapText(tester, 'Continue with phone');
-    expect(find.text('India (+91)'), findsNothing);
-    expect(find.textContaining('+91'), findsNothing);
-    expect(find.text('+1 '), findsOneWidget, reason: 'number field prefix');
-    expect(find.textContaining('Use email, Google or Apple'), findsOneWidget);
+  group('phone: any country (D-99)', () {
+    Future<Harness> openPhone(WidgetTester tester, {Locale? locale}) async {
+      if (locale != null) {
+        tester.platformDispatcher.localeTestValue = locale;
+        addTearDown(tester.platformDispatcher.clearLocaleTestValue);
+      }
+      final h = Harness(store: readyStore());
+      await h.boot(tester);
+      await tapText(tester, 'Continue with phone');
+      return h;
+    }
+
+    String chosen(WidgetTester tester) =>
+        tester.widget<Text>(find.byKey(const Key('phone-country-value'))).data!;
+
+    testWidgets('the country defaults to the device country', (tester) async {
+      await openPhone(tester, locale: const Locale('en', 'IN'));
+      expect(chosen(tester), contains('India (+91)'));
+      expect(find.text('+91 '), findsOneWidget, reason: 'number prefix');
+    });
+
+    testWidgets('a device in another country pre-selects it', (tester) async {
+      await openPhone(tester, locale: const Locale('en', 'GB'));
+      expect(chosen(tester), contains('United Kingdom (+44)'));
+    });
+
+    testWidgets('no device country: the United States', (tester) async {
+      await openPhone(tester, locale: const Locale('en'));
+      expect(chosen(tester), contains('United States (+1)'));
+    });
+
+    testWidgets('search by name, code or dial code, then select', (
+      tester,
+    ) async {
+      await openPhone(tester);
+      expect(chosen(tester), contains('United States (+1)'));
+      await tapKey(tester, 'phone-country');
+      expect(find.text('Choose your country'), findsOneWidget);
+      // The two markets come first.
+      expect(find.byKey(const Key('country-US')), findsOneWidget);
+      expect(find.byKey(const Key('country-IN')), findsOneWidget);
+
+      final search = find.byKey(const Key('country-search'));
+      await tester.enterText(search, 'united k');
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('country-GB')), findsOneWidget);
+      expect(find.byKey(const Key('country-US')), findsNothing);
+
+      await tester.enterText(search, '+977');
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('country-NP')), findsOneWidget);
+      expect(find.byKey(const Key('country-IN')), findsNothing);
+
+      await tester.enterText(search, 'cote');
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('country-CI')), findsOneWidget);
+
+      await tester.enterText(search, 'zzzz');
+      await tester.pumpAndSettle();
+      expect(find.textContaining('No country matches that'), findsOneWidget);
+
+      await tester.enterText(search, 'ae');
+      await tester.pumpAndSettle();
+      await tapKey(tester, 'country-AE');
+      expect(find.text('Choose your country'), findsNothing);
+      expect(chosen(tester), contains('United Arab Emirates (+971)'));
+      expect(find.text('+971 '), findsOneWidget);
+    });
+
+    testWidgets('India picked: a +91 number signs in, region India', (
+      tester,
+    ) async {
+      final h = await openPhone(tester);
+      await tapKey(tester, 'phone-country');
+      await tester.enterText(find.byKey(const Key('country-search')), 'india');
+      await tester.pumpAndSettle();
+      await tapKey(tester, 'country-IN');
+
+      // A US-shaped number that isn't an Indian mobile is refused.
+      await tester.enterText(find.byKey(const Key('phone')), '212 555 0123');
+      await tapText(tester, 'Send code');
+      expect(
+        find.text('Enter a valid mobile number for India.'),
+        findsOneWidget,
+      );
+      expect(h.auth.codesSent, 0);
+
+      await tester.enterText(find.byKey(const Key('phone')), '98765 43210');
+      await tapText(tester, 'Send code');
+      expect(
+        find.text('We sent a 6-digit code to +919876543210.'),
+        findsOneWidget,
+      );
+      await tester.enterText(find.byKey(const Key('code')), '123456');
+      await tapText(tester, 'Verify');
+      expect(find.byType(AvatarScreen), findsOneWidget);
+      expect(h.profiles.created['phone:+919876543210']!.region, 'IN');
+    });
+
+    testWidgets('a UK number signs in and the region is left to ask (D-03)', (
+      tester,
+    ) async {
+      // Device is en_US, the number is +44: never guess a region.
+      final h = await openPhone(tester);
+      await tapKey(tester, 'phone-country');
+      await tester.enterText(find.byKey(const Key('country-search')), 'gb');
+      await tester.pumpAndSettle();
+      await tapKey(tester, 'country-GB');
+      await tester.enterText(find.byKey(const Key('phone')), '07400 123456');
+      await tapText(tester, 'Send code');
+      expect(
+        find.text('We sent a 6-digit code to +447400123456.'),
+        findsOneWidget,
+      );
+      await tester.enterText(find.byKey(const Key('code')), '123456');
+      await tapText(tester, 'Verify');
+      expect(find.byType(AvatarScreen), findsOneWidget);
+      expect(h.profiles.created['phone:+447400123456']!.region, isNull);
+    });
+
+    testWidgets('a typed +code is accepted as typed', (tester) async {
+      final h = await openPhone(tester);
+      await tester.enterText(find.byKey(const Key('phone')), '+61 412 345 678');
+      await tester.pump();
+      expect(find.text('+1 '), findsNothing, reason: 'no clashing prefix');
+      await tapText(tester, 'Send code');
+      expect(
+        find.text('We sent a 6-digit code to +61412345678.'),
+        findsOneWidget,
+      );
+      expect(h.auth.codesSent, 1);
+    });
+
+    testWidgets('still one primary action on the phone screen', (tester) async {
+      await openPhone(tester);
+      expect(find.byType(FilledButton), findsOneWidget);
+    });
   });
 }
 

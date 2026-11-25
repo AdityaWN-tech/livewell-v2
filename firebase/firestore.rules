@@ -525,11 +525,18 @@ service cloud.firestore {
       match /memory_facts/{factId} {
         allow read: if isOwner(uid);
         // Facts are proposed by the Memory Agent (server); the user only
-        // changes their status. A deleted fact can't be brought back.
+        // changes their status. A deleted fact can't be brought back, and
+        // deleting wipes its text (T-AGT-05, D-100): only the server-side
+        // fact_key stays, so it is never proposed again.
         allow update: if isAdultOwner(uid)
-          && onlyChanges(['status', 'updated_at'])
+          && onlyChanges(['status', 'updated_at', 'fact'])
           && resource.data.status != 'deleted'
-          && request.resource.data.status in ['saved', 'deleted'];
+          && (
+            (request.resource.data.status == 'saved'
+              && request.resource.data.fact == resource.data.fact)
+            || (request.resource.data.status == 'deleted'
+              && request.resource.data.fact == '')
+          );
         allow create, delete: if false;
       }
 

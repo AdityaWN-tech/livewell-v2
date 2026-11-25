@@ -16,6 +16,8 @@ extension ConsentCopy on ConsentType {
     ConsentType.portalLinking => l.consentPortalLinkingTitle,
     ConsentType.marketing => l.consentMarketingTitle,
     ConsentType.analytics => l.consentAnalyticsTitle,
+    ConsentType.memory => l.consentMemoryTitle,
+    ConsentType.memorySensitive => l.consentMemorySensitiveTitle,
   };
 
   /// Null for the legal documents (their full text is shown elsewhere).
@@ -28,6 +30,8 @@ extension ConsentCopy on ConsentType {
     ConsentType.portalLinking => l.consentPortalLinkingBody,
     ConsentType.marketing => l.consentMarketingBody,
     ConsentType.analytics => l.consentAnalyticsBody,
+    ConsentType.memory => l.consentMemoryBody,
+    ConsentType.memorySensitive => l.consentMemorySensitiveBody,
     _ => null,
   };
 

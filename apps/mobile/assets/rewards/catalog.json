@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "review_status": "pending",
+  "note": "T-GAM-01 (FR-GAM-01..03, D-87). Badges, weekly challenges and avatar unlockables. Rewards are ONLY for consistency, learning, recovery and function (spec 6.9): never for weight, calories, fasting, restriction, exercise volume above the plan, rankings or comparing people. Every rule counts days or completed items, never amounts. Unlocks are cosmetic only. Copy is kind (no guilt, no 'don't lose your streak'), makes no health claims and is pending clinical review; the app shows rewards only with the `rewards` flag on (dev until review). A test (test/rewards/reward_catalog_test.dart) fails on any banned reward type or word.",
+  "allowed_bases": ["consistency", "learning", "recovery", "function"],
+  "badges": [
+    {
+      "id": "first_step",
+      "basis": "consistency",
+      "rule": { "type": "days_done", "count": 1 },
+      "title": "First step",
+      "line": "You did your first small step. That's how every habit starts."
+    },
+    {
+      "id": "steady_7",
+      "basis": "consistency",
+      "rule": { "type": "streak_days", "count": 7 },
+      "title": "A steady week",
+      "line": "7 days of small steps, rest days included."
+    },
+    {
+      "id": "steady_14",
+      "basis": "consistency",
+      "rule": { "type": "streak_days", "count": 14 },
+      "title": "Two steady weeks",
+      "line": "14 days of small steps. It's becoming part of your day."
+    },
+    {
+      "id": "steady_30",
+      "basis": "consistency",
+      "rule": { "type": "streak_days", "count": 30 },
+      "title": "A steady month",
+      "line": "30 days of small steps. That's a real habit."
+    },
+    {
+      "id": "restart",
+      "basis": "recovery",
+      "rule": { "type": "restarts", "count": 1 },
+      "title": "Restart",
+      "line": "You came back after a break. Coming back is what counts."
+    },
+    {
+      "id": "restart_3",
+      "basis": "recovery",
+      "rule": { "type": "restarts", "count": 3 },
+      "title": "Kind restarts",
+      "line": "You've restarted three times. Every restart is a fresh start."
+    },
+    {
+      "id": "lesson_1",
+      "basis": "learning",
+      "rule": { "type": "lessons_completed", "count": 1 },
+      "title": "First lesson",
+      "line": "You finished your first lesson."
+    },
+    {
+      "id": "lesson_5",
+      "basis": "learning",
+      "rule": { "type": "lessons_completed", "count": 5 },
+      "title": "Curious mind",
+      "line": "You finished 5 lessons."
+    },
+    {
+      "id": "challenge_1",
+      "basis": "function",
+      "rule": { "type": "challenges_completed", "count": 1 },
+      "title": "Challenge done",
+      "line": "You finished a weekly challenge."
+    },
+    {
+      "id": "challenge_3",
+      "basis": "function",
+      "rule": { "type": "challenges_completed", "count": 3 },
+      "title": "Three challenges",
+      "line": "You finished 3 weekly challenges."
+    }
+  ],
+  "challenges": [
+    {
+      "id": "post_meal_walk",
+      "basis": "function",
+      "movement": true,
+      "food": false,
+      "target_days": 3,
+      "title": "Post-meal walk",
+      "how": "After one meal, take a short, easy walk at your own pace."
+    },
+    {
+      "id": "plant_variety",
+      "basis": "consistency",
+      "movement": false,
+      "food": true,
+      "target_days": 3,
+      "title": "Plant variety",
+      "how": "Add a plant food you enjoy to one meal: a fruit, a vegetable, beans, nuts or a whole grain."
+    },
+    {
+      "id": "steady_bedtime",
+      "basis": "consistency",
+      "movement": false,
+      "food": false,
+      "target_days": 3,
+      "title": "Steady bedtime",
+      "how": "Go to bed at about the same time as the night before."
+    },
+    {
+      "id": "strength_balance",
+      "basis": "function",
+      "movement": true,
+      "food": false,
+      "target_days": 3,
+      "title": "Strength and balance",
+      "how": "Do a few gentle moves that are already part of your plan, holding on to something steady."
+    },
+    {
+      "id": "travel_ready",
+      "basis": "function",
+      "movement": false,
+      "food": false,
+      "target_days": 3,
+      "title": "Travel-ready",
+      "how": "Get one small thing ready for a busy day or a trip, like a water bottle or your plan for the day."
+    }
+  ],
+  "unlockables": [
+    { "id": "bg_meadow",   "kind": "background",  "cosmetic": true, "background": 6,  "unlocked_by": "first_step",  "title": "Meadow" },
+    { "id": "bg_dawn",     "kind": "background",  "cosmetic": true, "background": 7,  "unlocked_by": "steady_7",    "title": "Dawn" },
+    { "id": "bg_lagoon",   "kind": "background",  "cosmetic": true, "background": 8,  "unlocked_by": "steady_14",   "title": "Lagoon" },
+    { "id": "bg_blossom",  "kind": "background",  "cosmetic": true, "background": 9,  "unlocked_by": "steady_30",   "title": "Blossom" },
+    { "id": "bg_sand",     "kind": "background",  "cosmetic": true, "background": 10, "unlocked_by": "restart",     "title": "Sand" },
+    { "id": "bg_mist",     "kind": "background",  "cosmetic": true, "background": 11, "unlocked_by": "lesson_1",    "title": "Mist" },
+    { "id": "bg_sunset",   "kind": "background",  "cosmetic": true, "background": 12, "unlocked_by": "challenge_1", "title": "Sunset" },
+    { "id": "anim_petals", "kind": "celebration", "cosmetic": true, "celebration": "petals",   "unlocked_by": "steady_7",    "title": "Petals" },
+    { "id": "anim_stars",  "kind": "celebration", "cosmetic": true, "celebration": "stars",    "unlocked_by": "restart",     "title": "Stars" },
+    { "id": "anim_hearts", "kind": "celebration", "cosmetic": true, "celebration": "hearts",   "unlocked_by": "steady_14",   "title": "Hearts" },
+    { "id": "anim_bubbles","kind": "celebration", "cosmetic": true, "celebration": "bubbles",  "unlocked_by": "lesson_5",    "title": "Bubbles" },
+    { "id": "anim_confetti","kind": "celebration","cosmetic": true, "celebration": "confetti", "unlocked_by": "restart_3",   "title": "Confetti" }
+  ]
+}

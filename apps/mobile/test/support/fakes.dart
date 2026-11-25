@@ -670,6 +670,12 @@ class FakePlanRepository implements PlanRepository {
   @override
   Future<List<String>> datesFrom(String from) async =>
       (days.keys.where((d) => d.compareTo(from) >= 0).toList()..sort());
+
+  @override
+  Future<List<PlanDay>> daysBetween(String from, String to) async => [
+    for (final d in days.values)
+      if (d.date.compareTo(from) >= 0 && d.date.compareTo(to) <= 0) d,
+  ];
 }
 
 /// Records what would have been scheduled.

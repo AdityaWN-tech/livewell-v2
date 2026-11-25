@@ -43,6 +43,8 @@ import '../../features/splash/domain/splash_timing.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import '../../features/track/presentation/track_screen.dart';
 import '../../features/track/presentation/weekly_wins_screen.dart';
+import '../../features/rewards/presentation/rewards_screen.dart';
+import '../config/feature_flags.dart' show rewardsOnProvider;
 import '../../features/welcome/presentation/welcome_screen.dart';
 import '../../features/consent/domain/consent.dart';
 import '../../features/starter_plan/presentation/daily_plan_screen.dart';
@@ -54,6 +56,8 @@ import 'app_shell.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   final flavor = ref.watch(flavorProvider);
   final memoryEnabled = ref.watch(coachMemoryEnabledProvider);
+  // Badges and challenges (T-GAM-01): not even routable while off (D-87).
+  final rewardsOn = ref.watch(rewardsOnProvider);
   return GoRouter(
     initialLocation: '/splash',
     routes: [
@@ -163,6 +167,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'weekly',
                         builder: (context, state) => const WeeklyWinsScreen(),
+                      ),
+                    // Badges and challenges under Track (T-GAM-01).
+                    if (path == '/track' && rewardsOn)
+                      GoRoute(
+                        path: 'rewards',
+                        builder: (context, state) => const RewardsScreen(),
                       ),
                     if (path == '/learn')
                       GoRoute(

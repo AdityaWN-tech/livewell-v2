@@ -77,6 +77,20 @@
       },
       "description": "What my coach remembers (FR-CNV-05, T-AGT-05b). Off in staging and prod until the Memory Agent is deployed (D-101); dev always shows it.",
       "valueType": "BOOLEAN"
+    },
+    "ff_rewards": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "Badges, weekly challenges and avatar unlockables (T-GAM-01). Off in staging and prod until the reward copy is clinically reviewed (D-87); dev always shows them.",
+      "valueType": "BOOLEAN"
+    },
+    "ff_driver_wheel": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "The Live Well Map's 30-day fill per driver (FR-GAM-02). Off in staging and prod until the 8 driver names are clinical content (T-ASM-01, D-87); dev always shows it.",
+      "valueType": "BOOLEAN"
     }
   },
   "parameterGroups": {}

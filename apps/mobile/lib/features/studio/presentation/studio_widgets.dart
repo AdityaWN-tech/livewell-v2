@@ -480,15 +480,19 @@ class VoiceChoices extends StatelessWidget {
   }
 }
 
-/// The avatar background colours, and the scene backgrounds that come with
-/// the art kit (one unlocked by a streak, FR-GAM-03).
+/// The avatar background colours: six for everyone, plus the ones unlocked
+/// with badges (FR-GAM-03, cosmetic only; T-GAM-01).
 class BackgroundChoices extends StatelessWidget {
   const BackgroundChoices({
     super.key,
     required this.selected,
     required this.onPick,
     this.images,
+    this.unlocked = const [],
   });
+
+  /// Unlocked backgrounds: (AvatarColours index, name).
+  final List<(int, String)> unlocked;
 
   /// The background index chosen.
   final int selected;
@@ -502,14 +506,18 @@ class BackgroundChoices extends StatelessWidget {
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
-    final names = [
-      l.avatarBgSage,
-      l.avatarBgPeach,
-      l.avatarBgCream,
-      l.avatarBgSky,
-      l.avatarBgLavender,
-      l.avatarBgSunshine,
-    ];
+    final names = {
+      0: l.avatarBgSage,
+      1: l.avatarBgPeach,
+      2: l.avatarBgCream,
+      3: l.avatarBgSky,
+      4: l.avatarBgLavender,
+      5: l.avatarBgSunshine,
+      for (final (i, name) in unlocked)
+        if (i >= AvatarColours.baseBackgrounds &&
+            i < AvatarColours.background.length)
+          i: name,
+    };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -522,14 +530,14 @@ class BackgroundChoices extends StatelessWidget {
           spacing: LwSpacing.sm,
           runSpacing: LwSpacing.sm,
           children: [
-            for (var i = 0; i < AvatarColours.background.length; i++)
+            for (final MapEntry(key: i, value: name) in names.entries)
               Semantics(
                 key: Key('studio-bg-$i'),
                 button: true,
                 selected: selected == i,
                 container: true,
                 excludeSemantics: true,
-                label: names[i],
+                label: name,
                 child: InkWell(
                   customBorder: RoundedRectangleBorder(
                     borderRadius: LwRadius.lgAll,

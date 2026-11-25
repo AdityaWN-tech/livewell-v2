@@ -867,8 +867,16 @@ describe('memory_facts (user approves or deletes, FR-CNV-05)', () => {
     const ref = doc(as(ALICE), 'users/alice/memory_facts/f1');
     await assertSucceeds(getDoc(ref));
     await assertSucceeds(updateDoc(ref, { status: 'saved' }));
-    await assertSucceeds(updateDoc(ref, { status: 'deleted' }));
+    await assertSucceeds(updateDoc(ref, { status: 'deleted', fact: '' }));
     await assertFails(updateDoc(ref, { status: 'saved' }));
+  });
+  it('deleting must wipe the text; saving must keep it (D-100)', async () => {
+    const ref = doc(as(ALICE), 'users/alice/memory_facts/f1');
+    await assertFails(updateDoc(ref, { status: 'deleted' }));
+    await assertFails(updateDoc(ref, { status: 'deleted', fact: 'kept' }));
+    await assertFails(updateDoc(ref, { status: 'saved', fact: '' }));
+    await assertSucceeds(updateDoc(ref, { status: 'deleted', fact: '' }));
+    await assertFails(updateDoc(ref, { fact: 'back again' }));
   });
   it('cannot edit the fact text, create facts or hard-delete', async () => {
     const ref = doc(as(ALICE), 'users/alice/memory_facts/f1');

@@ -1,0 +1,166 @@
+{
+  "about": "Insights Agent fixtures (T-AGT-06 Done when: matches the deterministic statistics on fixtures; D-104). Synthetic. Each expected result was worked out by hand from the definitions in src/livewell_agents/insights/stats.py, not produced by running the code. The week is the 7 days before local_date.",
+  "cases": [
+    {
+      "id": "full_week_steady",
+      "why": "7 check-ins, halves 3,3,4 vs 3,4,3 (middle dropped) -> steady; two logs on one day count once; a skipped log does not count; active goal sets planned",
+      "local_date": "2026-11-22",
+      "activity": {
+        "checkins": [
+          {"day": "2026-11-15", "mood": 3, "energy": 3},
+          {"day": "2026-11-16", "mood": 3, "energy": 3},
+          {"day": "2026-11-17", "mood": 4, "energy": 4},
+          {"day": "2026-11-18", "mood": 3, "energy": 3},
+          {"day": "2026-11-19", "mood": 3, "energy": 3},
+          {"day": "2026-11-20", "mood": 4, "energy": 4},
+          {"day": "2026-11-21", "mood": 3, "energy": 3}
+        ],
+        "habit_logs": [
+          {"day": "2026-11-15", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-16", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-17", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-17", "habit_id": "support_1", "status": "done"},
+          {"day": "2026-11-18", "habit_id": "daily_step", "status": "skipped"}
+        ],
+        "goal": {"days_per_week": 5, "status": "active"},
+        "streak_days": 3
+      },
+      "expected": {
+        "week_start": "2026-11-15", "days_checked_in": 7, "habit_days_done": 3,
+        "habit_days_planned": 5, "streak_days": 3, "restarts": 0,
+        "mood_trend": "steady", "energy_trend": "steady", "stress_trend": "unknown"
+      }
+    },
+    {
+      "id": "empty_week",
+      "why": "nothing logged: zeros, 7 planned (no goal), every trend unknown",
+      "local_date": "2026-11-22",
+      "activity": {},
+      "expected": {
+        "week_start": "2026-11-15", "days_checked_in": 0, "habit_days_done": 0,
+        "habit_days_planned": 7, "streak_days": 0, "restarts": 0,
+        "mood_trend": "unknown", "energy_trend": "unknown", "stress_trend": "unknown"
+      }
+    },
+    {
+      "id": "outside_the_week_ignored",
+      "why": "the day before the week and today itself are outside; 3 readings is too few for a trend; a paused goal means 7 planned",
+      "local_date": "2026-11-22",
+      "activity": {
+        "checkins": [
+          {"day": "2026-11-14", "mood": 1, "energy": 1, "stress": 5},
+          {"day": "2026-11-15", "mood": 3, "energy": 3, "stress": 3},
+          {"day": "2026-11-18", "mood": 4, "energy": 4, "stress": 2},
+          {"day": "2026-11-21", "mood": 5, "energy": 5, "stress": 1},
+          {"day": "2026-11-22", "mood": 5, "energy": 5, "stress": 1}
+        ],
+        "habit_logs": [
+          {"day": "2026-11-14", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-20", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-22", "habit_id": "daily_step", "status": "done"}
+        ],
+        "goal": {"days_per_week": 3, "status": "paused"},
+        "streak_days": 1
+      },
+      "expected": {
+        "week_start": "2026-11-15", "days_checked_in": 3, "habit_days_done": 1,
+        "habit_days_planned": 7, "streak_days": 1, "restarts": 0,
+        "mood_trend": "unknown", "energy_trend": "unknown", "stress_trend": "unknown"
+      }
+    },
+    {
+      "id": "mood_up_stress_down",
+      "why": "mood 2,2 | 3,4: 2 -> 3.5 up; stress 4,4 | 3,2: 4 -> 2.5 down; energy flat steady; readings given out of order are sorted by day",
+      "local_date": "2026-11-22",
+      "activity": {
+        "checkins": [
+          {"day": "2026-11-21", "mood": 4, "energy": 3, "stress": 2},
+          {"day": "2026-11-15", "mood": 2, "energy": 3, "stress": 4},
+          {"day": "2026-11-20", "mood": 3, "energy": 3, "stress": 3},
+          {"day": "2026-11-16", "mood": 2, "energy": 3, "stress": 4}
+        ],
+        "goal": {"days_per_week": 4, "status": "active"},
+        "streak_days": 0
+      },
+      "expected": {
+        "week_start": "2026-11-15", "days_checked_in": 4, "habit_days_done": 0,
+        "habit_days_planned": 4, "streak_days": 0, "restarts": 0,
+        "mood_trend": "up", "energy_trend": "steady", "stress_trend": "down"
+      }
+    },
+    {
+      "id": "exactly_half_a_point",
+      "why": "boundary: mood 3,3 | 3,4 = +0.5 is up; energy 4,4 | 4,3 = -0.5 is down; stress 2,3 | 3,2 = 0 steady",
+      "local_date": "2026-11-22",
+      "activity": {
+        "checkins": [
+          {"day": "2026-11-15", "mood": 3, "energy": 4, "stress": 2},
+          {"day": "2026-11-16", "mood": 3, "energy": 4, "stress": 3},
+          {"day": "2026-11-17", "mood": 3, "energy": 4, "stress": 3},
+          {"day": "2026-11-18", "mood": 4, "energy": 3, "stress": 2}
+        ]
+      },
+      "expected": {
+        "week_start": "2026-11-15", "days_checked_in": 4, "habit_days_done": 0,
+        "habit_days_planned": 7, "streak_days": 0, "restarts": 0,
+        "mood_trend": "up", "energy_trend": "down", "stress_trend": "steady"
+      }
+    },
+    {
+      "id": "just_under_the_band_and_gaps",
+      "why": "mood 3,3,3 | 3,3,4: +1/3 steady; energy missing on one day: 2,2 (2) 4,4: 2 -> 4 up; stress only 3 readings unknown; every day done; goal 7",
+      "local_date": "2026-11-29",
+      "activity": {
+        "checkins": [
+          {"day": "2026-11-22", "mood": 3},
+          {"day": "2026-11-23", "mood": 3, "energy": 2, "stress": 1},
+          {"day": "2026-11-24", "mood": 3, "energy": 2},
+          {"day": "2026-11-25", "mood": 3, "energy": 2, "stress": 1},
+          {"day": "2026-11-26", "mood": 3, "energy": 4},
+          {"day": "2026-11-27", "mood": 4, "energy": 4, "stress": 5}
+        ],
+        "habit_logs": [
+          {"day": "2026-11-22", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-23", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-24", "habit_id": "support_2", "status": "done"},
+          {"day": "2026-11-25", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-26", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-27", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-28", "habit_id": "daily_step", "status": "done"}
+        ],
+        "goal": {"days_per_week": 7, "status": "active"},
+        "streak_days": 12
+      },
+      "expected": {
+        "week_start": "2026-11-22", "days_checked_in": 6, "habit_days_done": 7,
+        "habit_days_planned": 7, "streak_days": 12, "restarts": 0,
+        "mood_trend": "steady", "energy_trend": "up", "stress_trend": "unknown"
+      }
+    },
+    {
+      "id": "week_across_a_month_end",
+      "why": "local_date 2026-12-03: week 2026-11-26..2026-12-02; 2026-12-03 itself is outside",
+      "local_date": "2026-12-03",
+      "activity": {
+        "checkins": [
+          {"day": "2026-11-26", "mood": 2, "energy": 2},
+          {"day": "2026-11-30", "mood": 2, "energy": 2},
+          {"day": "2026-12-01", "mood": 2, "energy": 2},
+          {"day": "2026-12-02", "mood": 1, "energy": 1},
+          {"day": "2026-12-03", "mood": 5, "energy": 5}
+        ],
+        "habit_logs": [
+          {"day": "2026-11-25", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-11-26", "habit_id": "daily_step", "status": "done"},
+          {"day": "2026-12-02", "habit_id": "daily_step", "status": "done"}
+        ],
+        "streak_days": 2
+      },
+      "expected": {
+        "week_start": "2026-11-26", "days_checked_in": 4, "habit_days_done": 2,
+        "habit_days_planned": 7, "streak_days": 2, "restarts": 0,
+        "mood_trend": "down", "energy_trend": "down", "stress_trend": "unknown"
+      }
+    }
+  ]
+}

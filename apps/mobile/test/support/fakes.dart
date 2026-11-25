@@ -24,6 +24,7 @@ import 'package:livewell/features/routine/application/routine_moment.dart';
 import 'package:livewell/features/routine/domain/routine_reminders.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
+import 'package:livewell/features/starter_plan/domain/daily_cap.dart';
 import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
 import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
@@ -243,8 +244,27 @@ class FakeProfileRepository extends ProfileRepository {
 
   String? _step(String uid) => existing[uid] ?? created[uid]?.onboardingStep;
 
+  /// Server reads ([get]) and phone-cache reads ([getCached]).
+  int serverReads = 0;
+  int cacheReads = 0;
+
+  /// Nothing cached on this phone (a new phone): [getCached] asks the server.
+  bool cacheEmpty = false;
+
+  @override
+  Future<Profile?> getCached(String uid) async {
+    cacheReads++;
+    if (cacheEmpty) return get(uid);
+    return _profile(uid);
+  }
+
   @override
   Future<Profile?> get(String uid) async {
+    serverReads++;
+    return _profile(uid);
+  }
+
+  Future<Profile?> _profile(String uid) async {
     final step = _step(uid);
     if (step == null) return null;
     return Profile(
@@ -474,6 +494,9 @@ class FakeLearnRepository implements LearnRepository {
   List<PortalOffer> offers = [];
   final events = <PortalEventRecord>[];
   final clickIds = <String>[];
+
+  /// The surface of each logged event, in order.
+  final surfaces = <String>[];
   final _changes = StreamController<void>.broadcast();
 
   @override
@@ -514,8 +537,14 @@ class FakeLearnRepository implements LearnRepository {
   }
 
   @override
-  Future<void> logEvent(String event, String offerId, {String? clickId}) async {
+  Future<void> logEvent(
+    String event,
+    String offerId, {
+    String? clickId,
+    String surface = 'learn',
+  }) async {
     if (clickId != null) clickIds.add(clickId);
+    surfaces.add(surface);
     events.add(PortalEventRecord(event: event, offerId: offerId, at: _now()));
     _changes.add(null);
   }
@@ -753,6 +782,16 @@ class FakeReminderZoneStore implements ReminderZoneStore {
 
   @override
   Future<void> save(String z) async => zone = z;
+}
+
+class FakeReminderLedgerStore implements ReminderLedgerStore {
+  ReminderLedger? ledger;
+
+  @override
+  Future<ReminderLedger?> load() async => ledger;
+
+  @override
+  Future<void> save(ReminderLedger l) async => ledger = l;
 }
 
 class FakeAppearanceStore implements AppearanceStore {

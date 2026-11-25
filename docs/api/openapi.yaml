@@ -60,6 +60,318 @@ paths:
               schema: {$ref: "#/components/schemas/AvatarJob"}
         "401": {description: not_authorized}
         "404": {description: "not_found (also someone else's job)"}
+  /v1/briefings/morning:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: Today's morning briefing for the caller (Agent Service, T-AGT-01 / T-FND-03 spike)
+      description: >
+        Order (spec 9.4, 9.7): Safety.pre screens every free-text field of the
+        stored context with the shared red-flag rules (packages/safety-rules)
+        before anything else; a red flag returns the fixed template for that
+        category with no model call (emergency/crisis with the user's region
+        numbers, both regions when the region is unknown, D-03) and voice
+        neutral_device. Then the ai_disclosure consent is checked, then the
+        LangGraph flow (context, Coach draft, Safety.post, at most one retry)
+        returns an approved CoachMessage or the fixed fallback briefing. One
+        briefing per user and local day (repeat calls return the same one).
+        Spike: context comes from synthetic fixtures only (dev); D-91. Since
+        T-AGT-04 this is the Coach Agent's `briefing` mode (D-98): same
+        pipeline as the other Coach endpoints below.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/BriefingRequest"}
+      responses:
+        "200":
+          description: The briefing (route coach), the fixed fallback (route fallback) or a safety template (route safety_template)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CoachResponse"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (ai_disclosure not granted; no model call was made)"}
+        "404": {description: "no_context (no stored context for this user; in this slice only synthetic dev users exist)"}
+        "422": {description: invalid body (unknown fields are refused)}
+  /v1/conversation/turn:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: One Coach turn for the caller's chat message (Agent Service, T-AGT-04; spec 9.4, 12.1)
+      description: >
+        Coach Agent mode `reply` (D-98). Order, the same in every Coach mode:
+        Safety.pre screens the message AND every free-text field of the
+        stored context with the shared rules before anything else; a red flag
+        returns the fixed template (emergency/crisis with the user's region
+        numbers, both when the region is unknown, D-03) with voice
+        neutral_device and no model call. With ai_disclosure consent the
+        safety classifier may only escalate; it failing gives the fixed text.
+        A safety event in the last 72 h gives the fixed text (no model, no
+        portal). No consent gives 403. A message that looks like instructions
+        is never sent to the model (fixed text, safety.checks has
+        fallback:input_withheld). Otherwise approved passages are retrieved
+        (approved-only, D-94) and the graph returns an approved CoachMessage
+        (type reply; message.sources lists the passages it used; a health fact
+        without a cited approved source is refused) or the fixed reply text.
+        Text only for now (audio_ref and session memory come with T-CNV-01 /
+        T-AGT-05); nothing is stored (persisting messages is a D-98 follow-up).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ConversationTurnRequest"}
+      responses:
+        "200":
+          description: The reply (route coach), the fixed reply text (route fallback) or a safety template (route safety_template)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CoachResponse"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (ai_disclosure not granted; no model call was made)"}
+        "404": {description: "no_context (no stored context for this user)"}
+        "422": {description: invalid body (unknown fields are refused; text 1-1000 characters)}
+  /v1/reflections:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: The Coach's reply to the caller's evening reflection (Agent Service, T-AGT-04; FR-DLY-05)
+      description: >
+        Coach Agent mode `reflection` (D-98), same order as
+        /v1/conversation/turn; the reflection text is screened like the
+        context. Returns message.type reply and, on route coach, `barrier`
+        (a fixed code: what got in the way) as a proposal for the plan builder;
+        nothing is changed or stored here. The app keeps saving the reflection
+        itself at users/{uid}/reflections/{date} (data-model.md).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ReflectionRequest"}
+      responses:
+        "200":
+          description: The reply (route coach), the fixed reflection text (route fallback) or a safety template
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CoachResponse"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (no model call was made)"}
+        "404": {description: no_context}
+        "422": {description: invalid body (text 1-500 characters)}
+  /v1/nudges/copy:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: The words of one anchored nudge (Agent Service, T-AGT-04; FR-DLY-04, FR-TCH-02; job endpoint, not in spec 12.1)
+      description: >
+        Coach Agent mode `nudge` (D-98). For the nudge scheduler (T-DLY-04),
+        which alone decides whether and when a nudge is sent (caps, quiet
+        hours); this only writes the copy (at most 160 characters). The model
+        is never sent the name, the Why or check-in values, and a draft that
+        contains the name or the Why is refused (nothing personal on a lock
+        screen, AGENTS.md). Same safety order as every mode. Caller auth is the
+        user's token in this slice; service-to-service auth for the scheduler
+        is a follow-up (D-98).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/NudgeRequest"}
+      responses:
+        "200":
+          description: The nudge (route coach), the fixed nudge text (route fallback) or a safety template
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CoachResponse"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (no model call was made)"}
+        "404": {description: no_context}
+        "422": {description: invalid body}
+  /v1/reviews/weekly:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: This week's review (Agent Service, T-AGT-04; FR-DLY-06; job endpoint, not in spec 12.1)
+      description: >
+        Coach Agent mode `weekly_review` (D-98). The week's numbers are
+        counts and trend codes only. Send `stats`, or only `local_date`: then
+        the Insights Agent (T-AGT-06, D-104) computes them for the 7 days
+        before `local_date`, after the context and AI-consent checks (nothing
+        is read without them). Same safety order as every mode; reading
+        numbers as a condition is refused. No portal card (always null until
+        T-AGT-07). Caller auth as for nudges.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/WeeklyReviewRequest"}
+      responses:
+        "200":
+          description: The review (route coach), the fixed review text (route fallback) or a safety template
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/CoachResponse"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (no model call was made)"}
+        "404": {description: no_context}
+        "422": {description: "invalid body (neither stats nor local_date)"}
+        "503": {description: "insights_unavailable (no stats sent and no activity store configured)"}
+  /v1/insights/weekly:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: The week's statistics (Agent Service, Insights Agent, T-AGT-06; spec 9.3, 9.7; job endpoint, not in spec 12.1)
+      description: >
+        Deterministic, no model call (D-104). The week is the 7 days before
+        `local_date` (required: the time zone is never guessed). Reads only
+        check-in scores (mood, energy, stress), habit-log dates and status,
+        the primary goal's days_per_week and status, and the current streak
+        length; never barrier text, notes or reflections. Metrics are not
+        read yet (D-104). Definitions in
+        services/agents/src/livewell_agents/insights/stats.py. For the
+        nightly plan builder and the weekly review (spec 9.7). Caller auth
+        as for nudges.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_date]
+              properties:
+                local_date: {type: string, format: date}
+      responses:
+        "200":
+          description: The statistics
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/WeeklyStats"}
+        "401": {description: not_authorized}
+        "422": {description: invalid body}
+        "503": {description: insights_unavailable (activity store not configured)}
+  /v1/portal/recommend:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: One portal card or none for a surface (Agent Service, Portal Agent, T-AGT-07; spec 13.3, 13.4)
+      description: >
+        Step 1 eligibility and step 2 relevance are plain code (D-105).
+        No card: kill switch off (LW_PORTAL_CARDS, default off), a surface
+        other than evening_reflection, weekly_review, lesson_end, milestone
+        or user_question, no `portal_linking` consent, not 18+, safety
+        events unknown (always the case until they are recorded, D-22) or
+        one in the last 72 h, ed_safe_mode, a gentle day, the first 48 h,
+        already bought, 14-day cooldown after Not now (offer or topic),
+        another card in the last 24 h, 3 in the last 7 days, or a score
+        below the threshold (0.6). The first reason is returned as a code.
+        The card is copied from the approved catalog; only `bridge_line` is
+        written by a model (needs `ai_disclosure`; any failed check means no
+        line). The service writes nothing: the app records card_shown,
+        clicked and dismissed. Caller auth as for nudges.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/PortalRecommendRequest"}
+      responses:
+        "200":
+          description: A card, or none with the reason
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PortalRecommendResponse"}
+        "401": {description: not_authorized}
+        "422": {description: invalid body (unknown surface, a topic that is not a tag)}
+        "503": {description: portal_unavailable (source not configured)}
+  /v1/memory:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    get:
+      summary: The caller's memory list, "What my coach remembers" (Agent Service, T-AGT-05; FR-CNV-05)
+      description: >
+        Proposed and saved facts, newest first; deleted facts are never
+        returned. Works whatever the consents, so a person can always see and
+        delete (D-100). memory_on / sensitive_on are the `memory` and
+        `memory_sensitive` consents.
+      responses:
+        "200":
+          description: The list
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MemoryListResponse"}
+        "401": {description: not_authorized}
+        "503": {description: memory_unavailable (store not configured)}
+    delete:
+      summary: Delete every memory fact of the caller (final)
+      responses:
+        "200":
+          description: How many facts were deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [deleted]
+                properties: {deleted: {type: integer, minimum: 0}}
+        "401": {description: not_authorized}
+        "503": {description: memory_unavailable}
+  /v1/memory/propose:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: Memory Agent proposals after a conversation turn or a reflection (job endpoint; spec 9.3, 9.7)
+      description: >
+        Needs the `memory` and `ai_disclosure` consents, else status skipped
+        and no model call. A red flag, a safety event in the last 72 h,
+        instruction-like text, or a classifier hit or failure also skip. The
+        model suggests at most 3 facts; code drops unsafe ones and sensitive
+        ones (medication, diagnosis, mental_health) without the
+        `memory_sensitive` consent, and anything already known or deleted
+        before. Kept facts are stored as `proposed`; only the person saves
+        them. Caller auth is the user's token in this slice (D-100).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/MemoryProposeRequest"}
+      responses:
+        "200":
+          description: proposed (facts), nothing or skipped, with a reason code
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MemoryProposeResponse"}
+        "401": {description: not_authorized}
+        "404": {description: no_context}
+        "422": {description: invalid body}
+        "503": {description: memory_unavailable}
+  /v1/memory/{fact_id}/approve:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    post:
+      summary: Save a proposed fact (the person decides; spec 9.1 rule 3)
+      parameters:
+        - {name: fact_id, in: path, required: true, schema: {type: string}}
+      responses:
+        "200":
+          description: The saved fact (idempotent)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MemoryFact"}
+        "401": {description: not_authorized}
+        "403": {description: "consent_required (memory off, or a sensitive fact without memory_sensitive)"}
+        "404": {description: not_found}
+        "409": {description: fact_deleted (a deleted fact can never be saved)}
+        "503": {description: memory_unavailable}
+  /v1/memory/{fact_id}:
+    servers:
+      - url: https://agents.livewell.example/  # Agent Service; set per environment at deploy
+    delete:
+      summary: Delete one fact (final; the text is wiped; never proposed or used again)
+      parameters:
+        - {name: fact_id, in: path, required: true, schema: {type: string}}
+      responses:
+        "204": {description: Deleted (idempotent)}
+        "401": {description: not_authorized}
+        "404": {description: not_found}
+        "503": {description: memory_unavailable}
   # ---------- Core API: portal catalog for the Admin / CMS (T-PRT-02, D-92) ----------
   # Firebase callable functions (Cloud Functions 2nd gen, us-central1 until
   # regions are decided). Callable protocol: POST {"data": <request>}, reply
@@ -267,3 +579,150 @@ components:
             The 14-frame set made from the portrait (T-AVT-08d), in Cloud
             Storage avatars/{uid}/{frames_version}/ with avatar_frames.json;
             also written to users/{uid}/avatar/current.frames_version
+    BriefingRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        local_date:
+          type: string
+          format: date
+          description: The user's local date; defaults to the date in the stored context
+    CoachResponse:
+      type: object
+      description: What every Coach Agent endpoint returns (T-AGT-01 called it BriefingResponse).
+      required: [route, voice, message]
+      properties:
+        route: {type: string, enum: [coach, fallback, safety_template]}
+        voice:
+          type: string
+          enum: [neutral_device, gateway]
+          description: >
+            neutral_device for safety templates (FR-VOC-07); otherwise the app
+            asks the voice gateway with message.message_id (closed-script
+            rule, D-88). message.contains_user_text is true for model text, so
+            cloned voices refuse it.
+        message:
+          $ref: "../../packages/schemas/coach_message.schema.json"
+        barrier:
+          type: [string, "null"]
+          enum: [none, time, energy, motivation, schedule, weather, social, unwell, other, null]
+          description: >
+            Reflection mode, route coach only: what got in the way, as a fixed
+            code. A proposal for the nightly plan builder (FR-DLY-05); never
+            applied by the agent. Null otherwise.
+    BriefingResponse:
+      $ref: "#/components/schemas/CoachResponse"
+    ConversationTurnRequest:
+      type: object
+      additionalProperties: false
+      required: [text, session_id]
+      properties:
+        text: {type: string, minLength: 1, maxLength: 1000}
+        session_id: {type: string, minLength: 1, maxLength: 128, pattern: "^[A-Za-z0-9_-]+$"}
+        local_date: {type: string, format: date}
+    ReflectionRequest:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text: {type: string, minLength: 1, maxLength: 500}
+        prompt: {type: string, enum: [went_well], default: went_well}
+        local_date: {type: string, format: date}
+    NudgeRequest:
+      type: object
+      additionalProperties: false
+      required: [time_of_day]
+      properties:
+        time_of_day: {type: string, enum: [morning, midday, evening]}
+        local_date: {type: string, format: date}
+    WeeklyStats:
+      type: object
+      additionalProperties: false
+      required: [week_start, days_checked_in, habit_days_done, habit_days_planned, streak_days]
+      properties:
+        week_start: {type: string, format: date}
+        days_checked_in: {type: integer, minimum: 0, maximum: 7}
+        habit_days_done: {type: integer, minimum: 0, maximum: 7}
+        habit_days_planned: {type: integer, minimum: 0, maximum: 7}
+        streak_days: {type: integer, minimum: 0, maximum: 10000}
+        restarts: {type: integer, minimum: 0, maximum: 7, default: 0}
+        mood_trend: {type: string, enum: [up, steady, down, unknown], default: unknown}
+        energy_trend: {type: string, enum: [up, steady, down, unknown], default: unknown}
+        stress_trend: {type: string, enum: [up, steady, down, unknown], default: unknown}
+    WeeklyReviewRequest:
+      type: object
+      additionalProperties: false
+      description: stats, or local_date for the Insights Agent (at least one)
+      anyOf:
+        - required: [stats]
+        - required: [local_date]
+      properties:
+        stats: {$ref: "#/components/schemas/WeeklyStats"}
+        local_date: {type: string, format: date}
+    PortalRecommendRequest:
+      type: object
+      additionalProperties: false
+      required: [surface, local_date]
+      properties:
+        surface: {type: string, enum: [evening_reflection, weekly_review, lesson_end, milestone, user_question, morning_briefing, nudge, safety_message]}
+        local_date: {type: string, format: date}
+        asked_topics:
+          type: array
+          maxItems: 8
+          description: Covered topic tags the person asked about just now (never the question's text)
+          items: {type: string, pattern: "^[a-z0-9_]{1,40}$"}
+    PortalCard:
+      type: object
+      required: [offer_id, title, description, offer_type, label, price_label, url, click_id, surface, score]
+      properties:
+        offer_id: {type: string}
+        title: {type: string, description: as entered in the CMS}
+        description: {type: [string, "null"], description: as entered in the CMS}
+        offer_type: {type: string, enum: [course, program, free_lesson, coaching]}
+        label: {type: string, enum: ["From the Live Well Portal"]}
+        price_label: {type: string, description: "Free, the CMS price as entered, or Paid course"}
+        url: {type: string, description: "offer URL + utm_source, utm_medium, utm_campaign, utm_content, lw_cid only"}
+        click_id: {type: string}
+        surface: {type: string}
+        bridge_line: {type: [string, "null"], description: "1-2 sentences, or null (then no lead-in)"}
+        score: {type: number, minimum: 0, maximum: 1}
+    PortalRecommendResponse:
+      type: object
+      required: [reason]
+      properties:
+        card: {oneOf: [{$ref: "#/components/schemas/PortalCard"}, {type: "null"}]}
+        reason: {type: string, description: "ok, or the first reason for no card (a fixed code)"}
+    MemoryFact:
+      type: object
+      required: [fact_id, fact, category, sensitive, status, source, created_at]
+      properties:
+        fact_id: {type: string}
+        fact: {type: string, maxLength: 120}
+        category: {type: string, enum: [preference, routine, barrier, win, goal, physical, medication, diagnosis, mental_health]}
+        sensitive: {type: boolean, description: "medication, diagnosis or mental_health"}
+        status: {type: string, enum: [proposed, saved]}
+        source: {type: string, enum: [conversation, reflection]}
+        created_at: {type: string, format: date-time}
+    MemoryListResponse:
+      type: object
+      required: [facts, memory_on, sensitive_on]
+      properties:
+        facts: {type: array, items: {$ref: "#/components/schemas/MemoryFact"}}
+        memory_on: {type: boolean}
+        sensitive_on: {type: boolean}
+    MemoryProposeRequest:
+      type: object
+      additionalProperties: false
+      required: [text, source, source_message_id]
+      properties:
+        text: {type: string, minLength: 1, maxLength: 1000}
+        source: {type: string, enum: [conversation, reflection]}
+        source_message_id: {type: string, pattern: "^[A-Za-z0-9_-]+$", maxLength: 128}
+        local_date: {type: string, format: date}
+    MemoryProposeResponse:
+      type: object
+      required: [status, reason, facts]
+      properties:
+        status: {type: string, enum: [proposed, nothing, skipped]}
+        reason: {type: string, description: "code only (memory_off, no_ai_consent, red_flag, recent_safety_event, instruction_like, red_flag_classifier, classifier_unavailable, prompt_not_approved, too_many_pending, model_failed, no_fact_kept, ok)"}
+        facts: {type: array, items: {$ref: "#/components/schemas/MemoryFact"}}

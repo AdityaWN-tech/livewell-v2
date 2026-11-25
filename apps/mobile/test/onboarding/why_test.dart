@@ -76,6 +76,11 @@ void main() {
       expect(find.byKey(const Key('plan-not-ready')), findsOneWidget);
       await tapText(tester, 'Continue');
       expect(find.byType(HomeScreen), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('YOUR WHY'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('YOUR WHY'), findsOneWidget);
       expect(find.text('Energy to play cricket with my son.'), findsOneWidget);
     },

@@ -15,10 +15,10 @@ If a request conflicts with the spec, say so and stop before writing code.
 | Mobile (iOS + Android) | Flutter, Riverpod, go_router, Drift + SQLCipher (encrypted local DB) |
 | Auth, data, push | Firebase Auth (email, Google, Apple, phone OTP), Firestore, FCM/APNs, App Check, Remote Config |
 | Core API | TypeScript (strict, zod) on Cloud Functions 2nd gen or Cloud Run |
-| Agents | Python (ruff, mypy, pydantic I/O), LangGraph or Google ADK (chosen in T-FND-03), Cloud Run |
+| Agents | Python (ruff, mypy, pydantic I/O), LangGraph (core library only, no LangChain/LangSmith; D-90), Claude via the `anthropic` SDK behind our own `ModelClient`, Cloud Run |
 | Watch | Native watchOS (SwiftUI) and Wear OS (Kotlin + Compose) |
 | Widgets | iOS WidgetKit, Android Jetpack Glance |
-| Admin, voice-owner page | Flutter Web or Next.js (chosen in T-FND-03) |
+| Admin, voice-owner page | Admin / CMS: Flutter Web; voice-owner page: Next.js static export (D-90) |
 | Infra | Terraform; three Firebase/GCP projects (dev, staging, prod); GitHub Actions |
 
 ## Working agreement

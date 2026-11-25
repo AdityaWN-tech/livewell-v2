@@ -87,7 +87,10 @@ void main() {
       ),
     );
     expect(toggle.label, contains('Morning greeting'));
-    expect(toggle.getSemanticsData().flagsCollection.isToggled, isNot(Tristate.none));
+    expect(
+      toggle.getSemanticsData().flagsCollection.isToggled,
+      isNot(Tristate.none),
+    );
     await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     semantics.dispose();

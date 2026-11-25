@@ -23,15 +23,17 @@ import '../../safety/data/safety_rules_provider.dart';
 import '../../safety/domain/safety_rules.dart';
 import '../../safety/presentation/safety_screens.dart';
 import '../../profile/presentation/profile_button.dart';
-import '../../routine/application/routine_week_data.dart';
 import '../application/track_data.dart';
 import '../data/reflection_repository.dart';
 import '../domain/track_models.dart';
 import '../domain/streak.dart';
+import '../domain/chart_series.dart';
+import '../domain/metric_point.dart';
 import '../domain/track_stats.dart';
 import 'health_connect_sheet.dart';
 import '../../../core/config/feature_flags.dart' show rewardsOnProvider;
 import '../../rewards/presentation/rewards_screen.dart';
+import 'measures.dart';
 import 'weekly_wins_screen.dart';
 
 /// The streak card's data, from the habits done (D-60); null before the
@@ -84,8 +86,9 @@ String scaleWord(
 }
 
 /// Track tab (T-UI-02e, illustrated design): period picker, the 2 x 2
-/// metric cards with mini bars, the Mon-Sun Progress chart, the streak, the
-/// Weekly Reflection card and the evening reflection.
+/// metric cards with mini bars, the Progress chart for the period, My
+/// measures (T-GOL-02), the streak, the Weekly Reflection card and the
+/// evening reflection.
 class TrackScreen extends ConsumerWidget {
   const TrackScreen({super.key});
 
@@ -101,6 +104,8 @@ class TrackScreen extends ConsumerWidget {
         const _MetricGrid(),
         LwSectionHeader(l.trackProgressTitle),
         const _ProgressChart(),
+        LwSectionHeader(l.trackMeasuresTitle),
+        const MeasuresCard(),
         const SizedBox(height: LwSpacing.sectionGap),
         _WeekStreakCard(ref.watch(streakProvider)),
         LwSectionHeader(l.trackWeeklyTitle),
@@ -300,10 +305,13 @@ class _MetricGrid extends ConsumerWidget {
   }
 }
 
-/// Progress: Steps / Sleep / Mood / Habits chips and a Mon-Sun bar chart
-/// for this week, the selected day highlighted with its value in a bubble.
-/// Each bar is labelled for screen readers (FR-GOL-05), and the selected
-/// one is marked by its bubble and position, not colour alone.
+/// Progress: one chip per value and a bar chart for the picked period
+/// (FR-GOL-05): This Week by day (Monday to Sunday), This Month and 90 days
+/// by week (Monday to Sunday, clipped to the period). The selected bar is
+/// highlighted with its value in a bubble. Each bar is labelled for screen
+/// readers, and the selected one is marked by its bubble, position and bold
+/// day, not colour alone. Under the chart: where the values came from (and
+/// for Health, when they were read), FR-GOL-04.
 class _ProgressChart extends ConsumerStatefulWidget {
   const _ProgressChart();
 
@@ -311,106 +319,232 @@ class _ProgressChart extends ConsumerStatefulWidget {
   ConsumerState<_ProgressChart> createState() => _ProgressChartState();
 }
 
+/// One chart's data: per-day values, how weeks combine them, the bar
+/// scale, and the words for a value (a day, or a week's average).
+class _Series {
+  const _Series({
+    required this.daily,
+    required this.combine,
+    required this.top,
+    required this.word,
+    this.source,
+  });
+
+  final Map<String, Reading> daily;
+  final Combine combine;
+
+  /// The value of a full bar.
+  final double Function(List<Reading?> values) top;
+
+  /// The bubble's words for a value; [week] for a week's bar.
+  final String Function(Reading r, {required bool week}) word;
+  final String? source;
+}
+
 class _ProgressChartState extends ConsumerState<_ProgressChart> {
   TrackMetric _metric = TrackMetric.mood;
   int? _selected;
+  TrackPeriod? _period;
+
+  static double _max(List<Reading?> v, double floor) =>
+      v.nonNulls.fold(floor, (m, r) => r.a > m ? r.a : m);
+
+  /// The series for the chip, or the kind note to show instead.
+  (_Series?, String?) _series(AppLocalizations l, DateTime now) {
+    final number = NumberFormat.decimalPattern(
+      Localizations.localeOf(context).toString(),
+    );
+    final one = NumberFormat('0.0');
+    String perDay(Reading r) => l.trackPerDay(one.format(r.a));
+    switch (_metric) {
+      case TrackMetric.steps:
+        final steps = ref.watch(healthStepsProvider).value;
+        if (steps == null) return (null, l.trackChartStepsEmpty);
+        return (
+          _Series(
+            daily: {
+              for (final e in steps.days.entries)
+                e.key: (a: e.value.toDouble(), b: null),
+            },
+            combine: Combine.mean,
+            top: (v) => _max(v, steps.goal.toDouble()),
+            word: (r, {required week}) => number.format(r.a.round()),
+            source: l.trackChartFromHealth(
+              healthAppName(l),
+              DateFormat.jm(Localizations.localeOf(context).toString())
+                  .format(steps.readAt),
+            ),
+          ),
+          null,
+        );
+      case TrackMetric.sleep:
+      case TrackMetric.mood:
+        final history = ref.watch(trackHistoryProvider).value ?? <CheckIn>[];
+        return (
+          _Series(
+            daily: {
+              for (final c in history)
+                if ((_metric == TrackMetric.sleep ? c.sleep : c.mood)
+                    case final v?)
+                  c.date: (a: v.toDouble(), b: null),
+            },
+            combine: Combine.mean,
+            top: (_) => 5,
+            word: (r, {required week}) =>
+                scaleWord(l, _metric, TrackStats.nearest(r.a)),
+            source: l.trackFromCheckIns,
+          ),
+          l.trackChartEmpty,
+        );
+      case TrackMetric.habits:
+        final habits = ref.watch(habitsDailyProvider);
+        if (habits == null) return (null, l.trackChartHabitsEmpty);
+        return (
+          _Series(
+            daily: {
+              for (final e in habits.entries)
+                e.key: (a: e.value.toDouble(), b: null),
+            },
+            combine: Combine.perDay,
+            top: (v) => _max(v, 3),
+            word: (r, {required week}) =>
+                week ? perDay(r) : l.trackHabitsKept(r.a.round()),
+            source: l.trackChartFromApp,
+          ),
+          null,
+        );
+      case TrackMetric.routine:
+        // Items done per day (T-GOL-03e). A day with none simply has no
+        // bar: never red, never "missed" (spec 4.1).
+        final routine = ref.watch(routineDailyProvider).value;
+        if (routine == null) return (null, l.trackChartRoutineEmpty);
+        return (
+          _Series(
+            daily: {
+              for (final e in routine.entries)
+                e.key: (a: e.value.toDouble(), b: null),
+            },
+            combine: Combine.perDay,
+            top: (v) => _max(v, 3),
+            word: (r, {required week}) =>
+                week ? perDay(r) : l.trackRoutineDone(r.a.round()),
+            source: l.trackChartFromApp,
+          ),
+          null,
+        );
+      case TrackMetric.weight:
+      case TrackMetric.bloodPressure:
+      case TrackMetric.glucose:
+      case TrackMetric.meals:
+        final kind = switch (_metric) {
+          TrackMetric.weight => MetricKind.weight,
+          TrackMetric.bloodPressure => MetricKind.bloodPressure,
+          TrackMetric.glucose => MetricKind.glucose,
+          _ => MetricKind.meal,
+        };
+        final unit = ref.watch(weightUnitProvider);
+        final points = [
+          for (final p
+              in ref.watch(metricPointsProvider).value ?? <MetricPoint>[])
+            if (p.kind == kind) p,
+        ];
+        // Bars start at zero, so a change looks as big as it is.
+        return (
+          _Series(
+            daily: dailyFromPoints(points, kind, unit),
+            combine: kind == MetricKind.meal ? Combine.perDay : Combine.mean,
+            top: (v) => _max(v, kind == MetricKind.meal ? 3 : 1),
+            word: (r, {required week}) => switch (kind) {
+              MetricKind.weight => l.metricValueUnit(
+                formatWeight(context, r.a),
+                unit.id,
+              ),
+              MetricKind.bloodPressure => l.metricBpValue(
+                '${r.a.round()}',
+                '${r.b!.round()}',
+                MetricLimits.bpUnit,
+              ),
+              MetricKind.glucose => l.metricValueUnit(
+                '${r.a.round()}',
+                MetricLimits.glucoseUnit,
+              ),
+              MetricKind.meal =>
+                week ? perDay(r) : l.metricMealsCount(r.a.round()),
+            },
+            source: points.any((p) => p.source == MetricSource.health)
+                ? (points.any((p) => p.source == MetricSource.manual)
+                      ? l.trackChartFromYouAndHealth(healthAppName(l))
+                      : l.metricSourceHealth(healthAppName(l)))
+                : l.trackChartFromYou,
+          ),
+          l.trackChartMeasureEmpty,
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
     final now = ref.watch(clockProvider)();
-    final dates = weekDates(now);
-    final todayIndex = now.weekday - 1;
-    final history = {
-      for (final c in ref.watch(trackHistoryProvider).value ?? <CheckIn>[])
-        c.date: c,
-    };
-    final health = ref.watch(healthSummaryProvider);
-    final habits = ref.watch(habitsWeekProvider);
-    final routine = ref.watch(routineWeekProvider);
-    final number = NumberFormat.decimalPattern(
-      Localizations.localeOf(context).toString(),
-    );
-    final dayNames = [
-      for (final d in dates) DateFormat.E().format(DateTime.parse(d)),
-    ];
-    final fullDays = [
-      for (final d in dates) DateFormat.EEEE().format(DateTime.parse(d)),
-    ];
-
-    // Per day: bar height 0..1 and the words for the bubble and label.
-    final List<(double, String)?> days;
-    String? empty;
-    switch (_metric) {
-      case TrackMetric.steps:
-        if (health == null) {
-          days = List.filled(7, null);
-          empty = l.trackChartStepsEmpty;
-        } else {
-          final top = [
-            health.stepsGoal,
-            ...health.stepsWeek,
-          ].reduce((a, b) => a > b ? a : b);
-          days = [
-            for (var i = 0; i < 7; i++)
-              i > todayIndex || health.stepsWeek[i] == 0
-                  ? null
-                  : (
-                      health.stepsWeek[i] / top,
-                      number.format(health.stepsWeek[i]),
-                    ),
-          ];
-        }
-      case TrackMetric.habits:
-        if (habits == null) {
-          days = List.filled(7, null);
-          empty = l.trackChartHabitsEmpty;
-        } else {
-          days = [
-            for (var i = 0; i < 7; i++)
-              i > todayIndex
-                  ? null
-                  : (habits[i] / 3, l.trackHabitsKept(habits[i])),
-          ];
-        }
-      case TrackMetric.routine:
-        // Items done per day (T-GOL-03e). A day with none simply has no
-        // bar: never red, never "missed" (spec 4.1).
-        if (routine == null) {
-          days = List.filled(7, null);
-          empty = l.trackChartRoutineEmpty;
-        } else {
-          final top = routine.fold(3, (a, b) => a > b ? a : b);
-          days = [
-            for (var i = 0; i < 7; i++)
-              i > todayIndex || routine[i] == 0
-                  ? null
-                  : (routine[i] / top, l.trackRoutineDone(routine[i])),
-          ];
-        }
-      case TrackMetric.sleep:
-      case TrackMetric.mood:
-        days = [
-          for (final d in dates)
-            if ((_metric == TrackMetric.sleep
-                    ? history[d]?.sleep
-                    : history[d]?.mood)
-                case final v?)
-              (v / 5, scaleWord(l, _metric, v))
-            else
-              null,
-        ];
-        if (days.every((d) => d == null)) empty = l.trackChartEmpty;
+    final period = ref.watch(trackPeriodProvider);
+    if (period != _period) {
+      _period = period;
+      _selected = null;
     }
+    final edSafe = ref.watch(edSafeModeProvider);
+    if (edSafe &&
+        (_metric == TrackMetric.weight || _metric == TrackMetric.meals)) {
+      _metric = TrackMetric.mood;
+    }
+    final buckets = chartBuckets(period, now);
+    final byDay = period == TrackPeriod.week;
+    final today = DateTime(now.year, now.month, now.day);
+    final current = buckets.indexWhere(
+      (b) => !today.isBefore(b.first) && !today.isAfter(b.last),
+    );
 
-    // Today, or the latest earlier day with a value, until one is tapped.
-    var latest = todayIndex;
-    while (latest > 0 && days[latest] == null) {
+    final (series, note) = _series(l, now);
+    final values = series == null
+        ? List<Reading?>.filled(buckets.length, null)
+        : bucketValues(buckets, series.daily, now, series.combine);
+    // A note instead of the bars: no series, or a series that is
+    // empty-noted when nothing is in the period.
+    final String? empty = series == null
+        ? note
+        : (note != null && values.every((v) => v == null) ? note : null);
+    final top = series?.top(values) ?? 1;
+
+    // The bar's day under it and its full name for screen readers.
+    final short = [
+      for (var i = 0; i < buckets.length; i++)
+        byDay
+            ? DateFormat.E(locale).format(buckets[i].first)
+            : period == TrackPeriod.month
+            ? DateFormat.MMMd(locale).format(buckets[i].first)
+            // 90 days: every third week, newest last, so they fit.
+            : ((buckets.length - 1 - i) % 3 == 0
+                  ? DateFormat.Md(locale).format(buckets[i].first)
+                  : ''),
+    ];
+    final full = [
+      for (final b in buckets)
+        byDay
+            ? DateFormat.EEEE(locale).format(b.first)
+            : l.trackChartWeekOf(DateFormat.MMMMd(locale).format(b.first)),
+    ];
+
+    // Today's bar, or the latest earlier one with a value, until one is
+    // tapped.
+    var latest = current < 0 ? buckets.length - 1 : current;
+    while (latest > 0 && values[latest] == null) {
       latest--;
     }
     final selected = _selected ?? latest;
+    // 90 days has too many bars to tap: each is still read out.
+    final interactive = buckets.length <= 7;
 
     final chips = [
       (TrackMetric.steps, l.trackSteps),
@@ -418,6 +552,10 @@ class _ProgressChartState extends ConsumerState<_ProgressChart> {
       (TrackMetric.mood, l.trackMood),
       (TrackMetric.habits, l.trackChipHabits),
       (TrackMetric.routine, l.trackChipRoutine),
+      if (!edSafe) (TrackMetric.weight, l.metricWeight),
+      (TrackMetric.bloodPressure, l.metricBloodPressure),
+      (TrackMetric.glucose, l.metricGlucose),
+      if (!edSafe) (TrackMetric.meals, l.metricMeals),
     ];
     const chartHeight = 140.0;
     final bar = LwPalette.richer(p.mint);
@@ -445,7 +583,15 @@ class _ProgressChartState extends ConsumerState<_ProgressChart> {
               ],
             ),
             const SizedBox(height: LwSpacing.sm),
-            Text(l.trackThisWeekLabel, style: t.labelSmall),
+            Text(
+              switch (period) {
+                TrackPeriod.week => l.trackThisWeekLabel,
+                TrackPeriod.month => l.trackChartMonthLabel,
+                TrackPeriod.quarter => l.trackChartQuarterLabel,
+              },
+              key: const Key('track-chart-period'),
+              style: t.labelSmall,
+            ),
             const SizedBox(height: LwSpacing.sm),
             if (empty != null)
               Padding(
@@ -456,28 +602,50 @@ class _ProgressChartState extends ConsumerState<_ProgressChart> {
                   style: t.bodyMedium,
                 ),
               )
-            else
+            else ...[
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  for (var i = 0; i < 7; i++)
+                  for (var i = 0; i < buckets.length; i++)
                     Expanded(
-                      child: _Bar(
-                        key: Key('track-bar-$i'),
-                        height: chartHeight,
-                        value: days[i]?.$1,
-                        bubble: i == selected ? days[i]?.$2 : null,
-                        day: dayNames[i],
-                        colour: i == selected ? p.accent : bar,
-                        label: days[i] == null
-                            ? l.trackChartBarEmpty(fullDays[i])
-                            : l.trackChartBarLabel(fullDays[i], days[i]!.$2),
-                        selected: i == selected,
-                        onTap: () => setState(() => _selected = i),
-                      ),
+                      child: () {
+                        final v = values[i];
+                        final words = v == null
+                            ? null
+                            : series!.word(v, week: !byDay);
+                        final spoken = words == null
+                            ? null
+                            : (byDay || series!.combine == Combine.perDay
+                                  ? words
+                                  : l.trackOnAverage(words));
+                        return _Bar(
+                          key: Key('track-bar-$i'),
+                          height: chartHeight,
+                          value: v == null ? null : v.a / top,
+                          bubble: i == selected ? words : null,
+                          day: short[i],
+                          colour: i == selected ? p.accent : bar,
+                          label: spoken == null
+                              ? l.trackChartBarEmpty(full[i])
+                              : l.trackChartBarLabel(full[i], spoken),
+                          selected: i == selected,
+                          onTap: interactive
+                              ? () => setState(() => _selected = i)
+                              : null,
+                        );
+                      }(),
                     ),
                 ],
               ),
+              if (series?.source case final source?) ...[
+                const SizedBox(height: LwSpacing.sm),
+                Text(
+                  source,
+                  key: const Key('track-chart-source'),
+                  style: t.bodySmall,
+                ),
+              ],
+            ],
           ],
         ),
       ),
@@ -505,7 +673,9 @@ class _Bar extends StatelessWidget {
   final Color colour;
   final String label;
   final bool selected;
-  final VoidCallback onTap;
+
+  /// Null: read out but not tappable (90 days).
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -514,73 +684,77 @@ class _Bar extends StatelessWidget {
     final l = AppLocalizations.of(context);
     // The bubble and day names don't grow past 130%, so 7 fit across.
     final small = MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3);
+    final content = ConstrainedBox(
+      constraints: BoxConstraints(
+        minHeight: onTap == null ? 0 : LwSize.minTapTarget,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: height,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomCenter,
+              children: [
+                if (value != null)
+                  FractionallySizedBox(
+                    heightFactor: (value! * 0.8).clamp(0.06, 0.8),
+                    widthFactor: 0.55,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colour,
+                        borderRadius: LwRadius.smAll,
+                      ),
+                    ),
+                  ),
+                if (bubble != null)
+                  Positioned(
+                    top: 0,
+                    child: Container(
+                      key: const Key('track-bubble'),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: LwSpacing.xs,
+                        vertical: LwSpacing.xxs / 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: p.primary,
+                        borderRadius: LwRadius.pillAll,
+                      ),
+                      child: Text(
+                        bubble!,
+                        textScaler: small,
+                        style: t.labelSmall?.copyWith(color: p.onPrimary),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: LwSpacing.xxs),
+          Text(
+            day,
+            textScaler: small,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.visible,
+            style: t.labelSmall?.copyWith(
+              color: selected ? p.textPrimary : p.textSecondary,
+              fontWeight: selected ? FontWeight.w700 : null,
+            ),
+          ),
+        ],
+      ),
+    );
     return Semantics(
-      button: true,
+      button: onTap != null,
       container: true,
       excludeSemantics: true,
       selected: selected,
       label: selected ? l.trackChartSelected(label) : label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: LwRadius.smAll,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: height,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.bottomCenter,
-                  children: [
-                    if (value != null)
-                      FractionallySizedBox(
-                        heightFactor: (value! * 0.8).clamp(0.06, 0.8),
-                        widthFactor: 0.55,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: colour,
-                            borderRadius: LwRadius.smAll,
-                          ),
-                        ),
-                      ),
-                    if (bubble != null)
-                      Positioned(
-                        top: 0,
-                        child: Container(
-                          key: const Key('track-bubble'),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: LwSpacing.xs,
-                            vertical: LwSpacing.xxs / 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: p.primary,
-                            borderRadius: LwRadius.pillAll,
-                          ),
-                          child: Text(
-                            bubble!,
-                            textScaler: small,
-                            style: t.labelSmall?.copyWith(color: p.onPrimary),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: LwSpacing.xxs),
-              Text(
-                day,
-                textScaler: small,
-                style: t.labelSmall?.copyWith(
-                  color: selected ? p.textPrimary : p.textSecondary,
-                  fontWeight: selected ? FontWeight.w700 : null,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      child: onTap == null
+          ? content
+          : InkWell(onTap: onTap, borderRadius: LwRadius.smAll, child: content),
     );
   }
 }

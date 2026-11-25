@@ -7,9 +7,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/local_db/local_db_providers.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../avatar/data/avatar_repository.dart';
+import '../../notifications/application/push_registrar.dart';
 import '../../starter_plan/data/plan_repository.dart';
 import '../../voice/data/voice_repository.dart';
 import '../../home/application/home_data.dart' show todayPlanProvider;
@@ -149,14 +151,24 @@ class SharedPrefsLocalData implements LocalData {
 final localDataProvider = Provider<LocalData>((ref) => SharedPrefsLocalData());
 
 /// Log out / switch account / after deleting the account.
-/// TODO(T-FND-08): also drop the encrypted database key.
 class AccountActions {
   AccountActions(this._ref);
 
   final Ref _ref;
 
   Future<void> logOut() async {
+    // While still signed in: the device leaves the account and its push
+    // token is dropped (T-TCH-01).
+    await _ref.read(pushRegistrarProvider).unregister();
     await _ref.read(remindersProvider).cancelAll();
+    // Before signing out, so the last sync try still has the account
+    // (T-FND-08). The encrypted database and its key go with the account.
+    try {
+      await _ref.read(localDatabaseWiperProvider).wipe();
+    } catch (_) {
+      // Logging out must still work; the key is deleted even if the file
+      // couldn't be (EncryptedDatabaseWiper).
+    }
     await _ref.read(profilePhotoStoreProvider).remove();
     await _ref.read(localDataProvider).clear();
     await _ref.read(onboardingStoreProvider).clear();

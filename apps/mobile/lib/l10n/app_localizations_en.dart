@@ -772,6 +772,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t save your check-in. Please try again.';
 
   @override
+  String get checkinNoteCheckFailed =>
+      'We couldn\'t check your note just now, so it wasn\'t saved. Your other answers are saved.';
+
+  @override
+  String get checkinTryAgain => 'Try again';
+
+  @override
   String get checkinContinue => 'Continue';
 
   @override
@@ -3952,6 +3959,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dailyPlanWidgetPrivate =>
       'On the lock screen the widget shows general text only, never your answers or health details.';
+
+  @override
+  String get profileWidgetHideDetails => 'Hide details on lock screen';
+
+  @override
+  String get profileWidgetHideDetailsBody =>
+      'The widget says \"Your next step is ready\" instead of naming it.';
+
+  @override
+  String get voiceGreetingRest => 'I’m here to help, one small step at a time.';
+
+  @override
+  String get voiceSampleTitle => 'What you’ll hear';
+
+  @override
+  String get voiceSampleCalm =>
+      '“Hi, I’m your Live Well coach. Let’s take one small step together today.”';
+
+  @override
+  String get voiceSampleEnergetic =>
+      '“Hi! I’m your Live Well coach. Let’s make today count, one small step at a time!”';
+
+  @override
+  String profileChangeTime(String name, String time) {
+    return '$name, $time. Change the time';
+  }
 
   @override
   String get trackMeasuresTitle => 'My measures';

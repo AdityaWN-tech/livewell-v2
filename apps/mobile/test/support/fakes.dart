@@ -23,6 +23,9 @@ import 'package:livewell/features/profile/data/account_actions.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
 import 'package:livewell/features/routine/application/routine_moment.dart';
 import 'package:livewell/features/routine/domain/routine_reminders.dart';
+import 'package:livewell/features/notifications/data/device_registry.dart';
+import 'package:livewell/features/notifications/data/push_messaging.dart';
+import 'package:livewell/features/notifications/domain/push.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
 import 'package:livewell/features/starter_plan/domain/daily_cap.dart';
@@ -47,6 +50,7 @@ import 'package:livewell/core/design/avatar/avatar_art.dart'
 import 'package:livewell/features/widget/data/widget_inbox.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 import 'package:livewell/features/widget/domain/widget_snapshot.dart';
+import 'package:livewell/core/local_db/local_db_providers.dart';
 
 /// In-memory sign-in for widget tests.
 class FakeAuthService implements AuthService {
@@ -737,7 +741,14 @@ class FakeReminders implements Reminders {
     required String title,
     required String body,
     required String channelName,
-  }) async => shown.add((id, title, body));
+    String? payload,
+  }) async {
+    shown.add((id, title, body));
+    shownPayloads.add(payload);
+  }
+
+  /// The payload of each notification shown at once.
+  final shownPayloads = <String?>[];
 }
 
 class FakeCoachFaces implements CoachFaces {
@@ -845,6 +856,14 @@ class FakeDeletions implements Deletions {
 
   @override
   Future<void> deleteAccount() => _do('account');
+}
+
+/// The encrypted database wipe on log out (T-FND-08).
+class FakeLocalDatabaseWiper implements LocalDatabaseWiper {
+  int wipes = 0;
+
+  @override
+  Future<void> wipe() async => wipes++;
 }
 
 class FakeLocalData implements LocalData {
@@ -1165,4 +1184,78 @@ class FakeHealthSource implements HealthSource {
 
   @override
   Future<void> install() async => installs++;
+}
+
+/// Firebase Cloud Messaging stand-in (T-TCH-01). Nothing reaches FCM.
+class FakePushMessaging implements PushMessaging {
+  /// The OS permission (the plan's reminder dialog asks for it).
+  bool allowed = true;
+
+  /// This install's current token; null while there is none yet.
+  String? currentToken = 'token-1';
+  int deletes = 0;
+  final _refresh = StreamController<String>.broadcast();
+  final _foreground = StreamController<PushMessage>.broadcast();
+  final _opened = StreamController<PushMessage>.broadcast();
+  PushMessage? launch;
+
+  void rotate(String token) {
+    currentToken = token;
+    _refresh.add(token);
+  }
+
+  void receive(PushMessage m) => _foreground.add(m);
+  void tap(PushMessage m) => _opened.add(m);
+
+  @override
+  Future<bool> permitted() async => allowed;
+
+  @override
+  Future<String?> token() async => currentToken;
+
+  @override
+  Stream<String> get tokenRefresh => _refresh.stream;
+
+  @override
+  Future<void> deleteToken() async {
+    deletes++;
+    currentToken = null;
+  }
+
+  @override
+  Stream<PushMessage> get foreground => _foreground.stream;
+
+  @override
+  Stream<PushMessage> get opened => _opened.stream;
+
+  @override
+  Future<PushMessage?> launchMessage() async {
+    final m = launch;
+    launch = null;
+    return m;
+  }
+
+  @override
+  String get platform => 'android';
+}
+
+/// users/{uid}/devices in memory: path -> fields.
+class FakeDeviceRegistry implements DeviceRegistry {
+  final docs = <String, DeviceRecord>{};
+  int removes = 0;
+
+  @override
+  Future<void> save(String uid, String installId, DeviceRecord device) async =>
+      docs['users/$uid/devices/$installId'] = device;
+
+  @override
+  Future<void> remove(String uid, String installId) async {
+    removes++;
+    docs.remove('users/$uid/devices/$installId');
+  }
+}
+
+class FakePushInstallIdStore implements PushInstallIdStore {
+  @override
+  Future<String> get() async => 'install1';
 }

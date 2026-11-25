@@ -189,14 +189,17 @@ class InMemoryAvatarDocs:
 class JobNotifier(Protocol):
     """Tells the person their coach is ready (or couldn't be made) when a
     job ends: making one takes minutes on our GPU, so the app doesn't wait
-    on screen. A push through FCM at deploy; the words are generic ("Your
-    coach is ready"), never a name, a photo or anything personal."""
+    on screen. With Firebase configured it is FirestorePushOutbox: a push
+    request that core-api sends through FCM (T-TCH-01, D-77); the words are
+    generic ("Your coach is ready"), never a name, a photo or anything
+    personal."""
 
     def job_done(self, uid: str, job_id: str, made: bool) -> None: ...
 
 
 class NoNotifier:
-    """Until FCM is wired: the app finds out by asking (GET /jobs/{id})."""
+    """Without Firebase (tests, local runs): the app finds out by asking
+    (GET /jobs/{id})."""
 
     def job_done(self, uid: str, job_id: str, made: bool) -> None:
         return None

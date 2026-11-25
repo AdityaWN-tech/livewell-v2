@@ -50,7 +50,8 @@ class CountryField extends StatelessWidget {
           child: Text(
             '${country.flag}  $name (${country.dialCode})',
             key: const Key('phone-country-value'),
-            overflow: TextOverflow.ellipsis,
+            // Wraps at large text instead of being cut off (T-REL-01).
+            softWrap: true,
           ),
         ),
       ),

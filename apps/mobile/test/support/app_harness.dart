@@ -33,6 +33,7 @@ import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
     show avatarIdleMotionProvider;
 import 'package:livewell/features/learn/data/learn_repository.dart';
 import 'package:livewell/features/learn/application/learn_data.dart';
+import 'package:livewell/features/rewards/data/rewards_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
 import 'package:livewell/features/profile/data/data_export.dart';
@@ -127,6 +128,9 @@ class Harness {
   /// The 30-day goal and own habits, in memory (Step 4a).
   final goals = InMemoryGoalRepository();
 
+  /// Badges and weekly challenges, in memory (T-GAM-01).
+  final rewards = InMemoryRewardsRepository();
+
   /// Items the coach already asked about (T-GOL-03d).
   final routineAsked = FakeRoutineAskStore();
   final reminders = FakeReminders();
@@ -217,6 +221,7 @@ class Harness {
           planRepositoryProvider.overrideWithValue(plans),
           routineRepositoryProvider.overrideWithValue(routines),
           goalRepositoryProvider.overrideWithValue(goals),
+          rewardsRepositoryProvider.overrideWithValue(rewards),
           routineAskStoreProvider.overrideWithValue(routineAsked),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(reminderZone),

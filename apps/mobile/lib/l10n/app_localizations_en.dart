@@ -4231,6 +4231,156 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get rewardsTitle => 'Badges and challenges';
+
+  @override
+  String get rewardsSubtitle =>
+      'Small rewards for showing up. Rest days and restarts count too.';
+
+  @override
+  String get rewardsCardTitle => 'Your badges';
+
+  @override
+  String rewardsCardBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count badges so far',
+      one: '1 badge so far',
+      zero: 'Your first badge comes with your first small step.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rewardsCardLabel(int count) {
+    return 'Your badges, $count so far. Opens badges and challenges.';
+  }
+
+  @override
+  String get rewardsChallengeTitle => 'This week\'s challenge';
+
+  @override
+  String rewardsChallengeTarget(int days) {
+    return 'Any $days days this week. Any day counts.';
+  }
+
+  @override
+  String get rewardsChallengeJoin => 'Join this challenge';
+
+  @override
+  String get rewardsChallengeMark => 'I did it today';
+
+  @override
+  String get rewardsChallengeDoneToday => 'Done for today. Nice work.';
+
+  @override
+  String rewardsChallengeProgress(int done, int target) {
+    return '$done of $target days';
+  }
+
+  @override
+  String get rewardsChallengeComplete => 'Challenge done. Well done!';
+
+  @override
+  String get rewardsChallengeQuiet =>
+      'Challenges are resting for now. Take things gently; your badges stay yours.';
+
+  @override
+  String get rewardsChallengeNone =>
+      'No challenge this week. Your daily step is plenty.';
+
+  @override
+  String get rewardsBadgesTitle => 'Badges';
+
+  @override
+  String get rewardsBadgeNew => 'New';
+
+  @override
+  String rewardsBadgeEarnedLabel(String title, String line) {
+    return '$title, earned. $line';
+  }
+
+  @override
+  String rewardsBadgeNotYetLabel(String title, String how) {
+    return '$title, not yet. $how';
+  }
+
+  @override
+  String get rewardsNotYet => 'Not yet';
+
+  @override
+  String rewardsHowDaysDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Comes after $count days with a small step.',
+      one: 'Comes with your first small step.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rewardsHowStreak(int count) {
+    return 'Comes with a $count-day streak. A rest day each week still counts.';
+  }
+
+  @override
+  String rewardsHowRestarts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Comes after $count restarts.',
+      one: 'Comes when you come back after a missed day.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rewardsHowLessons(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Comes after $count lessons.',
+      one: 'Comes when you finish a lesson.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String rewardsHowChallenges(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Comes after $count weekly challenges.',
+      one: 'Comes when you finish a weekly challenge.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rewardsUnlocksTitle => 'Looks for your coach';
+
+  @override
+  String get rewardsUnlocksBody =>
+      'Just for fun: they only change how things look.';
+
+  @override
+  String rewardsUnlockedBy(String badge) {
+    return 'Comes with the badge: $badge';
+  }
+
+  @override
+  String get rewardsBackgroundUnlocked =>
+      'Background. Pick it in Avatar Studio.';
+
+  @override
+  String get rewardsCelebrationTitle => 'Done celebration';
+
+  @override
+  String get rewardsCelebrationLeaves => 'Leaves';
+
+  @override
   String get dataExportRowNote => 'Get a file with everything you’ve shared.';
 
   @override

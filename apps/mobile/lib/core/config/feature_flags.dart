@@ -24,6 +24,8 @@ class FeatureFlags {
     this.lovedOneVoice = false,
     this.photorealStreaming = false,
     this.coachMemory = false,
+    this.rewards = false,
+    this.driverWheel = false,
   });
 
   /// Morning briefing player (FR-DLY-01). Off until briefings are generated.
@@ -82,6 +84,8 @@ class FeatureFlags {
     Flag.lovedOneVoice => lovedOneVoice,
     Flag.photorealStreaming => photorealStreaming,
     Flag.coachMemory => coachMemory,
+    Flag.rewards => rewards,
+    Flag.driverWheel => driverWheel,
   };
 
   /// Builds flags from one value per [Flag]; missing ones are off.
@@ -97,6 +101,8 @@ class FeatureFlags {
     lovedOneVoice: v[Flag.lovedOneVoice] ?? false,
     photorealStreaming: v[Flag.photorealStreaming] ?? false,
     coachMemory: v[Flag.coachMemory] ?? false,
+    rewards: v[Flag.rewards] ?? false,
+    driverWheel: v[Flag.driverWheel] ?? false,
   );
 
   @override
@@ -107,6 +113,16 @@ class FeatureFlags {
   /// prod until the Memory Agent is deployed and proposing facts (D-101);
   /// the dev flavor always shows it (coachMemoryEnabledProvider).
   final bool coachMemory;
+
+  /// Badges, weekly challenges and avatar unlockables (T-GAM-01,
+  /// FR-GAM-01/03). Off until the reward copy is clinically reviewed
+  /// (D-87); the dev build has them anyway ([rewardsOnProvider]).
+  final bool rewards;
+
+  /// The Live Well Map's 30-day fill per driver (FR-GAM-02). Off until the
+  /// 8 driver names come from the clinical assessment content (T-ASM-01);
+  /// content/plan/drivers.json is provisional (D-87). Dev has it anyway.
+  final bool driverWheel;
 }
 
 /// Every flag, with its Remote Config parameter name (the same names as in
@@ -122,7 +138,9 @@ enum Flag {
   coachVoice('ff_coach_voice'),
   lovedOneVoice('ff_loved_one_voice', prodLocked: true),
   photorealStreaming('ff_photoreal_streaming', prodLocked: true),
-  coachMemory('ff_coach_memory');
+  coachMemory('ff_coach_memory'),
+  rewards('ff_rewards'),
+  driverWheel('ff_driver_wheel');
 
   const Flag(this.remoteKey, {this.prodLocked = false});
 
@@ -217,3 +235,19 @@ final featureFlagsProvider = Provider<FeatureFlags>((ref) {
     prodAllow: parseProdAllow(prodAllowFlagsDefine),
   );
 });
+
+/// Rewards (T-GAM-01): on with the flag, and always in the dev build so they
+/// can be tried; off in staging and prod until the copy is reviewed (D-87).
+final rewardsOnProvider = Provider<bool>(
+  (ref) =>
+      ref.watch(featureFlagsProvider).rewards ||
+      ref.watch(flavorProvider) == Flavor.dev,
+);
+
+/// The wheel's 30-day fill (FR-GAM-02): as [rewardsOnProvider], until the
+/// driver names are clinical content (D-87).
+final driverWheelOnProvider = Provider<bool>(
+  (ref) =>
+      ref.watch(featureFlagsProvider).driverWheel ||
+      ref.watch(flavorProvider) == Flavor.dev,
+);

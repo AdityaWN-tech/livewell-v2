@@ -128,6 +128,9 @@ flutter:
     - assets/coach/moments/
     # My Daily Routine activity catalog (copy of content/routine, checked by a test).
     - assets/routine/
+    # Badges, weekly challenges and unlockables (T-GAM-01): a copy of
+    # content/rewards/catalog.json.
+    - assets/rewards/
     # Legal texts users accept (copies of content/legal, checked by a test).
     - assets/legal/
     # Red-flag rules (copy of packages/safety-rules/rules.json, checked by a test).

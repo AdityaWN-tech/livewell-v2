@@ -7317,6 +7317,186 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 meal} other{{count} meals}}'**
   String metricMealsCount(int count);
 
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Badges and challenges'**
+  String get rewardsTitle;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Small rewards for showing up. Rest days and restarts count too.'**
+  String get rewardsSubtitle;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Your badges'**
+  String get rewardsCardTitle;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Your first badge comes with your first small step.} =1{1 badge so far} other{{count} badges so far}}'**
+  String rewardsCardBody(int count);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Your badges, {count} so far. Opens badges and challenges.'**
+  String rewardsCardLabel(int count);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'This week\'s challenge'**
+  String get rewardsChallengeTitle;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Any {days} days this week. Any day counts.'**
+  String rewardsChallengeTarget(int days);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Join this challenge'**
+  String get rewardsChallengeJoin;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'I did it today'**
+  String get rewardsChallengeMark;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Done for today. Nice work.'**
+  String get rewardsChallengeDoneToday;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {target} days'**
+  String rewardsChallengeProgress(int done, int target);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge done. Well done!'**
+  String get rewardsChallengeComplete;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges are resting for now. Take things gently; your badges stay yours.'**
+  String get rewardsChallengeQuiet;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'No challenge this week. Your daily step is plenty.'**
+  String get rewardsChallengeNone;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get rewardsBadgesTitle;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get rewardsBadgeNew;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, earned. {line}'**
+  String rewardsBadgeEarnedLabel(String title, String line);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, not yet. {how}'**
+  String rewardsBadgeNotYetLabel(String title, String how);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet'**
+  String get rewardsNotYet;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Comes with your first small step.} other{Comes after {count} days with a small step.}}'**
+  String rewardsHowDaysDone(int count);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Comes with a {count}-day streak. A rest day each week still counts.'**
+  String rewardsHowStreak(int count);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Comes when you come back after a missed day.} other{Comes after {count} restarts.}}'**
+  String rewardsHowRestarts(int count);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Comes when you finish a lesson.} other{Comes after {count} lessons.}}'**
+  String rewardsHowLessons(int count);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Comes when you finish a weekly challenge.} other{Comes after {count} weekly challenges.}}'**
+  String rewardsHowChallenges(int count);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Looks for your coach'**
+  String get rewardsUnlocksTitle;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Just for fun: they only change how things look.'**
+  String get rewardsUnlocksBody;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Comes with the badge: {badge}'**
+  String rewardsUnlockedBy(String badge);
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Background. Pick it in Avatar Studio.'**
+  String get rewardsBackgroundUnlocked;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Done celebration'**
+  String get rewardsCelebrationTitle;
+
+  /// T-GAM-01 badges, challenges and unlockables (D-87).
+  ///
+  /// In en, this message translates to:
+  /// **'Leaves'**
+  String get rewardsCelebrationLeaves;
+
   /// T-CMP-03 download my data (D-82).
   ///
   /// In en, this message translates to:

@@ -13,4 +13,4 @@ Deterministic red-flag rules (T-ASM-02, FR-SAF-01..05), shared by every part of 
 | `label_cases.json` / `check_label_cases.py` | Label test set and runner: `python check_label_cases.py`. `critical` cases: eating-disorder signs always caught, everyday steps never blocked. |
 
 Categories by priority: emergency, crisis (both interrupt with one-tap calls), disordered eating, medication, pregnancy / medically complex. Numbers per region (D-03): US 911 and 988 (call or text); India 112 and Tele-MANAS 14416; unknown region shows both.
-Rules are keyword patterns; the spec's classifier redundancy comes with the agents service (T-AGT-02).
+Rules are keyword patterns. The agents service adds the spec's classifier redundancy behind them (T-AGT-02, D-93): an LLM classifier that may only escalate a result, never clear a rule hit. Red flags it catches that the rules miss are listed in `services/agents/evals/cases/safety_15_3_cases.json` (`classifier_only`) as candidates for new rules.

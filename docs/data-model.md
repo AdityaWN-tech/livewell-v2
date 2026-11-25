@@ -44,9 +44,8 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 
 ## Cloud Storage (D-76)
 
-Rules: `firebase/storage.rules`, nothing open to clients (the server uses the Admin SDK and signed URLs). Reserved prefixes for personal media; revoke handling deletes them:
-
 Rules: `firebase/storage.rules`, nothing open to clients (the server uses the Admin SDK and signed URLs). Reserved prefixes for personal media; revoke handling deletes them, and "Delete my avatar" (`deleteAvatar` callable, D-78) deletes `selfies/{uid}/` and `avatars/{uid}/` with the same code (`deleteFaceData`):
+
 | Prefix | Holds | Deleted when revoked |
 |---|---|---|
 | `selfies/{uid}/` | raw selfie photos/video (16.3: 7 days max; the Media Service keeps selfies in memory only today) | camera, biometric |

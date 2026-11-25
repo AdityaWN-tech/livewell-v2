@@ -37,6 +37,7 @@
         "node_modules",
         "test",
         "src",
+        "scripts",
         "*.log",
         ".gitignore"
       ],

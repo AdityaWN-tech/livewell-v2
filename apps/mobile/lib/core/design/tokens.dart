@@ -70,6 +70,9 @@ class LwPalette extends ThemeExtension<LwPalette> {
     required this.sky,
     required this.butter,
     required this.rose,
+    required this.warmTop,
+    required this.warmBottom,
+    required this.flame,
     required this.onTint,
     required this.onTintSecondary,
     required this.background,
@@ -127,6 +130,14 @@ class LwPalette extends ThemeExtension<LwPalette> {
   final Color sky;
   final Color butter;
   final Color rose;
+
+  /// The streak card (T-UI-03, owner's reference): a soft peach that warms
+  /// towards orange at the bottom. Text on it is [onTint].
+  final Color warmTop;
+  final Color warmBottom;
+
+  /// The streak flame (decoration only; never text).
+  final Color flame;
   final Color onTint;
   final Color onTintSecondary;
 
@@ -186,6 +197,9 @@ class LwPalette extends ThemeExtension<LwPalette> {
     sky: Color(0xFFEBF5FE),
     butter: Color(0xFFFEF6DD),
     rose: Color(0xFFFFE3EC),
+    warmTop: Color(0xFFFFF0E0),
+    warmBottom: Color(0xFFFFE0BF),
+    flame: Color(0xFFF2672E),
     onTint: LwBrand.navy,
     onTintSecondary: Color(0xFF4F5868),
     background: Color(0xFFF4FBF8),
@@ -225,6 +239,9 @@ class LwPalette extends ThemeExtension<LwPalette> {
     sky: Color(0xFF1A2E3E),
     butter: Color(0xFF3A3320),
     rose: Color(0xFF3A2230),
+    warmTop: Color(0xFF3A2A22),
+    warmBottom: Color(0xFF45301F),
+    flame: Color(0xFFFF9A6B),
     onTint: Color(0xFFE9F1EF),
     onTintSecondary: Color(0xFFB9C4C2),
     background: Color(0xFF0D1A1C),

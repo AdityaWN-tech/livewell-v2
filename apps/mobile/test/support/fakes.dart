@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/painting.dart' show Color;
 import 'package:flutter/widgets.dart' show Key, SizedBox, Widget;
+import 'package:livewell/features/widget/domain/widget_interaction.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
 import 'package:livewell/features/avatar/domain/liveness.dart';
@@ -463,6 +464,14 @@ class FakeAnalytics implements Analytics {
     'name': 'reflection_submitted',
     'mode': voice ? 'voice' : 'text',
   });
+
+  @override
+  Future<void> widgetInteraction(WidgetInteraction i) async => events.add({
+    'name': 'widget_interaction',
+    'action': i.action,
+    'size': i.size,
+    'slot': i.slot,
+  });
 }
 
 /// Reflections in memory, for tests.
@@ -494,6 +503,9 @@ class FakeLearnRepository implements LearnRepository {
   List<PortalOffer> offers = [];
   final events = <PortalEventRecord>[];
   final clickIds = <String>[];
+
+  /// The surface of each logged event, in order.
+  final surfaces = <String>[];
   final _changes = StreamController<void>.broadcast();
 
   @override
@@ -534,8 +546,14 @@ class FakeLearnRepository implements LearnRepository {
   }
 
   @override
-  Future<void> logEvent(String event, String offerId, {String? clickId}) async {
+  Future<void> logEvent(
+    String event,
+    String offerId, {
+    String? clickId,
+    String surface = 'learn',
+  }) async {
     if (clickId != null) clickIds.add(clickId);
+    surfaces.add(surface);
     events.add(PortalEventRecord(event: event, offerId: offerId, at: _now()));
     _changes.add(null);
   }
@@ -1071,7 +1089,18 @@ class FakeWidgetInbox implements WidgetInbox {
   Future<String?> takeDone() async {
     final d = done;
     done = null;
+    if (d != null) interaction ??= WidgetInteraction.doneOnWidget();
     return d;
+  }
+
+  /// The tap behind the next link or Done (T-AVT-08g-e).
+  WidgetInteraction? interaction;
+
+  @override
+  WidgetInteraction? takeInteraction() {
+    final i = interaction;
+    interaction = null;
+    return i;
   }
 }
 

@@ -112,6 +112,7 @@ abstract final class PreviewSamples {
         title: 'Walk for 2 minutes after your morning tea',
         minutes: 2,
       ),
+      portalOfferId: 'sample-offer',
     ),
     Lesson(
       id: 'sample-2',

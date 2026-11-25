@@ -1,0 +1,53 @@
+# Admin / CMS checks (T-PRT-02, Flutter Web). Linux only: no golden images
+# yet. The shared-source test reads the app's design tokens and the Core
+# API's portal model, so changes there run it too.
+name: admin
+
+on:
+  pull_request:
+    paths:
+      - "apps/admin/**"
+      - "apps/mobile/lib/core/design/**"
+      - "apps/mobile/lib/l10n/app_en.arb"
+      - "services/core-api/src/portal/**"
+      - "services/core-api/src/admin/**"
+      - ".github/workflows/admin.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/admin/**"
+      - "apps/mobile/lib/core/design/**"
+      - "apps/mobile/lib/l10n/app_en.arb"
+      - "services/core-api/src/portal/**"
+      - "services/core-api/src/admin/**"
+      - ".github/workflows/admin.yml"
+
+concurrency:
+  group: admin-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: apps/admin
+
+env:
+  FLUTTER_VERSION: "3.47.7"
+
+jobs:
+  analyze-test-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test
+      # Compiles for the web with no Firebase settings (the page says so);
+      # nothing is deployed.
+      - run: flutter build web --release

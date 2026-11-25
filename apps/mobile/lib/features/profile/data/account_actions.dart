@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../account/data/profile_repository.dart';
 import '../../auth/data/firebase_auth_service.dart';
 import '../../avatar/data/avatar_repository.dart';
+import '../../notifications/application/push_registrar.dart';
 import '../../starter_plan/data/plan_repository.dart';
 import '../../voice/data/voice_repository.dart';
 import '../../home/application/home_data.dart' show todayPlanProvider;
@@ -156,6 +157,9 @@ class AccountActions {
   final Ref _ref;
 
   Future<void> logOut() async {
+    // While still signed in: the device leaves the account and its push
+    // token is dropped (T-TCH-01).
+    await _ref.read(pushRegistrarProvider).unregister();
     await _ref.read(remindersProvider).cancelAll();
     await _ref.read(profilePhotoStoreProvider).remove();
     await _ref.read(localDataProvider).clear();

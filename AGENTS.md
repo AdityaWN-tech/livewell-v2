@@ -15,10 +15,10 @@ If a request conflicts with the spec, say so and stop before writing code.
 | Mobile (iOS + Android) | Flutter, Riverpod, go_router, Drift + SQLCipher (encrypted local DB) |
 | Auth, data, push | Firebase Auth (email, Google, Apple, phone OTP), Firestore, FCM/APNs, App Check, Remote Config |
 | Core API | TypeScript (strict, zod) on Cloud Functions 2nd gen or Cloud Run |
-| Agents | Python (ruff, mypy, pydantic I/O), LangGraph or Google ADK (chosen in T-FND-03), Cloud Run |
+| Agents | Python (ruff, mypy, pydantic I/O), LangGraph (core library only, no LangChain/LangSmith; D-90), Claude via the `anthropic` SDK behind our own `ModelClient`, Cloud Run |
 | Watch | Native watchOS (SwiftUI) and Wear OS (Kotlin + Compose) |
 | Widgets | iOS WidgetKit, Android Jetpack Glance |
-| Admin, voice-owner page | Flutter Web or Next.js (chosen in T-FND-03) |
+| Admin, voice-owner page | Admin / CMS: Flutter Web; voice-owner page: Next.js static export (D-90) |
 | Infra | Terraform; three Firebase/GCP projects (dev, staging, prod); GitHub Actions |
 
 ## Working agreement
@@ -71,6 +71,7 @@ docs/                   Spec, decisions, setup guides, API, data model, ADRs
 | Golden images only / update them | `flutter test --tags golden` / `flutter test --update-goldens --tags golden` |
 | Firestore smoke test on a device | `flutter test integration_test/firestore_smoke_test.dart --flavor dev -d DEVICE` |
 | Firestore rules tests (emulator + coverage gate) | `cd firebase; $env:JAVA_HOME="D:\android\jbr"; npm test` (JAVA_HOME = the `jbr` folder inside your Android Studio / Android SDK install) |
+| Admin (Flutter Web) analyze + tests | `cd "D:\Adii voult\Adii\LiveWell\apps\admin"; flutter analyze; flutter test` (D-92) |
 | Core API / functions tests (Firestore + Functions emulators) | `cd services/core-api; npm test` (needs JAVA_HOME as above) |
 | Consent end to end on a device (emulators) | from repo root: `firebase emulators:exec --only auth,firestore,functions --project my-livewell "cd apps/mobile && flutter test integration_test/consent_emulator_test.dart --flavor dev -d DEVICE"` |
 | CI (GitHub Actions) | `.github/workflows/mobile.yml`: Linux runs everything except goldens; Windows runs goldens |

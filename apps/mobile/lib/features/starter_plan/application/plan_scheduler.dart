@@ -8,11 +8,13 @@ import '../../avatar/presentation/coach_avatar.dart';
 import '../../checkin/domain/checkin.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
-import '../../home/application/home_data.dart' show coachNameProvider;
+import '../../home/application/home_data.dart'
+    show coachNameProvider, stepProgressProvider;
 import '../../moments/data/coach_faces.dart';
 import '../../routine/application/routine_moment.dart';
 import '../data/plan_repository.dart';
 import '../data/reminders.dart';
+import '../domain/daily_cap.dart';
 import '../domain/touchpoints.dart';
 
 /// Keeps the plan's reminders in step with the plan, the touchpoint times,
@@ -51,17 +53,27 @@ class PlanScheduler {
     final quiet = QuietHours.fromMap(
       settings[ProfileSettings.quietHours] as Map<String, dynamic>?,
     );
-    final items = TouchpointScheduler.build(
-      days: [for (final d in dates) DateTime.parse(d)],
-      times: await plans.loadTimes(),
-      quiet: quiet,
-      consent: true,
-      now: now,
-      enabled: enabledFromMap(
-        settings[ProfileSettings.notificationCategories]
-            as Map<String, dynamic>?,
-      ),
+    // "Not today" (T-DLY-03e): that moment's reminder is off for the day.
+    final notToday = NotToday.fromMap(
+      settings[ProfileSettings.notToday] as Map<String, dynamic>?,
     );
+    // Today's step reminder is dropped once the step is done (TCH-e).
+    final stepDone = _ref.read(stepProgressProvider).done;
+    final doneNudge = TouchpointScheduler.idFor(now, TouchpointKind.nudge);
+    final items = notToday.filter([
+      for (final i in TouchpointScheduler.build(
+        days: [for (final d in dates) DateTime.parse(d)],
+        times: await plans.loadTimes(),
+        quiet: quiet,
+        consent: true,
+        now: now,
+        enabled: enabledFromMap(
+          settings[ProfileSettings.notificationCategories]
+              as Map<String, dynamic>?,
+        ),
+      ))
+        if (!(stepDone && i.id == doneNudge)) i,
+    ]);
     // My Daily Routine (T-GOL-03d): its own category and cap, same quiet
     // hours, scheduled in the same pass so neither wipes the other.
     final routine = await routineRemindersFor(
@@ -70,10 +82,26 @@ class PlanScheduler {
       settings: settings,
       quiet: quiet,
     );
-    final faces = items.isEmpty && routine.isEmpty
+    // One cap of 4 a day across plan and routine together (T-DLY-04,
+    // FR-TCH-01, D-71): the plan's touchpoints first, then routine
+    // reminders, earliest first; today's already shown ones count.
+    final ledgers = _ref.read(reminderLedgerStoreProvider);
+    final before = await ledgers.load();
+    final capped = capPerDay(
+      plan: items,
+      routine: routine,
+      used: {localDateKey(now): before?.shownBy(now).length ?? 0},
+    );
+    final faces = capped.plan.isEmpty && capped.routine.isEmpty
         ? const <TouchpointKind, String>{}
         : await _faces();
-    await reminders.replaceAll(items, texts, faces: faces, routine: routine);
+    await reminders.replaceAll(
+      capped.plan,
+      texts,
+      faces: faces,
+      routine: capped.routine,
+    );
+    await ledgers.save(ReminderLedger.next(before, now, capped));
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());
   }
 

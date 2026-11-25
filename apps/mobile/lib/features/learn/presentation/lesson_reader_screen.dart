@@ -14,6 +14,7 @@ import '../application/learn_data.dart';
 import '../data/learn_repository.dart';
 import '../domain/lesson.dart';
 import 'breathing_screen.dart';
+import 'portal_card.dart';
 
 /// Opens one approved item by id (`/learn/item/:id`): a lesson in the
 /// reader, a breathing session in the breathing guide.
@@ -391,13 +392,16 @@ class _CardPage extends StatelessWidget {
   }
 }
 
-/// The last page: the microhabit to try today, or a short well done.
-class _EndPage extends StatelessWidget {
+/// The last page: the microhabit to try today, or a short well done. Below
+/// it, the lesson's related portal card (FR-LRN-04, D-74) when every portal
+/// rule passes; it stays secondary, Finish is the page's one primary action.
+class _EndPage extends ConsumerWidget {
   const _EndPage({required this.lesson});
   final Lesson lesson;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final offer = ref.watch(lessonPortalCardProvider(lesson.portalOfferId));
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
@@ -440,6 +444,21 @@ class _EndPage extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+          ],
+          if (offer != null) ...[
+            const SizedBox(height: LwSpacing.sectionGap),
+            Text(
+              l.learnReaderPortalTitle,
+              key: const Key('lesson-portal-title'),
+              style: t.titleSmall,
+            ),
+            const SizedBox(height: LwSpacing.xs),
+            PortalCard(
+              key: ValueKey(offer.id),
+              offer: offer,
+              surface: PortalSurface.lessonEnd,
+              secondary: true,
             ),
           ],
         ],

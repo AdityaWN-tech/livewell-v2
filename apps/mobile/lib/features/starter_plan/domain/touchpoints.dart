@@ -2,6 +2,8 @@
 /// notification follows (FR-DLY-04, FR-TCH-01). Pure, so it can be tested.
 library;
 
+import '../../checkin/domain/checkin.dart' show localDateKey;
+
 /// A wall-clock time of day, in the person's local time zone.
 class ClockTime implements Comparable<ClockTime> {
   const ClockTime(this.hour, this.minute);
@@ -188,3 +190,49 @@ Set<TouchpointKind> enabledFromMap(Map<String, dynamic>? m) => {
 Map<String, bool> enabledToMap(Set<TouchpointKind> s) => {
   for (final k in TouchpointKind.values) k.name: s.contains(k),
 };
+
+/// "Not today" (T-DLY-03e): moments whose reminder is off for one local
+/// day only. Stored as `{date: "YYYY-MM-DD", kinds: [...]}`; any other day
+/// it means nothing, so it never needs clearing.
+class NotToday {
+  const NotToday({required this.date, this.kinds = const {}});
+
+  /// The local date it applies to, "YYYY-MM-DD".
+  final String date;
+  final Set<TouchpointKind> kinds;
+
+  static NotToday fromMap(Map<String, dynamic>? m) => NotToday(
+    date: m?['date'] as String? ?? '',
+    kinds: {
+      for (final k in TouchpointKind.values)
+        if ((m?['kinds'] as List?)?.contains(k.name) ?? false) k,
+    },
+  );
+
+  Map<String, Object> toMap() => {
+    'date': date,
+    'kinds': [
+      for (final k in TouchpointKind.values)
+        if (kinds.contains(k)) k.name,
+    ],
+  };
+
+  /// Whether [k] is off on [day].
+  bool skips(DateTime day, TouchpointKind k) =>
+      date == localDateKey(day) && kinds.contains(k);
+
+  /// Today's set with [k] turned off ([off]) or back on. A set from an
+  /// earlier day is dropped.
+  NotToday toggle(DateTime today, TouchpointKind k, {required bool off}) {
+    final key = localDateKey(today);
+    final next = {if (date == key) ...kinds};
+    off ? next.add(k) : next.remove(k);
+    return NotToday(date: key, kinds: next);
+  }
+
+  /// [items] without the reminders turned off for their day.
+  List<ScheduledTouchpoint> filter(List<ScheduledTouchpoint> items) => [
+    for (final i in items)
+      if (!skips(i.when, i.kind)) i,
+  ];
+}

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/consent/presentation/consents_screen.dart';
+import '../../features/memory/application/memory_enabled.dart';
+import '../../features/memory/presentation/memory_screen.dart';
 import '../../features/dev/presentation/design_gallery.dart';
 import '../../features/dev/presentation/illustration_gallery.dart';
 import '../../features/dev/presentation/avatar_frames_gallery.dart';
@@ -50,6 +52,7 @@ import 'app_shell.dart';
 /// (new users) or the 5-tab shell at /home (signed in).
 final routerProvider = Provider<GoRouter>((ref) {
   final flavor = ref.watch(flavorProvider);
+  final memoryEnabled = ref.watch(coachMemoryEnabledProvider);
   return GoRouter(
     initialLocation: '/splash',
     routes: [
@@ -238,6 +241,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'consents',
             builder: (context, state) => const ConsentsScreen(),
           ),
+          // Registered only while the screen is enabled (D-101).
+          if (memoryEnabled)
+            GoRoute(
+              path: 'memory',
+              builder: (context, state) => const MemoryScreen(),
+            ),
         ],
       ),
       if (flavor == Flavor.dev)

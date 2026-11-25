@@ -682,17 +682,41 @@ abstract class AppLocalizations {
   /// **'Continue with phone'**
   String get phoneTitle;
 
-  /// No description provided for @phoneUsOnlyNote.
+  /// D-99: phone sign-in and Profile > Add a phone number accept any country.
   ///
   /// In en, this message translates to:
-  /// **'Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.'**
-  String get phoneUsOnlyNote;
+  /// **'Choose your country, then enter your mobile number.'**
+  String get phoneCountryNote;
 
-  /// No description provided for @countryUs.
+  /// No description provided for @phoneCountryLabel.
   ///
   /// In en, this message translates to:
-  /// **'United States (+1)'**
-  String get countryUs;
+  /// **'Country'**
+  String get phoneCountryLabel;
+
+  /// No description provided for @phoneCountryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your country'**
+  String get phoneCountryTitle;
+
+  /// No description provided for @phoneCountrySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by country or code'**
+  String get phoneCountrySearchHint;
+
+  /// No description provided for @phoneCountryNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No country matches that. Try its name or its code, like +44.'**
+  String get phoneCountryNoMatch;
+
+  /// Screen reader label of the country button on the phone screen (D-99).
+  ///
+  /// In en, this message translates to:
+  /// **'Country: {country}, {dialCode}'**
+  String phoneCountrySemantics(String country, String dialCode);
 
   /// No description provided for @phoneNumberLabel.
   ///
@@ -703,8 +727,8 @@ abstract class AppLocalizations {
   /// No description provided for @phoneInvalidMsg.
   ///
   /// In en, this message translates to:
-  /// **'Enter a valid US mobile number.'**
-  String get phoneInvalidMsg;
+  /// **'Enter a valid mobile number for {country}.'**
+  String phoneInvalidMsg(String country);
 
   /// No description provided for @phoneSendCode.
   ///
@@ -1935,6 +1959,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{day}: coming up'**
   String trackDayUpcoming(String day);
+
+  /// Under the Track streak row: says the streak counts habits done, not check-ins.
+  ///
+  /// In en, this message translates to:
+  /// **'A day counts when you finish at least one habit.'**
+  String get trackStreakCounts;
 
   /// No description provided for @trackStreakLegend.
   ///
@@ -6488,6 +6518,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get healthTryAgain;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Let my coach remember things'**
+  String get consentMemoryTitle;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach can suggest small things to remember from your chats and reflections, like \"prefers morning walks\". You choose what is kept.'**
+  String get consentMemoryBody;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Include health details'**
+  String get consentMemorySensitiveTitle;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Medicines, health conditions and mental health. These are only suggested and kept if you turn this on.'**
+  String get consentMemorySensitiveBody;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'What my coach remembers'**
+  String get memoryTitle;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'These help your coach make suggestions that fit you. Nothing is kept unless you say so, and you can delete anything at any time.'**
+  String get memoryIntro;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions to keep'**
+  String get memorySuggestionsHeader;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Remembered'**
+  String get memorySavedHeader;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get memoryKeep;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get memoryDelete;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Health detail'**
+  String get memoryHealthTag;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Memory is off, so nothing new is suggested and your coach uses nothing here. You can still delete these.'**
+  String get memoryOffNote;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'To keep this, turn on Include health details.'**
+  String get memoryNeedsSensitive;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing remembered yet'**
+  String get memoryEmptyTitle;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'When you chat with your coach or write a reflection, it may suggest something to remember. You decide.'**
+  String get memoryEmptyBody;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete everything'**
+  String get memoryDeleteAll;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete everything your coach remembers?'**
+  String get memoryDeleteAllTitle;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'This can\'t be undone. Your coach won\'t use or suggest these again.'**
+  String get memoryDeleteAllBody;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get memoryCancel;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get memoryDeleted;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t save. Please try again.'**
+  String get memorySaveError;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load this right now. Please try again later.'**
+  String get memoryLoadError;
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep: {fact}'**
+  String memoryKeepSemantics(String fact);
+
+  /// T-AGT-05b memory screen (D-101).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete: {fact}'**
+  String memoryDeleteSemantics(String fact);
 
   /// Profile > Daily plan (T-DLY-03e).
   ///

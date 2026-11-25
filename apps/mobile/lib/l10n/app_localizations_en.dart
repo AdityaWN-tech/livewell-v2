@@ -337,17 +337,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneTitle => 'Continue with phone';
 
   @override
-  String get phoneUsOnlyNote =>
-      'Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.';
+  String get phoneCountryNote =>
+      'Choose your country, then enter your mobile number.';
 
   @override
-  String get countryUs => 'United States (+1)';
+  String get phoneCountryLabel => 'Country';
+
+  @override
+  String get phoneCountryTitle => 'Choose your country';
+
+  @override
+  String get phoneCountrySearchHint => 'Search by country or code';
+
+  @override
+  String get phoneCountryNoMatch =>
+      'No country matches that. Try its name or its code, like +44.';
+
+  @override
+  String phoneCountrySemantics(String country, String dialCode) {
+    return 'Country: $country, $dialCode';
+  }
 
   @override
   String get phoneNumberLabel => 'Mobile number';
 
   @override
-  String get phoneInvalidMsg => 'Enter a valid US mobile number.';
+  String phoneInvalidMsg(String country) {
+    return 'Enter a valid mobile number for $country.';
+  }
 
   @override
   String get phoneSendCode => 'Send code';
@@ -1071,6 +1088,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String trackDayUpcoming(String day) {
     return '$day: coming up';
   }
+
+  @override
+  String get trackStreakCounts =>
+      'A day counts when you finish at least one habit.';
 
   @override
   String get trackStreakLegend =>
@@ -3717,6 +3738,90 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthTryAgain => 'Try again';
+
+  @override
+  String get consentMemoryTitle => 'Let my coach remember things';
+
+  @override
+  String get consentMemoryBody =>
+      'Your coach can suggest small things to remember from your chats and reflections, like \"prefers morning walks\". You choose what is kept.';
+
+  @override
+  String get consentMemorySensitiveTitle => 'Include health details';
+
+  @override
+  String get consentMemorySensitiveBody =>
+      'Medicines, health conditions and mental health. These are only suggested and kept if you turn this on.';
+
+  @override
+  String get memoryTitle => 'What my coach remembers';
+
+  @override
+  String get memoryIntro =>
+      'These help your coach make suggestions that fit you. Nothing is kept unless you say so, and you can delete anything at any time.';
+
+  @override
+  String get memorySuggestionsHeader => 'Suggestions to keep';
+
+  @override
+  String get memorySavedHeader => 'Remembered';
+
+  @override
+  String get memoryKeep => 'Keep';
+
+  @override
+  String get memoryDelete => 'Delete';
+
+  @override
+  String get memoryHealthTag => 'Health detail';
+
+  @override
+  String get memoryOffNote =>
+      'Memory is off, so nothing new is suggested and your coach uses nothing here. You can still delete these.';
+
+  @override
+  String get memoryNeedsSensitive =>
+      'To keep this, turn on Include health details.';
+
+  @override
+  String get memoryEmptyTitle => 'Nothing remembered yet';
+
+  @override
+  String get memoryEmptyBody =>
+      'When you chat with your coach or write a reflection, it may suggest something to remember. You decide.';
+
+  @override
+  String get memoryDeleteAll => 'Delete everything';
+
+  @override
+  String get memoryDeleteAllTitle => 'Delete everything your coach remembers?';
+
+  @override
+  String get memoryDeleteAllBody =>
+      'This can\'t be undone. Your coach won\'t use or suggest these again.';
+
+  @override
+  String get memoryCancel => 'Cancel';
+
+  @override
+  String get memoryDeleted => 'Deleted';
+
+  @override
+  String get memorySaveError => 'That didn\'t save. Please try again.';
+
+  @override
+  String get memoryLoadError =>
+      'Couldn\'t load this right now. Please try again later.';
+
+  @override
+  String memoryKeepSemantics(String fact) {
+    return 'Keep: $fact';
+  }
+
+  @override
+  String memoryDeleteSemantics(String fact) {
+    return 'Delete: $fact';
+  }
 
   @override
   String get dailyPlanSubtitle =>

@@ -60,6 +60,8 @@ final prodRoutes = <AuditRoute>[
   const AuditRoute('/help'),
   const AuditRoute('/profile'),
   const AuditRoute('/profile/phone'),
+  // Moment times, quiet hours, playback and the widget (T-DLY-03e, D-79).
+  const AuditRoute('/profile/daily-plan'),
   const AuditRoute('/settings'),
   const AuditRoute('/settings/consents'),
 ];

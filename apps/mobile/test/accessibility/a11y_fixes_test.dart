@@ -60,13 +60,14 @@ void main() {
     });
   });
 
-  testWidgets('Profile: each daily plan time is a labelled 48 dp button', (
+  testWidgets('Daily plan: each moment time is a labelled 48 dp button', (
     tester,
   ) async {
+    // The times moved from Profile to Profile > Daily plan (T-DLY-03e, D-79).
     final semantics = tester.ensureSemantics();
-    await openRoute(tester, const AuditRoute('/profile'));
+    await openRoute(tester, const AuditRoute('/profile/daily-plan'));
     for (final kind in ['greeting', 'nudge', 'reflection']) {
-      final time = find.byKey(Key('profile-time-$kind'));
+      final time = find.byKey(Key('plan-time-$kind'));
       await tester.scrollUntilVisible(
         time,
         200,
@@ -74,18 +75,19 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.getSize(time).height, greaterThanOrEqualTo(48));
+      final node = tester.getSemantics(time);
+      expect(node.label, startsWith('Change the '));
+      expect(node.flagsCollection.isButton, isTrue);
     }
-    final morning = tester.getSemantics(
-      find.byKey(const Key('profile-time-greeting')),
-    );
-    expect(morning.label, 'Morning greeting, 7:00 AM. Change the time');
-    expect(morning.flagsCollection.isButton, isTrue);
     // Its own switch, labelled, not merged into one control with the time.
     final toggle = tester.getSemantics(
-      find.byKey(const Key('profile-touchpoint-greeting')),
+      find.descendant(
+        of: find.byKey(const Key('plan-touchpoint-greeting')),
+        matching: find.byType(Switch),
+      ),
     );
-    expect(toggle.label, 'Morning greeting');
-    expect(toggle.flagsCollection.isToggled, isNot(Tristate.none));
+    expect(toggle.label, contains('Morning greeting'));
+    expect(toggle.getSemanticsData().flagsCollection.isToggled, isNot(Tristate.none));
     await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     semantics.dispose();

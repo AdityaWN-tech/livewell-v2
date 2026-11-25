@@ -22,7 +22,10 @@ export type FnName =
   | 'onConsentCreated'
   | 'deleteAvatar'
   | 'deleteVoice'
-  | 'deleteAccount';
+  | 'deleteAccount'
+  | 'requestDataExport'
+  | 'getDataExportLink'
+  | 'onDataExportRequested';
 
 type FieldKind = 'id' | 'count';
 

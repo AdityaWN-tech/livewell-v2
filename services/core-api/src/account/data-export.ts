@@ -1,9 +1,10 @@
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall, type CallableRequest } from 'firebase-functions/v2/https';
 
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
+import { monitored } from '../observability/log.js';
 import {
   EXCLUDED_USER_COLLECTIONS,
   EXPORT_TTL_DAYS,
@@ -255,14 +256,29 @@ export async function exportLinkFor(uid: string, jobId: unknown, log: AuditLog, 
 
 export function makeDataExport(log: AuditLog = new FirestoreAuditLog()) {
   return {
-    requestDataExport: onCall((req) => requestExportFor(uidOf(req.auth), log)),
-    getDataExportLink: onCall((req) =>
-      exportLinkFor(uidOf(req.auth), (req.data as { jobId?: unknown } | null)?.jobId, log),
+    // monitored(): duration and error code only, never the request or an
+    // error message (T-FND-10, D-80).
+    requestDataExport: onCall(
+      monitored(
+        'requestDataExport',
+        async (req: CallableRequest) => requestExportFor(uidOf(req.auth), log),
+        { callable: true },
+      ),
+    ),
+    getDataExportLink: onCall(
+      monitored(
+        'getDataExportLink',
+        async (req: CallableRequest) =>
+          exportLinkFor(uidOf(req.auth), (req.data as { jobId?: unknown } | null)?.jobId, log),
+        { callable: true },
+      ),
     ),
     // Default region us-central1 serves the nam5 database (D-14).
     onDataExportRequested: onDocumentCreated(
       { document: 'users/{uid}/data_exports/{jobId}', memory: '1GiB', timeoutSeconds: 540 },
-      (event) => buildExportFor(event.params.uid, event.params.jobId, log),
+      monitored('onDataExportRequested', async (event: { params: { uid: string; jobId: string } }) =>
+        buildExportFor(event.params.uid, event.params.jobId, log),
+      ),
     ),
   };
 }

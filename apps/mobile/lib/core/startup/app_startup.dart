@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../data/firestore.dart';
@@ -8,6 +10,7 @@ import '../../features/account/application/account_setup.dart';
 import '../../features/auth/data/firebase_auth_service.dart';
 import '../../features/onboarding/data/onboarding_store.dart';
 import '../../features/onboarding/domain/onboarding_progress.dart';
+import '../config/remote_flags.dart';
 import 'startup_trace.dart';
 
 /// Where the app goes after the splash.
@@ -42,6 +45,9 @@ final appStartupProvider = FutureProvider<StartDestination>((ref) async {
   StartupTrace.mark('startup_begin');
   await ref.watch(firebaseAppProvider.future);
   StartupTrace.mark('firebase_ready');
+  // Feature flags from Remote Config (T-FND-11, D-73): last launch's values
+  // first, then a fetch. Not awaited, so startup never waits on it.
+  unawaited(ref.read(remoteFlagValuesProvider.notifier).load());
   // The signed-in user is restored from the device; don't wait long for it.
   final user = await FirebaseAuth.instance.authStateChanges().first.timeout(
     const Duration(seconds: 2),

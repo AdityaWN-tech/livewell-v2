@@ -29,8 +29,9 @@ AvatarExpression faceForMoment(Moment m) => switch (m) {
 };
 
 /// Voice off: the moments show text only and celebrations are silent.
-/// Set by the mute button in a moment (T-DLY-03d).
-/// TODO(T-DLY-03e): kept as the "Show text only" setting.
+/// Set by the mute button in a moment (T-DLY-03d), for this session. The
+/// lasting choice is Profile > Daily plan "Coach speaks automatically"
+/// (`momentPlaybackProvider`, T-DLY-03e).
 class CoachMuted extends Notifier<bool> {
   @override
   bool build() => false;

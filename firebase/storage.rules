@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Cloud Storage rules (D-76). HUMAN REVIEW REQUIRED (security).
+// Personal media (selfies/{uid}/, avatars/{uid}/, voice_samples/{uid}/) is
+// written and read only by the server (Media Service, Core API) through the
+// Admin SDK, which bypasses these rules; the app gets short-lived signed
+// URLs from the server. Nothing is open to clients.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

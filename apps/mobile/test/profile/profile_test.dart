@@ -175,6 +175,7 @@ void main() {
         expect(h.push.deletes, deletes + 1);
         expect(h.photo.path, isNull);
         expect(h.localData.clears, 1);
+        expect(h.localDb.wipes, 1, reason: 'encrypted database and key');
         expect(h.localData.pending, isTrue, reason: 'cache cleared next start');
         expect(find.byType(SignInScreen), findsOneWidget);
       });
@@ -313,6 +314,7 @@ void main() {
       expect(h.deletions.calls, ['account']);
       expect(h.auth.signedIn, isNull);
       expect(h.localData.clears, 1);
+      expect(h.localDb.wipes, 1, reason: 'encrypted database and key');
       expect(find.byType(WelcomeScreen), findsOneWidget);
     });
 
@@ -334,6 +336,7 @@ void main() {
       );
       expect(h.auth.signedIn, isNotNull);
       expect(h.localData.clears, 0);
+      expect(h.localDb.wipes, 0);
     });
 
     testWidgets('no Memory, and no Export without a data-request address '

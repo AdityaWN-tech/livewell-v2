@@ -17,6 +17,7 @@ import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/core/time/clock.dart';
+import 'package:livewell/core/local_db/local_db_providers.dart';
 import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
@@ -137,6 +138,7 @@ class Harness {
   final deletions = FakeDeletions();
   final avatarLocal = FakeAvatarLocalData();
   final localData = FakeLocalData();
+  final localDb = FakeLocalDatabaseWiper();
 
   /// Server push (T-TCH-01): FCM and the device documents, in memory.
   final push = FakePushMessaging();
@@ -210,6 +212,7 @@ class Harness {
           deletionsProvider.overrideWithValue(deletions),
           avatarLocalDataProvider.overrideWithValue(avatarLocal),
           localDataProvider.overrideWithValue(localData),
+          localDatabaseWiperProvider.overrideWithValue(localDb),
           pushMessagingProvider.overrideWithValue(push),
           deviceRegistryProvider.overrideWithValue(devices),
           pushInstallIdStoreProvider.overrideWithValue(

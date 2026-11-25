@@ -4004,4 +4004,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileWidgetHideDetailsBody =>
       'The widget says \"Your next step is ready\" instead of naming it.';
+
+  @override
+  String get voiceGreetingRest => 'I’m here to help, one small step at a time.';
+
+  @override
+  String get voiceSampleTitle => 'What you’ll hear';
+
+  @override
+  String get voiceSampleCalm =>
+      '“Hi, I’m your Live Well coach. Let’s take one small step together today.”';
+
+  @override
+  String get voiceSampleEnergetic =>
+      '“Hi! I’m your Live Well coach. Let’s make today count, one small step at a time!”';
+
+  @override
+  String profileChangeTime(String name, String time) {
+    return '$name, $time. Change the time';
+  }
 }

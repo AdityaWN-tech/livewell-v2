@@ -51,3 +51,10 @@ Rules: `firebase/storage.rules`, nothing open to clients (the server uses the Ad
 Anything not listed is denied.
 
 **Migrations.** T-PRT-02 (D-92): none. Nothing in the repo wrote `portal_offers` before, the fields the app reads are unchanged, and the new fields and `portal_offer_workflow` start at `schema_version: 1`. An offer added by hand in the Firebase console still loads in the app and shows in the Admin (no workflow document = rev 1, no editors).
+## Local database (on device, T-FND-08, D-84)
+Drift on SQLCipher (`apps/mobile/lib/core/local_db/`), file `livewell_local.db` in the app's private support directory, key only in the platform keystore. Schema version 1 (snapshot: `apps/mobile/drift_schemas/local_database/drift_schema_v1.json`); a table change bumps `schemaVersion`, adds a migration step and a new snapshot (`dart run drift_dev schema dump lib/core/local_db/local_database.dart drift_schemas/local_database/`). Deleted with its key on log out and account deletion.
+| Table | Columns | Notes |
+|---|---|---|
+| `local_check_ins` | uid, date (yyyy-mm-dd), mood, energy, sleep, stress, time_available, barrier_text, gentle_day, created_at, updated_at; key (uid, date) | The phone's copy of `users/{uid}/checkins/{date}`. Reads come from here; refreshed from the server unless a local change is still queued |
+| `sync_outbox` | id, idempotency_key (unique), uid, kind, doc_path, fields (JSON; null = remove on update), revision, attempts, last_error (code only), parked, created_at, updated_at | One row per record waiting to sync. Same key again replaces the values and bumps revision. Removed only after the server confirmed that revision |
+Server side nothing changes: the idempotency key maps to the record's own document id, so no new Firestore field or rule is needed.

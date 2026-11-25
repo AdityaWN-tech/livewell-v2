@@ -108,6 +108,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t load your choices. Please try again.';
 
   @override
+  String consentRevokeTitle(String name) {
+    return 'Turn off $name?';
+  }
+
+  @override
+  String get consentRevokeKeep => 'Keep it on';
+
+  @override
+  String get consentRevokeConfirm => 'Turn off';
+
+  @override
+  String get consentRevokeCamera =>
+      'Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach\'s name stays. This can\'t be undone.';
+
+  @override
+  String get consentRevokeMicrophone =>
+      'Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can\'t be undone.';
+
+  @override
+  String get consentRevokeBiometric =>
+      'Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can\'t be undone.';
+
+  @override
+  String get consentRevokePortalLinking =>
+      'We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.';
+
+  @override
+  String get consentRevokeMarketing =>
+      'We stop sending news and offers. It can take up to 24 hours.';
+
+  @override
   String get consentNotificationsTitle => 'Reminders and nudges';
 
   @override
@@ -337,17 +368,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneTitle => 'Continue with phone';
 
   @override
-  String get phoneUsOnlyNote =>
-      'Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.';
+  String get phoneCountryNote =>
+      'Choose your country, then enter your mobile number.';
 
   @override
-  String get countryUs => 'United States (+1)';
+  String get phoneCountryLabel => 'Country';
+
+  @override
+  String get phoneCountryTitle => 'Choose your country';
+
+  @override
+  String get phoneCountrySearchHint => 'Search by country or code';
+
+  @override
+  String get phoneCountryNoMatch =>
+      'No country matches that. Try its name or its code, like +44.';
+
+  @override
+  String phoneCountrySemantics(String country, String dialCode) {
+    return 'Country: $country, $dialCode';
+  }
 
   @override
   String get phoneNumberLabel => 'Mobile number';
 
   @override
-  String get phoneInvalidMsg => 'Enter a valid US mobile number.';
+  String phoneInvalidMsg(String country) {
+    return 'Enter a valid mobile number for $country.';
+  }
 
   @override
   String get phoneSendCode => 'Send code';
@@ -724,6 +772,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t save your check-in. Please try again.';
 
   @override
+  String get checkinNoteCheckFailed =>
+      'We couldn\'t check your note just now, so it wasn\'t saved. Your other answers are saved.';
+
+  @override
+  String get checkinTryAgain => 'Try again';
+
+  @override
   String get checkinContinue => 'Continue';
 
   @override
@@ -1073,6 +1128,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get trackStreakCounts =>
+      'A day counts when you finish at least one habit.';
+
+  @override
   String get trackStreakLegend =>
       'Rest days are part of the plan. One each week keeps your streak going.';
 
@@ -1344,6 +1403,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get voiceHowMadeBody =>
       'Your coach\'s voice is an AI voice. For now it is your phone\'s own text-to-speech, set to sound close to the voice you chose. It is not a copy of a real person\'s voice. The coach only says lines our team has written and reviewed.';
+
+  @override
+  String voiceHowMadeLibraryBody(String name) {
+    return '$name is an AI voice. It was made with Kokoro, an open-source text-to-speech model, and it is not a copy of any real person\'s voice. For now, your coach speaks with the voice on your phone that sounds closest to $name, so it may sound a little different from the sample. Your coach only says lines our team has written and reviewed.';
+  }
 
   @override
   String voiceGreetingNamed(String name) {
@@ -3569,6 +3633,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Well done for taking the time. Small steps add up.';
 
   @override
+  String get learnReaderPortalTitle => 'Go deeper on the Live Well Portal';
+
+  @override
   String get learnReaderFinish => 'Finish lesson';
 
   @override
@@ -3717,4 +3784,179 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get healthTryAgain => 'Try again';
+
+  @override
+  String get consentMemoryTitle => 'Let my coach remember things';
+
+  @override
+  String get consentMemoryBody =>
+      'Your coach can suggest small things to remember from your chats and reflections, like \"prefers morning walks\". You choose what is kept.';
+
+  @override
+  String get consentMemorySensitiveTitle => 'Include health details';
+
+  @override
+  String get consentMemorySensitiveBody =>
+      'Medicines, health conditions and mental health. These are only suggested and kept if you turn this on.';
+
+  @override
+  String get memoryTitle => 'What my coach remembers';
+
+  @override
+  String get memoryIntro =>
+      'These help your coach make suggestions that fit you. Nothing is kept unless you say so, and you can delete anything at any time.';
+
+  @override
+  String get memorySuggestionsHeader => 'Suggestions to keep';
+
+  @override
+  String get memorySavedHeader => 'Remembered';
+
+  @override
+  String get memoryKeep => 'Keep';
+
+  @override
+  String get memoryDelete => 'Delete';
+
+  @override
+  String get memoryHealthTag => 'Health detail';
+
+  @override
+  String get memoryOffNote =>
+      'Memory is off, so nothing new is suggested and your coach uses nothing here. You can still delete these.';
+
+  @override
+  String get memoryNeedsSensitive =>
+      'To keep this, turn on Include health details.';
+
+  @override
+  String get memoryEmptyTitle => 'Nothing remembered yet';
+
+  @override
+  String get memoryEmptyBody =>
+      'When you chat with your coach or write a reflection, it may suggest something to remember. You decide.';
+
+  @override
+  String get memoryDeleteAll => 'Delete everything';
+
+  @override
+  String get memoryDeleteAllTitle => 'Delete everything your coach remembers?';
+
+  @override
+  String get memoryDeleteAllBody =>
+      'This can\'t be undone. Your coach won\'t use or suggest these again.';
+
+  @override
+  String get memoryCancel => 'Cancel';
+
+  @override
+  String get memoryDeleted => 'Deleted';
+
+  @override
+  String get memorySaveError => 'That didn\'t save. Please try again.';
+
+  @override
+  String get memoryLoadError =>
+      'Couldn\'t load this right now. Please try again later.';
+
+  @override
+  String memoryKeepSemantics(String fact) {
+    return 'Keep: $fact';
+  }
+
+  @override
+  String memoryDeleteSemantics(String fact) {
+    return 'Delete: $fact';
+  }
+
+  @override
+  String get dailyPlanSubtitle =>
+      'Moment times, your coach\'s voice and the widget';
+
+  @override
+  String get dailyPlanIntro =>
+      'Choose when your coach checks in and how your moments play.';
+
+  @override
+  String get dailyPlanTimesHeader => 'Moment times';
+
+  @override
+  String dailyPlanChangeTime(String moment) {
+    return 'Change the $moment time';
+  }
+
+  @override
+  String get dailyPlanNotToday => 'Not today';
+
+  @override
+  String dailyPlanNotTodayDone(String moment) {
+    return 'No $moment reminder today. It\'s back tomorrow.';
+  }
+
+  @override
+  String get dailyPlanInQuiet =>
+      'This time is during quiet hours, so no reminder is sent. Pick a time outside them.';
+
+  @override
+  String get dailyPlanQuietHeader => 'Quiet hours';
+
+  @override
+  String get dailyPlanCoachHeader => 'Your coach in moments';
+
+  @override
+  String get dailyPlanAutoSpeak =>
+      'Coach speaks automatically when I open a moment';
+
+  @override
+  String get dailyPlanTextOnly =>
+      'Show text only. Tap play to hear your coach.';
+
+  @override
+  String get dailyPlanSpeedNote => 'The same speed as in your voice settings.';
+
+  @override
+  String get dailyPlanCaptions => 'Captions always on';
+
+  @override
+  String get dailyPlanCaptionsOn => 'The words appear as your coach speaks.';
+
+  @override
+  String get dailyPlanCaptionsOff =>
+      'The words appear when your coach has finished.';
+
+  @override
+  String get dailyPlanPreview => 'Preview tomorrow\'s morning';
+
+  @override
+  String get dailyPlanPreviewTag => 'Preview';
+
+  @override
+  String get dailyPlanPreviewNone =>
+      'There\'s no morning message to preview yet.';
+
+  @override
+  String get dailyPlanPreviewPaused =>
+      'Let\'s keep today quiet. Previews are back tomorrow.';
+
+  @override
+  String get dailyPlanWidgetHeader => 'Home-screen widget';
+
+  @override
+  String get dailyPlanWidgetTitle => 'Add the widget';
+
+  @override
+  String get dailyPlanWidgetBody =>
+      'See your next small step without opening the app.';
+
+  @override
+  String get dailyPlanWidgetAndroid =>
+      'Android: touch and hold an empty spot on your home screen, tap Widgets, then find Live Well.';
+
+  @override
+  String get dailyPlanWidgetIos =>
+      'iPhone: touch and hold your home screen, tap Edit or +, then search for Live Well.';
+
+  @override
+  String get dailyPlanWidgetPrivate =>
+      'On the lock screen the widget shows general text only, never your answers or health details.';
 }

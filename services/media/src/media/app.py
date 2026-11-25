@@ -187,6 +187,7 @@ class Services:
                 FirebaseAuthenticator,
                 FirestoreAvatarDocs,
                 FirestoreConsents,
+                FirestorePushOutbox,
                 firebase_app,
             )
 
@@ -197,6 +198,8 @@ class Services:
             db = firestore.client(app)
             s.consents = FirestoreConsents(db)
             s.docs = FirestoreAvatarDocs(db)
+            # "Your coach is ready" as a push when the app is closed (D-77).
+            s.notifier = FirestorePushOutbox(db)
         frames_dir = env.get("MEDIA_FRAMES_DIR", "").strip()
         if frames_dir:
             s.local_frames = LocalFrameStore(Path(frames_dir))

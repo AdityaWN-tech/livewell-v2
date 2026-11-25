@@ -327,6 +327,25 @@ void main() {
       }
     });
 
+    testWidgets('one primary action: New habit is outlined, goal is filled', (
+      tester,
+    ) async {
+      await withStarterPlan().boot(tester);
+      await openPlan(tester);
+      final newHabit = find.byKey(const Key('plan-new-habit'));
+      expect(
+        find.descendant(of: newHabit, matching: find.byType(FilledButton)),
+        findsNothing,
+      );
+      expect(
+        find.ancestor(
+          of: find.text('New habit'),
+          matching: find.byWidgetPredicate((w) => w is OutlinedButton),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('every petal is a labelled button that opens its driver', (
       tester,
     ) async {

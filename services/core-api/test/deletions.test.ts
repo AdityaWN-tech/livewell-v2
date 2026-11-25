@@ -1,13 +1,14 @@
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-// Runs inside `firebase emulators:exec --only auth,firestore,functions`:
+// Runs inside `firebase emulators:exec --only auth,firestore,functions,storage`:
 // the callables are the real deployed-to-emulator functions, called over
 // HTTP with an Auth-emulator ID token, exactly as the app calls them.
 beforeAll(() => {
-  initializeApp({ projectId: 'demo-livewell' });
+  initializeApp({ projectId: 'demo-livewell', storageBucket: 'demo-livewell.appspot.com' });
 });
 
 const db = () => getFirestore();
@@ -58,15 +59,92 @@ describe('deletions (FR-SET-02/03)', () => {
     }
   });
 
-  it('Delete my avatar: removes it and writes an audit entry', async () => {
+  const bucket = () => getStorage().bucket();
+  const put = (path: string) => bucket().file(path).save(Buffer.from('x'));
+  const exists = async (path: string) => (await bucket().file(path).exists())[0];
+
+  it('Delete my avatar: portrait, frames, selfie and vendor copy go; a ready-made coach takes over; logged (T-AVT-05, D-78)', async () => {
     const { uid, idToken } = await newUser();
-    await db().doc(`users/${uid}/avatar/current`).set({ type: 'stylized', style_config: {}, ...meta() });
+    const other = await newUser();
+    await db().doc(`users/${uid}/avatar/current`).set({
+      type: '3d_adult',
+      source: 'selfie',
+      coach_id: 'green_hijab',
+      coach_name: 'Maya',
+      background: 2,
+      frames_version: 3,
+      options: { outfit: 'green_knit' },
+      vendor: 'acme_avatar',
+      vendor_avatar_id: 'va-123',
+      thumbnail_urls: { neutral: 'avatars/x/3/neutral_thumb.png' },
+      raw_media_retained: false,
+      ...meta(),
+    });
+    await put(`avatars/${uid}/portraits/p1.png`);
+    await put(`avatars/${uid}/3/avatar_frames.json`);
+    await put(`avatars/${uid}/3/neutral@2x.webp`);
+    await put(`selfies/${uid}/raw.jpg`);
+    await put(`avatars/${other.uid}/portraits/keep.png`);
+
     const r = await call('deleteAvatar', idToken);
     expect(r.status).toBe(200);
-    expect((await db().doc(`users/${uid}/avatar/current`).get()).exists).toBe(false);
+    expect(r.body.result).toEqual({ deleted: true, reset: true });
+
+    // Every file in Cloud Storage is gone; nobody else's is touched.
+    expect(await exists(`avatars/${uid}/portraits/p1.png`)).toBe(false);
+    expect(await exists(`avatars/${uid}/3/avatar_frames.json`)).toBe(false);
+    expect(await exists(`avatars/${uid}/3/neutral@2x.webp`)).toBe(false);
+    expect(await exists(`selfies/${uid}/raw.jpg`)).toBe(false);
+    expect(await exists(`avatars/${other.uid}/portraits/keep.png`)).toBe(true);
+
+    // Back to the ready-made coach; name and background stay.
+    const avatar = (await db().doc(`users/${uid}/avatar/current`).get()).data()!;
+    expect(avatar.source).toBe('default');
+    expect(avatar.coach_id).toBe('green_hijab');
+    expect(avatar.coach_name).toBe('Maya');
+    expect(avatar.background).toBe(2);
+    for (const f of ['frames_version', 'options', 'vendor', 'vendor_avatar_id', 'thumbnail_urls']) {
+      expect(avatar[f]).toBeUndefined();
+    }
+
+    // The vendor copy is queued for deletion (drained by the adapter, T-AVT-03).
+    const vendor = await db().collection('vendor_requests').where('uid', '==', uid).get();
+    expect(vendor.docs.map((d) => d.data())).toEqual([
+      expect.objectContaining({
+        kind: 'avatar_model_delete',
+        vendor: 'acme_avatar',
+        vendor_ref: 'va-123',
+        source: 'delete_my_avatar',
+        status: 'pending',
+      }),
+    ]);
+
+    // One audit entry, counts only: no name, no paths.
     const audit = await auditFor(uid, 'avatar.deleted');
     expect(audit).toHaveLength(1);
-    expect(audit[0].details).toEqual({ existed: true, vendor_models_deleted: 0 });
+    expect(audit[0].details).toEqual({
+      existed: true,
+      media_files_deleted: 4,
+      avatar_reset: 1,
+      vendor_requests_queued: 1,
+    });
+    expect(JSON.stringify(audit[0])).not.toMatch(/Maya|va-123|\.png|\.jpg/);
+  });
+
+  it('Delete my avatar twice, or with no avatar: nothing fails, each is logged', async () => {
+    const { uid, idToken } = await newUser();
+    expect((await call('deleteAvatar', idToken)).status).toBe(200);
+    await db().doc(`users/${uid}/avatar/current`).set({
+      type: '3d_adult', source: 'default', coach_id: 'brown_hair', background: 0, raw_media_retained: false, ...meta(),
+    });
+    const r = await call('deleteAvatar', idToken);
+    expect(r.status).toBe(200);
+    expect(r.body.result).toEqual({ deleted: true, reset: false });
+    // A ready-made coach is left as it is.
+    expect((await db().doc(`users/${uid}/avatar/current`).get()).get('coach_id')).toBe('brown_hair');
+    const audit = await auditFor(uid, 'avatar.deleted');
+    expect(audit).toHaveLength(2);
+    expect(audit.map((a) => a.details.existed).sort()).toEqual([false, true]);
   });
 
   it('Delete my voice: removes every voice and logs the count', async () => {

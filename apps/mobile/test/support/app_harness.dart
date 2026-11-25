@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/safety/data/safety_event_store.dart';
 import 'package:livewell/features/goals/data/goal_repository.dart';
+import 'package:livewell/features/avatar/application/avatar_deletion.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
 import 'package:livewell/features/moments/application/moment_launcher.dart';
@@ -139,6 +140,7 @@ class Harness {
   final appearance = FakeAppearanceStore();
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
+  final avatarLocal = FakeAvatarLocalData();
   final localData = FakeLocalData();
   final localDb = FakeLocalDatabaseWiper();
 
@@ -217,6 +219,7 @@ class Harness {
           appearanceStoreProvider.overrideWithValue(appearance),
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
+          avatarLocalDataProvider.overrideWithValue(avatarLocal),
           localDataProvider.overrideWithValue(localData),
           localDatabaseWiperProvider.overrideWithValue(localDb),
           pushMessagingProvider.overrideWithValue(push),

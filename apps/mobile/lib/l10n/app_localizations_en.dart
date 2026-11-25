@@ -1767,7 +1767,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileMyCoach => 'My coach';
 
   @override
-  String get profileChangeAvatar => 'Change avatar';
+  String get profileChangeAvatar => 'Choose another coach';
 
   @override
   String get profileChangeVoice => 'Change voice';
@@ -1852,7 +1852,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDeleteAvatarBody =>
-      'Your coach’s avatar will be deleted. Your coach will use the default look.';
+      'This removes the coach made for you: its portrait, every picture of its faces, and any copy kept by our avatar partner. It can’t be undone.\n\nA ready-made coach will take over straight away, with the same name and voice. You can make a new one whenever you like.';
 
   @override
   String get profileDeleteVoiceBody =>
@@ -1871,6 +1871,44 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileDeleteFailed =>
       'We couldn’t delete that right now. Please try again later.';
+
+  @override
+  String get profileCoachReadyMade => 'A ready-made coach';
+
+  @override
+  String get profileCoachFromPhoto => 'Made from your photo';
+
+  @override
+  String get profileCoachBuilt => 'Built by you';
+
+  @override
+  String get profileRemakeFromPhoto => 'Remake from a new photo';
+
+  @override
+  String get profileBuildMyOwn => 'Build my own';
+
+  @override
+  String get profileAdjustCoach => 'Adjust';
+
+  @override
+  String get profileDeleteAvatarTitle => 'Delete your avatar?';
+
+  @override
+  String get profileDeleteAvatarKeep => 'Keep it';
+
+  @override
+  String get profileDeletingAvatar => 'Deleting your avatar…';
+
+  @override
+  String get profileAvatarDeleted =>
+      'Your avatar is deleted. A ready-made coach is with you now.';
+
+  @override
+  String get profileAvatarDeleteFailed =>
+      'We couldn’t reach our servers, so your avatar hasn’t been deleted yet.';
+
+  @override
+  String get profileTryAgain => 'Try again';
 
   @override
   String get profileHelp => 'Help & about';

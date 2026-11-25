@@ -3157,7 +3157,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileChangeAvatar.
   ///
   /// In en, this message translates to:
-  /// **'Change avatar'**
+  /// **'Choose another coach'**
   String get profileChangeAvatar;
 
   /// No description provided for @profileChangeVoice.
@@ -3319,7 +3319,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileDeleteAvatarBody.
   ///
   /// In en, this message translates to:
-  /// **'Your coach’s avatar will be deleted. Your coach will use the default look.'**
+  /// **'This removes the coach made for you: its portrait, every picture of its faces, and any copy kept by our avatar partner. It can’t be undone.\n\nA ready-made coach will take over straight away, with the same name and voice. You can make a new one whenever you like.'**
   String get profileDeleteAvatarBody;
 
   /// No description provided for @profileDeleteVoiceBody.
@@ -3351,6 +3351,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn’t delete that right now. Please try again later.'**
   String get profileDeleteFailed;
+
+  /// No description provided for @profileCoachReadyMade.
+  ///
+  /// In en, this message translates to:
+  /// **'A ready-made coach'**
+  String get profileCoachReadyMade;
+
+  /// No description provided for @profileCoachFromPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Made from your photo'**
+  String get profileCoachFromPhoto;
+
+  /// No description provided for @profileCoachBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Built by you'**
+  String get profileCoachBuilt;
+
+  /// No description provided for @profileRemakeFromPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remake from a new photo'**
+  String get profileRemakeFromPhoto;
+
+  /// No description provided for @profileBuildMyOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Build my own'**
+  String get profileBuildMyOwn;
+
+  /// No description provided for @profileAdjustCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust'**
+  String get profileAdjustCoach;
+
+  /// No description provided for @profileDeleteAvatarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your avatar?'**
+  String get profileDeleteAvatarTitle;
+
+  /// No description provided for @profileDeleteAvatarKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it'**
+  String get profileDeleteAvatarKeep;
+
+  /// No description provided for @profileDeletingAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your avatar…'**
+  String get profileDeletingAvatar;
+
+  /// No description provided for @profileAvatarDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your avatar is deleted. A ready-made coach is with you now.'**
+  String get profileAvatarDeleted;
+
+  /// No description provided for @profileAvatarDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t reach our servers, so your avatar hasn’t been deleted yet.'**
+  String get profileAvatarDeleteFailed;
+
+  /// No description provided for @profileTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get profileTryAgain;
 
   /// No description provided for @profileHelp.
   ///

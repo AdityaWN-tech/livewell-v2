@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,10 +25,11 @@ import '../application/plan_data.dart';
 import '../domain/plan_models.dart';
 import 'live_well_map.dart';
 
-/// Plan tab (T-UI-02d, illustrated design): calendar button, the Live Well
-/// Map, the 30-day goal, today's Daily Microhabits (today's step first, the
-/// same one Home shows) with the FR-GOL-01 limits, the MY GOAL DO IT entry
-/// (FR-GOL-06) and a daily thought.
+/// Plan tab (T-UI-02d illustrated design, T-UI-04 order): calendar button
+/// and New habit, Today's Thought, My Daily Routine, the Live Well Map, the
+/// 30-day goal, today's Daily Microhabits (today's step first, the same one
+/// Home shows) with the FR-GOL-01 limits, and the MY GOAL DO IT entry
+/// (FR-GOL-06).
 class PlanScreen extends ConsumerStatefulWidget {
   const PlanScreen({super.key});
 
@@ -225,9 +228,11 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
       ],
       profile: const ProfileButton(),
       actions: [
-        FilledButton.icon(
+        // Outlined: "Set my goal" is the screen's one primary action
+        // (spec 4.1).
+        OutlinedButton.icon(
           key: const Key('plan-new-habit'),
-          style: FilledButton.styleFrom(
+          style: OutlinedButton.styleFrom(
             shape: const StadiumBorder(),
             minimumSize: const Size(LwSize.minTapTarget, LwSize.minTapTarget),
             padding: const EdgeInsets.symmetric(horizontal: LwSpacing.md),
@@ -238,72 +243,124 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
         ),
       ],
       children: [
-        Card(
+        _AffirmationCard(now),
+        const SizedBox(height: LwSpacing.md),
+        const _RoutineRow(),
+        const SizedBox(height: LwSpacing.md),
+        _SoftCard(
           key: const Key('plan-map'),
-          child: Padding(
-            padding: const EdgeInsets.all(LwSpacing.cardPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Semantics(
-                  header: true,
-                  child: Text(l.planMapTitle, style: t.titleMedium),
-                ),
-                Text(l.planMapSubtitle, style: t.bodySmall),
-                const SizedBox(height: LwSpacing.md),
-                LiveWellMap(
-                  drivers: ref.watch(driversProvider),
-                  completion: ref.watch(driverCompletionProvider),
-                  onOpen: _openDriver,
-                ),
-              ],
-            ),
+          color: p.surface,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semantics(
+                header: true,
+                child: Text(l.planMapTitle, style: _cardTitle(t)),
+              ),
+              Text(l.planMapSubtitle, style: t.bodyMedium),
+              const SizedBox(height: LwSpacing.md),
+              LiveWellMap(
+                drivers: ref.watch(driversProvider),
+                completion: ref.watch(driverCompletionProvider),
+                onOpen: _openDriver,
+              ),
+            ],
           ),
         ),
-        LwSectionHeader(l.planGoalTitle),
+        const SizedBox(height: LwSpacing.md),
         _GoalCard(
           goal: ref.watch(planGoalProvider),
           // Dev preview shows a sample goal: nothing to change.
           onEdit: ref.watch(previewModeProvider) ? null : _editGoal,
         ),
-        LwSectionHeader(l.planHabitsTitle),
-        if (habits.isEmpty)
-          LwEmptyState(
-            icon: Icons.flag_outlined,
-            title: l.planEmptyTitle,
-            body: l.planEmptyBody,
-          )
-        else
-          Card(
-            key: const Key('plan-habits'),
-            child: Column(
-              children: [
-                for (final (i, h) in habits.indexed) ...[
-                  if (i > 0) const Divider(indent: LwSpacing.md),
-                  _HabitRow(
-                    habit: h,
-                    onDone: () => _markDone(h),
-                    onAbout: () => _about(h),
-                    onChange: h.own ? () => _changeHabit(h) : null,
-                    onSmaller: h.id == todayStepHabitId && canShrink
-                        ? () => ref
-                              .read(stepProgressActionsProvider)
-                              .makeSmaller()
-                        : null,
-                  ),
-                ],
-              ],
-            ),
+        const SizedBox(height: LwSpacing.md),
+        _SoftCard(
+          key: const Key('plan-habits-section'),
+          color: p.surface,
+          padding: const EdgeInsets.fromLTRB(
+            LwSpacing.xs,
+            LwSpacing.md,
+            LwSpacing.xs,
+            LwSpacing.xs,
           ),
-        const SizedBox(height: LwSpacing.sectionGap),
-        const _RoutineRow(),
-        const SizedBox(height: LwSpacing.sm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: LwSpacing.xs),
+                child: Semantics(
+                  header: true,
+                  child: Text(l.planHabitsTitle, style: _cardTitle(t)),
+                ),
+              ),
+              const SizedBox(height: LwSpacing.xs),
+              if (habits.isEmpty)
+                LwEmptyState(
+                  icon: Icons.flag_outlined,
+                  title: l.planEmptyTitle,
+                  body: l.planEmptyBody,
+                )
+              else
+                Column(
+                  key: const Key('plan-habits'),
+                  children: [
+                    for (final (i, h) in habits.indexed) ...[
+                      if (i > 0)
+                        Divider(
+                          indent: LwSize.minTapTarget + LwSpacing.xs,
+                          color: p.outlineSoft,
+                        ),
+                      _HabitRow(
+                        habit: h,
+                        onDone: () => _markDone(h),
+                        onAbout: () => _about(h),
+                        onChange: h.own ? () => _changeHabit(h) : null,
+                        onSmaller: h.id == todayStepHabitId && canShrink
+                            ? () => ref
+                                  .read(stepProgressActionsProvider)
+                                  .makeSmaller()
+                            : null,
+                      ),
+                    ],
+                  ],
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: LwSpacing.md),
         const _FrameworkRow(),
-        const SizedBox(height: LwSpacing.sm),
-        _AffirmationCard(now),
       ],
     );
   }
+}
+
+/// Card titles on Plan (T-UI-04): one size, a little bolder.
+TextStyle? _cardTitle(TextTheme t) =>
+    t.titleMedium?.copyWith(fontWeight: FontWeight.w700);
+
+/// A rounded card with the soft shadow (T-UI-04, as on Home).
+class _SoftCard extends StatelessWidget {
+  const _SoftCard({
+    super.key,
+    required this.color,
+    required this.child,
+    this.padding = const EdgeInsets.all(LwSpacing.cardPadding),
+  });
+
+  final Color color;
+  final Widget child;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: padding,
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: LwRadius.lgAll,
+      boxShadow: LwShadow.of(context),
+    ),
+    child: child,
+  );
 }
 
 /// The habit id of today's step on the Plan tab.
@@ -323,107 +380,150 @@ class _GoalCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
     final g = goal;
-    return Card(
+    return _SoftCard(
       key: const Key('plan-goal'),
-      child: Padding(
-        padding: const EdgeInsets.all(LwSpacing.cardPadding),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Illustration('icon_goal', width: 48, height: 48),
-            const SizedBox(width: LwSpacing.sm),
-            Expanded(
-              child: g == null
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l.planGoalEmpty, style: t.bodyMedium),
-                        if (onEdit != null) ...[
-                          const SizedBox(height: LwSpacing.xs),
-                          FilledButton(
-                            key: const Key('plan-goal-set'),
-                            onPressed: onEdit,
-                            child: Text(l.goalSetCta),
-                          ),
-                        ],
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(g.title, style: t.titleMedium),
-                            ),
-                            if (onEdit != null)
-                              Semantics(
-                                label: l.planGoalEditLabel,
-                                button: true,
-                                container: true,
-                                excludeSemantics: true,
-                                child: TextButton(
-                                  key: const Key('plan-goal-edit'),
-                                  onPressed: onEdit,
-                                  child: Text(l.planGoalEdit),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: LwSpacing.xs),
-                        if (g.paused)
+      color: p.mint,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Semantics(
+            header: true,
+            child: Text(
+              l.planGoalTitle,
+              style: _cardTitle(t)?.copyWith(color: p.onTint),
+            ),
+          ),
+          const SizedBox(height: LwSpacing.sm),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: LwSize.inputHeight,
+                height: LwSize.inputHeight,
+                decoration: BoxDecoration(
+                  color: p.surface,
+                  borderRadius: LwRadius.mdAll,
+                ),
+                child: ExcludeSemantics(
+                  child: Icon(Icons.flag_outlined, color: p.primaryDark),
+                ),
+              ),
+              const SizedBox(width: LwSpacing.sm),
+              Expanded(
+                child: g == null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            l.goalPausedNote,
-                            key: const Key('plan-goal-paused'),
-                            style: t.bodyMedium,
-                          )
-                        else
-                          Semantics(
-                            container: true,
-                            excludeSemantics: true,
-                            label: l.planGoalProgressLabel(
-                              g.day,
-                              PlanGoal.days,
-                              (g.progress * 100).round(),
+                            l.planGoalEmpty,
+                            style: t.bodyMedium?.copyWith(
+                              color: p.onTintSecondary,
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: LwRadius.pillAll,
-                                  child: LinearProgressIndicator(
-                                    value: g.progress,
-                                    minHeight: LwSpacing.xs,
-                                    color: p.accent,
-                                    backgroundColor: p.surfaceMuted,
+                          ),
+                          if (onEdit != null) ...[
+                            const SizedBox(height: LwSpacing.sm),
+                            FilledButton.icon(
+                              key: const Key('plan-goal-set'),
+                              style: FilledButton.styleFrom(
+                                shape: const StadiumBorder(),
+                              ),
+                              onPressed: onEdit,
+                              iconAlignment: IconAlignment.end,
+                              icon: const Icon(Icons.arrow_forward),
+                              label: Text(l.goalSetCta),
+                            ),
+                          ],
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  g.title,
+                                  style: t.titleMedium?.copyWith(
+                                    color: p.onTint,
                                   ),
                                 ),
-                                const SizedBox(height: LwSpacing.xxs),
-                                Wrap(
-                                  alignment: WrapAlignment.spaceBetween,
-                                  spacing: LwSpacing.sm,
-                                  children: [
-                                    Text(
-                                      l.planGoalDay(g.day, PlanGoal.days),
-                                      style: t.labelSmall,
+                              ),
+                              if (onEdit != null)
+                                Semantics(
+                                  label: l.planGoalEditLabel,
+                                  button: true,
+                                  container: true,
+                                  excludeSemantics: true,
+                                  child: TextButton(
+                                    key: const Key('plan-goal-edit'),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: p.primaryDark,
                                     ),
-                                    Text(
-                                      l.planGoalPercent(
-                                        (g.progress * 100).round(),
-                                      ),
-                                      style: t.labelSmall,
-                                    ),
-                                  ],
+                                    onPressed: onEdit,
+                                    child: Text(l.planGoalEdit),
+                                  ),
                                 ),
-                              ],
-                            ),
+                            ],
                           ),
-                      ],
-                    ),
-            ),
-          ],
-        ),
+                          const SizedBox(height: LwSpacing.xs),
+                          if (g.paused)
+                            Text(
+                              l.goalPausedNote,
+                              key: const Key('plan-goal-paused'),
+                              style: t.bodyMedium?.copyWith(color: p.onTint),
+                            )
+                          else
+                            Semantics(
+                              container: true,
+                              excludeSemantics: true,
+                              label: l.planGoalProgressLabel(
+                                g.day,
+                                PlanGoal.days,
+                                (g.progress * 100).round(),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: LwRadius.pillAll,
+                                    child: LinearProgressIndicator(
+                                      value: g.progress,
+                                      minHeight: LwSpacing.xs,
+                                      color: p.accent,
+                                      backgroundColor: p.surface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: LwSpacing.xxs),
+                                  Wrap(
+                                    alignment: WrapAlignment.spaceBetween,
+                                    spacing: LwSpacing.sm,
+                                    children: [
+                                      Text(
+                                        l.planGoalDay(g.day, PlanGoal.days),
+                                        style: t.labelSmall?.copyWith(
+                                          color: p.onTintSecondary,
+                                        ),
+                                      ),
+                                      Text(
+                                        l.planGoalPercent(
+                                          (g.progress * 100).round(),
+                                        ),
+                                        style: t.labelSmall?.copyWith(
+                                          color: p.onTintSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -569,51 +669,122 @@ class _RoutineRow extends ConsumerWidget {
     final t = Theme.of(context).textTheme;
     final l = AppLocalizations.of(context);
     final today = ref.watch(todayRoutineProvider);
+    final share = today.total == 0 ? null : today.done / today.total;
     return Semantics(
       button: true,
       container: true,
       label: l.routinePlanOpenLabel,
-      child: Material(
-        key: const Key('plan-routine'),
-        color: p.mint,
-        borderRadius: LwRadius.lgAll,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => context.push(RoutineScreen.path),
-          child: Padding(
-            padding: const EdgeInsets.all(LwSpacing.cardPadding),
-            child: Row(
-              children: [
-                ExcludeSemantics(
-                  child: Icon(
-                    Icons.wb_sunny_outlined,
-                    color: p.primaryDark,
-                    size: LwSize.iconMd,
-                  ),
-                ),
-                const SizedBox(width: LwSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l.routinePlanTitle,
-                        style: t.titleSmall?.copyWith(color: p.onTint),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: LwRadius.lgAll,
+          boxShadow: LwShadow.of(context),
+        ),
+        child: Material(
+          key: const Key('plan-routine'),
+          color: p.lavender,
+          borderRadius: LwRadius.lgAll,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => context.push(RoutineScreen.path),
+            child: Padding(
+              padding: const EdgeInsets.all(LwSpacing.cardPadding),
+              child: Row(
+                children: [
+                  ExcludeSemantics(
+                    child: Container(
+                      width: LwSize.inputHeight,
+                      height: LwSize.inputHeight,
+                      decoration: BoxDecoration(
+                        color: p.surface.withValues(alpha: 0.6),
+                        borderRadius: LwRadius.mdAll,
                       ),
-                      Text(
-                        today.total == 0
-                            ? l.routinePlanBody
-                            : l.routinePlanProgress(today.done, today.total),
-                        key: const Key('plan-routine-progress'),
-                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
+                      child: Icon(
+                        Icons.event_available_outlined,
+                        color: p.primaryDark,
+                        size: LwSize.iconMd * 1.25,
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                Icon(Icons.chevron_right, color: p.onTint),
-              ],
+                  const SizedBox(width: LwSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l.routinePlanTitle,
+                          style: _cardTitle(t)?.copyWith(color: p.onTint),
+                        ),
+                        Text(
+                          today.total == 0
+                              ? l.routinePlanBody
+                              : l.routinePlanProgress(today.done, today.total),
+                          key: const Key('plan-routine-progress'),
+                          style: t.bodyMedium?.copyWith(
+                            color: p.onTintSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (share != null) ...[
+                    const SizedBox(width: LwSpacing.xs),
+                    _PercentRing(share),
+                  ],
+                  Icon(Icons.chevron_right, color: p.onTint),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's routine as a ring with the percentage (the words beside it say
+/// the same, so the ring itself is hidden from screen readers).
+class _PercentRing extends StatelessWidget {
+  const _PercentRing(this.share);
+  final double share;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    const side = LwSize.minTapTarget;
+    return ExcludeSemantics(
+      child: SizedBox(
+        key: const Key('plan-routine-ring'),
+        width: side,
+        height: side,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: p.surface,
+                shape: BoxShape.circle,
+              ),
+            ),
+            SizedBox.expand(
+              child: CircularProgressIndicator(
+                value: share.clamp(0, 1),
+                strokeWidth: 4,
+                strokeCap: StrokeCap.round,
+                color: p.primary,
+                backgroundColor: p.surfaceMuted,
+              ),
+            ),
+            Text(
+              '${(share * 100).round()}%',
+              textScaler: MediaQuery.textScalerOf(context)
+                  .clamp(maxScaleFactor: 1.2),
+              style: t.labelMedium?.copyWith(
+                color: p.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -702,26 +873,65 @@ class _AffirmationCard extends StatelessWidget {
     final l = AppLocalizations.of(context);
     return Container(
       key: const Key('plan-affirmation'),
-      padding: const EdgeInsets.all(LwSpacing.cardPadding),
-      decoration: BoxDecoration(color: p.mint, borderRadius: LwRadius.lgAll),
-      child: Row(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: p.mint,
+        borderRadius: LwRadius.lgAll,
+        boxShadow: LwShadow.of(context),
+      ),
+      child: Stack(
         children: [
-          ExcludeSemantics(
-            child: Icon(Icons.eco_outlined, color: p.primaryDark),
-          ),
-          const SizedBox(width: LwSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l.planAffirmationLabel.toUpperCase(),
-                  style: t.labelSmall?.copyWith(color: p.primaryDark),
+          // A soft sun over a green hill on the right (decoration).
+          Positioned.fill(
+            child: ExcludeSemantics(
+              child: CustomPaint(
+                painter: _HillPainter(
+                  hill: p.accent.withValues(alpha: 0.28),
+                  sun: p.butter,
+                  sunEdge: p.caution.withValues(alpha: 0.25),
                 ),
-                const SizedBox(height: LwSpacing.xxs),
-                Text(
-                  '“${affirmationFor(l, now)}”',
-                  style: t.titleMedium?.copyWith(color: p.onTint),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              LwSpacing.md,
+              LwSpacing.md,
+              LwSize.minTapTarget * 1.5,
+              LwSpacing.md,
+            ),
+            child: Row(
+              children: [
+                ExcludeSemantics(
+                  child: Icon(
+                    Icons.eco_outlined,
+                    color: p.primaryDark,
+                    size: LwSize.iconMd * 1.25,
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.planAffirmationLabel.toUpperCase(),
+                        style: t.labelMedium?.copyWith(
+                          color: p.primaryDark,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                      const SizedBox(height: LwSpacing.xxs),
+                      Text(
+                        '“${affirmationFor(l, now)}”',
+                        style: t.titleMedium?.copyWith(
+                          color: p.onTint,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -730,6 +940,37 @@ class _AffirmationCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Today's Thought's corner: a sun behind a gentle hill.
+class _HillPainter extends CustomPainter {
+  _HillPainter({required this.hill, required this.sun, required this.sunEdge});
+
+  final Color hill;
+  final Color sun;
+  final Color sunEdge;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    // Small and high in the corner, clear of the words.
+    final r = math.min(h * 0.13, w * 0.04);
+    final sunCentre = Offset(w - r * 2.6, h * 0.5);
+    canvas
+      ..drawCircle(sunCentre, r * 1.3, Paint()..color = sunEdge)
+      ..drawCircle(sunCentre, r, Paint()..color = sun);
+    final path = Path()
+      ..moveTo(w * 0.7, h)
+      ..quadraticBezierTo(w * 0.85, h * 0.62, w, h * 0.66)
+      ..lineTo(w, h)
+      ..close();
+    canvas.drawPath(path, Paint()..color = hill);
+  }
+
+  @override
+  bool shouldRepaint(_HillPainter old) =>
+      old.hill != hill || old.sun != sun || old.sunEdge != sunEdge;
 }
 
 /// The week ahead from the plan (calendar button).

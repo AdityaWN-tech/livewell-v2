@@ -28,6 +28,7 @@ import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
     show avatarIdleMotionProvider;
 import 'package:livewell/features/learn/data/learn_repository.dart';
+import 'package:livewell/features/learn/application/learn_data.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
@@ -117,6 +118,7 @@ class Harness {
   final routineAsked = FakeRoutineAskStore();
   final reminders = FakeReminders();
   final reminderZone = FakeReminderZoneStore();
+  final reminderLedger = FakeReminderLedgerStore();
   final faces = FakeCoachFaces();
   final selfieCapture = FakeSelfieCapture();
   final avatarMaker = FakeAvatarMaker();
@@ -135,6 +137,10 @@ class Harness {
 
   /// The coach blinks and breathes (off by default so screens settle).
   bool idleMotion = false;
+
+  /// Whether we know there was no safety event in the last 72 hours. Null
+  /// keeps the app's own answer (unknown, so not clear, until D-22).
+  bool? safetyClear;
   final FakePortalBrowser browser;
 
   /// Feature flags (Remote Config later).
@@ -184,6 +190,7 @@ class Harness {
           routineAskStoreProvider.overrideWithValue(routineAsked),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(reminderZone),
+          reminderLedgerStoreProvider.overrideWithValue(reminderLedger),
           appearanceStoreProvider.overrideWithValue(appearance),
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
@@ -203,6 +210,8 @@ class Harness {
           widgetPublisherProvider.overrideWithValue(widget),
           widgetInboxProvider.overrideWithValue(widgetInbox),
           avatarIdleMotionProvider.overrideWithValue(idleMotion),
+          if (safetyClear != null)
+            safetyClearProvider.overrideWithValue(safetyClear!),
           // The dev preview keeps its sample lessons and offer.
           learnRepositoryProvider.overrideWith(
             (ref) => ref.watch(previewModeProvider)
@@ -217,7 +226,7 @@ class Harness {
             if (user != null) {
               final next = await ref
                   .read(signInCompletionProvider)
-                  .complete(user);
+                  .complete(user, restored: true);
               return StartDestination(next, signedIn: true);
             }
             return signedOutDestination(

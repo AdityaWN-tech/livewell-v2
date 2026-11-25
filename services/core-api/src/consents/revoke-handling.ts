@@ -121,7 +121,7 @@ export type RevokeCounts = {
   vendor_requests_queued: number;
 };
 
-const zero = (): RevokeCounts => ({
+export const zero = (): RevokeCounts => ({
   media_files_deleted: 0,
   avatar_reset: 0,
   voices_deleted: 0,
@@ -153,7 +153,7 @@ async function queueVendorRequest(
   kind: VendorRequestKind,
   vendor: string,
   vendorRef: string,
-  consentId: string,
+  source: string,
 ): Promise<number> {
   const hash = createHash('sha256')
     .update(`${vendor}:${vendorRef}`)
@@ -168,7 +168,7 @@ async function queueVendorRequest(
         kind,
         vendor,
         vendor_ref: vendorRef,
-        source: `consent_revoked:${consentId}`,
+        source,
         status: 'pending',
         requested_at: now,
         due_by: Timestamp.fromMillis(now.toMillis() + DEADLINE_MS),
@@ -192,9 +192,27 @@ const MADE_FOR_YOU_FIELDS = [
   'thumbnail_urls',
 ];
 
+/**
+ * Removes a person's face data: raw selfies, every portrait and frame set
+ * (`avatars/{uid}/`), queues the vendor copy's deletion, and puts the
+ * avatar back to a ready-made coach (name and background stay). Shared by
+ * consent revoke handling (D-76) and "Delete my avatar" (FR-SET-03, D-78);
+ * [source] says which (`consent_revoked:{id}`, `delete_my_avatar`) on the
+ * vendor request. Idempotent.
+ */
+export async function deleteFaceData(
+  uid: string,
+  source: string,
+  files: MediaFiles,
+  c: RevokeCounts = zero(),
+): Promise<RevokeCounts> {
+  await faceData(uid, source, files, c);
+  return c;
+}
+
 async function faceData(
   uid: string,
-  consentId: string,
+  source: string,
   files: MediaFiles,
   c: RevokeCounts,
 ) {
@@ -214,7 +232,7 @@ async function faceData(
       'avatar_model_delete',
       String(d.vendor ?? 'unknown'),
       vendorId,
-      consentId,
+      source,
     );
   }
   const madeForYou =
@@ -257,7 +275,7 @@ async function voiceData(
         'voice_model_delete',
         String(v.get('vendor') ?? 'unknown'),
         vendorId,
-        consentId,
+        `consent_revoked:${consentId}`,
       );
     }
     await v.ref.delete();
@@ -302,7 +320,7 @@ async function portalUnlink(uid: string, consentId: string, c: RevokeCounts) {
         'portal_unlink',
         'tagmango',
         ref,
-        consentId,
+        `consent_revoked:${consentId}`,
       );
     }
   }
@@ -348,7 +366,7 @@ async function marketingStop(
       'marketing_unsubscribe',
       'email_provider',
       consentId,
-      consentId,
+      `consent_revoked:${consentId}`,
     );
   }
 }
@@ -378,7 +396,7 @@ export async function runSteps(
   for (const s of steps) {
     switch (s) {
       case 'face_data':
-        await faceData(uid, consentId, files, c);
+        await faceData(uid, `consent_revoked:${consentId}`, files, c);
         break;
       case 'voice_data':
         await voiceData(uid, consentId, files, c);

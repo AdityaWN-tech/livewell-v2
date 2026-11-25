@@ -3157,7 +3157,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileChangeAvatar.
   ///
   /// In en, this message translates to:
-  /// **'Change avatar'**
+  /// **'Choose another coach'**
   String get profileChangeAvatar;
 
   /// No description provided for @profileChangeVoice.
@@ -3319,7 +3319,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileDeleteAvatarBody.
   ///
   /// In en, this message translates to:
-  /// **'Your coach’s avatar will be deleted. Your coach will use the default look.'**
+  /// **'This removes the coach made for you: its portrait, every picture of its faces, and any copy kept by our avatar partner. It can’t be undone.\n\nA ready-made coach will take over straight away, with the same name and voice. You can make a new one whenever you like.'**
   String get profileDeleteAvatarBody;
 
   /// No description provided for @profileDeleteVoiceBody.
@@ -3351,6 +3351,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn’t delete that right now. Please try again later.'**
   String get profileDeleteFailed;
+
+  /// No description provided for @profileCoachReadyMade.
+  ///
+  /// In en, this message translates to:
+  /// **'A ready-made coach'**
+  String get profileCoachReadyMade;
+
+  /// No description provided for @profileCoachFromPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Made from your photo'**
+  String get profileCoachFromPhoto;
+
+  /// No description provided for @profileCoachBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Built by you'**
+  String get profileCoachBuilt;
+
+  /// No description provided for @profileRemakeFromPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remake from a new photo'**
+  String get profileRemakeFromPhoto;
+
+  /// No description provided for @profileBuildMyOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Build my own'**
+  String get profileBuildMyOwn;
+
+  /// No description provided for @profileAdjustCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust'**
+  String get profileAdjustCoach;
+
+  /// No description provided for @profileDeleteAvatarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your avatar?'**
+  String get profileDeleteAvatarTitle;
+
+  /// No description provided for @profileDeleteAvatarKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it'**
+  String get profileDeleteAvatarKeep;
+
+  /// No description provided for @profileDeletingAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your avatar…'**
+  String get profileDeletingAvatar;
+
+  /// No description provided for @profileAvatarDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your avatar is deleted. A ready-made coach is with you now.'**
+  String get profileAvatarDeleted;
+
+  /// No description provided for @profileAvatarDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t reach our servers, so your avatar hasn’t been deleted yet.'**
+  String get profileAvatarDeleteFailed;
+
+  /// No description provided for @profileTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get profileTryAgain;
 
   /// No description provided for @profileHelp.
   ///
@@ -6890,6 +6962,360 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On the lock screen the widget shows general text only, never your answers or health details.'**
   String get dailyPlanWidgetPrivate;
+
+  /// T-AVT-08g-e: Profile > Daily plan switch for the home/lock-screen widget. On by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide details on lock screen'**
+  String get profileWidgetHideDetails;
+
+  /// T-AVT-08g-e: subtitle of the widget privacy switch.
+  ///
+  /// In en, this message translates to:
+  /// **'The widget says \"Your next step is ready\" instead of naming it.'**
+  String get profileWidgetHideDetailsBody;
+
+  /// T-REL-01 caption: the rest of what greeting.m4a says (docs/voices.md), so the whole recording is captioned (NFR-06).
+  ///
+  /// In en, this message translates to:
+  /// **'I’m here to help, one small step at a time.'**
+  String get voiceGreetingRest;
+
+  /// T-REL-01: heading over the transcript of the voice samples (NFR-06 captions).
+  ///
+  /// In en, this message translates to:
+  /// **'What you’ll hear'**
+  String get voiceSampleTitle;
+
+  /// T-REL-01 transcript of the calm voice samples (docs/voices.md, closed script).
+  ///
+  /// In en, this message translates to:
+  /// **'“Hi, I’m your Live Well coach. Let’s take one small step together today.”'**
+  String get voiceSampleCalm;
+
+  /// T-REL-01 transcript of the energetic voice samples (docs/voices.md, closed script).
+  ///
+  /// In en, this message translates to:
+  /// **'“Hi! I’m your Live Well coach. Let’s make today count, one small step at a time!”'**
+  String get voiceSampleEnergetic;
+
+  /// T-REL-01 screen-reader label for a daily plan time in Profile.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}, {time}. Change the time'**
+  String profileChangeTime(String name, String time);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'My measures'**
+  String get trackMeasuresTitle;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Add a number when you take one. Live Well keeps the record for you; your clinician can help you read it.'**
+  String get trackMeasuresIntro;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get metricWeight;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Blood pressure'**
+  String get metricBloodPressure;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Glucose'**
+  String get metricGlucose;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Meals'**
+  String get metricMeals;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing yet'**
+  String get metricNothingYet;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Add weight'**
+  String get metricAddWeight;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Add blood pressure'**
+  String get metricAddBloodPressure;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Add glucose'**
+  String get metricAddGlucose;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Add a meal'**
+  String get metricAddMeal;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} {unit}'**
+  String metricValueUnit(String value, String unit);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{systolic}/{diastolic} {unit}'**
+  String metricBpValue(String systolic, String diastolic, String unit);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get mealBreakfast;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch'**
+  String get mealLunch;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner'**
+  String get mealDinner;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Snack'**
+  String get mealSnack;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Entered by you'**
+  String get metricSourceManual;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'From {app}'**
+  String metricSourceHealth(String app);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{source} · {time}'**
+  String metricProvenance(String source, String time);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Today, {time}'**
+  String metricToday(String time);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday, {time}'**
+  String metricYesterday(String time);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{date}, {time}'**
+  String metricDateTime(String date, String time);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {value}. {provenance}. Opens your entries.'**
+  String metricRowLabel(String name, String value, String provenance);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: nothing yet. Opens your entries.'**
+  String metricRowEmptyLabel(String name);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get metricWhen;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get metricChangeTime;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'When: {time}. Change the date and time.'**
+  String metricChangeTimeLabel(String time);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get metricSave;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Top number (systolic)'**
+  String get metricSystolic;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom number (diastolic)'**
+  String get metricDiastolic;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a weight between {min} and {max} {unit}.'**
+  String metricWeightRange(String min, String max, String unit);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Please check the numbers: the top one between 50 and 260, the bottom one between 30 and 160, and the top one higher.'**
+  String get metricBpRange;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a whole number between 20 and 600.'**
+  String get metricGlucoseRange;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Which meal?'**
+  String get metricMealPick;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well keeps this as a record and doesn\'t comment on it. Your clinician can help you with what the numbers mean for you.'**
+  String get metricRecordNote;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get metricSaved;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t save that. Please try again.'**
+  String get metricSaveError;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recorded in the last 90 days.'**
+  String get metricHistoryEmpty;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {entry}'**
+  String metricDelete(String entry);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted.'**
+  String get metricDeleted;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'This month, week by week'**
+  String get trackChartMonthLabel;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Last 90 days, week by week'**
+  String get trackChartQuarterLabel;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Week of {date}'**
+  String trackChartWeekOf(String date);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} on average'**
+  String trackOnAverage(String value);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} a day'**
+  String trackPerDay(String value);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Add one under My measures to see it here.'**
+  String get trackChartMeasureEmpty;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'From {app}, read {time}'**
+  String trackChartFromHealth(String app, String time);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Entered by you'**
+  String get trackChartFromYou;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'Entered by you and from {app}'**
+  String trackChartFromYouAndHealth(String app);
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'From what you marked done in Live Well'**
+  String get trackChartFromApp;
+
+  /// T-GOL-02 manual measures and charts (D-72).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 meal} other{{count} meals}}'**
+  String metricMealsCount(int count);
 }
 
 class _AppLocalizationsDelegate

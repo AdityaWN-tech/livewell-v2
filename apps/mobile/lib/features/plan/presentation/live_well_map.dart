@@ -77,6 +77,9 @@ class LiveWellMap extends StatelessWidget {
             return Center(
               child: GestureDetector(
                 key: const Key('plan-map-wheel'),
+                // Screen readers use each driver's own labelled button
+                // below; the wheel-wide tap is for touch only (T-REL-01).
+                excludeFromSemantics: true,
                 onTapUp: (d) {
                   final i = segmentAt(d.localPosition, size, drivers.length);
                   if (i != null) onOpen(drivers[i]);

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:health/health.dart';
 
+import '../../checkin/domain/checkin.dart' show localDateKey;
 import '../domain/health_summary.dart';
 
 /// Reads steps and sleep from Apple Health (iOS) or Health Connect
@@ -16,6 +17,10 @@ abstract class HealthSource {
 
   /// This week, Monday to Sunday, up to [now].
   Future<HealthSummary> week(DateTime now);
+
+  /// Steps per local day from [first] to [now] (This Month and 90 days on
+  /// Track's chart, FR-GOL-05), by YYYY-MM-DD; days without steps left out.
+  Future<Map<String, int>> dailySteps(DateTime first, DateTime now);
 
   /// Opens the store page for Health Connect.
   Future<void> install();
@@ -95,6 +100,27 @@ class DeviceHealthSource implements HealthSource {
         for (final p in points) (p.dateFrom, p.dateTo),
       ]),
     );
+  }
+
+  @override
+  Future<Map<String, int>> dailySteps(DateTime first, DateTime now) async {
+    await _configure();
+    final steps = <String, int>{};
+    for (
+      var start = DateTime(first.year, first.month, first.day);
+      start.isBefore(now);
+      start = DateTime(start.year, start.month, start.day + 1)
+    ) {
+      final end = DateTime(start.year, start.month, start.day + 1);
+      final n =
+          await _health.getTotalStepsInInterval(
+            start,
+            end.isAfter(now) ? now : end,
+          ) ??
+          0;
+      if (n > 0) steps[localDateKey(start)] = n;
+    }
+    return steps;
   }
 
   @override

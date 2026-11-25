@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/safety/data/safety_event_store.dart';
 import 'package:livewell/features/goals/data/goal_repository.dart';
+import 'package:livewell/features/avatar/application/avatar_deletion.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/features/avatar/data/selfie_capture.dart';
 import 'package:livewell/features/moments/application/moment_launcher.dart';
@@ -16,6 +17,7 @@ import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/analytics/analytics.dart';
 import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/core/time/clock.dart';
+import 'package:livewell/core/local_db/local_db_providers.dart';
 import 'package:livewell/core/startup/app_startup.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
@@ -44,6 +46,7 @@ import 'package:livewell/features/track/data/reflection_repository.dart';
 import 'package:livewell/features/widget/data/widget_inbox.dart';
 import 'package:livewell/features/account/application/app_lock.dart';
 import 'package:livewell/features/track/data/health_source.dart';
+import 'package:livewell/features/track/data/metric_repository.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
@@ -110,6 +113,9 @@ class Harness {
   /// Apple Health / Health Connect (Step 4f).
   final health = FakeHealthSource();
 
+  /// Weight, blood pressure, glucose and meals, in memory (T-GOL-02).
+  final metrics = InMemoryMetricRepository();
+
   /// Fingerprint / face unlock (D-62).
   final unlock = FakeDeviceUnlock();
 
@@ -134,7 +140,9 @@ class Harness {
   final appearance = FakeAppearanceStore();
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
+  final avatarLocal = FakeAvatarLocalData();
   final localData = FakeLocalData();
+  final localDb = FakeLocalDatabaseWiper();
 
   /// Server push (T-TCH-01): FCM and the device documents, in memory.
   final push = FakePushMessaging();
@@ -185,6 +193,11 @@ class Harness {
           profileRepositoryProvider.overrideWithValue(profiles),
           consentRepositoryProvider.overrideWithValue(consents),
           healthSourceProvider.overrideWithValue(health),
+          metricRepositoryProvider.overrideWith(
+            (ref) => ref.watch(previewModeProvider)
+                ? InMemoryMetricRepository()
+                : metrics,
+          ),
           deviceUnlockProvider.overrideWithValue(unlock),
           dictationProvider.overrideWithValue(dictation),
           phoneLauncherProvider.overrideWithValue(phone),
@@ -206,7 +219,9 @@ class Harness {
           appearanceStoreProvider.overrideWithValue(appearance),
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
+          avatarLocalDataProvider.overrideWithValue(avatarLocal),
           localDataProvider.overrideWithValue(localData),
+          localDatabaseWiperProvider.overrideWithValue(localDb),
           pushMessagingProvider.overrideWithValue(push),
           deviceRegistryProvider.overrideWithValue(devices),
           pushInstallIdStoreProvider.overrideWithValue(

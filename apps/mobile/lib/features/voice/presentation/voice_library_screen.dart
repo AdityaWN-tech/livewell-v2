@@ -122,6 +122,8 @@ class _VoiceLibraryScreenState extends ConsumerState<VoiceLibraryScreen> {
                     },
                     onOwnVoice: () => showOwnVoiceSheet(context),
                   ),
+                  const SizedBox(height: LwSpacing.sm),
+                  VoiceSampleTranscript(style: _c.style),
                   // How the chosen voice is made (FR-VOC-08, D-75).
                   const SizedBox(height: LwSpacing.md),
                   VoiceHowMade(voiceId: _c.voiceId),

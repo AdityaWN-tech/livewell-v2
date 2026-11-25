@@ -132,7 +132,8 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
         return views
       }
 
-      val hide = snapshot.optBoolean("hide_details", false)
+      // Missing setting = hidden: the private choice is the default (D-68).
+      val hide = snapshot.optBoolean("hide_details", true)
       views.setTextViewText(
           R.id.widget_headline,
           if (hide) entry.optString("lock_headline") else entry.optString("headline"))

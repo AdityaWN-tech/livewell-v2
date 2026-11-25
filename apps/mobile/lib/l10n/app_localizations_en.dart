@@ -108,6 +108,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'We couldn\'t load your choices. Please try again.';
 
   @override
+  String consentRevokeTitle(String name) {
+    return 'Turn off $name?';
+  }
+
+  @override
+  String get consentRevokeKeep => 'Keep it on';
+
+  @override
+  String get consentRevokeConfirm => 'Turn off';
+
+  @override
+  String get consentRevokeCamera =>
+      'Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach\'s name stays. This can\'t be undone.';
+
+  @override
+  String get consentRevokeMicrophone =>
+      'Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can\'t be undone.';
+
+  @override
+  String get consentRevokeBiometric =>
+      'Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can\'t be undone.';
+
+  @override
+  String get consentRevokePortalLinking =>
+      'We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.';
+
+  @override
+  String get consentRevokeMarketing =>
+      'We stop sending news and offers. It can take up to 24 hours.';
+
+  @override
   String get consentNotificationsTitle => 'Reminders and nudges';
 
   @override

@@ -967,7 +967,14 @@ describe('global catalogues (approved and active only)', () => {
 });
 
 describe('server-only collections are closed to clients (11.1)', () => {
-  for (const col of ['voice_consents', 'safety_events', 'audit_log']) {
+  for (const col of [
+    'voice_consents',
+    'safety_events',
+    'audit_log',
+    'consent_revocations',
+    'vendor_requests',
+    'marketing_suppressions',
+  ]) {
     it(col, async () => {
       await seed(env, { [`${col}/x`]: { uid: ALICE, ...meta() } });
       await assertFails(getDoc(doc(as(ALICE), `${col}/x`)));

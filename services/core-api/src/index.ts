@@ -2,11 +2,18 @@ import { initializeApp } from 'firebase-admin/app';
 
 import { makeDeletions } from './account/deletions.js';
 import { makeOnConsentCreated } from './consents/on-consent-created.js';
+import { makeRevokeSweep } from './consents/revoke-sweep.js';
 
 initializeApp();
 
-/** Audit entry for every consent grant or revocation (T-FND-05). */
+/**
+ * Audit entry for every consent grant or revocation (T-FND-05), and the
+ * spec 16.3 handling when a consent is revoked (FR-ONB-03, D-76).
+ */
 export const onConsentCreated = makeOnConsentCreated();
+
+/** Hourly retry of revoke handling, well inside the 24 h limit (D-76). */
+export const consentRevokeSweep = makeRevokeSweep();
 
 /**
  * "Delete my avatar", "Delete my voice", "Delete my account" (FR-SET-02/03,

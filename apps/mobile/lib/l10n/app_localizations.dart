@@ -274,6 +274,54 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load your choices. Please try again.'**
   String get consentLoadError;
 
+  /// Confirming a revoke that deletes or stops something on our side (FR-ONB-03, D-76).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off {name}?'**
+  String consentRevokeTitle(String name);
+
+  /// No description provided for @consentRevokeKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it on'**
+  String get consentRevokeKeep;
+
+  /// No description provided for @consentRevokeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get consentRevokeConfirm;
+
+  /// No description provided for @consentRevokeCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach\'s name stays. This can\'t be undone.'**
+  String get consentRevokeCamera;
+
+  /// No description provided for @consentRevokeMicrophone.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can\'t be undone.'**
+  String get consentRevokeMicrophone;
+
+  /// No description provided for @consentRevokeBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can\'t be undone.'**
+  String get consentRevokeBiometric;
+
+  /// No description provided for @consentRevokePortalLinking.
+  ///
+  /// In en, this message translates to:
+  /// **'We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.'**
+  String get consentRevokePortalLinking;
+
+  /// No description provided for @consentRevokeMarketing.
+  ///
+  /// In en, this message translates to:
+  /// **'We stop sending news and offers. It can take up to 24 hours.'**
+  String get consentRevokeMarketing;
+
   /// No description provided for @consentNotificationsTitle.
   ///
   /// In en, this message translates to:

@@ -53,10 +53,14 @@ class PlanScheduler {
     final quiet = QuietHours.fromMap(
       settings[ProfileSettings.quietHours] as Map<String, dynamic>?,
     );
+    // "Not today" (T-DLY-03e): that moment's reminder is off for the day.
+    final notToday = NotToday.fromMap(
+      settings[ProfileSettings.notToday] as Map<String, dynamic>?,
+    );
     // Today's step reminder is dropped once the step is done (TCH-e).
     final stepDone = _ref.read(stepProgressProvider).done;
     final doneNudge = TouchpointScheduler.idFor(now, TouchpointKind.nudge);
-    final items = [
+    final items = notToday.filter([
       for (final i in TouchpointScheduler.build(
         days: [for (final d in dates) DateTime.parse(d)],
         times: await plans.loadTimes(),
@@ -69,7 +73,7 @@ class PlanScheduler {
         ),
       ))
         if (!(stepDone && i.id == doneNudge)) i,
-    ];
+    ]);
     // My Daily Routine (T-GOL-03d): its own category and cap, same quiet
     // hours, scheduled in the same pass so neither wipes the other.
     final routine = await routineRemindersFor(

@@ -28,6 +28,13 @@ void main() {
       )
       .value;
 
+  /// The switch lives in Profile > Daily plan > widget (moved there by
+  /// T-DLY-03e, D-79).
+  Future<void> openDailyPlan(WidgetTester tester) async {
+    await openProfile(tester);
+    await tapKey(tester, 'profile-daily-plan');
+  }
+
   group('"Hide details on lock screen"', () {
     testWidgets('on by default: the widget is told to hide details', (
       tester,
@@ -37,7 +44,7 @@ void main() {
       await waitSync(tester);
       expect(h.widget.last!.hideDetails, isTrue);
       expect(h.widget.last!.toJson()['hide_details'], isTrue);
-      await openProfile(tester);
+      await openDailyPlan(tester);
       await tester.scrollUntilVisible(
         find.byKey(const Key('profile-widget-hide-details')),
         300,
@@ -50,7 +57,7 @@ void main() {
         'sent to the widget; turned back on, hidden again', (tester) async {
       final h = signedIn();
       await h.boot(tester);
-      await openProfile(tester);
+      await openDailyPlan(tester);
       await tapKey(tester, 'profile-widget-hide-details');
       expect(switchValue(tester), isFalse);
       final prefs = await SharedPreferences.getInstance();

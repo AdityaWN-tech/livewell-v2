@@ -34,8 +34,14 @@ abstract class LearnRepository {
   /// The person's portal events from the last [days] days.
   Stream<List<PortalEventRecord>> watchEvents({int days = 14});
 
-  /// Appends card_shown, clicked or dismissed. Only ids, never health data.
-  Future<void> logEvent(String event, String offerId, {String? clickId});
+  /// Appends card_shown, clicked or dismissed on [surface] (`learn` or
+  /// `lesson_end`). Only ids, never health data.
+  Future<void> logEvent(
+    String event,
+    String offerId, {
+    String? clickId,
+    String surface = 'learn',
+  });
 }
 
 class FirestoreLearnRepository implements LearnRepository {
@@ -73,9 +79,13 @@ class FirestoreLearnRepository implements LearnRepository {
                 d.data()['breathing'] as String?,
               ),
               version: (d.data()['version'] as num?)?.toInt() ?? 1,
+              portalOfferId: _nonEmpty(d.data()['portal_offer_id']),
             ),
         ],
       );
+
+  static String? _nonEmpty(Object? v) =>
+      v is String && v.trim().isNotEmpty ? v.trim() : null;
 
   static LessonMicrohabit? _microhabit(Object? m) {
     if (m is! Map) return null;
@@ -197,14 +207,19 @@ class FirestoreLearnRepository implements LearnRepository {
       );
 
   @override
-  Future<void> logEvent(String event, String offerId, {String? clickId}) {
+  Future<void> logEvent(
+    String event,
+    String offerId, {
+    String? clickId,
+    String surface = 'learn',
+  }) {
     final now = FieldValue.serverTimestamp();
     // Not awaited past the local write: offline it syncs later.
     return _events
         .add({
           'event': event,
           'offer_id': offerId,
-          'surface': 'learn',
+          'surface': surface,
           'click_id': ?clickId,
           'created_at': now,
           'updated_at': now,
@@ -266,7 +281,12 @@ class PreviewLearnRepository implements LearnRepository {
   }
 
   @override
-  Future<void> logEvent(String event, String offerId, {String? clickId}) async {
+  Future<void> logEvent(
+    String event,
+    String offerId, {
+    String? clickId,
+    String surface = 'learn',
+  }) async {
     _events.add(
       PortalEventRecord(event: event, offerId: offerId, at: DateTime.now()),
     );

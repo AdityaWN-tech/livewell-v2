@@ -274,6 +274,54 @@ abstract class AppLocalizations {
   /// **'We couldn\'t load your choices. Please try again.'**
   String get consentLoadError;
 
+  /// Confirming a revoke that deletes or stops something on our side (FR-ONB-03, D-76).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off {name}?'**
+  String consentRevokeTitle(String name);
+
+  /// No description provided for @consentRevokeKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it on'**
+  String get consentRevokeKeep;
+
+  /// No description provided for @consentRevokeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get consentRevokeConfirm;
+
+  /// No description provided for @consentRevokeCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 24 hours we delete any selfie photos and the face data used to make your coach, and your coach goes back to a ready-made look. Your coach\'s name stays. This can\'t be undone.'**
+  String get consentRevokeCamera;
+
+  /// No description provided for @consentRevokeMicrophone.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Well stops using your microphone. Within 24 hours we delete any voice recordings we keep and any copy of a voice made from them. This can\'t be undone.'**
+  String get consentRevokeMicrophone;
+
+  /// No description provided for @consentRevokeBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 24 hours we delete your face and voice models, with the photos and recordings they came from. Your coach goes back to a ready-made look and a library voice. This can\'t be undone.'**
+  String get consentRevokeBiometric;
+
+  /// No description provided for @consentRevokePortalLinking.
+  ///
+  /// In en, this message translates to:
+  /// **'We unlink your portal account and, within 24 hours, delete the record of the courses you were shown or opened. Your coach stops suggesting courses.'**
+  String get consentRevokePortalLinking;
+
+  /// No description provided for @consentRevokeMarketing.
+  ///
+  /// In en, this message translates to:
+  /// **'We stop sending news and offers. It can take up to 24 hours.'**
+  String get consentRevokeMarketing;
+
   /// No description provided for @consentNotificationsTitle.
   ///
   /// In en, this message translates to:
@@ -2415,18 +2463,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlock'**
   String get appLockUnlock;
-
-  /// T-AVT-08g-e: Profile > Daily plan switch for the home/lock-screen widget. On by default.
-  ///
-  /// In en, this message translates to:
-  /// **'Hide details on lock screen'**
-  String get profileWidgetHideDetails;
-
-  /// T-AVT-08g-e: subtitle of the widget privacy switch.
-  ///
-  /// In en, this message translates to:
-  /// **'The widget says \"Your next step is ready\" instead of naming it.'**
-  String get profileWidgetHideDetailsBody;
 
   /// D-62: Profile > Privacy & data switch (FR-ONB-01).
   ///
@@ -6279,6 +6315,12 @@ abstract class AppLocalizations {
   /// **'Well done for taking the time. Small steps add up.'**
   String get learnReaderEndBody;
 
+  /// FR-LRN-04 / T-PRT-03: heading above the lesson's related portal card at the end of the reader (D-74).
+  ///
+  /// In en, this message translates to:
+  /// **'Go deeper on the Live Well Portal'**
+  String get learnReaderPortalTitle;
+
   /// Step 4e Learn reader and breathing guide (D-57).
   ///
   /// In en, this message translates to:
@@ -6680,6 +6722,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete: {fact}'**
   String memoryDeleteSemantics(String fact);
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Moment times, your coach\'s voice and the widget'**
+  String get dailyPlanSubtitle;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose when your coach checks in and how your moments play.'**
+  String get dailyPlanIntro;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Moment times'**
+  String get dailyPlanTimesHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Change the {moment} time'**
+  String dailyPlanChangeTime(String moment);
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Not today'**
+  String get dailyPlanNotToday;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'No {moment} reminder today. It\'s back tomorrow.'**
+  String dailyPlanNotTodayDone(String moment);
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'This time is during quiet hours, so no reminder is sent. Pick a time outside them.'**
+  String get dailyPlanInQuiet;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours'**
+  String get dailyPlanQuietHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach in moments'**
+  String get dailyPlanCoachHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Coach speaks automatically when I open a moment'**
+  String get dailyPlanAutoSpeak;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Show text only. Tap play to hear your coach.'**
+  String get dailyPlanTextOnly;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'The same speed as in your voice settings.'**
+  String get dailyPlanSpeedNote;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Captions always on'**
+  String get dailyPlanCaptions;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'The words appear as your coach speaks.'**
+  String get dailyPlanCaptionsOn;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'The words appear when your coach has finished.'**
+  String get dailyPlanCaptionsOff;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Preview tomorrow\'s morning'**
+  String get dailyPlanPreview;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get dailyPlanPreviewTag;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s no morning message to preview yet.'**
+  String get dailyPlanPreviewNone;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s keep today quiet. Previews are back tomorrow.'**
+  String get dailyPlanPreviewPaused;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Home-screen widget'**
+  String get dailyPlanWidgetHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Add the widget'**
+  String get dailyPlanWidgetTitle;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'See your next small step without opening the app.'**
+  String get dailyPlanWidgetBody;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Android: touch and hold an empty spot on your home screen, tap Widgets, then find Live Well.'**
+  String get dailyPlanWidgetAndroid;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'iPhone: touch and hold your home screen, tap Edit or +, then search for Live Well.'**
+  String get dailyPlanWidgetIos;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'On the lock screen the widget shows general text only, never your answers or health details.'**
+  String get dailyPlanWidgetPrivate;
+
+  /// T-AVT-08g-e: Profile > Daily plan switch for the home/lock-screen widget. On by default.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide details on lock screen'**
+  String get profileWidgetHideDetails;
+
+  /// T-AVT-08g-e: subtitle of the widget privacy switch.
+  ///
+  /// In en, this message translates to:
+  /// **'The widget says \"Your next step is ready\" instead of naming it.'**
+  String get profileWidgetHideDetailsBody;
 }
 
 class _AppLocalizationsDelegate

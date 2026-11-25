@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -24,7 +26,16 @@ class LwScreen extends StatelessWidget {
     this.bottom,
     this.subtitle,
     this.titleIcon,
+    this.aside,
+    this.showEyebrow = true,
   });
+
+  /// Tab screens: a card beside the title, under [icons] (Home's streak).
+  /// Moves below the title when there is no room for both.
+  final Widget? aside;
+
+  /// Tab screens: whether the small eyebrow line shows above the title.
+  final bool showEyebrow;
 
   /// Tab screens: a short line under the title.
   final String? subtitle;
@@ -84,6 +95,8 @@ class LwScreen extends StatelessWidget {
                           icons: icons,
                           profile: profile,
                           actions: actions,
+                          aside: aside,
+                          showEyebrow: showEyebrow,
                         ),
                         const SizedBox(height: LwSpacing.md),
                         ...children,
@@ -123,6 +136,8 @@ class LwTabHeader extends StatelessWidget {
     this.actions = const [],
     this.subtitle,
     this.titleIcon,
+    this.aside,
+    this.showEyebrow = true,
   });
 
   final String eyebrow;
@@ -133,59 +148,169 @@ class LwTabHeader extends StatelessWidget {
   final Widget? profile;
   final List<Widget> actions;
 
+  /// A card beside the title, under the icons (Home's streak, T-UI-03).
+  /// Below the title instead when the row is too narrow for both: small
+  /// phones with large text.
+  final Widget? aside;
+  final bool showEyebrow;
+
+  /// Share of the row the [aside] column takes when beside the title; at
+  /// least the width of the [icons] and [profile] buttons above it.
+  static const double asideShare = 0.46;
+
+  /// Width of the widest word in [text] at [style]: the title may wrap
+  /// between words but must never break inside one.
+  static double widestWord(
+    BuildContext context,
+    String text,
+    TextStyle? style,
+  ) {
+    var widest = 0.0;
+    for (final word in text.split(RegExp(r'\s+'))) {
+      final tp = TextPainter(
+        text: TextSpan(text: word, style: style),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      if (tp.width > widest) widest = tp.width;
+    }
+    return widest;
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
+    final heading = Semantics(
+      header: true,
+      child: Column(
+        key: const Key('tab-header-title'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (showEyebrow) Text(eyebrow.toUpperCase(), style: t.labelSmall),
+          if (titleIcon == null)
+            Text(title, style: t.headlineSmall)
+          else
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: '$title '),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: titleIcon!,
+                  ),
+                ],
+              ),
+              style: t.headlineSmall,
+            ),
+          if (subtitle != null) ...[
+            const SizedBox(height: LwSpacing.xxs),
+            Text(subtitle!, style: t.bodyMedium),
+          ],
+        ],
+      ),
+    );
+    final actionRow = actions.isEmpty
+        ? null
+        : Wrap(
+            key: const Key('tab-header-actions'),
+            spacing: LwSpacing.xs,
+            runSpacing: LwSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: actions,
+          );
+    final aside = this.aside;
+    if (aside != null) {
+      return LayoutBuilder(
+        builder: (context, box) {
+          final buttons = icons.length + (profile == null ? 0 : 1);
+          final asideWidth = math.max(
+            box.maxWidth * asideShare,
+            buttons * LwSize.minTapTarget + LwSpacing.xxs,
+          );
+          final room = box.maxWidth - asideWidth - LwSpacing.xs;
+          // The icon follows the last word, so it only widens that one.
+          final lastWord = title.trim().split(RegExp(r'\s+')).last;
+          final titleWord = math.max(
+            widestWord(context, title, t.headlineSmall),
+            widestWord(context, lastWord, t.headlineSmall) +
+                (titleIcon == null ? 0 : LwSize.iconSm + LwSpacing.xs),
+          );
+          final subtitleWord = subtitle == null
+              ? 0.0
+              : widestWord(context, subtitle!, t.bodyMedium);
+          if (math.max(titleWord, subtitleWord) <= room) {
+            return Row(
+              key: const Key('tab-header-aside-beside'),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      heading,
+                      if (actionRow != null) ...[
+                        const SizedBox(height: LwSpacing.xs),
+                        actionRow,
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: LwSpacing.xs),
+                // As wide as the buttons need (never cut off), the card at
+                // its share of the row below them.
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [...icons, ?profile],
+                    ),
+                    // Right under the buttons, as in the reference.
+                    const SizedBox(height: LwSpacing.xxs),
+                    SizedBox(width: asideWidth, child: aside),
+                  ],
+                ),
+              ],
+            );
+          }
+          return Column(
+            key: const Key('tab-header-aside-below'),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: heading),
+                  ...icons,
+                  ?profile,
+                ],
+              ),
+              if (actionRow != null) ...[
+                const SizedBox(height: LwSpacing.xs),
+                actionRow,
+              ],
+              const SizedBox(height: LwSpacing.sm),
+              aside,
+            ],
+          );
+        },
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Semantics(
-                header: true,
-                child: Column(
-                  key: const Key('tab-header-title'),
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(eyebrow.toUpperCase(), style: t.labelSmall),
-                    if (titleIcon == null)
-                      Text(title, style: t.headlineSmall)
-                    else
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(text: '$title '),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: titleIcon!,
-                            ),
-                          ],
-                        ),
-                        style: t.headlineSmall,
-                      ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: LwSpacing.xxs),
-                      Text(subtitle!, style: t.bodyMedium),
-                    ],
-                  ],
-                ),
-              ),
-            ),
+            Expanded(child: heading),
             ...icons,
             ?profile,
           ],
         ),
-        if (actions.isNotEmpty) ...[
+        if (actionRow != null) ...[
           const SizedBox(height: LwSpacing.xs),
-          Wrap(
-            key: const Key('tab-header-actions'),
-            spacing: LwSpacing.xs,
-            runSpacing: LwSpacing.xs,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: actions,
-          ),
+          actionRow,
         ],
       ],
     );

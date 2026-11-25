@@ -16,6 +16,7 @@ class FeatureFlags {
     this.coachChat = false,
     this.coachVoice = false,
     this.lovedOneVoice = false,
+    this.coachMemory = false,
   });
 
   /// Morning briefing player (FR-DLY-01). Off until briefings are generated.
@@ -55,6 +56,11 @@ class FeatureFlags {
   /// "A loved one's voice" (FR-VOC-03, Phase 2). Off until its own consent
   /// and clone flow exist.
   final bool lovedOneVoice;
+
+  /// "What my coach remembers" (FR-CNV-05, T-AGT-05b). Off in staging and
+  /// prod until the Memory Agent is deployed and proposing facts (D-101);
+  /// the dev flavor always shows it (coachMemoryEnabledProvider).
+  final bool coachMemory;
 }
 
 /// Dev with a Media Service on the developer's computer (LW_MEDIA_URL,

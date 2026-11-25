@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../widget/application/widget_settings.dart';
 import '../../../core/design/components/illustrated.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
@@ -426,6 +427,17 @@ class _DailyPlanScreenState extends ConsumerState<DailyPlanScreen> {
                         ),
                       ),
                     ],
+                  ),
+                  // Hide details on the lock screen (T-AVT-08g-e, D-68):
+                  // on by default, and on while the setting is loading.
+                  SwitchListTile(
+                    key: const Key('profile-widget-hide-details'),
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l.profileWidgetHideDetails),
+                    subtitle: Text(l.profileWidgetHideDetailsBody),
+                    value: ref.watch(widgetHideDetailsProvider).value ?? true,
+                    onChanged: (hide) =>
+                        ref.read(widgetHideDetailsProvider.notifier).set(hide),
                   ),
                 ],
               ),

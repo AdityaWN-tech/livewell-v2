@@ -1,6 +1,8 @@
 /// Sign-in domain (FR-ONB-01, D-02): email, phone OTP, Google, Apple.
 library;
 
+import 'package:phone_numbers_parser/phone_numbers_parser.dart' as pn;
+
 /// The signed-in person, as the app needs them.
 class AuthUser {
   const AuthUser({
@@ -115,47 +117,80 @@ class PhoneVerification {
   final int? resendToken;
 }
 
-/// Countries offered for phone sign-in. US only (D-66): the app is mainly
-/// used in the US. India is still a market for safety numbers (D-03); people
-/// there sign in with email, Google or Apple.
-enum PhoneCountry {
-  us('US', '+1', 10);
+/// A country offered for phone sign-in and Profile > Add a phone number.
+/// Any country (D-99, reverses D-66 for phone). Validation and E.164 come from
+/// `phone_numbers_parser` (Google libphonenumber metadata, pure Dart).
+///
+/// The chosen country only shapes the number. It never sets the safety
+/// region: that comes from [inferRegion] on the verified number (D-03).
+class PhoneCountry {
+  PhoneCountry._(this.iso)
+    : dialCode = '+${pn.PhoneNumber(isoCode: iso, nsn: '').countryCode}';
 
-  const PhoneCountry(this.isoCode, this.dialCode, this.nationalLength);
+  final pn.IsoCode iso;
 
-  final String isoCode;
+  /// E.g. '+44'. Shared by several countries for +1, +7, +44 and others.
   final String dialCode;
-  final int nationalLength;
 
-  /// Digits only, without the country code; null if it can't be a valid
-  /// number for this country.
-  String? normalise(String input) {
-    var digits = input.replaceAll(RegExp(r'[^0-9]'), '');
-    // Allow people to type the country code.
-    final cc = dialCode.substring(1);
-    if (digits.length == nationalLength + cc.length && digits.startsWith(cc)) {
-      digits = digits.substring(cc.length);
-    }
-    if (digits.length != nationalLength) return null;
-    return switch (this) {
-      // NANP: area code and exchange can't start with 0 or 1.
-      PhoneCountry.us =>
-        RegExp(r'^[2-9][0-9]{2}[2-9]').hasMatch(digits) ? digits : null,
-    };
-  }
+  /// ISO 3166-1 alpha-2, e.g. 'GB'.
+  String get isoCode => iso.name;
 
-  /// E.164 form, or null if invalid.
+  /// Every country the phone metadata knows, in ISO code order.
+  static final List<PhoneCountry> all = List.unmodifiable(
+    pn.IsoCode.values.map(PhoneCountry._),
+  );
+
+  static final Map<String, PhoneCountry> _byIso = {
+    for (final c in all) c.isoCode: c,
+  };
+
+  static final PhoneCountry us = _byIso['US']!;
+  static final PhoneCountry india = _byIso['IN']!;
+
+  /// The country for an ISO code (any case), or null if unknown.
+  static PhoneCountry? byIso(String? isoCode) =>
+      isoCode == null ? null : _byIso[isoCode.toUpperCase()];
+
+  /// Pre-selected country: the device's country if known, else the US.
+  /// Only a convenience for typing; the user can change it.
+  static PhoneCountry initial(String? deviceCountry) =>
+      byIso(deviceCountry) ?? us;
+
+  /// Flag emoji from the ISO code (regional indicator letters).
+  String get flag =>
+      String.fromCharCodes(isoCode.codeUnits.map((c) => 0x1F1E6 + c - 0x41));
+
+  /// E.164 form of a mobile number typed for this country, or null if it
+  /// can't be a valid mobile number. A leading national prefix (e.g. the 0
+  /// in 07400 123456) is accepted. A number typed with a leading
+  /// `+<code>` is read as international and must be a valid mobile number
+  /// for that code's country, which may differ from this one.
   String? toE164(String input) {
-    final national = normalise(input);
-    return national == null ? null : '$dialCode$national';
+    final trimmed = input.trim();
+    if (!RegExp(r'^\+?[0-9 ().\-]+$').hasMatch(trimmed)) return null;
+    final digits = trimmed.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.length < 4 || digits.length > 15) return null;
+    try {
+      final number = trimmed.startsWith('+')
+          ? pn.PhoneNumber.parse('+$digits')
+          : pn.PhoneNumber.parse(digits, destinationCountry: iso);
+      if (!number.isValid(type: pn.PhoneNumberType.mobile)) return null;
+      final e164 = number.international;
+      return e164.length <= 16 ? e164 : null;
+    } on Object {
+      return null;
+    }
   }
+
+  @override
+  String toString() => 'PhoneCountry($isoCode)';
 }
 
-/// Region for safety numbers and legal texts (D-03). New phone numbers are
-/// +1 only (D-66), but +91 still maps to India so any +91 account gets India's
-/// emergency and crisis numbers. Never guessed: +1 is
-/// shared with Canada and the Caribbean, so it means US only when the device
-/// is also set to the US. Null means "ask the user later".
+/// Region for safety numbers and legal texts (D-03). Phone numbers from any
+/// country are accepted (D-99), but only +91 maps to India. Never guessed:
+/// +1 is shared with Canada and the Caribbean, so it means US only when the
+/// device is also set to the US; every other code is null. Null means "ask
+/// the user later" (and, until then, both IN and US numbers are shown).
 String? inferRegion({String? phoneE164, String? deviceCountry}) {
   final country = deviceCountry?.toUpperCase();
   if (phoneE164 != null) {

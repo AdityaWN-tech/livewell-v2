@@ -1,0 +1,105 @@
+{
+  "about": "Prompt registry (spec 9.6). Each prompt version is a file here; review_status must be approved before staging/prod may use it (dev may use pending). sha256 pins the reviewed text: editing a prompt means a new version and a new review. One prompt per Coach mode (coach_briefing, coach_reply, coach_nudge, coach_reflection, coach_weekly_review; T-AGT-04, D-98). Memory Agent: memory_extract (T-AGT-05, D-100); Portal Agent: portal_bridge (T-AGT-07, D-105); coach_reply and coach_reflection 0.2 add the saved-memory line. A Remote Config pointer for the active version is a follow-up (D-98): until then `active` here is the pointer.",
+  "prompts": {
+    "coach_briefing": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_briefing/v0.1.md",
+          "review_status": "pending",
+          "sha256": "6acf5bdb16528423a3b183014e45b32b96de7d4a7655e7049f8969974e6da914"
+        }
+      }
+    },
+    "safety_classifier_input": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "safety_classifier_input/v0.1.md",
+          "review_status": "pending",
+          "sha256": "aca7e7503b6cbb4f156ce76ddb0b70a11ab255699184891e04e83169a6c68109"
+        }
+      }
+    },
+    "safety_classifier_output": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "safety_classifier_output/v0.1.md",
+          "review_status": "pending",
+          "sha256": "8010c3cb8b99bf6d44a647c826fb12e55eb79288e769ce5f95d49d56c4562c0c"
+        }
+      }
+    },
+    "coach_reply": {
+      "active": "0.2",
+      "versions": {
+        "0.1": {
+          "file": "coach_reply/v0.1.md",
+          "review_status": "pending",
+          "sha256": "3e0d1e3a11b3a9a1871ef2e2151d43fd9efbfa9a1790136184d2d160ae6890dc"
+        },
+        "0.2": {
+          "file": "coach_reply/v0.2.md",
+          "review_status": "pending",
+          "sha256": "e38d734ea0d2584130e128d0f52c3812b0ce5b8adf5e821a1dd975f0a832e9db"
+        }
+      }
+    },
+    "coach_nudge": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_nudge/v0.1.md",
+          "review_status": "pending",
+          "sha256": "54e90ec65e92312c645e9e89a38e3e24b8a86b6e78a01614ec268516bab24863"
+        }
+      }
+    },
+    "coach_reflection": {
+      "active": "0.2",
+      "versions": {
+        "0.1": {
+          "file": "coach_reflection/v0.1.md",
+          "review_status": "pending",
+          "sha256": "2651f1b728ece318272a89721a22fc5165e36371872abcba520a3d0f45e0b79c"
+        },
+        "0.2": {
+          "file": "coach_reflection/v0.2.md",
+          "review_status": "pending",
+          "sha256": "ce9b4309ea3fdc755b20bffa2d99864f1d3d83e32041dfb96fa29dfec7cb6e3a"
+        }
+      }
+    },
+    "coach_weekly_review": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "coach_weekly_review/v0.1.md",
+          "review_status": "pending",
+          "sha256": "f2b46c605c2f89b953dba2e8ed1cdecd7663814bfd5d075324d8a49b9c1581b0"
+        }
+      }
+    },
+    "memory_extract": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "memory_extract/v0.1.md",
+          "review_status": "pending",
+          "sha256": "4baea745127b1da9bb05eca32fc4e4771b4c113a71b9fb6b12a90430de69ab85"
+        }
+      }
+    },
+    "portal_bridge": {
+      "active": "0.1",
+      "versions": {
+        "0.1": {
+          "file": "portal_bridge/v0.1.md",
+          "review_status": "pending",
+          "sha256": "6d2408cec8cfc433eb0f30c1fb6cf52dd230beace3d6d8aeedaa312f1aa1da5a"
+        }
+      }
+    }
+  }
+}

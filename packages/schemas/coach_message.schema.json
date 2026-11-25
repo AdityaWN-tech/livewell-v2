@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://livewell.app/schemas/coach_message.schema.json",
+  "title": "CoachMessage v1 (spec 9.5)",
+  "description": "T-AGT-01. One message from the orchestrator (briefing, reply, nudge, reflection prompt, weekly review), stored at users/{uid}/messages/{message_id}. Only the text and emotion come from a model; everything else is set by code. safety.status 'approved' means the draft passed Safety.post; 'fallback' is the fixed safe text; 'safety_template' is a fixed emergency/crisis/red-flag text (safety.category set; the voice gateway routes the neutral device voice, D-88). contains_user_text is false only for fixed texts (D-88: model text is never spoken in a cloned voice).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "message_id",
+    "type",
+    "text",
+    "emotion",
+    "primary_action",
+    "secondary_actions",
+    "sources",
+    "driver_tags",
+    "portal_card",
+    "safety",
+    "contains_user_text",
+    "model",
+    "prompt_version"
+  ],
+  "properties": {
+    "message_id": { "type": "string", "minLength": 1 },
+    "type": { "enum": ["briefing", "reply", "nudge", "reflection_prompt", "weekly_review"] },
+    "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "ssml_hints": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "pauses": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+        "emphasis": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "emotion": { "enum": ["encouraging", "happy", "calm", "neutral", "celebrating"] },
+    "primary_action": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/action" }]
+    },
+    "secondary_actions": { "type": "array", "items": { "$ref": "#/$defs/action" } },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "title"],
+        "properties": {
+          "source_id": { "type": "string", "minLength": 1 },
+          "title": { "type": "string" }
+        }
+      }
+    },
+    "mgdi_letter": { "type": ["string", "null"] },
+    "driver_tags": { "type": "array", "items": { "type": "string" } },
+    "portal_card": {
+      "description": "Always null until the Portal Agent (T-AGT-07); never in or within 72 h of a safety event.",
+      "type": "null"
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "checks"],
+      "properties": {
+        "status": { "enum": ["approved", "fallback", "safety_template"] },
+        "checks": { "type": "array", "items": { "type": "string" } },
+        "category": {
+          "enum": [null, "emergency", "crisis", "disordered_eating", "medication", "pregnancy_complex"]
+        }
+      }
+    },
+    "contains_user_text": { "type": "boolean" },
+    "model": { "type": "string", "description": "provider/model@version, or 'none' for fixed texts" },
+    "prompt_version": { "type": "string" }
+  },
+  "$defs": {
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "action_id"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "action_id": { "type": "string", "minLength": 1, "maxLength": 64 }
+      }
+    }
+  }
+}

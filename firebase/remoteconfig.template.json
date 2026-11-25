@@ -70,6 +70,13 @@
       },
       "description": "Live photo-realistic avatar streaming (spec 8.4/10.2 kill switch). Not built yet. PROD-LOCKED (D-73).",
       "valueType": "BOOLEAN"
+    },
+    "ff_coach_memory": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "What my coach remembers (FR-CNV-05, T-AGT-05b). Off in staging and prod until the Memory Agent is deployed (D-101); dev always shows it.",
+      "valueType": "BOOLEAN"
     }
   },
   "parameterGroups": {}

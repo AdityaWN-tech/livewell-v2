@@ -23,6 +23,7 @@ class FeatureFlags {
     this.coachVoice = false,
     this.lovedOneVoice = false,
     this.photorealStreaming = false,
+    this.coachMemory = false,
   });
 
   /// Morning briefing player (FR-DLY-01). Off until briefings are generated.
@@ -80,6 +81,7 @@ class FeatureFlags {
     Flag.coachVoice => coachVoice,
     Flag.lovedOneVoice => lovedOneVoice,
     Flag.photorealStreaming => photorealStreaming,
+    Flag.coachMemory => coachMemory,
   };
 
   /// Builds flags from one value per [Flag]; missing ones are off.
@@ -94,11 +96,17 @@ class FeatureFlags {
     coachVoice: v[Flag.coachVoice] ?? false,
     lovedOneVoice: v[Flag.lovedOneVoice] ?? false,
     photorealStreaming: v[Flag.photorealStreaming] ?? false,
+    coachMemory: v[Flag.coachMemory] ?? false,
   );
 
   @override
   String toString() =>
       'FeatureFlags(${Flag.values.map((f) => '${f.name}: ${this[f]}').join(', ')})';
+
+  /// "What my coach remembers" (FR-CNV-05, T-AGT-05b). Off in staging and
+  /// prod until the Memory Agent is deployed and proposing facts (D-101);
+  /// the dev flavor always shows it (coachMemoryEnabledProvider).
+  final bool coachMemory;
 }
 
 /// Every flag, with its Remote Config parameter name (the same names as in
@@ -113,7 +121,8 @@ enum Flag {
   coachChat('ff_coach_chat'),
   coachVoice('ff_coach_voice'),
   lovedOneVoice('ff_loved_one_voice', prodLocked: true),
-  photorealStreaming('ff_photoreal_streaming', prodLocked: true);
+  photorealStreaming('ff_photoreal_streaming', prodLocked: true),
+  coachMemory('ff_coach_memory');
 
   const Flag(this.remoteKey, {this.prodLocked = false});
 

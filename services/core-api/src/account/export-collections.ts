@@ -18,6 +18,8 @@ export const EXPORTED_USER_COLLECTIONS = [
   'habit_logs',
   'checkins',
   'reflections',
+  // Weight, blood pressure, glucose and meals the person recorded (T-GOL-02, D-72).
+  'metrics',
   'routines',
   'routine_items',
   'routine_logs',

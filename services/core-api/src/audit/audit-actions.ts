@@ -23,6 +23,23 @@ export const AUDIT_ACTIONS = [
   'data_export.ready',
   'data_export.failed',
   'data_export.link_issued',
+  // Data migration of the prototype's users arrays (T-FND-07, D-83).
+  'migration.plan',
+  'migration.copy',
+  'migration.verify',
+  'migration.cleanup',
+  'migration.rollback',
+  // Portal catalog in Admin (T-PRT-02, D-92): one per offer revision.
+  'admin.portal_offer_created',
+  'admin.portal_offer_updated',
+  'admin.portal_offer_submitted',
+  'admin.portal_offer_withdrawn',
+  'admin.portal_offer_approved',
+  'admin.portal_offer_rejected',
+  'admin.portal_offer_published',
+  'admin.portal_offer_unpublished',
+  'admin.portal_offer_archived',
+  'admin.portal_offer_restored',
   // Reserved: voice and avatar consent (T-VOC-*, T-AVT-*).
   'voice_consent.granted',
   'voice_consent.revoked',

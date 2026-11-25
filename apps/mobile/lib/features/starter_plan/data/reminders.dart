@@ -81,12 +81,14 @@ abstract class Reminders {
 
   /// Shows a notification now (T-AVT-08: "Your coach is ready"). Generic
   /// words only, hidden on a locked screen like the reminders; tapping it
-  /// just opens the app.
+  /// just opens the app, or hands [payload] to [taps] (a push shown while
+  /// the app is open, T-TCH-01).
   Future<void> showNow({
     required int id,
     required String title,
     required String body,
     required String channelName,
+    String? payload,
   });
 
   /// The payload (a [TouchpointKind] name, or a routine payload) of each
@@ -233,12 +235,14 @@ class LocalReminders implements Reminders {
     required String title,
     required String body,
     required String channelName,
+    String? payload,
   }) async {
     await _init();
     await _plugin.show(
       id: id,
       title: title,
       body: body,
+      payload: payload,
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           'coach',

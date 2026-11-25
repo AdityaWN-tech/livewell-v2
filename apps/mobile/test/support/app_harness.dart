@@ -34,6 +34,8 @@ import 'package:livewell/features/learn/application/learn_data.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
+import 'package:livewell/features/notifications/data/device_registry.dart';
+import 'package:livewell/features/notifications/data/push_messaging.dart';
 import 'package:livewell/features/starter_plan/data/plan_repository.dart';
 import 'package:livewell/features/starter_plan/data/reminders.dart';
 import 'package:livewell/features/routine/application/routine_moment.dart';
@@ -134,6 +136,10 @@ class Harness {
   final deletions = FakeDeletions();
   final localData = FakeLocalData();
 
+  /// Server push (T-TCH-01): FCM and the device documents, in memory.
+  final push = FakePushMessaging();
+  final devices = FakeDeviceRegistry();
+
   /// The coach blinks and breathes (off by default so screens settle).
   bool idleMotion = false;
 
@@ -201,6 +207,11 @@ class Harness {
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
           localDataProvider.overrideWithValue(localData),
+          pushMessagingProvider.overrideWithValue(push),
+          deviceRegistryProvider.overrideWithValue(devices),
+          pushInstallIdStoreProvider.overrideWithValue(
+            FakePushInstallIdStore(),
+          ),
           namePromptStoreProvider.overrideWithValue(namePrompt),
           coachSpeakerProvider.overrideWithValue(speaker),
           coachFacesProvider.overrideWithValue(faces),

@@ -4,6 +4,7 @@ import { makeDeletions } from './account/deletions.js';
 import { makeOnConsentCreated } from './consents/on-consent-created.js';
 import { makeRevokeSweep } from './consents/revoke-sweep.js';
 import { makePortalOfferCallables } from './portal/portal-offers.js';
+import { makeOnPushRequest } from './push/on-push-request.js';
 
 initializeApp();
 
@@ -32,3 +33,10 @@ export const {
   adminUpdatePortalOffer,
   adminTransitionPortalOffer,
 } = makePortalOfferCallables();
+
+/**
+ * Server push (T-TCH-01, D-77): each push_outbox request goes through
+ * sendPush (notifications consent, category toggle, quiet hours, daily cap
+ * of 4, fixed generic words, invalid tokens removed).
+ */
+export const onPushRequest = makeOnPushRequest();

@@ -962,6 +962,61 @@ describe('server-written documents are read-only for the owner', () => {
   }
 });
 
+describe('devices (T-TCH-01: push tokens, D-77)', () => {
+  const path = 'users/alice/devices/AbCdEf0123456789XyZw';
+  const device = (over: Record<string, unknown> = {}) => ({
+    token: 'fcm-token-abc',
+    platform: 'android',
+    time_zone: 'America/New_York',
+    ...serverMeta(),
+    ...over,
+  });
+  it('owner registers a device: token, platform, time zone only', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(doc(as(ALICE), path), device()));
+    await assertSucceeds(getDoc(doc(as(ALICE), path)));
+    // A new token replaces the old one.
+    await assertSucceeds(setDoc(doc(as(ALICE), path), device({ token: 'fcm-token-new' })));
+  });
+  it('no personal fields, no unknown platform, no empty token', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), path), device({ display_name: 'Priya' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ email: 'p@example.com' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ platform: 'web' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ token: '' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ token: 'x'.repeat(4097) })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ time_zone: 'x'.repeat(65) })));
+    const { time_zone: _, ...noZone } = device();
+    await assertFails(setDoc(doc(as(ALICE), path), noZone));
+  });
+  it('updated_at is the server time; the id is a plain install id', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), path), { ...device(), updated_at: meta().updated_at }));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/devices/short'), device()));
+  });
+  it('only the adult owner writes; others cannot read or write', async () => {
+    await assertFails(setDoc(doc(as(ALICE), path), device())); // no profile yet
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(BOB), path), device()));
+    await assertFails(setDoc(doc(anon(), path), device()));
+    await seed(env, { [path]: { token: 't', platform: 'ios', time_zone: 'UTC', ...meta() } });
+    await assertFails(getDoc(doc(as(BOB), path)));
+    await assertFails(deleteDoc(doc(as(BOB), path)));
+  });
+  it('owner deletes it (consent off, log out)', async () => {
+    await seedAdult(env);
+    await seed(env, { [path]: { token: 't', platform: 'ios', time_zone: 'UTC', ...meta() } });
+    await assertSucceeds(deleteDoc(doc(as(ALICE), path)));
+  });
+  it('push_days (the server daily count) is closed to the owner', async () => {
+    await seedAdult(env);
+    const day = 'users/alice/push_days/2026-11-16';
+    await seed(env, { [day]: { count: 1, ...meta() } });
+    await assertFails(getDoc(doc(as(ALICE), day)));
+    await assertFails(setDoc(doc(as(ALICE), day), { count: 0, ...meta() }));
+  });
+});
+
 describe('global catalogues (approved and active only)', () => {
   it('portal_offers: active + approved readable when signed in', async () => {
     await seed(env, {
@@ -995,6 +1050,7 @@ describe('server-only collections are closed to clients (11.1)', () => {
     'consent_revocations',
     'vendor_requests',
     'marketing_suppressions',
+    'push_outbox',
   ]) {
     it(col, async () => {
       await seed(env, { [`${col}/x`]: { uid: ALICE, ...meta() } });

@@ -25,6 +25,8 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `users/{uid}/memory_facts/{id}` | fact (≤ 120 chars; `""` once deleted), category (preference/routine/barrier/win/goal/physical; sensitive: medication/diagnosis/mental_health), sensitive, confidence, source (conversation/reflection), source_message_id, status (proposed/saved/deleted), fact_key (sha256 of uid + normalised text; kept after delete so the fact is never proposed again), prompt_version, created_at, updated_at, schema_version 1 (T-AGT-05, D-100; new optional fields, no documents existed, no migration) | Owner read; change status to saved (text unchanged) or deleted (text must be wiped to `""`); deleted is final | Memory Agent proposals (server, Admin SDK) |
 | `users/{uid}/streaks/current` | length, grace_used_week, best, restart_count | Owner read only | streak engine |
 | `users/{uid}/portal_link/{doc}` | tagmango_customer_ref, matched_email_hash, status | Owner read only | link/unlink |
+| `users/{uid}/devices/{installId}` | token (FCM), platform (android/ios), time_zone (IANA, for quiet hours and the local day). **No name, contact or health data.** `installId` is a random id kept on the phone (T-TCH-01, D-77) | Owner read; adult owner create/update with exactly these fields (+ meta, `updated_at` = server time); owner delete (consent off, log out) | removes tokens FCM reports invalid; deleted with the account |
+| `users/{uid}/push_days/{YYYY-MM-DD}` | count, nudges: server pushes sent on that **local** day, for the daily cap of 4 (D-77) | **None** | `sendPush` |
 | `users/{uid}/content_progress/{itemId}` | progress (0–1), completed (bool) (Step 4e, D-57). Feeds "Pick up where you left off". Not in spec section 11 | Owner read/create/update; id letters, digits, `_`, `-`; only these fields; created_at never changes; no delete | — |
 | `users/{uid}/portal_events/{id}` | event, offer_id, click_id, surface (`learn` or `lesson_end`, D-74), value | Owner read; **append-only** create of card_shown / clicked / dismissed | order / progress / completed (webhooks) |
 | `users/{uid}/legacy_goals/{nnnn}`, `legacy_affirmations/{nnnn}`, `legacy_favorites/{nnnn}` | One doc per item of the prototype's `users/{uid}` arrays `goals`, `affirmations`, `favorites` (spec 10.4, T-FND-07, D-83): index (array position; id = index zero-padded to 4), value (the original item, verbatim), source (`prototype_users_array`), source_field, migration (`T-FND-07`). Not in spec section 11 by name: old goals don't fit `goals/primary` until the real prototype shape is known. Written by `npm run migrate:user-arrays` in services/core-api (dry run by default); the arrays stay on `users/{uid}` until its separate `cleanup` step; removed with the account (recursive delete) | **None** (not listed in the rules) | the migration only |
@@ -36,16 +38,14 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `consent_revocations/{uid}_{consentId}` | uid, consent_id, type, steps[], status (pending/done/failed), attempts, requested_at, due_by (+24 h), completed_at, counts{}, last_error (code only), followed_up (D-76) | **None** | `onConsentCreated`, `consentRevokeSweep` |
 | `vendor_requests/{kind_uid_hash}` | uid, kind (avatar_model_delete / voice_model_delete / portal_unlink / marketing_unsubscribe), vendor, vendor_ref, source, status (pending), requested_at, due_by (D-76). Queue for vendor adapters; no vendor is connected yet | **None** | revoke handling (adds); vendor adapters (drain, log confirmation) |
 | `marketing_suppressions/{uid}` | uid, suppressed (bool), since, source (D-76). Any marketing sender checks the consent **and** this list | **None** | revoke handling / new marketing grant |
-
 ## Cloud Storage (D-76)
-
 Rules: `firebase/storage.rules`, nothing open to clients (the server uses the Admin SDK and signed URLs). Reserved prefixes for personal media; revoke handling deletes them:
-
 | Prefix | Holds | Deleted when revoked |
 |---|---|---|
 | `selfies/{uid}/` | raw selfie photos/video (16.3: 7 days max; the Media Service keeps selfies in memory only today) | camera, biometric |
 | `avatars/{uid}/` | approved portraits (`portraits/`) and frame sets (`{version}/`) (D-64, T-AVT-08d) | camera, biometric |
 | `voice_samples/{uid}/` | raw voice samples and raw consent audio (16.3) | microphone, biometric |
+| `push_outbox/{id}` | uid, category (fixed list), ref_id (an id, never text); then result {status, reason}, processed_at, expire_at (TTL, 7 days) | **None** | other servers ask for a push (Media Service: `coach_{jobId}`); `onPushRequest` sends it through `sendPush` (D-77) |
 
 Anything not listed is denied.
 

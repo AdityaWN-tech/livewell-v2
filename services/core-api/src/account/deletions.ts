@@ -1,9 +1,14 @@
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import {
+  HttpsError,
+  onCall,
+  type CallableRequest,
+} from 'firebase-functions/v2/https';
 
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
+import { monitored } from '../observability/log.js';
 import { exportPrefix } from './export-collections.js';
 import {
   CloudStorageMediaFiles,
@@ -108,8 +113,22 @@ export function makeDeletions(
   files: MediaFiles = new CloudStorageMediaFiles(),
 ) {
   return {
-    deleteAvatar: onCall((req) => deleteAvatarFor(uidOf(req.auth), log, files)),
-    deleteVoice: onCall((req) => deleteVoicesFor(uidOf(req.auth), log)),
-    deleteAccount: onCall((req) => deleteAccountFor(uidOf(req.auth), log)),
+    // monitored(): duration and error code only, never the request
+    // (T-FND-10, D-80).
+    deleteAvatar: onCall(
+      monitored('deleteAvatar', async (req: CallableRequest) =>
+        deleteAvatarFor(uidOf(req.auth), log, files),
+      { callable: true }),
+    ),
+    deleteVoice: onCall(
+      monitored('deleteVoice', async (req: CallableRequest) =>
+        deleteVoicesFor(uidOf(req.auth), log),
+      { callable: true }),
+    ),
+    deleteAccount: onCall(
+      monitored('deleteAccount', async (req: CallableRequest) =>
+        deleteAccountFor(uidOf(req.auth), log),
+      { callable: true }),
+    ),
   };
 }

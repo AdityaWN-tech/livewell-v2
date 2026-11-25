@@ -7,6 +7,7 @@ import 'package:livewell/core/routing/router.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
 import 'package:livewell/features/dev/application/preview_mode.dart';
+import 'package:livewell/features/dev/presentation/crash_check_screen.dart';
 import 'package:livewell/features/dev/presentation/design_gallery.dart';
 import 'package:livewell/features/dev/presentation/illustration_gallery.dart';
 import 'package:livewell/features/dev/presentation/avatar_frames_gallery.dart';
@@ -77,6 +78,18 @@ void main() {
     expect(find.byType(IllustrationGallery), findsOneWidget);
   });
 
+  testWidgets('dev: Profile > Developer has Crash reporting, and it opens', (
+    tester,
+  ) async {
+    await signedIn(Flavor.dev).boot(tester);
+    await openSettings(tester);
+    await tester.tap(find.byKey(const Key('dev-crash-reporting')));
+    await tester.pumpAndSettle();
+    expect(find.byType(CrashCheckScreen), findsOneWidget);
+    // Off by default in dev: nothing is sent.
+    expect(find.textContaining('Collection is OFF'), findsOneWidget);
+  });
+
   for (final flavor in [Flavor.staging, Flavor.prod]) {
     testWidgets('${flavor.name}: Profile has no Developer section', (
       tester,
@@ -88,6 +101,32 @@ void main() {
       expect(find.byKey(const Key('dev-illustrations')), findsNothing);
       expect(find.byKey(const Key('dev-moments')), findsNothing);
       expect(find.byKey(const Key('dev-avatar-frames')), findsNothing);
+      expect(find.byKey(const Key('dev-crash-reporting')), findsNothing);
+    });
+
+    test(
+      '${flavor.name}: the crash-reporting test screen is not registered',
+      () {
+        final container = ProviderContainer(
+          overrides: [flavorProvider.overrideWithValue(flavor)],
+        );
+        addTearDown(container.dispose);
+        final match = container
+            .read(routerProvider)
+            .configuration
+            .findMatch(Uri.parse(CrashCheckScreen.path));
+        expect(match.matches, isEmpty);
+      },
+    );
+
+    testWidgets('${flavor.name}: a deep link to the crash test does nothing', (
+      tester,
+    ) async {
+      await signedIn(flavor).boot(tester);
+      GoRouter.of(tester.element(find.byType(HomeScreen)))
+          .go(CrashCheckScreen.path);
+      await tester.pumpAndSettle();
+      expect(find.byType(CrashCheckScreen), findsNothing);
     });
 
     test('${flavor.name}: the avatar frames screen is not registered', () {

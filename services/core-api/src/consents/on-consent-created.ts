@@ -1,6 +1,7 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
+import { monitored } from '../observability/log.js';
 import {
   CloudStorageMediaFiles,
   handleRevocation,
@@ -38,7 +39,7 @@ export function makeOnConsentCreated(
   // (US multi-region) database (D-14).
   return onDocumentCreated(
     'users/{uid}/consents/{consentId}',
-    async (event) => {
+    monitored('onConsentCreated', async (event) => {
       const data = event.data?.data();
       if (!data) return;
       const { id, entry } = consentAuditEntry(
@@ -62,6 +63,6 @@ export function makeOnConsentCreated(
           files,
         );
       }
-    },
+    }),
   );
 }

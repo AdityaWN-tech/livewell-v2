@@ -634,6 +634,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 onTap: () => context.push('/dev/avatar-frames'),
               ),
             ),
+            const SizedBox(height: LwSpacing.xs),
+            Card(
+              child: ListTile(
+                key: const Key('dev-crash-reporting'),
+                leading: const Icon(Icons.bug_report_outlined),
+                title: Text(l.devCrashReporting),
+                onTap: () => context.push('/dev/crash-reporting'),
+              ),
+            ),
           ],
           const SizedBox(height: LwSpacing.xl),
         ],

@@ -6674,6 +6674,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete: {fact}'**
   String memoryDeleteSemantics(String fact);
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Moment times, your coach\'s voice and the widget'**
+  String get dailyPlanSubtitle;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose when your coach checks in and how your moments play.'**
+  String get dailyPlanIntro;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Moment times'**
+  String get dailyPlanTimesHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Change the {moment} time'**
+  String dailyPlanChangeTime(String moment);
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Not today'**
+  String get dailyPlanNotToday;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'No {moment} reminder today. It\'s back tomorrow.'**
+  String dailyPlanNotTodayDone(String moment);
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'This time is during quiet hours, so no reminder is sent. Pick a time outside them.'**
+  String get dailyPlanInQuiet;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours'**
+  String get dailyPlanQuietHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Your coach in moments'**
+  String get dailyPlanCoachHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Coach speaks automatically when I open a moment'**
+  String get dailyPlanAutoSpeak;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Show text only. Tap play to hear your coach.'**
+  String get dailyPlanTextOnly;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'The same speed as in your voice settings.'**
+  String get dailyPlanSpeedNote;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Captions always on'**
+  String get dailyPlanCaptions;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'The words appear as your coach speaks.'**
+  String get dailyPlanCaptionsOn;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'The words appear when your coach has finished.'**
+  String get dailyPlanCaptionsOff;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Preview tomorrow\'s morning'**
+  String get dailyPlanPreview;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get dailyPlanPreviewTag;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'There\'s no morning message to preview yet.'**
+  String get dailyPlanPreviewNone;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s keep today quiet. Previews are back tomorrow.'**
+  String get dailyPlanPreviewPaused;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Home-screen widget'**
+  String get dailyPlanWidgetHeader;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Add the widget'**
+  String get dailyPlanWidgetTitle;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'See your next small step without opening the app.'**
+  String get dailyPlanWidgetBody;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'Android: touch and hold an empty spot on your home screen, tap Widgets, then find Live Well.'**
+  String get dailyPlanWidgetAndroid;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'iPhone: touch and hold your home screen, tap Edit or +, then search for Live Well.'**
+  String get dailyPlanWidgetIos;
+
+  /// Profile > Daily plan (T-DLY-03e).
+  ///
+  /// In en, this message translates to:
+  /// **'On the lock screen the widget shows general text only, never your answers or health details.'**
+  String get dailyPlanWidgetPrivate;
 }
 
 class _AppLocalizationsDelegate

@@ -1960,6 +1960,12 @@ abstract class AppLocalizations {
   /// **'{day}: coming up'**
   String trackDayUpcoming(String day);
 
+  /// Under the Track streak row: says the streak counts habits done, not check-ins.
+  ///
+  /// In en, this message translates to:
+  /// **'A day counts when you finish at least one habit.'**
+  String get trackStreakCounts;
+
   /// No description provided for @trackStreakLegend.
   ///
   /// In en, this message translates to:

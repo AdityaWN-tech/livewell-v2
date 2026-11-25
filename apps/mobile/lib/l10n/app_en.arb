@@ -603,6 +603,10 @@
       }
     }
   },
+  "trackStreakCounts": "A day counts when you finish at least one habit.",
+  "@trackStreakCounts": {
+    "description": "Under the Track streak row: says the streak counts habits done, not check-ins."
+  },
   "trackStreakLegend": "Rest days are part of the plan. One each week keeps your streak going.",
   "trackCheckInTitle": "30-second daily check-in",
   "trackCheckInTap": "Tap to log",

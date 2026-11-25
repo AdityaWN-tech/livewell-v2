@@ -63,7 +63,7 @@ service cloud.firestore {
                 'focus_choices', 'activity_limited', 'touchpoints',
                 'coach_name', 'appearance', 'quiet_hours',
                 'notification_categories', 'routine_mode',
-                'routine_reminders_per_day',
+                'routine_reminders_per_day', 'moment_playback', 'not_today',
                 'why_statement', 'created_at', 'updated_at', 'schema_version'];
       }
 
@@ -105,10 +105,31 @@ service cloud.firestore {
           && (!('notification_categories' in d)
               || (d.notification_categories is map
                   && d.notification_categories.keys()
-                       .hasOnly(['greeting', 'nudge', 'reflection'])
+                       .hasOnly(['greeting', 'nudge', 'reflection', 'weekly'])
                   && d.notification_categories.greeting is bool
                   && d.notification_categories.nudge is bool
-                  && d.notification_categories.reflection is bool))
+                  && d.notification_categories.reflection is bool
+                  // The weekly review (T-DLY-03c); the app sends it with
+                  // the other three.
+                  && (!('weekly' in d.notification_categories)
+                      || d.notification_categories.weekly is bool)))
+          // How Avatar Moments play (T-DLY-03e): speak on open, captions.
+          && (!('moment_playback' in d)
+              || (d.moment_playback is map
+                  && d.moment_playback.keys().hasOnly(['auto_speak', 'captions'])
+                  && d.moment_playback.keys().hasAll(['auto_speak', 'captions'])
+                  && d.moment_playback.auto_speak is bool
+                  && d.moment_playback.captions is bool))
+          // "Not today" (T-DLY-03e): the moments off for one local day.
+          && (!('not_today' in d)
+              || (d.not_today is map
+                  && d.not_today.keys().hasOnly(['date', 'kinds'])
+                  && d.not_today.date is string
+                  && d.not_today.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+                  && d.not_today.kinds is list
+                  && d.not_today.kinds.size() <= 4
+                  && d.not_today.kinds.toSet()
+                       .hasOnly(['greeting', 'nudge', 'reflection', 'weekly'])))
           // Life-event mode for My Daily Routine (T-GOL-03b, FR-DLY-09):
           // travel / sick / busy until a date, or none.
           && (!('routine_mode' in d)
@@ -373,10 +394,14 @@ service cloud.firestore {
           && validCheckin(request.resource.data)
           && hasMeta(request.resource.data);
         // Same-day re-submit updates the record; created_at never changes.
+        // Once a day is gentle it stays gentle (spec 15.3, D-70): a redo
+        // with a better mood can't bring portal cards back that day.
         allow update: if isAdultOwner(uid)
           && validCheckin(request.resource.data)
           && request.resource.data.created_at == resource.data.created_at
-          && request.resource.data.updated_at is timestamp;
+          && request.resource.data.updated_at is timestamp
+          && (resource.data.gentle_day != true
+              || request.resource.data.gentle_day == true);
         allow delete: if false;
       }
 
@@ -647,11 +672,20 @@ service cloud.firestore {
 
     // ---------- global catalogues: read-only, approved items only ----------
     // Rules are not filters: app queries must include these same conditions.
+    // Staff roles get nothing extra here: the Admin / CMS reads and writes
+    // the catalog only through the Core API (role + MFA checks, audit log;
+    // T-PRT-02, D-92).
     match /portal_offers/{offerId} {
       allow read: if signedIn()
         && resource.data.active == true
         && resource.data.review_status == 'approved';
       allow write: if false;
+    }
+
+    // Who edited, submitted, approved or published an offer (staff ids):
+    // server-only, so staff ids never reach app users (T-PRT-02, D-92).
+    match /portal_offer_workflow/{offerId} {
+      allow read, write: if false;
     }
 
     match /content_items/{itemId} {
@@ -667,6 +701,17 @@ service cloud.firestore {
       allow read, write: if false;
     }
     match /audit_log/{id} {
+      allow read, write: if false;
+    }
+    // Revoke handling (FR-ONB-03 → 16.3, D-76): the per-revocation task, the
+    // queue of vendor-side deletions/unlinks, and the marketing stop list.
+    match /consent_revocations/{id} {
+      allow read, write: if false;
+    }
+    match /vendor_requests/{id} {
+      allow read, write: if false;
+    }
+    match /marketing_suppressions/{id} {
       allow read, write: if false;
     }
     // Push requests from other servers (T-TCH-01, D-77).

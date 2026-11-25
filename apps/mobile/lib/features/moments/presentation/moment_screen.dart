@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/design/avatar/avatar_art.dart';
+import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../avatar/domain/coach_face.dart';
@@ -15,6 +16,7 @@ import '../../voice/presentation/voice_screen.dart' show AiVoiceLabel;
 import '../application/coach_state.dart';
 import '../application/moment_context.dart';
 import '../application/moment_launcher.dart';
+import '../application/moment_playback.dart';
 import '../data/coach_speaker.dart';
 import '../domain/coach_message.dart';
 
@@ -48,9 +50,18 @@ String actionLabel(AppLocalizations l, MomentAction a) => switch (a) {
 /// Fallbacks (FR-AVT-05): voice + moving avatar → still avatar + voice
 /// (reduced motion) → text only (muted, or the voice can't start).
 class MomentScreen extends ConsumerStatefulWidget {
-  const MomentScreen({super.key, required this.moment, this.routine});
+  const MomentScreen({
+    super.key,
+    required this.moment,
+    this.routine,
+    this.preview,
+  });
 
   final Moment moment;
+
+  /// Profile > Daily plan "Preview" (T-DLY-03e): plays this message instead
+  /// of today's, and marks nothing as seen.
+  final CoachMessage? preview;
 
   /// A routine reminder's payload, for [Moment.routineItem] (T-GOL-03d).
   final String? routine;
@@ -83,6 +94,9 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
   CoachMessage? _message;
   late final CoachSpeaker _speaker;
 
+  /// Profile > Daily plan (T-DLY-03e): speak on open, and captions.
+  late final MomentPlayback _playback;
+
   @override
   void initState() {
     super.initState();
@@ -90,6 +104,7 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     _speaker = ref.read(coachSpeakerProvider);
     // Muted in an earlier moment: text only until the voice is turned on.
     _muted = ref.read(coachMutedProvider);
+    _playback = ref.read(momentPlaybackProvider);
   }
 
   bool get _stillAvatar => MediaQuery.of(context).disableAnimations;
@@ -115,8 +130,9 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     setState(() {
       _phase = _Phase.speaking;
       _textOnly = false;
-      // Reduced motion: the whole text at once, still avatar.
-      _revealed = _stillAvatar ? m.text.length : 0;
+      // Reduced motion: the whole text at once, still avatar. Captions
+      // off: the text comes once the coach has finished.
+      _revealed = _stillAvatar && _playback.captions ? m.text.length : 0;
     });
     final ok = await _speaker.speak(
       m,
@@ -124,7 +140,9 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
       onWord: (start, end) {
         _wordAt = start;
         _tick = 0;
-        if (mounted && end > _revealed) setState(() => _revealed = end);
+        if (mounted && _playback.captions && end > _revealed) {
+          setState(() => _revealed = end);
+        }
       },
       onDone: () {
         if (!mounted) return;
@@ -161,6 +179,7 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
       });
     });
     // Engines that don't report words: reveal at a speaking pace.
+    if (!_playback.captions) return;
     final perTick = (m.text.length / (m.text.split(' ').length / 2.6 / speed))
         .clamp(4, 60)
         .round();
@@ -203,7 +222,10 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
     final l = AppLocalizations.of(context);
     final t = Theme.of(context).textTheme;
     final routine = widget.moment == Moment.routineItem;
-    final async = routine
+    final preview = widget.preview;
+    final async = preview != null
+        ? AsyncValue<CoachMessage?>.data(preview)
+        : routine
         ? ref.watch(routineMessageProvider(widget.routine ?? ''))
         : ref.watch(coachMessageProvider(widget.moment));
     final background = ref.watch(coachBackgroundProvider);
@@ -213,14 +235,21 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
       if (_muted) {
         _phase = _Phase.done;
         _revealed = m.text.length;
+      } else if (!_playback.autoSpeak) {
+        // "Show text only" (T-DLY-03e): the whole message, and the play
+        // button to hear it.
+        _revealed = m.text.length;
+      } else {
+        // Speaks automatically when the moment opens (T-DLY-03e setting).
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_muted) _play(m);
+        });
       }
-      // Speaks automatically when the moment opens (setting in T-DLY-03e).
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && !_muted) _play(m);
-      });
       // Played: the morning card on Home and the reminder go (T-DLY-03c).
-      if (widget.moment == Moment.morning ||
-          widget.moment == Moment.missedDay) {
+      // Never for a preview.
+      if (preview == null &&
+          (widget.moment == Moment.morning ||
+              widget.moment == Moment.missedDay)) {
         ref.read(momentLauncherProvider).morningSeen();
       }
     }
@@ -261,6 +290,15 @@ class _MomentScreenState extends ConsumerState<MomentScreen> {
                         onMute: m == null ? null : () => _toggleMute(m),
                       ),
                       const SizedBox(height: LwSpacing.md),
+                      if (preview != null) ...[
+                        Center(
+                          child: LwTag(
+                            l.dailyPlanPreviewTag,
+                            key: const Key('moment-preview-tag'),
+                          ),
+                        ),
+                        const SizedBox(height: LwSpacing.xs),
+                      ],
                       if (async.isLoading)
                         const Center(child: CircularProgressIndicator())
                       else if (m == null)

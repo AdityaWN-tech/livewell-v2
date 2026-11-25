@@ -67,6 +67,9 @@ dependencies:
   google_sign_in: ^7.2.0
   health: ^13.3.2
   local_auth: ^3.0.2
+  # Pinned: 6.7.1 needs firebase-ios-sdk 12.19.3 but firebase_auth 6.7.0 pins 12.19.0,
+  # which breaks the iOS package resolve. Move all Firebase plugins up together.
+  firebase_remote_config: 6.7.0
   phone_numbers_parser: ^9.0.29
 
 dev_dependencies:

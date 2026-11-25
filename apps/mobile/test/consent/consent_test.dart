@@ -137,6 +137,11 @@ void main() {
       expect(tester.widget<SwitchListTile>(tile).value, isTrue);
       await tester.tap(tile);
       await tester.pumpAndSettle();
+      // Revokes that delete or stop something on the server ask first.
+      if (find.byKey(const Key('confirm-revoke')).evaluate().isNotEmpty) {
+        await tester.tap(find.byKey(const Key('confirm-revoke')));
+        await tester.pumpAndSettle();
+      }
       expect(tester.widget<SwitchListTile>(tile).value, isFalse);
     }
 
@@ -147,6 +152,82 @@ void main() {
       expect(forType.map((r) => r.granted), [true, false]);
       expect(forType.first.docVersion, ConsentTexts.versionOf(type));
     }
+  });
+
+  group('revoking tells the person what will happen (D-76)', () {
+    const asks = {
+      ConsentType.camera: 'selfie photos and the face data',
+      ConsentType.microphone: 'voice recordings',
+      ConsentType.biometric: 'face and voice models',
+      ConsentType.portalLinking: 'unlink your portal account',
+      ConsentType.marketing: 'stop sending news and offers',
+    };
+
+    Finder tileFor(ConsentType type) =>
+        find.byType(SwitchListTile).at(ConsentType.granular.indexOf(type));
+
+    Future<void> grant(
+      WidgetTester tester,
+      FakeConsentRepository repo,
+      ConsentType type,
+    ) async {
+      await repo.record(type, granted: true);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(tileFor(type));
+      await tester.pumpAndSettle();
+    }
+
+    for (final MapEntry(key: type, value: words) in asks.entries) {
+      testWidgets('${type.key}: explains, and Keep it on changes nothing', (
+        tester,
+      ) async {
+        final repo = await pumpScreen(tester);
+        await grant(tester, repo, type);
+        await tester.tap(tileFor(type));
+        await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.textContaining(words), findsOneWidget);
+        if (type != ConsentType.marketing) {
+          expect(find.textContaining('24 hours'), findsOneWidget);
+        }
+        await tester.tap(find.text('Keep it on'));
+        await tester.pumpAndSettle();
+        expect(tester.widget<SwitchListTile>(tileFor(type)).value, isTrue);
+        expect(repo.records.where((r) => r.type == type), hasLength(1));
+
+        await tester.tap(tileFor(type));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('confirm-revoke')));
+        await tester.pumpAndSettle();
+        expect(tester.widget<SwitchListTile>(tileFor(type)).value, isFalse);
+        expect(repo.records.last.type, type);
+        expect(repo.records.last.granted, isFalse);
+      });
+    }
+
+    testWidgets('nothing held on the server: no question, switch goes off', (
+      tester,
+    ) async {
+      final repo = await pumpScreen(tester);
+      for (final type in [
+        ConsentType.notifications,
+        ConsentType.healthData,
+        ConsentType.analytics,
+      ]) {
+        await grant(tester, repo, type);
+        await tester.tap(tileFor(type));
+        await tester.pumpAndSettle();
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(tester.widget<SwitchListTile>(tileFor(type)).value, isFalse);
+      }
+    });
+
+    testWidgets('granting never asks', (tester) async {
+      await pumpScreen(tester);
+      await tester.tap(tileFor(ConsentType.camera));
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+    });
   });
 
   testWidgets('legal documents are read-only and show the accepted version', (

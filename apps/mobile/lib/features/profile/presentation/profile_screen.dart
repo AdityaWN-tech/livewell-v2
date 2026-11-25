@@ -22,6 +22,7 @@ import '../../starter_plan/presentation/daily_plan_screen.dart';
 import '../data/account_actions.dart';
 import '../data/appearance.dart';
 import 'data_export_sheet.dart';
+import 'my_coach_section.dart';
 import 'profile_button.dart';
 import '../../avatar/data/avatar_repository.dart';
 import '../../avatar/domain/coach_choice.dart';
@@ -268,16 +269,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Future<void> _delete(String what) async {
     if (!_signedIn) return;
     final l = AppLocalizations.of(context);
+    // Delete my avatar is in My coach (my_coach_section.dart, D-78).
     final (title, body) = switch (what) {
-      'avatar' => (l.profileDeleteAvatar, l.profileDeleteAvatarBody),
       'voice' => (l.profileDeleteVoice, l.profileDeleteVoiceBody),
       _ => (l.profileDeleteAccount, l.profileDeleteAccountBody),
     };
     if (!await _confirm(title, body, l.profileDeleteConfirm)) return;
     try {
       switch (what) {
-        case 'avatar':
-          await ref.read(deletionsProvider).deleteAvatar();
         case 'voice':
           await ref.read(deletionsProvider).deleteVoice();
         default:
@@ -438,35 +437,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
 
-          // ---- My coach ----
+          // ---- My coach (T-AVT-08h) ----
           header(l.profileMyCoach),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  key: const Key('profile-avatar'),
-                  leading: const Icon(Icons.face_outlined),
-                  title: Text(l.profileChangeAvatar),
-                  onTap: () => _openStudio(StudioTab.coaches),
-                ),
-                ListTile(
-                  key: const Key('profile-voice'),
-                  leading: const Icon(Icons.record_voice_over_outlined),
-                  title: Text(l.profileChangeVoice),
-                  onTap: () => _openStudio(StudioTab.voice),
-                ),
-                ListTile(
-                  key: const Key('profile-coach-name'),
-                  leading: const Icon(Icons.edit_outlined),
-                  title: Text(l.profileCoachName),
-                  subtitle: Text(
-                    ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,
-                  ),
-                  onTap: _coachName,
-                ),
-              ],
-            ),
-          ),
+          MyCoachSection(openStudio: _openStudio, editCoachName: _coachName),
 
           // ---- Appearance ----
           header(l.profileAppearance),
@@ -568,12 +541,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   onTap: _signedIn
                       ? () => showDataExport(context, uid: _uid)
                       : null,
-                ),
-                ListTile(
-                  key: const Key('profile-delete-avatar'),
-                  leading: const Icon(Icons.no_accounts_outlined),
-                  title: Text(l.profileDeleteAvatar),
-                  onTap: () => _delete('avatar'),
                 ),
                 ListTile(
                   key: const Key('profile-delete-voice'),

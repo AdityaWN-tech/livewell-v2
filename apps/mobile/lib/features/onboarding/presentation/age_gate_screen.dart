@@ -21,12 +21,14 @@ class AgeGateScreen extends ConsumerWidget {
       appBar: AppBar(),
       body: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.all(LwSpacing.screenGutter),
+        child: _FillOrScroll(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(l.ageTitle, style: t.displaySmall),
+              Semantics(
+                header: true,
+                child: Text(l.ageTitle, style: t.displaySmall),
+              ),
               const SizedBox(height: LwSpacing.sm),
               Text(l.ageBody, style: t.bodyMedium),
               const Spacer(),
@@ -76,13 +78,15 @@ class Under18Screen extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(LwSpacing.screenGutter),
+        child: _FillOrScroll(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              Text(l.under18Title, style: t.displaySmall),
+              Semantics(
+                header: true,
+                child: Text(l.under18Title, style: t.displaySmall),
+              ),
               const SizedBox(height: LwSpacing.sm),
               Text(l.under18Body, style: t.bodyLarge),
               const Spacer(),
@@ -96,4 +100,25 @@ class Under18Screen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Fills the screen (so the Spacers push the buttons down) and scrolls when
+/// large text makes the content taller than the screen (T-REL-01).
+class _FillOrScroll extends StatelessWidget {
+  const _FillOrScroll({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) => SingleChildScrollView(
+      padding: const EdgeInsets.all(LwSpacing.screenGutter),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: box.maxHeight - LwSpacing.screenGutter * 2,
+        ),
+        child: IntrinsicHeight(child: child),
+      ),
+    ),
+  );
 }

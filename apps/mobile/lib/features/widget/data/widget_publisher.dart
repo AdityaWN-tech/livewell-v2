@@ -10,6 +10,10 @@ import '../domain/widget_snapshot.dart';
 /// Hands the snapshot to the native home-screen widgets.
 abstract class WidgetPublisher {
   Future<void> publish(WidgetSnapshot snapshot);
+
+  /// Forgets every copy of the coach's face the widget keeps (Delete my
+  /// avatar, D-78); the next [publish] brings the ready-made coach's.
+  Future<void> clearFaces();
 }
 
 /// Each flavour's App Group (D-40), shared by the app and its widget.
@@ -53,6 +57,31 @@ class HomeWidgetPublisher implements WidgetPublisher {
       );
     } catch (_) {
       // No widget on this device (or not added yet): nothing to update.
+    }
+  }
+
+  /// Every expression the widget could have been given a face for.
+  static const faceExpressions = [
+    'happy',
+    'waving',
+    'talking',
+    'listening',
+    'calm',
+    'celebrating',
+    'neutral',
+  ];
+
+  @override
+  Future<void> clearFaces() async {
+    _copied.clear();
+    try {
+      await HomeWidget.setAppGroupId(appGroupId);
+      // null removes the key (iOS shared defaults, Android preferences).
+      for (final e in faceExpressions) {
+        await HomeWidget.saveWidgetData<String>('lw_face_$e', null);
+      }
+    } catch (_) {
+      // No widget on this device: nothing kept.
     }
   }
 

@@ -275,8 +275,9 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
     final full = day.length >= maxItemsPerDay;
 
     return Scaffold(
+      // The title is in the page so it wraps at large text instead of
+      // being cut off in the app bar (T-REL-01, as LwPageTitle elsewhere).
       appBar: AppBar(
-        title: Text(l.routineTitle),
         actions: [
           PopupMenuButton<String>(
             key: const Key('routine-more'),
@@ -327,6 +328,7 @@ class _RoutineScreenState extends ConsumerState<RoutineScreen> {
         key: const Key('routine-list'),
         padding: const EdgeInsets.all(LwSpacing.screenGutter),
         children: [
+          LwPageTitle(l.routineTitle),
           Text(l.routineIntro, style: t.bodyMedium),
           const SizedBox(height: LwSpacing.sm),
           if (modeOn) ...[

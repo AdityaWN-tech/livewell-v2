@@ -121,6 +121,9 @@ class _LegalScreenState extends ConsumerState<LegalScreen> {
           key: const Key('legal-agree'),
           borderRadius: BorderRadius.circular(LwRadius.sm),
           onTap: () => setAccepted(!allAccepted),
+          // Screen readers use the labelled checkbox and the links; the
+          // row's own tap would be an unlabelled button (T-REL-01).
+          excludeFromSemantics: true,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: LwSpacing.xs),
             child: Row(

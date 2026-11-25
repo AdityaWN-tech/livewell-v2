@@ -1030,7 +1030,7 @@
   "profileLogOutTitle": "Log out?",
   "profileLogOutBody": "We’ll clear your data from this phone and stop reminders. Everything stays safe in your account.",
   "profileMyCoach": "My coach",
-  "profileChangeAvatar": "Change avatar",
+  "profileChangeAvatar": "Choose another coach",
   "profileChangeVoice": "Change voice",
   "profileCoachName": "Coach name",
   "profileCoachNameHint": "For example, Maya",
@@ -1067,12 +1067,24 @@
   "profileDeleteAvatar": "Delete my avatar",
   "profileDeleteVoice": "Delete my voice",
   "profileDeleteAccount": "Delete my account",
-  "profileDeleteAvatarBody": "Your coach’s avatar will be deleted. Your coach will use the default look.",
+  "profileDeleteAvatarBody": "This removes the coach made for you: its portrait, every picture of its faces, and any copy kept by our avatar partner. It can’t be undone.\n\nA ready-made coach will take over straight away, with the same name and voice. You can make a new one whenever you like.",
   "profileDeleteVoiceBody": "Your coach’s voice choice will be deleted. Your coach will use the default voice.",
   "profileDeleteAccountBody": "This deletes your account and everything in it: your Why, check-ins, plans and reflections. It can’t be undone.",
   "profileDeleteConfirm": "Delete",
   "profileDeleted": "Deleted.",
   "profileDeleteFailed": "We couldn’t delete that right now. Please try again later.",
+  "profileCoachReadyMade": "A ready-made coach",
+  "profileCoachFromPhoto": "Made from your photo",
+  "profileCoachBuilt": "Built by you",
+  "profileRemakeFromPhoto": "Remake from a new photo",
+  "profileBuildMyOwn": "Build my own",
+  "profileAdjustCoach": "Adjust",
+  "profileDeleteAvatarTitle": "Delete your avatar?",
+  "profileDeleteAvatarKeep": "Keep it",
+  "profileDeletingAvatar": "Deleting your avatar…",
+  "profileAvatarDeleted": "Your avatar is deleted. A ready-made coach is with you now.",
+  "profileAvatarDeleteFailed": "We couldn’t reach our servers, so your avatar hasn’t been deleted yet.",
+  "profileTryAgain": "Try again",
   "profileHelp": "Help & about",
   "profileTerms": "Terms of Service",
   "profilePrivacyPolicy": "Privacy Policy",
@@ -3212,6 +3224,362 @@
   "profileWidgetHideDetailsBody": "The widget says \"Your next step is ready\" instead of naming it.",
   "@profileWidgetHideDetailsBody": {
     "description": "T-AVT-08g-e: subtitle of the widget privacy switch."
+  },
+  "voiceGreetingRest": "I’m here to help, one small step at a time.",
+  "@voiceGreetingRest": {
+    "description": "T-REL-01 caption: the rest of what greeting.m4a says (docs/voices.md), so the whole recording is captioned (NFR-06)."
+  },
+  "voiceSampleTitle": "What you’ll hear",
+  "@voiceSampleTitle": {
+    "description": "T-REL-01: heading over the transcript of the voice samples (NFR-06 captions)."
+  },
+  "voiceSampleCalm": "“Hi, I’m your Live Well coach. Let’s take one small step together today.”",
+  "@voiceSampleCalm": {
+    "description": "T-REL-01 transcript of the calm voice samples (docs/voices.md, closed script)."
+  },
+  "voiceSampleEnergetic": "“Hi! I’m your Live Well coach. Let’s make today count, one small step at a time!”",
+  "@voiceSampleEnergetic": {
+    "description": "T-REL-01 transcript of the energetic voice samples (docs/voices.md, closed script)."
+  },
+  "profileChangeTime": "{name}, {time}. Change the time",
+  "@profileChangeTime": {
+    "description": "T-REL-01 screen-reader label for a daily plan time in Profile.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMeasuresTitle": "My measures",
+  "@trackMeasuresTitle": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "trackMeasuresIntro": "Add a number when you take one. Live Well keeps the record for you; your clinician can help you read it.",
+  "@trackMeasuresIntro": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricWeight": "Weight",
+  "@metricWeight": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricBloodPressure": "Blood pressure",
+  "@metricBloodPressure": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricGlucose": "Glucose",
+  "@metricGlucose": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricMeals": "Meals",
+  "@metricMeals": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricNothingYet": "Nothing yet",
+  "@metricNothingYet": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricAddWeight": "Add weight",
+  "@metricAddWeight": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricAddBloodPressure": "Add blood pressure",
+  "@metricAddBloodPressure": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricAddGlucose": "Add glucose",
+  "@metricAddGlucose": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricAddMeal": "Add a meal",
+  "@metricAddMeal": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricValueUnit": "{value} {unit}",
+  "@metricValueUnit": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "metricBpValue": "{systolic}/{diastolic} {unit}",
+  "@metricBpValue": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "systolic": {
+        "type": "String"
+      },
+      "diastolic": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "mealBreakfast": "Breakfast",
+  "@mealBreakfast": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "mealLunch": "Lunch",
+  "@mealLunch": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "mealDinner": "Dinner",
+  "@mealDinner": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "mealSnack": "Snack",
+  "@mealSnack": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricSourceManual": "Entered by you",
+  "@metricSourceManual": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricSourceHealth": "From {app}",
+  "@metricSourceHealth": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "metricProvenance": "{source} · {time}",
+  "@metricProvenance": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "metricToday": "Today, {time}",
+  "@metricToday": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "metricYesterday": "Yesterday, {time}",
+  "@metricYesterday": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "metricDateTime": "{date}, {time}",
+  "@metricDateTime": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "metricRowLabel": "{name}: {value}. {provenance}. Opens your entries.",
+  "@metricRowLabel": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "provenance": {
+        "type": "String"
+      }
+    }
+  },
+  "metricRowEmptyLabel": "{name}: nothing yet. Opens your entries.",
+  "@metricRowEmptyLabel": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "metricWhen": "When",
+  "@metricWhen": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricChangeTime": "Change",
+  "@metricChangeTime": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricChangeTimeLabel": "When: {time}. Change the date and time.",
+  "@metricChangeTimeLabel": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "metricSave": "Save",
+  "@metricSave": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricSystolic": "Top number (systolic)",
+  "@metricSystolic": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricDiastolic": "Bottom number (diastolic)",
+  "@metricDiastolic": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricWeightRange": "Please enter a weight between {min} and {max} {unit}.",
+  "@metricWeightRange": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "metricBpRange": "Please check the numbers: the top one between 50 and 260, the bottom one between 30 and 160, and the top one higher.",
+  "@metricBpRange": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricGlucoseRange": "Please enter a whole number between 20 and 600.",
+  "@metricGlucoseRange": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricMealPick": "Which meal?",
+  "@metricMealPick": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricRecordNote": "Live Well keeps this as a record and doesn't comment on it. Your clinician can help you with what the numbers mean for you.",
+  "@metricRecordNote": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricSaved": "Saved.",
+  "@metricSaved": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricSaveError": "We couldn't save that. Please try again.",
+  "@metricSaveError": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricHistoryEmpty": "Nothing recorded in the last 90 days.",
+  "@metricHistoryEmpty": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricDelete": "Delete {entry}",
+  "@metricDelete": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "entry": {
+        "type": "String"
+      }
+    }
+  },
+  "metricDeleted": "Deleted.",
+  "@metricDeleted": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "trackChartMonthLabel": "This month, week by week",
+  "@trackChartMonthLabel": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "trackChartQuarterLabel": "Last 90 days, week by week",
+  "@trackChartQuarterLabel": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "trackChartWeekOf": "Week of {date}",
+  "@trackChartWeekOf": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackOnAverage": "{value} on average",
+  "@trackOnAverage": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackPerDay": "{value} a day",
+  "@trackPerDay": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackChartMeasureEmpty": "Add one under My measures to see it here.",
+  "@trackChartMeasureEmpty": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "trackChartFromHealth": "From {app}, read {time}",
+  "@trackChartFromHealth": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "trackChartFromYou": "Entered by you",
+  "@trackChartFromYou": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "trackChartFromYouAndHealth": "Entered by you and from {app}",
+  "@trackChartFromYouAndHealth": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "trackChartFromApp": "From what you marked done in Live Well",
+  "@trackChartFromApp": {
+    "description": "T-GOL-02 manual measures and charts (D-72)."
+  },
+  "metricMealsCount": "{count, plural, =1{1 meal} other{{count} meals}}",
+  "@metricMealsCount": {
+    "description": "T-GOL-02 manual measures and charts (D-72).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "dataExportRowNote": "Get a file with everything you’ve shared.",
   "@dataExportRowNote": {

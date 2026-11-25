@@ -173,41 +173,45 @@ class _LetterRow extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
-          child: Padding(
-            padding: const EdgeInsets.all(LwSpacing.sm),
-            child: Row(
-              children: [
-                ExcludeSemantics(
-                  child: Container(
-                    width: LwSize.avatarSm,
-                    height: LwSize.avatarSm,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: p.heroSurface,
-                      borderRadius: LwRadius.smAll,
-                    ),
-                    child: Text(
-                      letter,
-                      style: t.titleMedium?.copyWith(color: p.onHeroSurface),
+      // Announced as a button, not just "double tap to activate" (T-REL-01).
+      child: Semantics(
+        button: true,
+        child: InkWell(
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: LwSize.minTapTarget),
+            child: Padding(
+              padding: const EdgeInsets.all(LwSpacing.sm),
+              child: Row(
+                children: [
+                  ExcludeSemantics(
+                    child: Container(
+                      width: LwSize.avatarSm,
+                      height: LwSize.avatarSm,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: p.heroSurface,
+                        borderRadius: LwRadius.smAll,
+                      ),
+                      child: Text(
+                        letter,
+                        style: t.titleMedium?.copyWith(color: p.onHeroSurface),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: LwSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name, style: t.titleSmall),
-                      Text(body, style: t.bodySmall),
-                    ],
+                  const SizedBox(width: LwSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(name, style: t.titleSmall),
+                        Text(body, style: t.bodySmall),
+                      ],
+                    ),
                   ),
-                ),
-                Icon(Icons.chevron_right, color: p.textSecondary),
-              ],
+                  Icon(Icons.chevron_right, color: p.textSecondary),
+                ],
+              ),
             ),
           ),
         ),

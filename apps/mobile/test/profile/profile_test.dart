@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/studio/presentation/studio_screen.dart';
+import 'package:livewell/core/config/feature_flags.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
@@ -21,9 +22,11 @@ const uid = 'u1';
 Harness signedIn({
   Flavor flavor = Flavor.prod,
   List<String> providers = const ['password'],
+  FeatureFlags flags = const FeatureFlags(),
 }) {
   final h = Harness(
     flavor: flavor,
+    flags: flags,
     auth: FakeAuthService(
       signedIn: AuthUser(
         uid: uid,
@@ -172,6 +175,7 @@ void main() {
         expect(h.push.deletes, deletes + 1);
         expect(h.photo.path, isNull);
         expect(h.localData.clears, 1);
+        expect(h.localDb.wipes, 1, reason: 'encrypted database and key');
         expect(h.localData.pending, isTrue, reason: 'cache cleared next start');
         expect(find.byType(SignInScreen), findsOneWidget);
       });
@@ -280,10 +284,8 @@ void main() {
   });
 
   group('privacy & data (FR-SET-02/03)', () {
-    for (final (key, call) in [
-      ('profile-delete-avatar', 'avatar'),
-      ('profile-delete-voice', 'voice'),
-    ]) {
+    // Delete my avatar: test/profile/my_coach_test.dart (T-AVT-08h).
+    for (final (key, call) in [('profile-delete-voice', 'voice')]) {
       testWidgets('$key: confirm, then the server deletes it', (tester) async {
         final h = signedIn();
         await h.boot(tester);
@@ -312,6 +314,7 @@ void main() {
       expect(h.deletions.calls, ['account']);
       expect(h.auth.signedIn, isNull);
       expect(h.localData.clears, 1);
+      expect(h.localDb.wipes, 1, reason: 'encrypted database and key');
       expect(find.byType(WelcomeScreen), findsOneWidget);
     });
 
@@ -333,6 +336,7 @@ void main() {
       );
       expect(h.auth.signedIn, isNotNull);
       expect(h.localData.clears, 0);
+      expect(h.localDb.wipes, 0);
     });
 
     testWidgets('no Memory; Export is the in-app download (T-CMP-03, '

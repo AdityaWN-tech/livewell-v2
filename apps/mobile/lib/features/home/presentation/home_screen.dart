@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/analytics/analytics.dart';
 import '../../../core/config/feature_flags.dart';
 import '../../../core/design/avatar/avatar_art.dart' show AvatarView;
 import '../../../core/design/components/speech_bubble.dart';
@@ -54,9 +56,9 @@ export '../application/home_data.dart'
 import '../data/name_prompt.dart';
 import '../domain/home_models.dart';
 
-/// Home tab (T-UI-02c, illustrated design): greeting header, the coach
-/// hero with a speech bubble, the Why, Today's Next Step, the 4 Quick
-/// Check-in tiles, the streak and the milestone.
+/// Home tab (T-UI-02c illustrated design, T-UI-03 layout): the greeting
+/// with the streak card beside it, the 4 Quick Check-in tiles, the coach
+/// with a speech bubble, Today's Next Step, the milestone and the Why.
 ///
 /// Actions (FR-DLY-03, at most 1 primary and 2 secondary): the step card
 /// opens Done (the primary) and "Make it N min" (a secondary); the check-in
@@ -114,6 +116,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _widgetLinks = inbox.links.listen(_openWidgetLink);
     final link = await inbox.launchLink();
     if (!mounted) return;
+    if (link == WidgetLink.home) _logWidgetTap();
     if (link != null && link != WidgetLink.home) {
       await _openWidgetLink(link);
       return;
@@ -231,6 +234,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _widgetDone() async {
     final date = await ref.read(widgetInboxProvider).takeDone();
     if (!mounted || date == null) return;
+    _logWidgetTap();
     if (date != _today) {
       if (date.compareTo(_today) < 0) {
         await ref
@@ -245,9 +249,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  /// `widget_interaction {action, size, slot}` for the tap the inbox just
+  /// read (T-AVT-08g-e). Fixed names only; only with the analytics consent.
+  void _logWidgetTap() {
+    final tap = ref.read(widgetInboxProvider).takeInteraction();
+    if (tap == null) return;
+    unawaited(ref.read(analyticsProvider).widgetInteraction(tap));
+  }
+
   /// A widget button opened the app (T-AVT-08g-b).
   Future<void> _openWidgetLink(WidgetLink link) async {
     if (!mounted) return;
+    _logWidgetTap();
     final step = ref.read(todayStepProvider);
     switch (link) {
       case WidgetLink.checkIn:
@@ -476,14 +489,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ],
       profile: const ProfileButton(),
       actions: [if (day != null) _DayPill(day)],
+      // The streak sits beside the greeting (T-UI-03).
+      aside: LwStreakCard(ref.watch(streakProvider)),
+      showEyebrow: false,
       children: [
-        if (ref.watch(morningCardProvider) case final moment?) ...[
-          _MomentCard(onPlay: () => _playMoment(moment)),
-          const SizedBox(height: LwSpacing.sm),
+        if (ref.watch(canCheckInProvider)) ...[
+          _CheckInCard(checkIn: checkIn, onTap: _openCheckIn),
+          if (checkIn != null) ...[
+            const SizedBox(height: LwSpacing.sm),
+            _CheckInResponse(checkIn),
+          ],
+          const SizedBox(height: LwSpacing.md),
         ],
         if (askName) ...[
           _NamePrompt(onSave: _saveName, onSkip: _skipName),
-          const SizedBox(height: LwSpacing.sm),
+          const SizedBox(height: LwSpacing.md),
+        ],
+        if (ref.watch(morningCardProvider) case final moment?) ...[
+          _MomentCard(onPlay: () => _playMoment(moment)),
+          const SizedBox(height: LwSpacing.md),
         ],
         _HeroCard(
           coach: ref.watch(coachNameProvider) ?? l.homeCoachDefaultName,
@@ -516,11 +540,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : () => _playMoment(hero),
           showBriefing: ref.watch(featureFlagsProvider).briefings,
         ),
-        // The Why is shown on Home (FR-ONB-05).
-        if (why != null && why.isNotEmpty) ...[
-          const SizedBox(height: LwSpacing.sm),
-          _WhyCard(why),
-        ],
         LwSectionHeader(l.homeNextStepTitle),
         _StepCard(
           step: step,
@@ -541,18 +560,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ref.read(routineActionsProvider).mark(next, RoutineStatus.done),
           ),
         ],
-        if (ref.watch(canCheckInProvider)) ...[
-          LwSectionHeader(l.homeCheckInTitle),
-          _CheckInTiles(checkIn: checkIn, onTap: _openCheckIn),
-          if (checkIn != null) ...[
-            const SizedBox(height: LwSpacing.sm),
-            _CheckInResponse(checkIn),
-          ],
-        ],
-        const SizedBox(height: LwSpacing.sectionGap),
-        LwStreakCard(ref.watch(streakProvider)),
-        const SizedBox(height: LwSpacing.sm),
+        const SizedBox(height: LwSpacing.md),
         _MilestoneCard(ref.watch(milestoneProvider)),
+        // The Why is shown on Home (FR-ONB-05).
+        if (why != null && why.isNotEmpty) ...[
+          const SizedBox(height: LwSpacing.md),
+          _WhyCard(why),
+        ],
       ],
     );
   }
@@ -733,6 +747,18 @@ class _HeroCard extends StatelessWidget {
               placeholderIcon: false,
             ),
           ),
+          // Two soft leaves in the corner (decoration).
+          Positioned(
+            right: LwSpacing.sm,
+            bottom: LwSpacing.sm,
+            child: ExcludeSemantics(
+              child: Icon(
+                Icons.eco_rounded,
+                size: LwSize.inputHeight,
+                color: p.accent.withValues(alpha: 0.45),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(LwSpacing.cardPadding),
             child: Column(
@@ -750,27 +776,28 @@ class _HeroCard extends StatelessWidget {
                     expression: faceForMoment(moment),
                     bubble: bubble,
                     size: 104,
+                    // Beside the face, as in the owner's reference (T-UI-03).
+                    minBubbleWidth: 136,
                   ),
                 ),
                 const SizedBox(height: LwSpacing.sm),
                 if (showBriefing)
                   _BriefingRow()
-                else
-                  // Wraps on small phones and large text.
-                  Wrap(
-                    spacing: LwSpacing.sm,
-                    runSpacing: LwSpacing.xs,
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(
-                        l.homeTagline,
-                        key: const Key('home-tagline'),
-                        style: t.bodySmall?.copyWith(color: p.onTintSecondary),
-                      ),
-                      if (onPlay != null) _PlayPill(onPlay: onPlay!),
-                    ],
+                else ...[
+                  Text(
+                    l.homeTagline,
+                    key: const Key('home-tagline'),
+                    style: t.bodySmall?.copyWith(color: p.onTintSecondary),
                   ),
+                  if (onPlay != null) ...[
+                    const SizedBox(height: LwSpacing.sm),
+                    // Room on the right for the leaves.
+                    Padding(
+                      padding: const EdgeInsets.only(right: LwSize.inputHeight),
+                      child: _PlayPill(onPlay: onPlay!),
+                    ),
+                  ],
+                ],
               ],
             ),
           ),
@@ -1134,6 +1161,19 @@ class _CheckInTiles extends StatelessWidget {
     final p = LwPalette.of(context);
     final l = AppLocalizations.of(context);
     final c = checkIn;
+    final t = Theme.of(context).textTheme;
+    // Every word a tile can show, so the layout doesn't change after a
+    // check-in: the names and all the answers.
+    final allValues = [
+      l.homeTileEmpty,
+      l.homeTileSkipped,
+      for (final i in [1, 2, 3, 4, 5]) ...[
+        _answer(l, 'mood', i),
+        _answer(l, 'energy', i),
+        _answer(l, 'sleep', i),
+        _answer(l, 'stress', i),
+      ],
+    ];
     String value(int? v, List<String> words) => c == null
         ? l.homeTileEmpty
         : v == null
@@ -1195,11 +1235,20 @@ class _CheckInTiles extends StatelessWidget {
     ];
     return LayoutBuilder(
       builder: (context, box) {
-        // 4 across normally; 2 across on small phones or with large text,
-        // so values like "Very high" never break mid-word.
-        final scale = MediaQuery.textScalerOf(context).scale(1);
-        final columns = box.maxWidth / scale >= 300 ? 4 : 2;
+        // 4 across when every word fits a quarter-width tile; else 2
+        // across (small phones, large text), so values like "Moderate"
+        // never break mid-word.
         final gap = LwSpacing.xs;
+        final widest = math.max(
+          LwTabHeader.widestWord(
+            context,
+            tiles.map((x) => x.$2).join(' '),
+            t.labelMedium,
+          ),
+          LwTabHeader.widestWord(context, allValues.join(' '), t.labelSmall),
+        );
+        final quarter = (box.maxWidth - gap * 3) / 4 - LwCheckinTile.textInset;
+        final columns = widest <= quarter ? 4 : 2;
         final width = (box.maxWidth - gap * (columns - 1)) / columns;
         return Wrap(
           key: const Key('home-checkin-card'),
@@ -1221,6 +1270,80 @@ class _CheckInTiles extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// One answer word for a tile, 1 (lowest) to 5.
+String _answer(AppLocalizations l, String tile, int v) => switch ((tile, v)) {
+  ('mood', 1) => l.checkinMood1,
+  ('mood', 2) => l.checkinMood2,
+  ('mood', 3) => l.checkinMood3,
+  ('mood', 4) => l.checkinMood4,
+  ('mood', _) => l.checkinMood5,
+  ('energy', 1) => l.checkinEnergy1,
+  ('energy', 2) => l.checkinEnergy2,
+  ('energy', 3) => l.checkinEnergy3,
+  ('energy', 4) => l.checkinEnergy4,
+  ('energy', _) => l.checkinEnergy5,
+  ('sleep', 1) => l.checkinSleep1,
+  ('sleep', 2) => l.checkinSleep2,
+  ('sleep', 3) => l.checkinSleep3,
+  ('sleep', 4) => l.checkinSleep4,
+  ('sleep', _) => l.checkinSleep5,
+  ('stress', 1) => l.checkinStress1,
+  ('stress', 2) => l.checkinStress2,
+  ('stress', 3) => l.checkinStress3,
+  ('stress', 4) => l.checkinStress4,
+  (_, _) => l.checkinStress5,
+};
+
+/// Quick Check-in (T-UI-03): the title and the 4 tiles on one white card,
+/// right under the greeting.
+class _CheckInCard extends StatelessWidget {
+  const _CheckInCard({required this.checkIn, required this.onTap});
+
+  final CheckIn? checkIn;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = LwPalette.of(context);
+    final t = Theme.of(context).textTheme;
+    return Container(
+      key: const Key('home-checkin-section'),
+      padding: const EdgeInsets.fromLTRB(
+        LwSpacing.xs,
+        LwSpacing.sm,
+        LwSpacing.xs,
+        LwSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: LwRadius.lgAll,
+        boxShadow: LwShadow.of(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              LwSpacing.xs,
+              0,
+              LwSpacing.xs,
+              LwSpacing.sm,
+            ),
+            child: Semantics(
+              header: true,
+              child: Text(
+                AppLocalizations.of(context).homeCheckInTitle,
+                style: t.titleMedium,
+              ),
+            ),
+          ),
+          _CheckInTiles(checkIn: checkIn, onTap: onTap),
+        ],
+      ),
     );
   }
 }

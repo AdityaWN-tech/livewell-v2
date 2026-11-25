@@ -2,6 +2,12 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
 import { monitored } from '../observability/log.js';
+import {
+  CloudStorageMediaFiles,
+  handleRevocation,
+  liftMarketingSuppression,
+  type MediaFiles,
+} from './revoke-handling.js';
 
 /** Builds the audit entry for a new consent record (pure, unit-testable). */
 export function consentAuditEntry(
@@ -24,7 +30,10 @@ export function consentAuditEntry(
   };
 }
 
-export function makeOnConsentCreated(log: AuditLog = new FirestoreAuditLog()) {
+export function makeOnConsentCreated(
+  log: AuditLog = new FirestoreAuditLog(),
+  files: MediaFiles = new CloudStorageMediaFiles(),
+) {
   // Consent records are append-only (firestore.rules), so "created" covers
   // both grants and revocations. Default region us-central1 serves the nam5
   // (US multi-region) database (D-14).
@@ -39,6 +48,21 @@ export function makeOnConsentCreated(log: AuditLog = new FirestoreAuditLog()) {
         data,
       );
       await log.append(id, entry);
+      // A revocation starts the spec 16.3 handling at once (D-76); the
+      // hourly sweep retries anything left pending.
+      if (data.granted === true) {
+        if (data.type === 'marketing') {
+          await liftMarketingSuppression(event.params.uid, event.params.consentId);
+        }
+      } else {
+        await handleRevocation(
+          event.params.uid,
+          event.params.consentId,
+          String(data.type ?? ''),
+          log,
+          files,
+        );
+      }
     }),
   );
 }

@@ -196,6 +196,29 @@ void main() {
         );
       });
 
+      test('${flavor.name}: sign-out turns it off even if the consent '
+          'listener never ends (offline)', () async {
+        final signedIn = StreamController<bool>();
+        final open = StreamController<List<ConsentRecord>>(); // never closed
+        final seen = <bool>[];
+        final sub = crashCollectionAllowed(
+          flavor: flavor,
+          devOptIn: false,
+          signedIn: signedIn.stream,
+          consents: () => open.stream,
+        ).listen(seen.add);
+        signedIn.add(true);
+        await pumpEventQueue();
+        open.add([analytics(true, 1)]);
+        await pumpEventQueue();
+        signedIn.add(false);
+        await pumpEventQueue();
+        expect(seen, [true, false]);
+        await sub.cancel();
+        await signedIn.close();
+        await open.close();
+      });
+
       test('${flavor.name}: on with it, off again after sign-out', () async {
         expect(
           await allowed(

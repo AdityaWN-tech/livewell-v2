@@ -67,6 +67,10 @@ dependencies:
   # stays on firebase-ios-sdk 12.19.0 (newer releases move it and broke iOS
   # CI before). T-FND-10, D-80.
   firebase_crashlytics: 5.4.0
+  # Pinned: 6.7.1 needs firebase-ios-sdk 12.19.3 but firebase_auth 6.7.0 pins 12.19.0,
+  # which breaks the iOS package resolve. Move all Firebase plugins up together.
+  firebase_remote_config: 6.7.0
+  phone_numbers_parser: ^9.0.29
 
 dev_dependencies:
   flutter_test:

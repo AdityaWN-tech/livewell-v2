@@ -38,8 +38,11 @@ void main() {
     });
 
     test('without LW_MEDIA_URL nothing changes: flags off, nothing sent', () {
-      // No flavor override: an unset address never reads it.
-      final c = ProviderContainer();
+      // An unset address never reads the flavor; the flags use dev's
+      // defaults here (the strictest dev case).
+      final c = ProviderContainer(
+        overrides: [flavorProvider.overrideWithValue(Flavor.dev)],
+      );
       addTearDown(c.dispose);
       expect(c.read(mediaServiceBaseProvider), isNull);
       expect(c.read(featureFlagsProvider).avatarFromPhoto, isFalse);
@@ -51,6 +54,7 @@ void main() {
     test('with an address: the photo and maker ways turn on', () {
       final c = ProviderContainer(
         overrides: [
+          flavorProvider.overrideWithValue(Flavor.dev),
           mediaServiceBaseProvider.overrideWithValue(
             Uri.parse('http://127.0.0.1:6800/'),
           ),

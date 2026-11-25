@@ -224,13 +224,53 @@ Stream<bool> crashCollectionAllowed({
   required Stream<List<ConsentRecord>> Function() consents,
 }) {
   if (flavor == Flavor.dev && !devOptIn) return Stream.value(false);
-  return signedIn.distinct().asyncExpand(
+  // Switch, not asyncExpand: a sign-out must turn collection off at once,
+  // even while the consent listener is still open (offline, it may never
+  // end on its own).
+  return _switchLatest(
+    signedIn.distinct(),
     (inNow) => inNow
         ? consents().map(
             (r) => isGranted(currentConsents(r), ConsentType.analytics),
           )
         : Stream.value(false),
   );
+}
+
+/// Follows the stream made from the latest [outer] value only, cancelling
+/// the previous one (rxdart's switchMap, without the dependency).
+Stream<R> _switchLatest<T, R>(Stream<T> outer, Stream<R> Function(T) inner) {
+  late StreamController<R> out;
+  StreamSubscription<T>? outerSub;
+  StreamSubscription<R>? innerSub;
+  var outerDone = false;
+  out = StreamController<R>(
+    onListen: () {
+      outerSub = outer.listen(
+        (v) {
+          innerSub?.cancel();
+          innerSub = inner(v).listen(
+            out.add,
+            onError: out.addError,
+            onDone: () {
+              innerSub = null;
+              if (outerDone) out.close();
+            },
+          );
+        },
+        onError: out.addError,
+        onDone: () {
+          outerDone = true;
+          if (innerSub == null) out.close();
+        },
+      );
+    },
+    onCancel: () async {
+      await innerSub?.cancel();
+      await outerSub?.cancel();
+    },
+  );
+  return out.stream;
 }
 
 final crashSinkProvider = Provider<CrashSink>((ref) => FirebaseCrashSink());

@@ -32,7 +32,9 @@ import '../../moments/presentation/celebration.dart';
 import '../../moments/domain/coach_message.dart';
 import '../../moments/domain/moment_builder.dart';
 import '../../moments/presentation/moment_screen.dart';
+import '../../notifications/application/push_registrar.dart';
 import '../../notifications/presentation/notifications_screen.dart';
+import '../../notifications/presentation/push_texts.dart';
 import '../../profile/presentation/profile_button.dart';
 import '../../routine/application/routine_data.dart';
 import '../../routine/application/routine_moment.dart';
@@ -75,6 +77,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late final AppLifecycleListener _lifecycle;
   StreamSubscription<String>? _reminderTaps;
+  StreamSubscription<String>? _pushTaps;
   StreamSubscription<WidgetLink>? _widgetLinks;
   bool _asking = false;
 
@@ -106,6 +109,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     } catch (_) {
       // No notifications on this device: Home as usual.
     }
+    // Server pushes (T-TCH-01): registered only with the notifications
+    // consent; a tapped push opens like a reminder.
+    if (!mounted) return;
+    final push = ref.read(pushRegistrarProvider);
+    _pushTaps = push.taps.listen(_openReminder);
+    unawaited(push.start(pushTexts(AppLocalizations.of(context))));
+    launch ??= await push.launchPayload();
     if (!mounted) return;
     unawaited(_routineReminders());
     if (launch != null && await _openReminder(launch)) return;
@@ -296,6 +306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void dispose() {
     _reminderTaps?.cancel();
+    _pushTaps?.cancel();
     _widgetLinks?.cancel();
     _lifecycle.dispose();
     super.dispose();

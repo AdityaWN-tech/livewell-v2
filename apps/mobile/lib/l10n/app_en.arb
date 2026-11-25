@@ -2077,6 +2077,8 @@
   "@learnReaderEndTitle": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
   "learnReaderEndBody": "Well done for taking the time. Small steps add up.",
   "@learnReaderEndBody": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "learnReaderPortalTitle": "Go deeper on the Live Well Portal",
+  "@learnReaderPortalTitle": {"description": "FR-LRN-04 / T-PRT-03: heading above the lesson's related portal card at the end of the reader (D-74)."},
   "learnReaderFinish": "Finish lesson",
   "@learnReaderFinish": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
   "learnReaderMissingTitle": "This lesson isn't here right now",

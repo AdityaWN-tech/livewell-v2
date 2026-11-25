@@ -10,8 +10,11 @@ import {
   deleteField,
   doc,
   getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
@@ -349,6 +352,20 @@ describe('profile settings (T-ONB-03f)', () => {
     await assertSucceeds(upd({ appearance: { theme: 'dark', text_scale: 1.15 } }));
     await assertSucceeds(upd({ quiet_hours: { start: '21:30', end: '06:30' } }));
     await assertSucceeds(upd({ notification_categories: { greeting: true, nudge: false, reflection: true } }));
+    // The app sends the weekly review's switch too (T-DLY-03c).
+    await assertSucceeds(upd({ notification_categories: { greeting: true, nudge: false, reflection: true, weekly: false } }));
+  });
+  it('moment playback and "Not today" (T-DLY-03e)', async () => {
+    await seedAdult(env);
+    await assertSucceeds(upd({ moment_playback: { auto_speak: false, captions: true } }));
+    await assertSucceeds(upd({ not_today: { date: '2026-10-15', kinds: ['greeting'] } }));
+    await assertSucceeds(upd({ not_today: { date: '2026-10-15', kinds: [] } }));
+    await assertFails(upd({ moment_playback: { auto_speak: 'no', captions: true } }));
+    await assertFails(upd({ moment_playback: { auto_speak: true } }));
+    await assertFails(upd({ moment_playback: { auto_speak: true, captions: true, volume: 3 } }));
+    await assertFails(upd({ not_today: { date: 'today', kinds: ['greeting'] } }));
+    await assertFails(upd({ not_today: { date: '2026-10-15', kinds: ['marketing'] } }));
+    await assertFails(upd({ not_today: { date: '2026-10-15', kinds: ['greeting'], note: 'x' } }));
   });
   it('rejects bad values', async () => {
     await seedAdult(env);
@@ -359,6 +376,7 @@ describe('profile settings (T-ONB-03f)', () => {
     await assertFails(upd({ quiet_hours: { start: '9pm', end: '06:30' } }));
     await assertFails(upd({ notification_categories: { greeting: 'yes', nudge: true, reflection: true } }));
     await assertFails(upd({ notification_categories: { marketing: true } }));
+    await assertFails(upd({ notification_categories: { greeting: true, nudge: true, reflection: true, weekly: 'yes' } }));
   });
 });
 
@@ -608,6 +626,24 @@ describe('checkins (T-DLY-02: mood first, one per local date)', () => {
   });
   it('nothing is stored before the 18+ gate', async () => {
     await assertFails(setDoc(ref(), checkin()));
+  });
+  it('once gentle, a same-day redo keeps it gentle (spec 15.3, D-70)', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/checkins/2026-10-13': checkin({ mood: 1, gentle_day: true }) });
+    const saved = (await getDoc(ref())).data()!;
+    const redo = (o: Record<string, unknown>) =>
+      setDoc(ref(), checkin({ created_at: saved.created_at, updated_at: meta().updated_at, ...o }));
+    await assertFails(redo({ mood: 5, gentle_day: false }));
+    await assertSucceeds(redo({ mood: 5, gentle_day: true }));
+    // Not gentle yet: a later answer may still make it gentle.
+    await seed(env, { 'users/alice/checkins/2026-10-14': checkin({ mood: 4, gentle_day: false }) });
+    const ref14 = doc(as(ALICE), 'users/alice/checkins/2026-10-14');
+    const saved14 = (await getDoc(ref14)).data()!;
+    await assertSucceeds(
+      setDoc(ref14, checkin({
+        created_at: saved14.created_at, updated_at: meta().updated_at, stress: 5, gentle_day: true,
+      })),
+    );
   });
 });
 
@@ -926,6 +962,61 @@ describe('server-written documents are read-only for the owner', () => {
   }
 });
 
+describe('devices (T-TCH-01: push tokens, D-77)', () => {
+  const path = 'users/alice/devices/AbCdEf0123456789XyZw';
+  const device = (over: Record<string, unknown> = {}) => ({
+    token: 'fcm-token-abc',
+    platform: 'android',
+    time_zone: 'America/New_York',
+    ...serverMeta(),
+    ...over,
+  });
+  it('owner registers a device: token, platform, time zone only', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(doc(as(ALICE), path), device()));
+    await assertSucceeds(getDoc(doc(as(ALICE), path)));
+    // A new token replaces the old one.
+    await assertSucceeds(setDoc(doc(as(ALICE), path), device({ token: 'fcm-token-new' })));
+  });
+  it('no personal fields, no unknown platform, no empty token', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), path), device({ display_name: 'Priya' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ email: 'p@example.com' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ platform: 'web' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ token: '' })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ token: 'x'.repeat(4097) })));
+    await assertFails(setDoc(doc(as(ALICE), path), device({ time_zone: 'x'.repeat(65) })));
+    const { time_zone: _, ...noZone } = device();
+    await assertFails(setDoc(doc(as(ALICE), path), noZone));
+  });
+  it('updated_at is the server time; the id is a plain install id', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), path), { ...device(), updated_at: meta().updated_at }));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/devices/short'), device()));
+  });
+  it('only the adult owner writes; others cannot read or write', async () => {
+    await assertFails(setDoc(doc(as(ALICE), path), device())); // no profile yet
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(BOB), path), device()));
+    await assertFails(setDoc(doc(anon(), path), device()));
+    await seed(env, { [path]: { token: 't', platform: 'ios', time_zone: 'UTC', ...meta() } });
+    await assertFails(getDoc(doc(as(BOB), path)));
+    await assertFails(deleteDoc(doc(as(BOB), path)));
+  });
+  it('owner deletes it (consent off, log out)', async () => {
+    await seedAdult(env);
+    await seed(env, { [path]: { token: 't', platform: 'ios', time_zone: 'UTC', ...meta() } });
+    await assertSucceeds(deleteDoc(doc(as(ALICE), path)));
+  });
+  it('push_days (the server daily count) is closed to the owner', async () => {
+    await seedAdult(env);
+    const day = 'users/alice/push_days/2026-11-16';
+    await seed(env, { [day]: { count: 1, ...meta() } });
+    await assertFails(getDoc(doc(as(ALICE), day)));
+    await assertFails(setDoc(doc(as(ALICE), day), { count: 0, ...meta() }));
+  });
+});
+
 describe('global catalogues (approved and active only)', () => {
   it('portal_offers: active + approved readable when signed in', async () => {
     await seed(env, {
@@ -952,7 +1043,15 @@ describe('global catalogues (approved and active only)', () => {
 });
 
 describe('server-only collections are closed to clients (11.1)', () => {
-  for (const col of ['voice_consents', 'safety_events', 'audit_log']) {
+  for (const col of [
+    'voice_consents',
+    'safety_events',
+    'audit_log',
+    'consent_revocations',
+    'vendor_requests',
+    'marketing_suppressions',
+    'push_outbox',
+  ]) {
     it(col, async () => {
       await seed(env, { [`${col}/x`]: { uid: ALICE, ...meta() } });
       await assertFails(getDoc(doc(as(ALICE), `${col}/x`)));
@@ -972,4 +1071,106 @@ describe('server-only collections are closed to clients (11.1)', () => {
       await assertFails(setDoc(doc(as(ALICE), `users/alice/${col}/0001`), { index: 1, value: 'y', ...meta() }));
     });
   }
+});
+
+// ---------- portal catalog (T-PRT-02, D-92; spec 11.1) ----------
+// App users read only live offers (active + approved); nobody writes from a
+// client, staff included (the Admin uses the Core API); the workflow
+// collection (staff ids) is server-only.
+const asStaff = (uid: string) =>
+  env
+    .authenticatedContext(uid, {
+      staff_roles: ['admin', 'content_editor', 'clinical_reviewer'],
+      staff_mfa_waiver_until: Math.floor(Date.now() / 1000) + 3600,
+    })
+    .firestore();
+
+const offer = (o: Record<string, unknown>) => ({
+  title: 'Gut health in 30 days',
+  url: 'https://livewell.conciergeconnectedcare.net/web/courses/gut-health',
+  offer_type: 'course',
+  driver_tags: [],
+  topic_tags: [],
+  price_display: '$49',
+  version: 1,
+  ...meta(),
+  ...o,
+});
+
+async function seedOffers() {
+  await seed(env, {
+    'portal_offers/live': offer({ active: true, review_status: 'approved' }),
+    'portal_offers/approved_not_live': offer({ active: false, review_status: 'approved' }),
+    'portal_offers/draft': offer({ active: false, review_status: 'draft' }),
+    'portal_offers/in_review': offer({ active: false, review_status: 'in_review' }),
+    'portal_offers/rejected': offer({ active: false, review_status: 'rejected' }),
+    'portal_offers/archived': offer({ active: false, review_status: 'archived' }),
+    // Inconsistent states the API never writes, still hidden.
+    'portal_offers/archived_active': offer({ active: true, review_status: 'archived' }),
+    'portal_offers/draft_active': offer({ active: true, review_status: 'draft' }),
+    'portal_offers/active_string': offer({ active: 'true', review_status: 'approved' }),
+    'portal_offer_workflow/live': { rev: 3, created_by: 'staff1', version_editors: [], ...meta() },
+  });
+}
+
+describe('portal_offers: clients see live offers only (T-PRT-02, D-92)', () => {
+  beforeEach(seedOffers);
+  it('a signed-in user reads only the active + approved offer', async () => {
+    await assertSucceeds(getDoc(doc(as(ALICE), 'portal_offers/live')));
+    for (const id of [
+      'approved_not_live',
+      'draft',
+      'in_review',
+      'rejected',
+      'archived',
+      'archived_active',
+      'draft_active',
+      'active_string',
+    ]) {
+      await assertFails(getDoc(doc(as(ALICE), `portal_offers/${id}`)));
+    }
+  });
+
+  it("the app's filtered query works; an unfiltered list is refused", async () => {
+    const q = query(
+      collection(as(ALICE), 'portal_offers'),
+      where('active', '==', true),
+      where('review_status', '==', 'approved'),
+    );
+    await assertSucceeds(getDocs(q));
+    await assertFails(getDocs(collection(as(ALICE), 'portal_offers')));
+    await assertFails(getDocs(query(collection(as(ALICE), 'portal_offers'), where('active', '==', true))));
+  });
+
+  it('signed-out readers see nothing', async () => {
+    await assertFails(getDoc(doc(anon(), 'portal_offers/live')));
+  });
+
+  it('staff claims give no extra client access: reads and writes go through the Core API', async () => {
+    const staff = asStaff('staff1');
+    await assertSucceeds(getDoc(doc(staff, 'portal_offers/live')));
+    await assertFails(getDoc(doc(staff, 'portal_offers/draft')));
+    await assertFails(setDoc(doc(staff, 'portal_offers/new'), offer({ active: false, review_status: 'draft' })));
+    await assertFails(updateDoc(doc(staff, 'portal_offers/live'), { title: 'Changed' }));
+    await assertFails(updateDoc(doc(staff, 'portal_offers/draft'), { active: true, review_status: 'approved' }));
+    await assertFails(deleteDoc(doc(staff, 'portal_offers/live')));
+  });
+
+  it('app users cannot create, publish, edit or delete offers', async () => {
+    const db = as(ALICE);
+    await assertFails(setDoc(doc(db, 'portal_offers/new'), offer({ active: true, review_status: 'approved' })));
+    await assertFails(updateDoc(doc(db, 'portal_offers/live'), { price_display: '$1' }));
+    await assertFails(deleteDoc(doc(db, 'portal_offers/live')));
+  });
+});
+
+describe('portal_offer_workflow: server-only (D-92)', () => {
+  beforeEach(seedOffers);
+  it('nobody reads or writes it from a client', async () => {
+    for (const db of [as(ALICE), asStaff('staff1'), anon()]) {
+      await assertFails(getDoc(doc(db, 'portal_offer_workflow/live')));
+      await assertFails(setDoc(doc(db, 'portal_offer_workflow/x'), { rev: 1 }));
+      await assertFails(updateDoc(doc(db, 'portal_offer_workflow/live'), { version_editors: [] }));
+    }
+  });
 });

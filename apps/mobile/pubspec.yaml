@@ -48,6 +48,11 @@ dependencies:
   speech_to_text: ^7.5.0
   url_launcher: ^6.3.3
   firebase_analytics: ^12.6.0
+  # Pinned exactly: 16.7.0 is from the same FlutterFire release (2026-09-14)
+  # as firebase_core 4.15 / auth 6.7 / firestore 6.10, which pins
+  # firebase-ios-sdk 12.19.0. A newer one needs a newer iOS SDK and the iOS
+  # Swift package resolve fails (T-TCH-01, D-77).
+  firebase_messaging: 16.7.0
   image_picker: ^1.2.4
   audioplayers: ^6.8.1
   flutter_local_notifications: ^22.3.2
@@ -67,6 +72,9 @@ dependencies:
   drift: ^2.35.4
   sqlite3: ^3.9.1
   flutter_secure_storage: ^11.2.0
+  # Pinned: 6.7.1 needs firebase-ios-sdk 12.19.3 but firebase_auth 6.7.0 pins 12.19.0,
+  # which breaks the iOS package resolve. Move all Firebase plugins up together.
+  firebase_remote_config: 6.7.0
   phone_numbers_parser: ^9.0.29
 
 dev_dependencies:

@@ -14,6 +14,7 @@ import '../../moments/data/coach_faces.dart';
 import '../../routine/application/routine_moment.dart';
 import '../data/plan_repository.dart';
 import '../data/reminders.dart';
+import '../domain/daily_cap.dart';
 import '../domain/touchpoints.dart';
 
 /// Keeps the plan's reminders in step with the plan, the touchpoint times,
@@ -77,10 +78,26 @@ class PlanScheduler {
       settings: settings,
       quiet: quiet,
     );
-    final faces = items.isEmpty && routine.isEmpty
+    // One cap of 4 a day across plan and routine together (T-DLY-04,
+    // FR-TCH-01, D-71): the plan's touchpoints first, then routine
+    // reminders, earliest first; today's already shown ones count.
+    final ledgers = _ref.read(reminderLedgerStoreProvider);
+    final before = await ledgers.load();
+    final capped = capPerDay(
+      plan: items,
+      routine: routine,
+      used: {localDateKey(now): before?.shownBy(now).length ?? 0},
+    );
+    final faces = capped.plan.isEmpty && capped.routine.isEmpty
         ? const <TouchpointKind, String>{}
         : await _faces();
-    await reminders.replaceAll(items, texts, faces: faces, routine: routine);
+    await reminders.replaceAll(
+      capped.plan,
+      texts,
+      faces: faces,
+      routine: capped.routine,
+    );
+    await ledgers.save(ReminderLedger.next(before, now, capped));
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());
   }
 

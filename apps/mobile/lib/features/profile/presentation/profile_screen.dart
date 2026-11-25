@@ -33,6 +33,8 @@ import 'profile_button.dart';
 import '../../avatar/data/avatar_repository.dart';
 import '../../avatar/domain/coach_choice.dart';
 import '../../avatar/presentation/coach_avatar.dart' show coachChoiceProvider;
+import '../../memory/application/memory_enabled.dart';
+import '../../memory/presentation/memory_screen.dart';
 
 final _versionProvider = FutureProvider<String>(
   (ref) async => (await PackageInfo.fromPlatform()).version,
@@ -724,7 +726,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     }
                   },
                 ),
-                // Memory comes with the coach (FR-CNV-05). Export by email
+                // "What my coach remembers" (FR-CNV-05, D-101): only while
+                // enabled (dev flavor, or the coachMemory flag).
+                if (ref.watch(coachMemoryEnabledProvider))
+                  ListTile(
+                    key: const Key('profile-memory'),
+                    leading: const Icon(Icons.bookmark_border),
+                    title: Text(l.profileMemory),
+                    onTap: () => context.push(MemoryScreen.path),
+                  ),
+                // Export by email
                 // until the export function exists (FR-SET-02; needs Blaze),
                 // only when an address is set (Step 4d, D-56).
                 if (dataRequestEmail.isNotEmpty)

@@ -1,0 +1,37 @@
+{
+  "about": "SYNTHETIC users for local runs and tests. Invented names and values; no real person, no PHI (AGENTS.md rule 4).",
+  "users": [
+    {
+      "uid": "demo-us",
+      "first_name": "Maya",
+      "coach_name": "Sam",
+      "region": "US",
+      "local_date": "2026-11-19",
+      "why": "Energy to play with my grandkids at the park",
+      "focus_driver": "move_more",
+      "plan_step": {"title": "Walk after lunch", "minutes": 10, "smaller_minutes": 5},
+      "last_checkin": {"day": "2026-11-18", "mood": 4, "energy": 3, "sleep": 3, "stress": 2},
+      "streak_days": 4
+    },
+    {
+      "uid": "demo-in",
+      "first_name": "Arjun",
+      "coach_name": "Asha",
+      "region": "IN",
+      "local_date": "2026-11-19",
+      "why": "To feel strong for my morning cricket with friends",
+      "focus_driver": "sleep_better",
+      "plan_step": {"title": "Lights off by 10:30", "minutes": 15, "smaller_minutes": 5},
+      "last_checkin": {"day": "2026-11-18", "mood": 2, "energy": 2},
+      "streak_days": 0
+    },
+    {
+      "uid": "demo-x",
+      "first_name": "Lee",
+      "region": null,
+      "local_date": "2026-11-19",
+      "plan_step": {"title": "Stretch before breakfast", "minutes": 5},
+      "streak_days": 12
+    }
+  ]
+}

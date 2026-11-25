@@ -243,8 +243,27 @@ class FakeProfileRepository extends ProfileRepository {
 
   String? _step(String uid) => existing[uid] ?? created[uid]?.onboardingStep;
 
+  /// Server reads ([get]) and phone-cache reads ([getCached]).
+  int serverReads = 0;
+  int cacheReads = 0;
+
+  /// Nothing cached on this phone (a new phone): [getCached] asks the server.
+  bool cacheEmpty = false;
+
+  @override
+  Future<Profile?> getCached(String uid) async {
+    cacheReads++;
+    if (cacheEmpty) return get(uid);
+    return _profile(uid);
+  }
+
   @override
   Future<Profile?> get(String uid) async {
+    serverReads++;
+    return _profile(uid);
+  }
+
+  Future<Profile?> _profile(String uid) async {
     final step = _step(uid);
     if (step == null) return null;
     return Profile(

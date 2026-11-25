@@ -4737,6 +4737,12 @@ abstract class AppLocalizations {
   /// **'Avatar frames'**
   String get devAvatarFrames;
 
+  /// No description provided for @devCrashReporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Crash reporting'**
+  String get devCrashReporting;
+
   /// No description provided for @devAvatarTalk.
   ///
   /// In en, this message translates to:

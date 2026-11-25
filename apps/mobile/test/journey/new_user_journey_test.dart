@@ -185,7 +185,15 @@ void main() {
   ) async {
     final h = await runJourney(tester);
 
-    // 9. Profile (ONB-03f): dark mode, then log out.
+    // 9. Profile (ONB-03f): dark mode, then log out. The Why is at the
+    // bottom of Home (T-UI-03): back up to the header first.
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('profile-button')),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byKey(const Key('profile-button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('profile-button')));
     await tester.pumpAndSettle();
     expect(find.byType(ProfileScreen), findsOneWidget);

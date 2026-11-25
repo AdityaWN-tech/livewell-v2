@@ -1,0 +1,32 @@
+{
+  "about": "Retrieval eval for T-AGT-03 (D-94): synthetic questions against fixtures/content/synthetic_corpus.json. A retrieved chunk counts as relevant when its source_id is in `relevant`. precision@5 = relevant chunks in the top 5 / 5 (strict: fewer than 5 results count as misses). Done when the mean is >= 0.8. driver_tags is what the orchestrator would pass (the person's focus driver), empty when unknown. Some questions deliberately pass no driver or the wrong one.",
+  "k": 5,
+  "threshold": 0.8,
+  "cases": [
+    {"id": "r01", "query": "How can I move more during my busy day?", "driver_tags": ["movement"], "relevant": ["move_walk_after_meals", "move_desk_stretch", "book_movement_everyday"]},
+    {"id": "r02", "query": "Is a short walk after lunch a good idea?", "driver_tags": [], "relevant": ["move_walk_after_meals", "book_movement_everyday"]},
+    {"id": "r03", "query": "I sit at my desk all day and feel stiff", "driver_tags": ["movement"], "relevant": ["move_desk_stretch", "move_walk_after_meals", "book_movement_everyday"]},
+    {"id": "r04", "query": "I can't fall asleep at night", "driver_tags": ["sleep"], "relevant": ["sleep_wind_down", "sleep_bedroom", "book_sleep_rhythm"]},
+    {"id": "r05", "query": "What should my bedtime routine look like?", "driver_tags": [], "relevant": ["sleep_wind_down", "sleep_bedroom", "book_sleep_rhythm"]},
+    {"id": "r06", "query": "my bedroom is too bright and noisy for sleeping", "driver_tags": ["sleep"], "relevant": ["sleep_bedroom", "sleep_wind_down", "book_sleep_rhythm"]},
+    {"id": "r07", "query": "How do I eat better without a strict diet?", "driver_tags": ["nutrition"], "relevant": ["eat_more_vegetables", "eat_mindful_meals", "book_nutrition_plate"]},
+    {"id": "r08", "query": "ideas to add more vegetables to my meals", "driver_tags": [], "relevant": ["eat_more_vegetables", "book_nutrition_plate", "eat_mindful_meals"]},
+    {"id": "r09", "query": "I eat too fast in front of the TV", "driver_tags": ["nutrition"], "relevant": ["eat_mindful_meals", "eat_more_vegetables", "book_nutrition_plate"]},
+    {"id": "r10", "query": "I feel stressed at work, what can I do?", "driver_tags": ["stress"], "relevant": ["stress_breathing", "stress_worry_time", "book_stress_pause"]},
+    {"id": "r11", "query": "a breathing exercise to calm down", "driver_tags": [], "relevant": ["stress_breathing", "book_stress_pause"]},
+    {"id": "r12", "query": "I keep worrying and can't switch off my mind", "driver_tags": ["stress"], "relevant": ["stress_worry_time", "stress_breathing", "book_stress_pause"]},
+    {"id": "r13", "query": "I feel tired every afternoon", "driver_tags": ["energy"], "relevant": ["energy_afternoon_slump", "energy_morning_boost", "book_energy_sources"]},
+    {"id": "r14", "query": "how to have more energy in the morning", "driver_tags": [], "relevant": ["energy_morning_boost", "energy_afternoon_slump", "book_energy_sources"]},
+    {"id": "r15", "query": "I'm low on energy and drained by evening", "driver_tags": ["energy"], "relevant": ["book_energy_sources", "energy_afternoon_slump", "energy_morning_boost"]},
+    {"id": "r16", "query": "How do I build a new habit that sticks?", "driver_tags": ["routine"], "relevant": ["routine_habit_stacking", "routine_plan_your_day", "book_routine_consistency"]},
+    {"id": "r17", "query": "I missed a day of my habit, should I give up?", "driver_tags": [], "relevant": ["book_routine_consistency", "routine_habit_stacking", "routine_plan_your_day"]},
+    {"id": "r18", "query": "help me plan a simple daily routine", "driver_tags": ["routine"], "relevant": ["routine_plan_your_day", "routine_habit_stacking", "book_routine_consistency"]},
+    {"id": "r19", "query": "I feel lonely and want to connect with people", "driver_tags": ["connection"], "relevant": ["connect_call_a_friend", "connect_shared_meals", "book_connection_belonging"]},
+    {"id": "r20", "query": "ways to spend more time with family and friends", "driver_tags": [], "relevant": ["connect_shared_meals", "connect_call_a_friend", "book_connection_belonging"]},
+    {"id": "r21", "query": "should I join a group or community?", "driver_tags": ["connection"], "relevant": ["book_connection_belonging", "connect_call_a_friend", "connect_shared_meals"]},
+    {"id": "r22", "query": "how can I feel more hopeful and positive?", "driver_tags": ["mindset"], "relevant": ["book_mindset_hope", "mindset_gratitude", "mindset_kind_self_talk"]},
+    {"id": "r23", "query": "I'm too hard on myself when I slip up", "driver_tags": [], "relevant": ["mindset_kind_self_talk", "book_mindset_hope", "mindset_gratitude"]},
+    {"id": "r24", "query": "a gratitude practice before bed", "driver_tags": ["mindset"], "relevant": ["mindset_gratitude", "book_mindset_hope", "mindset_kind_self_talk"]},
+    {"id": "r25", "query": "short walk at an easy pace", "driver_tags": ["sleep"], "relevant": ["move_walk_after_meals", "book_movement_everyday", "energy_afternoon_slump"]}
+  ]
+}

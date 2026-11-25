@@ -112,7 +112,9 @@ void main() {
         find.text('Take your 10-minute check to fill your map.'),
         findsOneWidget,
       );
-      await scrollTo(tester, find.byKey(const Key('plan-affirmation')));
+      // Today's Thought and the routine come first now (T-UI-04).
+      expect(find.byKey(const Key('plan-affirmation')), findsOneWidget);
+      await scrollTo(tester, find.byKey(const Key('plan-framework')));
       expect(
         find.text(
           'Choose one small goal for the next 30 days. You can change it '
@@ -296,16 +298,128 @@ void main() {
     });
   });
 
+  group('layout (T-UI-04)', () {
+    testWidgets('order: thought, routine, map, goal, habits, framework', (
+      tester,
+    ) async {
+      await withStarterPlan().boot(tester);
+      tester.view
+        ..physicalSize = const Size(780, 6000)
+        ..devicePixelRatio = 2;
+      addTearDown(tester.view.reset);
+      await openPlan(tester);
+      double top(String key) => tester.getTopLeft(find.byKey(Key(key))).dy;
+      final order = [
+        'plan-new-habit',
+        'plan-affirmation',
+        'plan-routine',
+        'plan-map',
+        'plan-goal',
+        'plan-habits-section',
+        'plan-framework',
+      ];
+      for (var i = 1; i < order.length; i++) {
+        expect(
+          top(order[i - 1]),
+          lessThan(top(order[i])),
+          reason: '${order[i - 1]} before ${order[i]}',
+        );
+      }
+    });
+
+    testWidgets('one primary action: New habit is outlined, goal is filled', (
+      tester,
+    ) async {
+      await withStarterPlan().boot(tester);
+      await openPlan(tester);
+      final newHabit = find.byKey(const Key('plan-new-habit'));
+      expect(
+        find.descendant(of: newHabit, matching: find.byType(FilledButton)),
+        findsNothing,
+      );
+      expect(
+        find.ancestor(
+          of: find.text('New habit'),
+          matching: find.byWidgetPredicate((w) => w is OutlinedButton),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('every petal is a labelled button that opens its driver', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await signedIn().boot(tester);
+      await openPlan(tester);
+      for (var i = 0; i < 8; i++) {
+        final petal = find.byKey(Key('plan-driver-$i'));
+        await scrollTo(tester, petal);
+        expect(
+          find.bySemanticsLabel(RegExp('^Driver ${i + 1}\\b')),
+          findsOneWidget,
+        );
+        await tester.tap(petal);
+        await tester.pumpAndSettle();
+        expect(find.byKey(Key('plan-driver-sheet-$i')), findsOneWidget);
+        await tester.tap(find.text('Got it'));
+        await tester.pumpAndSettle();
+      }
+      handle.dispose();
+    });
+
+    for (final (width, scale) in [(320.0, 0.9), (360.0, 1.0), (360.0, 2.0)]) {
+      testWidgets('no overflow at ${width.toInt()} wide, text $scale', (
+        tester,
+      ) async {
+        await withStarterPlan().boot(tester);
+        tester.view
+          ..physicalSize = Size(width * 2, 1600)
+          ..devicePixelRatio = 2;
+        tester.platformDispatcher.textScaleFactorTestValue = scale;
+        addTearDown(tester.platformDispatcher.clearAllTestValues);
+        addTearDown(tester.view.reset);
+        await openPlan(tester);
+        // Very large text: the names also show at full size below the map.
+        if (scale > LiveWellMap.labelMaxScale) {
+          await scrollTo(tester, find.byKey(const Key('plan-map-chips')));
+        } else {
+          await scrollTo(tester, find.byKey(const Key('plan-goal')));
+          expect(find.byKey(const Key('plan-map-chips')), findsNothing);
+        }
+        expect(tester.takeException(), isNull);
+        await scrollTo(tester, find.byKey(const Key('plan-framework')));
+        expect(tester.takeException(), isNull);
+      });
+    }
+  });
+
   group('dev preview: sample plan', () {
     testWidgets('filled map, goal, and the same step as Home', (tester) async {
       await bootPreview(tester);
       await openPlan(tester);
-      expect(find.text('Driver 3 · 70%'), findsOneWidget);
+      await scrollTo(tester, find.byKey(const Key('plan-driver-2')));
+      // The petal shows its number, label and share (T-UI-04).
+      for (final text in ['3', 'Driver 3', '70%']) {
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('plan-driver-2')),
+            matching: find.text(text),
+          ),
+          findsOneWidget,
+        );
+      }
       expect(find.byKey(const Key('plan-map-empty')), findsNothing);
       await scrollTo(tester, find.byKey(const Key('plan-goal')));
       expect(find.text('Feel more energetic every day'), findsOneWidget);
       expect(find.text('Day 12 of 30'), findsOneWidget);
-      expect(find.text('40%'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('plan-goal')),
+          matching: find.text('40%'),
+        ),
+        findsOneWidget,
+      );
       await scrollTo(tester, find.byKey(const Key('habit-sample-screens')));
       expect(find.text('10-min walk after lunch'), findsOneWidget);
       expect(find.text('Daily habit · In progress'), findsOneWidget);

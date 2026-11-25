@@ -8,7 +8,8 @@ import 'routine_editing.dart';
 /// plan's touchpoints (PlanScheduler).
 
 /// "Routine reminders per day" (needs-product: default 6, at most 10). Its
-/// own category, beside the coach's caps (FR-DLY-04, FR-TCH-01).
+/// own category and limit, and on top of that the one daily cap of 4 across
+/// plan and routine (FR-TCH-01, D-71: `capPerDay`), plan touchpoints first.
 const routineRemindersDefault = 6;
 const routineRemindersMax = 10;
 

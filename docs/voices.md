@@ -36,6 +36,9 @@ The screen shows "Hi {first name}, …" as **text**. A bundled recording can't s
 ## Server gateway (T-VOC-07, D-88)
 Every synthesis in a coach voice on the server goes through the Core API callable `speakMessage`: an approved `message_id` in, never text. Cloned voices also need active consent and the cloned-voices switch (off by default); Dr. Gokula's voice stays off until T-VOC-08. Safety messages answer "use the phone's neutral voice" without any check that could block them. No vendor is connected yet (T-VOC-01).
 
+## What the app tells people (FR-VOC-08, D-75)
+Voice settings (Studio > Voice and the onboarding voice library) explain the chosen voice: an AI voice made with Kokoro, an open-source text-to-speech model; not a copy of any real person's voice; for now the coach speaks with the phone's closest voice (D-49), so it may sound a little different from the sample. Change that text (`voiceHowMadeLibraryBody` in `apps/mobile/lib/l10n/app_en.arb`) whenever a source in the table above changes, and with T-VOC-01.
+
 ## Open (needs-product / legal)
 - **Legal review of these voices for commercial use.** Apache-2.0 covers the weights; the training-data provenance is described on the model card.
 - **12 voices by launch:** 6 more are needed. Which accents? An Indian English voice would help the India market.

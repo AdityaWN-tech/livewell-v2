@@ -1090,6 +1090,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get trackStreakCounts =>
+      'A day counts when you finish at least one habit.';
+
+  @override
   String get trackStreakLegend =>
       'Rest days are part of the plan. One each week keeps your streak going.';
 

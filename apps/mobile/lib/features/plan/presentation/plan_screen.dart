@@ -228,9 +228,11 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
       ],
       profile: const ProfileButton(),
       actions: [
-        FilledButton.icon(
+        // Outlined: "Set my goal" is the screen's one primary action
+        // (spec 4.1).
+        OutlinedButton.icon(
           key: const Key('plan-new-habit'),
-          style: FilledButton.styleFrom(
+          style: OutlinedButton.styleFrom(
             shape: const StadiumBorder(),
             minimumSize: const Size(LwSize.minTapTarget, LwSize.minTapTarget),
             padding: const EdgeInsets.symmetric(horizontal: LwSpacing.md),

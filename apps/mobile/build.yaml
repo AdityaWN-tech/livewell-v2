@@ -1,0 +1,11 @@
+# Code generation (T-FND-08): only the Drift database needs it.
+# Regenerate with: dart run build_runner build
+targets:
+  $default:
+    builders:
+      drift_dev:
+        generate_for:
+          - lib/core/local_db/local_database.dart
+      source_gen:combining_builder:
+        generate_for:
+          - lib/core/local_db/local_database.dart

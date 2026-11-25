@@ -12,7 +12,7 @@ What is ready in code, and the steps only the owner can do (accounts, keys, uplo
 | T-CMP-02 counsel review: photo avatar, voice clone | Not done; both are flagged **off** | Only those features |
 | Safety critical set at 100% (§15.3) | Passing in CI (`packages/safety-rules`, `safety_rules_test.dart`) | Beta |
 | T-CMP-04 penetration test | Not done | Public launch (beta: owner's call) |
-| T-REL-01 accessibility audit (WCAG 2.2 AA) | Not done; automated checks pass (tap targets, labels, contrast in tests) | Public launch |
+| T-REL-01 accessibility audit (WCAG 2.2 AA) | Automated audit done, no AA blockers found after fixes (`docs/audit/2026-11-19-accessibility.md`, D-89); the owner's VoiceOver/TalkBack device checks in that report are still open | Public launch |
 | Clinical review: coach scripts, routine lines, breathing timings, lessons | Pending (`content/*/REVIEW.md`); prod uses **approved only** | What prod users see |
 | Client: logo file (D-15), app id (D-06), support/privacy email (D-56) | Waiting on client | Store listing |
 

@@ -559,3 +559,34 @@ class BackgroundChoices extends StatelessWidget {
     );
   }
 }
+
+/// What the voice samples say, so the audio is never the only way to get
+/// it (NFR-06 captions, T-REL-01). Text from docs/voices.md.
+class VoiceSampleTranscript extends StatelessWidget {
+  const VoiceSampleTranscript({super.key, required this.style});
+
+  final VoiceStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final t = Theme.of(context).textTheme;
+    return Semantics(
+      container: true,
+      child: Column(
+        key: const Key('voice-sample-transcript'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l.voiceSampleTitle, style: t.titleSmall),
+          const SizedBox(height: LwSpacing.xxs),
+          Text(
+            style == VoiceStyle.energetic
+                ? l.voiceSampleEnergetic
+                : l.voiceSampleCalm,
+            style: t.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}

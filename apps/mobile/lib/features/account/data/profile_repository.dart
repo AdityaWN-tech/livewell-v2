@@ -100,6 +100,13 @@ abstract final class ProfileSettings {
   static const routineRemindersPerDay = 'routine_reminders_per_day';
   static const displayName = 'display_name';
 
+  /// Avatar Moment playback (T-DLY-03e): {auto_speak, captions}, both on by
+  /// default.
+  static const momentPlayback = 'moment_playback';
+
+  /// "Not today" (T-DLY-03e): {date, kinds}, reminders off for one day.
+  static const notToday = 'not_today';
+
   static const keys = [
     coachName,
     appearance,
@@ -108,6 +115,8 @@ abstract final class ProfileSettings {
     touchpoints,
     routineMode,
     routineRemindersPerDay,
+    momentPlayback,
+    notToday,
   ];
 }
 
@@ -117,6 +126,12 @@ abstract class ProfileRepository {
   Future<Profile?> get(String uid);
 
   Future<bool> exists(String uid) async => await get(uid) != null;
+
+  /// The profile as this phone last saw it, without waiting for the network
+  /// when a copy is cached; otherwise the same as [get]. For a sign-in
+  /// restored on app start, so Home doesn't wait for a server round trip
+  /// (NFR-01). Live screens still watch the server copy.
+  Future<Profile?> getCached(String uid) => get(uid);
 
   /// Live profile, null while it doesn't exist.
   Stream<Profile?> watch(String uid);
@@ -177,6 +192,17 @@ class FirestoreProfileRepository extends ProfileRepository {
   Future<Profile?> get(String uid) async {
     final snap = await _doc(uid).get();
     return snap.exists ? Profile.fromData(uid, snap.data()!) : null;
+  }
+
+  @override
+  Future<Profile?> getCached(String uid) async {
+    try {
+      final snap = await _doc(uid).get(const GetOptions(source: Source.cache));
+      if (snap.exists) return Profile.fromData(uid, snap.data()!);
+    } on FirebaseException {
+      // Nothing cached on this phone yet: ask the server.
+    }
+    return get(uid);
   }
 
   @override

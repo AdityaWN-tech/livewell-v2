@@ -120,10 +120,18 @@
   "@legalAgree": {
     "description": "Step 3: the one legal checkbox. Each placeholder is a document name shown as a link; keep all four.",
     "placeholders": {
-      "terms": {"type": "String"},
-      "privacy": {"type": "String"},
-      "medical": {"type": "String"},
-      "ai": {"type": "String"}
+      "terms": {
+        "type": "String"
+      },
+      "privacy": {
+        "type": "String"
+      },
+      "medical": {
+        "type": "String"
+      },
+      "ai": {
+        "type": "String"
+      }
     }
   },
   "legalLoadError": "We couldn't open this document. Please try again.",
@@ -153,10 +161,35 @@
   "emailInvalidMsg": "Enter a valid email address.",
   "passwordShortMsg": "Use at least 8 characters.",
   "phoneTitle": "Continue with phone",
-  "phoneUsOnlyNote": "Phone sign-in works with US numbers. Outside the US? Use email, Google or Apple instead.",
-  "countryUs": "United States (+1)",
+  "phoneCountryNote": "Choose your country, then enter your mobile number.",
+  "@phoneCountryNote": {
+    "description": "D-99: phone sign-in and Profile > Add a phone number accept any country."
+  },
+  "phoneCountryLabel": "Country",
+  "phoneCountryTitle": "Choose your country",
+  "phoneCountrySearchHint": "Search by country or code",
+  "phoneCountryNoMatch": "No country matches that. Try its name or its code, like +44.",
+  "phoneCountrySemantics": "Country: {country}, {dialCode}",
+  "@phoneCountrySemantics": {
+    "description": "Screen reader label of the country button on the phone screen (D-99).",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "dialCode": {
+        "type": "String"
+      }
+    }
+  },
   "phoneNumberLabel": "Mobile number",
-  "phoneInvalidMsg": "Enter a valid US mobile number.",
+  "phoneInvalidMsg": "Enter a valid mobile number for {country}.",
+  "@phoneInvalidMsg": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "phoneSendCode": "Send code",
   "phoneSmsNote": "We'll text you a 6-digit code. Message rates may apply.",
   "codeTitle": "Enter the code",
@@ -193,7 +226,9 @@
   "authErrorMethodDisabled": "This sign-in option isn't available yet.",
   "authErrorUnknown": "Something went wrong. Please try again.",
   "authErrorAppNotVerified": "We couldn't check this phone to send a code. Please try again in a moment, or sign in with email or Google.",
-  "@authErrorAppNotVerified": {"description": "D-58: Firebase app verification (Play Integrity / reCAPTCHA) failed during phone sign-in."},
+  "@authErrorAppNotVerified": {
+    "description": "D-58: Firebase app verification (Play Integrity / reCAPTCHA) failed during phone sign-in."
+  },
   "accountSetupError": "We couldn't finish setting up your account. Please try again.",
   "whyTitle": "Your Why",
   "whyHeading": "What matters most to you?",
@@ -612,6 +647,10 @@
       }
     }
   },
+  "trackStreakCounts": "A day counts when you finish at least one habit.",
+  "@trackStreakCounts": {
+    "description": "Under the Track streak row: says the streak counts habits done, not check-ins."
+  },
   "trackStreakLegend": "Rest days are part of the plan. One each week keeps your streak going.",
   "trackCheckInTitle": "30-second daily check-in",
   "trackCheckInTap": "Tap to log",
@@ -758,21 +797,47 @@
   "voiceAiLabel": "AI voice",
   "voiceAiLabelLong": "This is an AI voice",
   "appLockReason": "Unlock Live Well",
-  "@appLockReason": {"description": "D-62: shown by the phone's fingerprint/face/PIN prompt."},
+  "@appLockReason": {
+    "description": "D-62: shown by the phone's fingerprint/face/PIN prompt."
+  },
   "appLockTitle": "Live Well is locked",
-  "@appLockTitle": {"description": "D-62: app lock screen."},
+  "@appLockTitle": {
+    "description": "D-62: app lock screen."
+  },
   "appLockUnlock": "Unlock",
-  "@appLockUnlock": {"description": "D-62: app lock screen button."},
+  "@appLockUnlock": {
+    "description": "D-62: app lock screen button."
+  },
   "profileAppLock": "Lock with fingerprint or face",
-  "@profileAppLock": {"description": "D-62: Profile > Privacy & data switch (FR-ONB-01)."},
+  "@profileAppLock": {
+    "description": "D-62: Profile > Privacy & data switch (FR-ONB-01)."
+  },
   "profileAppLockBody": "Ask for your phone's unlock when Live Well opens.",
-  "@profileAppLockBody": {"description": "D-62: Profile switch subtitle."},
+  "@profileAppLockBody": {
+    "description": "D-62: Profile switch subtitle."
+  },
   "profileAppLockUnavailable": "This phone couldn't confirm it's you, so the lock is off. Set up a screen lock on your phone first.",
-  "@profileAppLockUnavailable": {"description": "D-62: when turning the lock on fails."},
+  "@profileAppLockUnavailable": {
+    "description": "D-62: when turning the lock on fails."
+  },
   "voiceHowMadeTitle": "How this voice is made",
-  "@voiceHowMadeTitle": {"description": "FR-VOC-08, voice settings (D-61)."},
+  "@voiceHowMadeTitle": {
+    "description": "FR-VOC-08, voice settings (D-61)."
+  },
   "voiceHowMadeBody": "Your coach's voice is an AI voice. For now it is your phone's own text-to-speech, set to sound close to the voice you chose. It is not a copy of a real person's voice. The coach only says lines our team has written and reviewed.",
-  "@voiceHowMadeBody": {"description": "FR-VOC-08, voice settings (D-61). Accurate while voices are device TTS (D-49); update with T-VOC-01."},
+  "@voiceHowMadeBody": {
+    "description": "FR-VOC-08, voice settings (D-61): general text for a voice that isn't in the library. Accurate while voices are device TTS (D-49); update with T-VOC-01."
+  },
+  "voiceHowMadeLibraryBody": "{name} is an AI voice. It was made with Kokoro, an open-source text-to-speech model, and it is not a copy of any real person's voice. For now, your coach speaks with the voice on your phone that sounds closest to {name}, so it may sound a little different from the sample. Your coach only says lines our team has written and reviewed.",
+  "@voiceHowMadeLibraryBody": {
+    "description": "FR-VOC-08 (D-75): how the chosen library voice was made, in voice settings. Facts from docs/voices.md (Kokoro-82M, Apache-2.0) and D-49 (the coach speaks with the phone's closest text-to-speech voice). Update with T-VOC-01.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Warm"
+      }
+    }
+  },
   "voiceGreetingNamed": "Hi {name}, I’m your Live Well coach.",
   "@voiceGreetingNamed": {
     "placeholders": {
@@ -1661,521 +1726,1493 @@
   "photoTryAgain": "Try again",
   "photoPickReady": "Pick a ready-made coach",
   "widgetCheckInSub": "Start with a 30-second check-in",
-  "@widgetCheckInSub": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetCheckInSub": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetShorter": "Short on time? {smaller}",
-  "@widgetShorter": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.", "placeholders": {"smaller": {"type": "String"}}},
+  "@widgetShorter": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.",
+    "placeholders": {
+      "smaller": {
+        "type": "String"
+      }
+    }
+  },
   "widgetTimeFor": "Time for your {step}",
-  "@widgetTimeFor": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.", "placeholders": {"step": {"type": "String"}}},
+  "@widgetTimeFor": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.",
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
   "widgetDayN": "Day {days}!",
-  "@widgetDayN": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.", "placeholders": {"days": {"type": "int"}}},
+  "@widgetDayN": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "widgetDoneHeadline": "Nice work!",
-  "@widgetDoneHeadline": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetDoneHeadline": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetDoneSub": "Your step is done for today.",
-  "@widgetDoneSub": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetDoneSub": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetEvening": "How did today go?",
-  "@widgetEvening": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetEvening": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetGentleSub": "Let's keep today gentle.",
-  "@widgetGentleSub": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetGentleSub": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetNoPlan": "Open Live Well to start your plan",
-  "@widgetNoPlan": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetNoPlan": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetSignedOut": "Open Live Well to sign in",
-  "@widgetSignedOut": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetSignedOut": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetLockNext": "Next: {step}",
-  "@widgetLockNext": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.", "placeholders": {"step": {"type": "String"}}},
+  "@widgetLockNext": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values.",
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
   "widgetLockReady": "Your next step is ready",
-  "@widgetLockReady": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetLockReady": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetLockDone": "Done for today",
-  "@widgetLockDone": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetLockDone": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetStart": "Start",
-  "@widgetStart": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetStart": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetReflect": "Reflect",
-  "@widgetReflect": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetReflect": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetOpen": "Open",
-  "@widgetOpen": {"description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."},
+  "@widgetOpen": {
+    "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
+  },
   "widgetRoutineMorning": "Morning",
-  "@widgetRoutineMorning": {"description": "Home-screen widget routine row (T-AVT-08g)."},
+  "@widgetRoutineMorning": {
+    "description": "Home-screen widget routine row (T-AVT-08g)."
+  },
   "widgetRoutineStep": "Step",
-  "@widgetRoutineStep": {"description": "Home-screen widget routine row (T-AVT-08g)."},
+  "@widgetRoutineStep": {
+    "description": "Home-screen widget routine row (T-AVT-08g)."
+  },
   "widgetRoutineEvening": "Evening",
-  "@widgetRoutineEvening": {"description": "Home-screen widget routine row (T-AVT-08g)."},
+  "@widgetRoutineEvening": {
+    "description": "Home-screen widget routine row (T-AVT-08g)."
+  },
   "routinePlanTitle": "My Daily Routine",
-  "@routinePlanTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routinePlanTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routinePlanBody": "Your own small steps for each day",
-  "@routinePlanBody": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routinePlanBody": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routinePlanProgress": "{done} of {total} done today",
-  "@routinePlanProgress": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
+  "@routinePlanProgress": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "routinePlanOpenLabel": "Open My Daily Routine",
-  "@routinePlanOpenLabel": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routinePlanOpenLabel": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineTitle": "My Daily Routine",
-  "@routineTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineIntro": "Your own steps for each day, beside your coach's plan.",
-  "@routineIntro": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineIntro": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineDayLabel": "Show {day}",
-  "@routineDayLabel": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"day": {"type": "String"}}},
+  "@routineDayLabel": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "routineFromCoach": "From your coach",
-  "@routineFromCoach": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineFromCoach": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineMarkDone": "Mark {label} done",
-  "@routineMarkDone": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"label": {"type": "String"}}},
+  "@routineMarkDone": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "routineDone": "Done",
-  "@routineDone": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineDone": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineSkipped": "Skipped today",
-  "@routineSkipped": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineSkipped": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineResting": "Resting today",
-  "@routineResting": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineResting": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineItemMenu": "Options for {label}",
-  "@routineItemMenu": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"label": {"type": "String"}}},
+  "@routineItemMenu": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "routineEdit": "Edit",
-  "@routineEdit": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineEdit": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineSkipToday": "Skip today",
-  "@routineSkipToday": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineSkipToday": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineRemoveFromDay": "Remove from {day}",
-  "@routineRemoveFromDay": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"day": {"type": "String"}}},
+  "@routineRemoveFromDay": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "routineDelete": "Delete",
-  "@routineDelete": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineDelete": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineDeleted": "{label} deleted",
-  "@routineDeleted": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"label": {"type": "String"}}},
+  "@routineDeleted": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "routineRemovedFromDay": "{label} removed from {day}",
-  "@routineRemovedFromDay": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"label": {"type": "String"}, "day": {"type": "String"}}},
+  "@routineRemovedFromDay": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "routineUndo": "Undo",
-  "@routineUndo": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineUndo": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineAdd": "Add to my routine",
-  "@routineAdd": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineAdd": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineDayFull": "This day has 12 steps, the most it can hold.",
-  "@routineDayFull": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineDayFull": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineClash": "Two things at {time}. Want to move one?",
-  "@routineClash": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"time": {"type": "String"}}},
+  "@routineClash": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "routineEmptyTitle": "Build your day, one small step at a time",
-  "@routineEmptyTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineEmptyTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineEmptyBody": "Start from a template and make it yours, or add steps one by one.",
-  "@routineEmptyBody": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineEmptyBody": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineTemplatesTitle": "Quick-start templates",
-  "@routineTemplatesTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineTemplatesTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineTemplates": "Templates",
-  "@routineTemplates": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineTemplates": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineTemplateApplied": "{name} added. Change anything you like.",
-  "@routineTemplateApplied": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"name": {"type": "String"}}},
+  "@routineTemplateApplied": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "routineTemplateSkipped": "{count, plural, =1{1 step didn't fit (12 a day).} other{{count} steps didn't fit (12 a day).}}",
-  "@routineTemplateSkipped": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"count": {"type": "int"}}},
+  "@routineTemplateSkipped": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "routineCopyDay": "Copy this day to…",
-  "@routineCopyDay": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineCopyDay": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineCopyTitle": "Copy {day} to…",
-  "@routineCopyTitle": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"day": {"type": "String"}}},
+  "@routineCopyTitle": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
   "routineCopyAction": "Copy",
-  "@routineCopyAction": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineCopyAction": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineCopied": "Copied.",
-  "@routineCopied": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineCopied": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineCopyFull": "{days} already full (12 steps), so left out.",
-  "@routineCopyFull": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"days": {"type": "String"}}},
+  "@routineCopyFull": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
   "routineMoreMenu": "More options",
-  "@routineMoreMenu": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineMoreMenu": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModesMenu": "Travel, sick day or busy week",
-  "@routineModesMenu": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModesMenu": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModesTitle": "Life happens",
-  "@routineModesTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModesTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModesBody": "Shrink or pause your routine for a while. Your streak is safe.",
-  "@routineModesBody": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModesBody": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeTravel": "Travelling",
-  "@routineModeTravel": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeTravel": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeTravelBody": "Keep just your first 3 steps for 7 days.",
-  "@routineModeTravelBody": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeTravelBody": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeSick": "Sick day",
-  "@routineModeSick": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeSick": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeSickBody": "Rest today. Your routine pauses until tomorrow.",
-  "@routineModeSickBody": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeSickBody": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeBusy": "Busy week",
-  "@routineModeBusy": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeBusy": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeBusyBody": "Keep just your first 3 steps for 7 days.",
-  "@routineModeBusyBody": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeBusyBody": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeOff": "Back to my full routine",
-  "@routineModeOff": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeOff": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeBannerTravel": "Travel mode until {date}: just your first 3 steps.",
-  "@routineModeBannerTravel": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"date": {"type": "String"}}},
+  "@routineModeBannerTravel": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "routineModeBannerSick": "Sick day: your routine is resting today. Take care.",
-  "@routineModeBannerSick": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeBannerSick": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineModeBannerBusy": "Busy week until {date}: just your first 3 steps.",
-  "@routineModeBannerBusy": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"date": {"type": "String"}}},
+  "@routineModeBannerBusy": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "routineModeEnd": "End",
-  "@routineModeEnd": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineModeEnd": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineAddTitle": "Add to my routine",
-  "@routineAddTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineAddTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineCustom": "Custom",
-  "@routineCustom": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineCustom": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineCustomBody": "Your own step",
-  "@routineCustomBody": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineCustomBody": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineClinicianFirst": "Check with your clinician first",
-  "@routineClinicianFirst": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineClinicianFirst": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineEditTitle": "Edit step",
-  "@routineEditTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineEditTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineNewTitle": "New step",
-  "@routineNewTitle": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineNewTitle": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineLabelField": "What is it?",
-  "@routineLabelField": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineLabelField": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineLabelHint": "For example: Call a friend",
-  "@routineLabelHint": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineLabelHint": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineIconField": "Icon",
-  "@routineIconField": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineIconField": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineIconOption": "Icon {number} of {count}",
-  "@routineIconOption": {"description": "My Daily Routine (T-GOL-03b).", "placeholders": {"number": {"type": "int"}, "count": {"type": "int"}}},
+  "@routineIconOption": {
+    "description": "My Daily Routine (T-GOL-03b).",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "routineTimeField": "Time",
-  "@routineTimeField": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineTimeField": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineDurationField": "How long",
-  "@routineDurationField": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineDurationField": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineDaysField": "Repeats on",
-  "@routineDaysField": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineDaysField": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineReminder": "Remind me",
-  "@routineReminder": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineReminder": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineAnnounce": "Coach announces it",
-  "@routineAnnounce": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineAnnounce": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineAnnounceCustom": "Your coach says “time for your next routine step”. Your own words show as text only.",
-  "@routineAnnounceCustom": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineAnnounceCustom": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineClinicianNote": "Movement can help, but check with your clinician first. Reminders stay off until you turn them on.",
-  "@routineClinicianNote": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineClinicianNote": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineSave": "Save",
-  "@routineSave": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineSave": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineDaysNone": "Pick at least one day.",
-  "@routineDaysNone": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineDaysNone": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineLabelEmpty": "Add a few words.",
-  "@routineLabelEmpty": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineLabelEmpty": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineLabelNotSaved": "That wasn't saved. You can try different words.",
-  "@routineLabelNotSaved": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineLabelNotSaved": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineSaveError": "Couldn't save. Please try again.",
-  "@routineSaveError": {"description": "My Daily Routine (T-GOL-03b)."},
+  "@routineSaveError": {
+    "description": "My Daily Routine (T-GOL-03b)."
+  },
   "routineLabelMedication": "Medicines and supplements can't go in your routine yet. Please keep following your care team's plan for them.",
-  "@routineLabelMedication": {"description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."},
+  "@routineLabelMedication": {
+    "description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."
+  },
   "routineLabelNotAllowed": "Your routine is for kind, everyday steps, not weight, calories or diets. Want to try a different step?",
-  "@routineLabelNotAllowed": {"description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."},
+  "@routineLabelNotAllowed": {
+    "description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."
+  },
   "routineLabelUnkind": "Let's word it kindly. You deserve the same kindness you'd give a friend.",
-  "@routineLabelUnkind": {"description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."},
+  "@routineLabelUnkind": {
+    "description": "My Daily Routine custom-label check (T-GOL-03c). Needs clinical copy review."
+  },
   "reminderRoutineTitle": "Your routine",
-  "@reminderRoutineTitle": {"description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."},
+  "@reminderRoutineTitle": {
+    "description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."
+  },
   "reminderRoutineBody": "Time for your next step.",
-  "@reminderRoutineBody": {"description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."},
+  "@reminderRoutineBody": {
+    "description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."
+  },
   "reminderRoutineBundleBody": "A few things from your routine now.",
-  "@reminderRoutineBundleBody": {"description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."},
+  "@reminderRoutineBundleBody": {
+    "description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."
+  },
   "reminderRoutineChannel": "My Daily Routine",
-  "@reminderRoutineChannel": {"description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."},
+  "@reminderRoutineChannel": {
+    "description": "My Daily Routine reminders (T-GOL-03d). Generic on purpose: nothing personal on the lock screen."
+  },
   "routineIgnoredTitle": "Want to move or pause this one?",
-  "@routineIgnoredTitle": {"description": "T-GOL-03d: asked once after 5 days of ignored reminders."},
+  "@routineIgnoredTitle": {
+    "description": "T-GOL-03d: asked once after 5 days of ignored reminders."
+  },
   "routineIgnoredBody": "{label} hasn't fit your day lately. That's okay. A new time might help, or we can pause its reminder.",
-  "@routineIgnoredBody": {"description": "T-GOL-03d.", "placeholders": {"label": {"type": "String"}}},
+  "@routineIgnoredBody": {
+    "description": "T-GOL-03d.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "routineIgnoredMove": "Move it",
-  "@routineIgnoredMove": {"description": "T-GOL-03d."},
+  "@routineIgnoredMove": {
+    "description": "T-GOL-03d."
+  },
   "routineIgnoredPause": "Pause reminder",
-  "@routineIgnoredPause": {"description": "T-GOL-03d."},
+  "@routineIgnoredPause": {
+    "description": "T-GOL-03d."
+  },
   "routineIgnoredKeep": "Keep it",
-  "@routineIgnoredKeep": {"description": "T-GOL-03d."},
+  "@routineIgnoredKeep": {
+    "description": "T-GOL-03d."
+  },
   "routineReminderPaused": "Reminder paused for {label}.",
-  "@routineReminderPaused": {"description": "T-GOL-03d.", "placeholders": {"label": {"type": "String"}}},
+  "@routineReminderPaused": {
+    "description": "T-GOL-03d.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "routineMomentItems": "In your routine now",
-  "@routineMomentItems": {"description": "T-GOL-03d: heading over the item names (text only) in a routine moment."},
+  "@routineMomentItems": {
+    "description": "T-GOL-03d: heading over the item names (text only) in a routine moment."
+  },
   "profileRoutineReminders": "Routine reminders per day",
-  "@profileRoutineReminders": {"description": "T-GOL-03d, Profile > Daily plan."},
+  "@profileRoutineReminders": {
+    "description": "T-GOL-03d, Profile > Daily plan."
+  },
   "profileRoutineRemindersOff": "Off",
-  "@profileRoutineRemindersOff": {"description": "T-GOL-03d."},
+  "@profileRoutineRemindersOff": {
+    "description": "T-GOL-03d."
+  },
   "homeRoutineNext": "Next in your routine",
-  "@homeRoutineNext": {"description": "T-GOL-03e: Home row."},
+  "@homeRoutineNext": {
+    "description": "T-GOL-03e: Home row."
+  },
   "homeRoutineNextLabel": "Next in your routine: {label} at {time}. Open My Daily Routine.",
-  "@homeRoutineNextLabel": {"description": "T-GOL-03e", "placeholders": {"label": {"type": "String"}, "time": {"type": "String"}}},
+  "@homeRoutineNextLabel": {
+    "description": "T-GOL-03e",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "trackChipRoutine": "Routine",
-  "@trackChipRoutine": {"description": "T-GOL-03e: Track chip."},
+  "@trackChipRoutine": {
+    "description": "T-GOL-03e: Track chip."
+  },
   "trackChartRoutineEmpty": "Build your routine on the Plan tab to see it here.",
-  "@trackChartRoutineEmpty": {"description": "T-GOL-03e"},
+  "@trackChartRoutineEmpty": {
+    "description": "T-GOL-03e"
+  },
   "trackRoutineDone": "{count, plural, =0{Nothing yet} =1{1 done} other{{count} done}}",
-  "@trackRoutineDone": {"description": "T-GOL-03e: never a 'missed' word.", "placeholders": {"count": {"type": "int"}}},
+  "@trackRoutineDone": {
+    "description": "T-GOL-03e: never a 'missed' word.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "widgetRoutineNext": "Next in your routine",
-  "@widgetRoutineNext": {"description": "T-GOL-03e: widget subline."},
+  "@widgetRoutineNext": {
+    "description": "T-GOL-03e: widget subline."
+  },
   "widgetRoutineCustom": "Your next routine step",
-  "@widgetRoutineCustom": {"description": "T-GOL-03e: a custom item's words never go to the widget."},
+  "@widgetRoutineCustom": {
+    "description": "T-GOL-03e: a custom item's words never go to the widget."
+  },
   "widgetRoutineAt": "At {time}",
-  "@widgetRoutineAt": {"description": "T-GOL-03e", "placeholders": {"time": {"type": "String"}}},
+  "@widgetRoutineAt": {
+    "description": "T-GOL-03e",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "widgetLockRoutine": "A small step from your routine",
-  "@widgetLockRoutine": {"description": "T-GOL-03e: lock screen, generic."},
+  "@widgetLockRoutine": {
+    "description": "T-GOL-03e: lock screen, generic."
+  },
   "widgetRoutineOpen": "My routine",
-  "@widgetRoutineOpen": {"description": "T-GOL-03e: widget button."},
+  "@widgetRoutineOpen": {
+    "description": "T-GOL-03e: widget button."
+  },
   "avatarCatAge": "Age",
-  "@avatarCatAge": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatAge": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatFace": "Face shape",
-  "@avatarCatFace": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatFace": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatBody": "Build",
-  "@avatarCatBody": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatBody": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatSkin": "Skin tone",
-  "@avatarCatSkin": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatSkin": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatEyes": "Eyes",
-  "@avatarCatEyes": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatEyes": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatEyebrows": "Eyebrows",
-  "@avatarCatEyebrows": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatEyebrows": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatNose": "Nose",
-  "@avatarCatNose": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatNose": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatLips": "Lips",
-  "@avatarCatLips": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatLips": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatHairstyle": "Hairstyle",
-  "@avatarCatHairstyle": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatHairstyle": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatHairColour": "Hair colour",
-  "@avatarCatHairColour": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatHairColour": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatFacialHair": "Facial hair",
-  "@avatarCatFacialHair": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatFacialHair": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatOutfit": "Outfit",
-  "@avatarCatOutfit": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatOutfit": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatOutfitColour": "Outfit colour",
-  "@avatarCatOutfitColour": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatOutfitColour": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatCap": "Cap or hat",
-  "@avatarCatCap": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatCap": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatHeadCovering": "Head covering",
-  "@avatarCatHeadCovering": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatHeadCovering": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatGlasses": "Glasses",
-  "@avatarCatGlasses": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatGlasses": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "avatarCatAccessories": "Accessories and mobility aids",
-  "@avatarCatAccessories": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@avatarCatAccessories": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "studioBuildMake": "Make my coach",
-  "@studioBuildMake": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@studioBuildMake": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "studioAdjustMake": "Make these changes",
-  "@studioAdjustMake": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@studioAdjustMake": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "studioAdjustReadyMade": "Ready-made coaches keep their look. For a coach with the hair, outfit and details you choose, build your own.",
-  "@studioAdjustReadyMade": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@studioAdjustReadyMade": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "studioMakingTitle": "We're making your coach",
-  "@studioMakingTitle": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@studioMakingTitle": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "studioMakingBody": "It takes a few minutes. You can leave this screen; we'll let you know when your coach is ready.",
-  "@studioMakingBody": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@studioMakingBody": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "studioErrUnavailable": "Making a coach isn't available right now. You can pick a ready-made coach.",
-  "@studioErrUnavailable": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@studioErrUnavailable": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "studioErrNotMade": "We couldn't make your coach this time. You can try different choices, or pick a ready-made coach.",
-  "@studioErrNotMade": {"description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."},
+  "@studioErrNotMade": {
+    "description": "Avatar Studio, Build my own and Adjust (Step 1, D-50)."
+  },
   "goalSetCta": "Set my goal",
-  "@goalSetCta": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalSetCta": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalSheetNewTitle": "Set your 30-day goal",
-  "@goalSheetNewTitle": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalSheetNewTitle": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalSheetEditTitle": "Your 30-day goal",
-  "@goalSheetEditTitle": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalSheetEditTitle": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalActionField": "What will you do?",
-  "@goalActionField": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalActionField": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalActionHint": "For example: Walk after dinner",
-  "@goalActionHint": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalActionHint": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalDaysField": "How many days a week?",
-  "@goalDaysField": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalDaysField": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalMinutesField": "For how long?",
-  "@goalMinutesField": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalMinutesField": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalAnchorField": "When in your day?",
-  "@goalAnchorField": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalAnchorField": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalBarrierField": "If something gets in the way, I will…",
-  "@goalBarrierField": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalBarrierField": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalBarrierHint": "For example: walk indoors if it rains",
-  "@goalBarrierHint": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalBarrierHint": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalLinkWhy": "Show my Why with this goal",
-  "@goalLinkWhy": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalLinkWhy": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalSave": "Save",
-  "@goalSave": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalSave": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalPause": "Pause this goal",
-  "@goalPause": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalPause": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalRestart": "Restart from day 1",
-  "@goalRestart": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalRestart": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalPausedNote": "Paused. Restart it when you're ready.",
-  "@goalPausedNote": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalPausedNote": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalSaved": "Your goal is saved.",
-  "@goalSaved": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalSaved": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalPausedSnack": "Your goal is paused. Nothing is lost.",
-  "@goalPausedSnack": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalPausedSnack": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalRestartedSnack": "Day 1 again. You've got this.",
-  "@goalRestartedSnack": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalRestartedSnack": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalLabelMedication": "Medicines and supplements can't be a goal or habit here yet. Please keep following your care team's plan for them.",
-  "@goalLabelMedication": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalLabelMedication": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalLabelNotAllowed": "Goals and habits here are kind, everyday steps, not weight, calories or diets. Want to try a different one?",
-  "@goalLabelNotAllowed": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@goalLabelNotAllowed": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "anchorWakeUp": "After waking up",
-  "@anchorWakeUp": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@anchorWakeUp": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "anchorBreakfast": "After breakfast",
-  "@anchorBreakfast": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@anchorBreakfast": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "anchorLunch": "After lunch",
-  "@anchorLunch": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@anchorLunch": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "anchorDinner": "After dinner",
-  "@anchorDinner": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@anchorDinner": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "anchorBedtime": "Before bed",
-  "@anchorBedtime": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@anchorBedtime": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitSheetNewTitle": "New habit",
-  "@habitSheetNewTitle": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitSheetNewTitle": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitSheetEditTitle": "Change this habit",
-  "@habitSheetEditTitle": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitSheetEditTitle": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitSheetBody": "A supporting habit is a small step that helps your goal. Keep it tiny, so it's easy on busy days.",
-  "@habitSheetBody": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitSheetBody": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitTitleField": "What is the habit?",
-  "@habitTitleField": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitTitleField": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitTitleHint": "For example: Drink a glass of water",
-  "@habitTitleHint": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitTitleHint": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitAdd": "Add habit",
-  "@habitAdd": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitAdd": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitStop": "Stop this habit",
-  "@habitStop": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitStop": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "habitChange": "Change",
-  "@habitChange": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."},
+  "@habitChange": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53)."
+  },
   "goalDaysValue": "{count, plural, =1{1 day a week} other{{count} days a week}}",
-  "@goalDaysValue": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).", "placeholders": {"count": {"type": "int"}}},
+  "@goalDaysValue": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "habitAdded": "{title} is in your plan.",
-  "@habitAdded": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).", "placeholders": {"title": {"type": "String"}}},
+  "@habitAdded": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "habitStoppedSnack": "{title} stopped. You can add a new habit any time.",
-  "@habitStoppedSnack": {"description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).", "placeholders": {"title": {"type": "String"}}},
+  "@habitStoppedSnack": {
+    "description": "Plan: goal and habits (Step 4a, FR-GOL-01/02, D-53).",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "winsTitle": "Your weekly wins",
-  "@winsTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsSubtitle": "The last 7 days. Every small step counts.",
-  "@winsSubtitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsSubtitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsEmptyTitle": "A fresh week",
-  "@winsEmptyTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsEmptyTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsEmptyBody": "Your wins will show here as you check in and tick off your steps. One small step today is a great start.",
-  "@winsEmptyBody": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsEmptyBody": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsNextTitle": "One small change for next week",
-  "@winsNextTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsNextTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsFirstTitle": "Start with one check-in",
-  "@winsFirstTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsFirstTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsFirstBody": "It takes under 30 seconds. Try it after breakfast tomorrow.",
-  "@winsFirstBody": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsFirstBody": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsMoreTitle": "Check in at the same time each day",
-  "@winsMoreTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsMoreTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsMoreBody": "Pair your check-in with something you already do every day, like your morning tea.",
-  "@winsMoreBody": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsMoreBody": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsSmallerTitle": "Make one habit smaller",
-  "@winsSmallerTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsSmallerTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsSmallerBody": "Pick your easiest habit and shrink it until it feels almost too easy. Then do it right after breakfast.",
-  "@winsSmallerBody": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsSmallerBody": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsKeepTitle": "Keep the same plan",
-  "@winsKeepTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsKeepTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsKeepBody": "This week worked. Keep the same steps next week and notice how they feel.",
-  "@winsKeepBody": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsKeepBody": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsOpenPlan": "Open my plan",
-  "@winsOpenPlan": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@winsOpenPlan": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "frameworkThoughtTitle": "Today's thought",
-  "@frameworkThoughtTitle": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@frameworkThoughtTitle": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "whyEditSaved": "Your Why is saved.",
-  "@whyEditSaved": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."},
+  "@whyEditSaved": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54)."
+  },
   "winsCheckIns": "{count, plural, =1{You checked in on 1 day.} other{You checked in on {count} days.}}",
-  "@winsCheckIns": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"count": {"type": "int"}}},
+  "@winsCheckIns": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "winsMood": "Your mood was mostly “{word}”.",
-  "@winsMood": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"word": {"type": "String"}}},
+  "@winsMood": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).",
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
   "winsHabits": "{count, plural, =1{You did a habit 1 time.} other{You did your habits {count} times.}}",
-  "@winsHabits": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"count": {"type": "int"}}},
+  "@winsHabits": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "winsRoutine": "{count, plural, =1{You did 1 routine step.} other{You did {count} routine steps.}}",
-  "@winsRoutine": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"count": {"type": "int"}}},
+  "@winsRoutine": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "winsSteady": "You kept up {step} on {days} days.",
-  "@winsSteady": {"description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).", "placeholders": {"step": {"type": "String"}, "days": {"type": "int"}}},
+  "@winsSteady": {
+    "description": "Weekly wins and MY GOAL DO IT (Step 4b, D-54).",
+    "placeholders": {
+      "step": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "authErrorPhoneInUse": "This number is already used by another Live Well account. Sign in with it there, or use a different number.",
-  "@authErrorPhoneInUse": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "@authErrorPhoneInUse": {
+    "description": "Profile: add or remove a phone number (Step 4c, D-55)."
+  },
   "authErrorAlreadyLinked": "Your account already has a phone number.",
-  "@authErrorAlreadyLinked": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "@authErrorAlreadyLinked": {
+    "description": "Profile: add or remove a phone number (Step 4c, D-55)."
+  },
   "profilePhoneAdded": "Your phone number is added. You can sign in with it next time.",
-  "@profilePhoneAdded": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "@profilePhoneAdded": {
+    "description": "Profile: add or remove a phone number (Step 4c, D-55)."
+  },
   "profileRemovePhone": "Remove phone number",
-  "@profileRemovePhone": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "@profileRemovePhone": {
+    "description": "Profile: add or remove a phone number (Step 4c, D-55)."
+  },
   "profileRemovePhoneTitle": "Remove your phone number?",
-  "@profileRemovePhoneTitle": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "@profileRemovePhoneTitle": {
+    "description": "Profile: add or remove a phone number (Step 4c, D-55)."
+  },
   "profilePhoneRemoved": "Phone number removed.",
-  "@profilePhoneRemoved": {"description": "Profile: add or remove a phone number (Step 4c, D-55)."},
+  "@profilePhoneRemoved": {
+    "description": "Profile: add or remove a phone number (Step 4c, D-55)."
+  },
   "profileRemovePhoneBody": "You won't be able to sign in with {phone} any more. You can add it again later.",
-  "@profileRemovePhoneBody": {"description": "Profile: add or remove a phone number (Step 4c, D-55).", "placeholders": {"phone": {"type": "String"}}},
+  "@profileRemovePhoneBody": {
+    "description": "Profile: add or remove a phone number (Step 4c, D-55).",
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
   "careSupportBubble": "I'm here for you. Here are some things that can help right now.",
-  "@careSupportBubble": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "@careSupportBubble": {
+    "description": "Step 4d hide/flag sweep (D-56)."
+  },
   "profileRequestData": "Request a copy of my data",
-  "@profileRequestData": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "@profileRequestData": {
+    "description": "Step 4d hide/flag sweep (D-56)."
+  },
   "profileRequestDataNote": "We'll email it to you within 72 hours.",
-  "@profileRequestDataNote": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "@profileRequestDataNote": {
+    "description": "Step 4d hide/flag sweep (D-56)."
+  },
   "profileRequestDataSubject": "Live Well: a copy of my data",
-  "@profileRequestDataSubject": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "@profileRequestDataSubject": {
+    "description": "Step 4d hide/flag sweep (D-56)."
+  },
   "profileRequestDataNoMail": "No email app found. Please write to us from your email.",
-  "@profileRequestDataNoMail": {"description": "Step 4d hide/flag sweep (D-56)."},
+  "@profileRequestDataNoMail": {
+    "description": "Step 4d hide/flag sweep (D-56)."
+  },
   "profileRequestDataBody": "Please send me a copy of my Live Well data. My account id is {uid}.",
-  "@profileRequestDataBody": {"description": "Step 4d hide/flag sweep (D-56).", "placeholders": {"uid": {"type": "String"}}},
+  "@profileRequestDataBody": {
+    "description": "Step 4d hide/flag sweep (D-56).",
+    "placeholders": {
+      "uid": {
+        "type": "String"
+      }
+    }
+  },
   "learnReaderCardOf": "Card {n} of {total}",
-  "@learnReaderCardOf": {"description": "Step 4e Learn reader and breathing guide (D-57).", "placeholders": {"n": {"type": "int"}, "total": {"type": "int"}}},
+  "@learnReaderCardOf": {
+    "description": "Step 4e Learn reader and breathing guide (D-57).",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "learnReaderNext": "Next",
-  "@learnReaderNext": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderNext": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnReaderBack": "Back",
-  "@learnReaderBack": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderBack": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnReaderTryThis": "Try this today",
-  "@learnReaderTryThis": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderTryThis": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnReaderEndTitle": "That's the lesson",
-  "@learnReaderEndTitle": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderEndTitle": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnReaderEndBody": "Well done for taking the time. Small steps add up.",
-  "@learnReaderEndBody": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderEndBody": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
+  "learnReaderPortalTitle": "Go deeper on the Live Well Portal",
+  "@learnReaderPortalTitle": {
+    "description": "FR-LRN-04 / T-PRT-03: heading above the lesson's related portal card at the end of the reader (D-74)."
+  },
   "learnReaderFinish": "Finish lesson",
-  "@learnReaderFinish": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderFinish": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnReaderMissingTitle": "This lesson isn't here right now",
-  "@learnReaderMissingTitle": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderMissingTitle": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnReaderMissingBody": "It may be being updated. You can find other lessons on Learn.",
-  "@learnReaderMissingBody": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderMissingBody": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnReaderBackToLearn": "Back to Learn",
-  "@learnReaderBackToLearn": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnReaderBackToLearn": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnListen": "Listen",
-  "@learnListen": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnListen": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnListenStop": "Stop listening",
-  "@learnListenStop": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnListenStop": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "learnListenProgress": "Listening, card {n} of {total}",
-  "@learnListenProgress": {"description": "Step 4e Learn reader and breathing guide (D-57).", "placeholders": {"n": {"type": "int"}, "total": {"type": "int"}}},
+  "@learnListenProgress": {
+    "description": "Step 4e Learn reader and breathing guide (D-57).",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "learnListenUnavailable": "Listening isn't working on this phone right now. You can read the lesson instead.",
-  "@learnListenUnavailable": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@learnListenUnavailable": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheTitle": "Breathe with me",
-  "@breatheTitle": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheTitle": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheCardBody": "A guided breathing break, 1 to 5 minutes. Works offline.",
-  "@breatheCardBody": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheCardBody": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheCardLabel": "Breathe with me. A guided breathing break, 1 to 5 minutes. Opens the breathing guide.",
-  "@breatheCardLabel": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheCardLabel": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePatternBox": "Box breathing",
-  "@breathePatternBox": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePatternBox": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePatternBoxSteps": "In 4, hold 4, out 4, hold 4",
-  "@breathePatternBoxSteps": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePatternBoxSteps": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePatternCalm": "Slow breathing",
-  "@breathePatternCalm": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePatternCalm": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePatternCalmSteps": "In 4, out 6",
-  "@breathePatternCalmSteps": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePatternCalmSteps": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePatternSleep": "Sleep wind-down",
-  "@breathePatternSleep": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePatternSleep": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePatternSleepSteps": "In 4, out 7",
-  "@breathePatternSleepSteps": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePatternSleepSteps": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePatternLabel": "Pattern",
-  "@breathePatternLabel": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePatternLabel": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheLengthLabel": "How long",
-  "@breatheLengthLabel": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheLengthLabel": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheStart": "Start",
-  "@breatheStart": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheStart": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breathePause": "Pause",
-  "@breathePause": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breathePause": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheResume": "Resume",
-  "@breatheResume": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheResume": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheIn": "Breathe in",
-  "@breatheIn": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheIn": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheHold": "Hold",
-  "@breatheHold": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheHold": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheOut": "Breathe out",
-  "@breatheOut": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheOut": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheBreathOf": "Breath {n} of {total}",
-  "@breatheBreathOf": {"description": "Step 4e Learn reader and breathing guide (D-57).", "placeholders": {"n": {"type": "int"}, "total": {"type": "int"}}},
+  "@breatheBreathOf": {
+    "description": "Step 4e Learn reader and breathing guide (D-57).",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "breatheSafety": "Breathe gently, through your nose if you can. If you feel dizzy or unwell, stop and breathe normally.",
-  "@breatheSafety": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheSafety": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheDoneTitle": "Well done",
-  "@breatheDoneTitle": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheDoneTitle": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheDoneBody": "You took {breaths} calm breaths. Notice how you feel now.",
-  "@breatheDoneBody": {"description": "Step 4e Learn reader and breathing guide (D-57).", "placeholders": {"breaths": {"type": "int"}}},
+  "@breatheDoneBody": {
+    "description": "Step 4e Learn reader and breathing guide (D-57).",
+    "placeholders": {
+      "breaths": {
+        "type": "int"
+      }
+    }
+  },
   "breatheAgain": "Again",
-  "@breatheAgain": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheAgain": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "breatheClose": "Close",
-  "@breatheClose": {"description": "Step 4e Learn reader and breathing guide (D-57)."},
+  "@breatheClose": {
+    "description": "Step 4e Learn reader and breathing guide (D-57)."
+  },
   "healthAppleHealth": "Apple Health",
-  "@healthAppleHealth": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "@healthAppleHealth": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
   "healthHealthConnect": "Health Connect",
-  "@healthHealthConnect": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "@healthHealthConnect": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
   "healthConnectTitle": "Connect {app}",
-  "@healthConnectTitle": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "@healthConnectTitle": {
+    "description": "Step 4f Apple Health / Health Connect (D-59).",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
   "healthConnectBody": "Live Well can read your steps and sleep from {app} to show them in Track. It only reads, and what it reads stays on your phone. You can turn this off any time in Settings > Consents.",
-  "@healthConnectBody": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "@healthConnectBody": {
+    "description": "Step 4f Apple Health / Health Connect (D-59).",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
   "healthConnectButton": "Connect {app}",
-  "@healthConnectButton": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "@healthConnectButton": {
+    "description": "Step 4f Apple Health / Health Connect (D-59).",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
   "healthNotNow": "Not now",
-  "@healthNotNow": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "@healthNotNow": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
   "healthNeedsInstallBody": "To show your steps and sleep, this phone needs the free Health Connect app from Google.",
-  "@healthNeedsInstallBody": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "@healthNeedsInstallBody": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
   "healthInstallButton": "Get Health Connect",
-  "@healthInstallButton": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "@healthInstallButton": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
   "healthUnavailableBody": "This phone can't share health data with apps. Track still shows your check-ins.",
-  "@healthUnavailableBody": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "@healthUnavailableBody": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
   "healthClose": "Close",
-  "@healthClose": {"description": "Step 4f Apple Health / Health Connect (D-59)."},
+  "@healthClose": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
   "healthDeniedBody": "Live Well wasn't given access. To connect, allow steps and sleep for Live Well in {app}.",
-  "@healthDeniedBody": {"description": "Step 4f Apple Health / Health Connect (D-59).", "placeholders": {"app": {"type": "String"}}},
+  "@healthDeniedBody": {
+    "description": "Step 4f Apple Health / Health Connect (D-59).",
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
   "healthTryAgain": "Try again",
-  "@healthTryAgain": {"description": "Step 4f Apple Health / Health Connect (D-59)."}
+  "@healthTryAgain": {
+    "description": "Step 4f Apple Health / Health Connect (D-59)."
+  },
+  "consentMemoryTitle": "Let my coach remember things",
+  "@consentMemoryTitle": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "consentMemoryBody": "Your coach can suggest small things to remember from your chats and reflections, like \"prefers morning walks\". You choose what is kept.",
+  "@consentMemoryBody": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "consentMemorySensitiveTitle": "Include health details",
+  "@consentMemorySensitiveTitle": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "consentMemorySensitiveBody": "Medicines, health conditions and mental health. These are only suggested and kept if you turn this on.",
+  "@consentMemorySensitiveBody": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryTitle": "What my coach remembers",
+  "@memoryTitle": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryIntro": "These help your coach make suggestions that fit you. Nothing is kept unless you say so, and you can delete anything at any time.",
+  "@memoryIntro": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memorySuggestionsHeader": "Suggestions to keep",
+  "@memorySuggestionsHeader": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memorySavedHeader": "Remembered",
+  "@memorySavedHeader": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryKeep": "Keep",
+  "@memoryKeep": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryDelete": "Delete",
+  "@memoryDelete": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryHealthTag": "Health detail",
+  "@memoryHealthTag": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryOffNote": "Memory is off, so nothing new is suggested and your coach uses nothing here. You can still delete these.",
+  "@memoryOffNote": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryNeedsSensitive": "To keep this, turn on Include health details.",
+  "@memoryNeedsSensitive": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryEmptyTitle": "Nothing remembered yet",
+  "@memoryEmptyTitle": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryEmptyBody": "When you chat with your coach or write a reflection, it may suggest something to remember. You decide.",
+  "@memoryEmptyBody": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryDeleteAll": "Delete everything",
+  "@memoryDeleteAll": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryDeleteAllTitle": "Delete everything your coach remembers?",
+  "@memoryDeleteAllTitle": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryDeleteAllBody": "This can't be undone. Your coach won't use or suggest these again.",
+  "@memoryDeleteAllBody": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryCancel": "Cancel",
+  "@memoryCancel": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryDeleted": "Deleted",
+  "@memoryDeleted": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memorySaveError": "That didn't save. Please try again.",
+  "@memorySaveError": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryLoadError": "Couldn't load this right now. Please try again later.",
+  "@memoryLoadError": {
+    "description": "T-AGT-05b memory screen (D-101)."
+  },
+  "memoryKeepSemantics": "Keep: {fact}",
+  "@memoryKeepSemantics": {
+    "description": "T-AGT-05b memory screen (D-101).",
+    "placeholders": {
+      "fact": {
+        "type": "String"
+      }
+    }
+  },
+  "memoryDeleteSemantics": "Delete: {fact}",
+  "@memoryDeleteSemantics": {
+    "description": "T-AGT-05b memory screen (D-101).",
+    "placeholders": {
+      "fact": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyPlanSubtitle": "Moment times, your coach's voice and the widget",
+  "@dailyPlanSubtitle": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanIntro": "Choose when your coach checks in and how your moments play.",
+  "@dailyPlanIntro": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanTimesHeader": "Moment times",
+  "@dailyPlanTimesHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanChangeTime": "Change the {moment} time",
+  "@dailyPlanChangeTime": {
+    "description": "Profile > Daily plan (T-DLY-03e).",
+    "placeholders": {
+      "moment": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyPlanNotToday": "Not today",
+  "@dailyPlanNotToday": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanNotTodayDone": "No {moment} reminder today. It's back tomorrow.",
+  "@dailyPlanNotTodayDone": {
+    "description": "Profile > Daily plan (T-DLY-03e).",
+    "placeholders": {
+      "moment": {
+        "type": "String"
+      }
+    }
+  },
+  "dailyPlanInQuiet": "This time is during quiet hours, so no reminder is sent. Pick a time outside them.",
+  "@dailyPlanInQuiet": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanQuietHeader": "Quiet hours",
+  "@dailyPlanQuietHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCoachHeader": "Your coach in moments",
+  "@dailyPlanCoachHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanAutoSpeak": "Coach speaks automatically when I open a moment",
+  "@dailyPlanAutoSpeak": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanTextOnly": "Show text only. Tap play to hear your coach.",
+  "@dailyPlanTextOnly": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanSpeedNote": "The same speed as in your voice settings.",
+  "@dailyPlanSpeedNote": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCaptions": "Captions always on",
+  "@dailyPlanCaptions": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCaptionsOn": "The words appear as your coach speaks.",
+  "@dailyPlanCaptionsOn": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanCaptionsOff": "The words appear when your coach has finished.",
+  "@dailyPlanCaptionsOff": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreview": "Preview tomorrow's morning",
+  "@dailyPlanPreview": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreviewTag": "Preview",
+  "@dailyPlanPreviewTag": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreviewNone": "There's no morning message to preview yet.",
+  "@dailyPlanPreviewNone": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanPreviewPaused": "Let's keep today quiet. Previews are back tomorrow.",
+  "@dailyPlanPreviewPaused": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetHeader": "Home-screen widget",
+  "@dailyPlanWidgetHeader": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetTitle": "Add the widget",
+  "@dailyPlanWidgetTitle": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetBody": "See your next small step without opening the app.",
+  "@dailyPlanWidgetBody": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetAndroid": "Android: touch and hold an empty spot on your home screen, tap Widgets, then find Live Well.",
+  "@dailyPlanWidgetAndroid": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetIos": "iPhone: touch and hold your home screen, tap Edit or +, then search for Live Well.",
+  "@dailyPlanWidgetIos": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  },
+  "dailyPlanWidgetPrivate": "On the lock screen the widget shows general text only, never your answers or health details.",
+  "@dailyPlanWidgetPrivate": {
+    "description": "Profile > Daily plan (T-DLY-03e)."
+  }
 }

@@ -49,6 +49,29 @@ void main() {
     expect(find.text('Phone number removed.'), findsOneWidget);
   });
 
+  testWidgets('any country (D-99): pick India and add a +91 number', (
+    tester,
+  ) async {
+    final h = signedIn();
+    await h.boot(tester);
+    await openProfile(tester);
+    await tapKey(tester, 'profile-link-phone');
+    expect(find.byKey(const Key('phone-country')), findsOneWidget);
+    await tapKey(tester, 'phone-country');
+    await tester.enterText(find.byKey(const Key('country-search')), '91');
+    await tester.pumpAndSettle();
+    await tapKey(tester, 'country-IN');
+    await tester.enterText(find.byKey(const Key('phone')), '98765 43210');
+    await tester.tap(find.text('Send code'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('code')), '123456');
+    await tester.tap(find.text('Verify'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ProfileScreen), findsOneWidget);
+    expect(h.auth.signedIn!.uid, 'u1');
+    expect(h.auth.signedIn!.phoneNumber, '+919876543210');
+  });
+
   testWidgets('a wrong code says so and nothing is added', (tester) async {
     final h = signedIn();
     await h.boot(tester);

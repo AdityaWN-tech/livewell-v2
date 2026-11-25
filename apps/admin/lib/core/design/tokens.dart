@@ -329,6 +329,9 @@ abstract final class LwSize {
   static const double iconMd = 24;
   static const double avatarSm = 40;
 
+  /// The coach's preview in Profile > My coach.
+  static const double coachPreview = 64;
+
   /// Logo mark on the splash. Must equal the native splash image
   /// (640 px at 4x in assets/brand/splash/), so the hand-off doesn't jump.
   static const double splashMark = 160;

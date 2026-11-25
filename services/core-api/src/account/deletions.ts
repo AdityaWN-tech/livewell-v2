@@ -1,8 +1,18 @@
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import {
+  HttpsError,
+  onCall,
+  type CallableRequest,
+} from 'firebase-functions/v2/https';
 
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
+import { monitored } from '../observability/log.js';
+import {
+  CloudStorageMediaFiles,
+  deleteFaceData,
+  type MediaFiles,
+} from '../consents/revoke-handling.js';
 
 /**
  * Deletions the app can't do itself (firestore.rules forbid client deletes):
@@ -21,19 +31,37 @@ function uidOf(auth: { uid: string } | undefined): string {
 /** Unique per call, so repeated deletions each get an entry. */
 const stamp = () => Date.now().toString(36);
 
-export async function deleteAvatarFor(uid: string, log: AuditLog) {
-  const ref = getFirestore().doc(`users/${uid}/avatar/current`);
-  const existed = (await ref.get()).exists;
-  await ref.delete();
-  // TODO(T-AVT-03): when a vendor avatar exists, delete it by API first and
-  // record the vendor's confirmation (FR-SET-03).
+/**
+ * "Delete my avatar" (FR-SET-03, T-AVT-05, D-78). HUMAN REVIEW REQUIRED
+ * (privacy). The same face-data deletion as revoking the camera consent
+ * (D-76, one copy of that logic): raw selfies, every portrait and frame set
+ * in Cloud Storage, the vendor copy queued for deletion
+ * (`vendor_requests`, drained by the vendor adapter, T-AVT-03), and the
+ * avatar put back to a ready-made coach; the coach's name and background
+ * stay (not face data). One audit entry with counts only. Idempotent: a
+ * retry after a failure deletes what is left and logs again.
+ */
+export async function deleteAvatarFor(
+  uid: string,
+  log: AuditLog,
+  files: MediaFiles = new CloudStorageMediaFiles(),
+) {
+  const existed = (
+    await getFirestore().doc(`users/${uid}/avatar/current`).get()
+  ).exists;
+  const c = await deleteFaceData(uid, 'delete_my_avatar', files);
   await log.append(`avatar_deleted_${uid}_${stamp()}`, {
     actor: uid,
     action: 'avatar.deleted',
     target: `users/${uid}/avatar/current`,
-    details: { existed, vendor_models_deleted: 0 },
+    details: {
+      existed,
+      media_files_deleted: c.media_files_deleted,
+      avatar_reset: c.avatar_reset,
+      vendor_requests_queued: c.vendor_requests_queued,
+    },
   });
-  return { deleted: existed };
+  return { deleted: true, reset: c.avatar_reset > 0 };
 }
 
 export async function deleteVoicesFor(uid: string, log: AuditLog) {
@@ -71,10 +99,27 @@ export async function deleteAccountFor(uid: string, log: AuditLog) {
   return { deleted: true };
 }
 
-export function makeDeletions(log: AuditLog = new FirestoreAuditLog()) {
+export function makeDeletions(
+  log: AuditLog = new FirestoreAuditLog(),
+  files: MediaFiles = new CloudStorageMediaFiles(),
+) {
   return {
-    deleteAvatar: onCall((req) => deleteAvatarFor(uidOf(req.auth), log)),
-    deleteVoice: onCall((req) => deleteVoicesFor(uidOf(req.auth), log)),
-    deleteAccount: onCall((req) => deleteAccountFor(uidOf(req.auth), log)),
+    // monitored(): duration and error code only, never the request
+    // (T-FND-10, D-80).
+    deleteAvatar: onCall(
+      monitored('deleteAvatar', async (req: CallableRequest) =>
+        deleteAvatarFor(uidOf(req.auth), log, files),
+      { callable: true }),
+    ),
+    deleteVoice: onCall(
+      monitored('deleteVoice', async (req: CallableRequest) =>
+        deleteVoicesFor(uidOf(req.auth), log),
+      { callable: true }),
+    ),
+    deleteAccount: onCall(
+      monitored('deleteAccount', async (req: CallableRequest) =>
+        deleteAccountFor(uidOf(req.auth), log),
+      { callable: true }),
+    ),
   };
 }

@@ -3985,4 +3985,207 @@ class AppLocalizationsEn extends AppLocalizations {
   String profileChangeTime(String name, String time) {
     return '$name, $time. Change the time';
   }
+
+  @override
+  String get trackMeasuresTitle => 'My measures';
+
+  @override
+  String get trackMeasuresIntro =>
+      'Add a number when you take one. Live Well keeps the record for you; your clinician can help you read it.';
+
+  @override
+  String get metricWeight => 'Weight';
+
+  @override
+  String get metricBloodPressure => 'Blood pressure';
+
+  @override
+  String get metricGlucose => 'Glucose';
+
+  @override
+  String get metricMeals => 'Meals';
+
+  @override
+  String get metricNothingYet => 'Nothing yet';
+
+  @override
+  String get metricAddWeight => 'Add weight';
+
+  @override
+  String get metricAddBloodPressure => 'Add blood pressure';
+
+  @override
+  String get metricAddGlucose => 'Add glucose';
+
+  @override
+  String get metricAddMeal => 'Add a meal';
+
+  @override
+  String metricValueUnit(String value, String unit) {
+    return '$value $unit';
+  }
+
+  @override
+  String metricBpValue(String systolic, String diastolic, String unit) {
+    return '$systolic/$diastolic $unit';
+  }
+
+  @override
+  String get mealBreakfast => 'Breakfast';
+
+  @override
+  String get mealLunch => 'Lunch';
+
+  @override
+  String get mealDinner => 'Dinner';
+
+  @override
+  String get mealSnack => 'Snack';
+
+  @override
+  String get metricSourceManual => 'Entered by you';
+
+  @override
+  String metricSourceHealth(String app) {
+    return 'From $app';
+  }
+
+  @override
+  String metricProvenance(String source, String time) {
+    return '$source · $time';
+  }
+
+  @override
+  String metricToday(String time) {
+    return 'Today, $time';
+  }
+
+  @override
+  String metricYesterday(String time) {
+    return 'Yesterday, $time';
+  }
+
+  @override
+  String metricDateTime(String date, String time) {
+    return '$date, $time';
+  }
+
+  @override
+  String metricRowLabel(String name, String value, String provenance) {
+    return '$name: $value. $provenance. Opens your entries.';
+  }
+
+  @override
+  String metricRowEmptyLabel(String name) {
+    return '$name: nothing yet. Opens your entries.';
+  }
+
+  @override
+  String get metricWhen => 'When';
+
+  @override
+  String get metricChangeTime => 'Change';
+
+  @override
+  String metricChangeTimeLabel(String time) {
+    return 'When: $time. Change the date and time.';
+  }
+
+  @override
+  String get metricSave => 'Save';
+
+  @override
+  String get metricSystolic => 'Top number (systolic)';
+
+  @override
+  String get metricDiastolic => 'Bottom number (diastolic)';
+
+  @override
+  String metricWeightRange(String min, String max, String unit) {
+    return 'Please enter a weight between $min and $max $unit.';
+  }
+
+  @override
+  String get metricBpRange =>
+      'Please check the numbers: the top one between 50 and 260, the bottom one between 30 and 160, and the top one higher.';
+
+  @override
+  String get metricGlucoseRange =>
+      'Please enter a whole number between 20 and 600.';
+
+  @override
+  String get metricMealPick => 'Which meal?';
+
+  @override
+  String get metricRecordNote =>
+      'Live Well keeps this as a record and doesn\'t comment on it. Your clinician can help you with what the numbers mean for you.';
+
+  @override
+  String get metricSaved => 'Saved.';
+
+  @override
+  String get metricSaveError => 'We couldn\'t save that. Please try again.';
+
+  @override
+  String get metricHistoryEmpty => 'Nothing recorded in the last 90 days.';
+
+  @override
+  String metricDelete(String entry) {
+    return 'Delete $entry';
+  }
+
+  @override
+  String get metricDeleted => 'Deleted.';
+
+  @override
+  String get trackChartMonthLabel => 'This month, week by week';
+
+  @override
+  String get trackChartQuarterLabel => 'Last 90 days, week by week';
+
+  @override
+  String trackChartWeekOf(String date) {
+    return 'Week of $date';
+  }
+
+  @override
+  String trackOnAverage(String value) {
+    return '$value on average';
+  }
+
+  @override
+  String trackPerDay(String value) {
+    return '$value a day';
+  }
+
+  @override
+  String get trackChartMeasureEmpty =>
+      'Add one under My measures to see it here.';
+
+  @override
+  String trackChartFromHealth(String app, String time) {
+    return 'From $app, read $time';
+  }
+
+  @override
+  String get trackChartFromYou => 'Entered by you';
+
+  @override
+  String trackChartFromYouAndHealth(String app) {
+    return 'Entered by you and from $app';
+  }
+
+  @override
+  String get trackChartFromApp => 'From what you marked done in Live Well';
+
+  @override
+  String metricMealsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count meals',
+      one: '1 meal',
+    );
+    return '$_temp0';
+  }
 }

@@ -429,6 +429,55 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // ---------- recorded measures (T-GOL-02, FR-GOL-04, D-72) ----------
+      // Weight, blood pressure, glucose and meals, one document each, with
+      // their source (typed in or read from Apple Health / Health Connect)
+      // and when they were measured. The limits only catch typos; the app
+      // never interprets a value. Added or deleted, never edited.
+      match /metrics/{id} {
+        function validMeasure(d) {
+          return (d.kind == 'weight'
+                  && d.keys().hasOnly(['kind', 'source', 'measured_at', 'value',
+                       'unit', 'created_at', 'updated_at', 'schema_version'])
+                  && d.value is number
+                  && ((d.unit == 'kg' && d.value >= 20 && d.value <= 300)
+                      || (d.unit == 'lb' && d.value >= 44 && d.value <= 660)))
+            || (d.kind == 'blood_pressure'
+                  && d.keys().hasOnly(['kind', 'source', 'measured_at',
+                       'systolic', 'diastolic', 'unit', 'created_at',
+                       'updated_at', 'schema_version'])
+                  && d.unit == 'mmHg'
+                  && d.systolic is int && d.systolic >= 50 && d.systolic <= 260
+                  && d.diastolic is int && d.diastolic >= 30 && d.diastolic <= 160
+                  && d.systolic > d.diastolic)
+            || (d.kind == 'glucose'
+                  && d.keys().hasOnly(['kind', 'source', 'measured_at', 'value',
+                       'unit', 'created_at', 'updated_at', 'schema_version'])
+                  && d.unit == 'mg/dL'
+                  && d.value is int && d.value >= 20 && d.value <= 600)
+            || (d.kind == 'meal'
+                  && d.keys().hasOnly(['kind', 'source', 'measured_at', 'meal',
+                       'created_at', 'updated_at', 'schema_version'])
+                  && d.meal in ['breakfast', 'lunch', 'dinner', 'snack']);
+        }
+        function validMetric(d) {
+          return d.source in ['manual', 'health']
+            && d.measured_at is timestamp
+            // Not in the future (10 minutes for clock drift), at most 31 days back.
+            && d.measured_at <= request.time + duration.value(10, 'm')
+            && d.measured_at >= request.time - duration.value(31, 'd')
+            && validMeasure(d);
+        }
+        allow read: if isOwner(uid);
+        allow create: if isAdultOwner(uid)
+          && id.matches('^[A-Za-z0-9_-]{1,40}$')
+          && validMetric(request.resource.data)
+          && hasMeta(request.resource.data);
+        allow update: if false;
+        // A wrong entry can be removed.
+        allow delete: if isOwner(uid);
+      }
+
       // ---------- My Daily Routine (T-GOL-03a) ----------
       // Routines the person builds for each weekday. Items come from the
       // approved catalog (content/routine/catalog.json) or are custom labels

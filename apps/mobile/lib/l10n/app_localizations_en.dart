@@ -1367,6 +1367,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your coach\'s voice is an AI voice. For now it is your phone\'s own text-to-speech, set to sound close to the voice you chose. It is not a copy of a real person\'s voice. The coach only says lines our team has written and reviewed.';
 
   @override
+  String voiceHowMadeLibraryBody(String name) {
+    return '$name is an AI voice. It was made with Kokoro, an open-source text-to-speech model, and it is not a copy of any real person\'s voice. For now, your coach speaks with the voice on your phone that sounds closest to $name, so it may sound a little different from the sample. Your coach only says lines our team has written and reviewed.';
+  }
+
+  @override
   String voiceGreetingNamed(String name) {
     return 'Hi $name, I’m your Live Well coach.';
   }
@@ -3590,6 +3595,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Well done for taking the time. Small steps add up.';
 
   @override
+  String get learnReaderPortalTitle => 'Go deeper on the Live Well Portal';
+
+  @override
   String get learnReaderFinish => 'Finish lesson';
 
   @override
@@ -3822,4 +3830,95 @@ class AppLocalizationsEn extends AppLocalizations {
   String memoryDeleteSemantics(String fact) {
     return 'Delete: $fact';
   }
+
+  @override
+  String get dailyPlanSubtitle =>
+      'Moment times, your coach\'s voice and the widget';
+
+  @override
+  String get dailyPlanIntro =>
+      'Choose when your coach checks in and how your moments play.';
+
+  @override
+  String get dailyPlanTimesHeader => 'Moment times';
+
+  @override
+  String dailyPlanChangeTime(String moment) {
+    return 'Change the $moment time';
+  }
+
+  @override
+  String get dailyPlanNotToday => 'Not today';
+
+  @override
+  String dailyPlanNotTodayDone(String moment) {
+    return 'No $moment reminder today. It\'s back tomorrow.';
+  }
+
+  @override
+  String get dailyPlanInQuiet =>
+      'This time is during quiet hours, so no reminder is sent. Pick a time outside them.';
+
+  @override
+  String get dailyPlanQuietHeader => 'Quiet hours';
+
+  @override
+  String get dailyPlanCoachHeader => 'Your coach in moments';
+
+  @override
+  String get dailyPlanAutoSpeak =>
+      'Coach speaks automatically when I open a moment';
+
+  @override
+  String get dailyPlanTextOnly =>
+      'Show text only. Tap play to hear your coach.';
+
+  @override
+  String get dailyPlanSpeedNote => 'The same speed as in your voice settings.';
+
+  @override
+  String get dailyPlanCaptions => 'Captions always on';
+
+  @override
+  String get dailyPlanCaptionsOn => 'The words appear as your coach speaks.';
+
+  @override
+  String get dailyPlanCaptionsOff =>
+      'The words appear when your coach has finished.';
+
+  @override
+  String get dailyPlanPreview => 'Preview tomorrow\'s morning';
+
+  @override
+  String get dailyPlanPreviewTag => 'Preview';
+
+  @override
+  String get dailyPlanPreviewNone =>
+      'There\'s no morning message to preview yet.';
+
+  @override
+  String get dailyPlanPreviewPaused =>
+      'Let\'s keep today quiet. Previews are back tomorrow.';
+
+  @override
+  String get dailyPlanWidgetHeader => 'Home-screen widget';
+
+  @override
+  String get dailyPlanWidgetTitle => 'Add the widget';
+
+  @override
+  String get dailyPlanWidgetBody =>
+      'See your next small step without opening the app.';
+
+  @override
+  String get dailyPlanWidgetAndroid =>
+      'Android: touch and hold an empty spot on your home screen, tap Widgets, then find Live Well.';
+
+  @override
+  String get dailyPlanWidgetIos =>
+      'iPhone: touch and hold your home screen, tap Edit or +, then search for Live Well.';
+
+  @override
+  String get dailyPlanWidgetPrivate =>
+      'On the lock screen the widget shows general text only, never your answers or health details.';
 }

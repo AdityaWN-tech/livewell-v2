@@ -11,7 +11,9 @@ import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/studio/presentation/studio_widgets.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
 import 'package:livewell/features/voice/presentation/voice_library_screen.dart';
+import 'package:livewell/features/voice/presentation/voice_how_made.dart';
 import 'package:livewell/features/voice/presentation/voice_screen.dart';
+import 'package:livewell/l10n/app_localizations.dart';
 
 import '../support/app_harness.dart';
 import '../support/fakes.dart';
@@ -104,18 +106,58 @@ void main() {
   });
 
   group('choose another voice', () {
-    testWidgets('the settings say how the voice is made (FR-VOC-08)', (
-      tester,
-    ) async {
+    testWidgets('the settings say how the chosen voice is made (FR-VOC-08, '
+        'D-75)', (tester) async {
       await atVoice().boot(tester);
       await tapKey(tester, 'voice-another');
+      final body = find.byKey(const Key('voice-how-made-body'));
       await tester.scrollUntilVisible(
-        find.byKey(const Key('voice-how-made')),
+        body,
         300,
         scrollable: find.byType(Scrollable).first,
       );
       expect(find.text('How this voice is made'), findsOneWidget);
-      expect(find.textContaining('text-to-speech'), findsOneWidget);
+      String text() => tester.widget<Text>(body).data!;
+      // The default voice: AI, the model it comes from, not a clone, and
+      // the phone's closest voice for now (D-49). No vendor is invented.
+      expect(text(), startsWith('Warm is an AI voice.'));
+      expect(text(), contains('Kokoro, an open-source text-to-speech model'));
+      expect(text(), contains("not a copy of any real person's voice"));
+      expect(
+        text(),
+        contains('voice on your phone that sounds closest to Warm'),
+      );
+      expect(text(), contains('lines our team has written and reviewed'));
+
+      // Pick another voice: the text follows the choice.
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('voice-lw-clear')),
+        -300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tapKey(tester, 'voice-lw-clear');
+      await tester.scrollUntilVisible(
+        body,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(text(), startsWith('Clear is an AI voice.'));
+      expect(text(), contains('sounds closest to Clear'));
+    });
+
+    testWidgets('a voice that is not in the library gets the general text, '
+        'never a claim about how it was made', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: Scaffold(body: VoiceHowMade(voiceId: 'lw-dr-gokula')),
+        ),
+      );
+      expect(find.textContaining('Kokoro'), findsNothing);
+      expect(
+        find.textContaining("your phone's own text-to-speech"),
+        findsOneWidget,
+      );
       expect(
         find.textContaining('not a copy of a real person'),
         findsOneWidget,

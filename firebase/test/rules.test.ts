@@ -349,6 +349,20 @@ describe('profile settings (T-ONB-03f)', () => {
     await assertSucceeds(upd({ appearance: { theme: 'dark', text_scale: 1.15 } }));
     await assertSucceeds(upd({ quiet_hours: { start: '21:30', end: '06:30' } }));
     await assertSucceeds(upd({ notification_categories: { greeting: true, nudge: false, reflection: true } }));
+    // The app sends the weekly review's switch too (T-DLY-03c).
+    await assertSucceeds(upd({ notification_categories: { greeting: true, nudge: false, reflection: true, weekly: false } }));
+  });
+  it('moment playback and "Not today" (T-DLY-03e)', async () => {
+    await seedAdult(env);
+    await assertSucceeds(upd({ moment_playback: { auto_speak: false, captions: true } }));
+    await assertSucceeds(upd({ not_today: { date: '2026-10-15', kinds: ['greeting'] } }));
+    await assertSucceeds(upd({ not_today: { date: '2026-10-15', kinds: [] } }));
+    await assertFails(upd({ moment_playback: { auto_speak: 'no', captions: true } }));
+    await assertFails(upd({ moment_playback: { auto_speak: true } }));
+    await assertFails(upd({ moment_playback: { auto_speak: true, captions: true, volume: 3 } }));
+    await assertFails(upd({ not_today: { date: 'today', kinds: ['greeting'] } }));
+    await assertFails(upd({ not_today: { date: '2026-10-15', kinds: ['marketing'] } }));
+    await assertFails(upd({ not_today: { date: '2026-10-15', kinds: ['greeting'], note: 'x' } }));
   });
   it('rejects bad values', async () => {
     await seedAdult(env);
@@ -359,6 +373,7 @@ describe('profile settings (T-ONB-03f)', () => {
     await assertFails(upd({ quiet_hours: { start: '9pm', end: '06:30' } }));
     await assertFails(upd({ notification_categories: { greeting: 'yes', nudge: true, reflection: true } }));
     await assertFails(upd({ notification_categories: { marketing: true } }));
+    await assertFails(upd({ notification_categories: { greeting: true, nudge: true, reflection: true, weekly: 'yes' } }));
   });
 });
 
@@ -963,4 +978,13 @@ describe('server-only collections are closed to clients (11.1)', () => {
     await assertFails(setDoc(doc(as(ALICE), 'anything/x'), { a: 1 }));
     await assertFails(setDoc(doc(as(ALICE), 'users/alice/unknown/x'), { a: 1 }));
   });
+  // T-FND-07 (D-83): copies of the prototype's users arrays are server-only
+  // until the product decides how the app shows them.
+  for (const col of ['legacy_goals', 'legacy_affirmations', 'legacy_favorites']) {
+    it(`users/{uid}/${col} (T-FND-07 migration copies)`, async () => {
+      await seed(env, { [`users/alice/${col}/0000`]: { index: 0, value: 'x', ...meta() } });
+      await assertFails(getDoc(doc(as(ALICE), `users/alice/${col}/0000`)));
+      await assertFails(setDoc(doc(as(ALICE), `users/alice/${col}/0001`), { index: 1, value: 'y', ...meta() }));
+    });
+  }
 });

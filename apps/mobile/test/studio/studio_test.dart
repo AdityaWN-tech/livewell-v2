@@ -428,6 +428,26 @@ void main() {
       expect(h.voices.chosen!.voiceId, 'lw-deep');
     });
 
+    testWidgets('voice settings say how the chosen voice is made '
+        '(FR-VOC-08, D-75)', (tester) async {
+      final h = signedIn();
+      h.voices.chosen = const VoiceChoice(voiceId: 'lw-gentle');
+      await h.boot(tester);
+      await openStudio(tester, row: 'profile-voice');
+      final body = find.byKey(const Key('voice-how-made-body'));
+      await tester.scrollUntilVisible(
+        body,
+        300,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text('How this voice is made'), findsOneWidget);
+      final text = tester.widget<Text>(body).data!;
+      expect(text, startsWith('Gentle is an AI voice.'));
+      expect(text, contains('Kokoro'));
+      expect(text, contains("not a copy of any real person's voice"));
+      expect(text, contains('sounds closest to Gentle'));
+    });
+
     testWidgets('clone, loved one and Dr. Gokula off: not shown, no consent '
         'banner, no "Coming soon"', (tester) async {
       await signedIn().boot(tester);

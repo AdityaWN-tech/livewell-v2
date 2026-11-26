@@ -409,7 +409,7 @@ export async function runUserArraysMigration(
     await audit.append(`migration_${MIGRATION_ID}_${opts.mode}_${Date.now().toString(36)}`, {
       actor: `migration:${MIGRATION_ID}`,
       action: `migration.${opts.mode}`,
-      target: 'users/*',
+      target: 'users', // the whole collection (the audit target pattern has no '*')
       details,
     });
   }

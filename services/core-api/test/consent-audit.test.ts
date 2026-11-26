@@ -85,7 +85,12 @@ describe('onConsentCreated trigger (functions emulator)', () => {
 describe('FirestoreAuditLog', () => {
   it('is idempotent: a retried write keeps one entry and does not throw', async () => {
     const log = new FirestoreAuditLog();
-    const entry = { actor: 'bob', action: 'test.retry', target: 'x', details: { n: 1 } };
+    const entry = {
+      actor: 'bob',
+      action: 'account.deleted' as const,
+      target: 'users/bob',
+      details: { n: 1 },
+    };
     await log.append('retry_case', entry);
     await log.append('retry_case', { ...entry, details: { n: 2 } });
     const snap = await db().doc('audit_log/retry_case').get();

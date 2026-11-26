@@ -9,6 +9,7 @@ import { HttpsError, onCall, type CallableRequest } from 'firebase-functions/v2/
 import { logger } from 'firebase-functions/v2';
 import type { z } from 'zod';
 
+import type { AuditAction } from '../audit/audit-actions.js';
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
 import { requireStaff, STAFF_ROLES, type Staff, type TokenLike } from '../admin/staff.js';
 import {
@@ -127,7 +128,7 @@ function stateOf(o: DocumentData, w: DocumentData | undefined): OfferState {
   };
 }
 
-const AUDIT_ACTION: Record<Transition | 'create' | 'update', string> = {
+const AUDIT_ACTION: Record<Transition | 'create' | 'update', AuditAction> = {
   create: 'admin.portal_offer_created',
   update: 'admin.portal_offer_updated',
   submit: 'admin.portal_offer_submitted',

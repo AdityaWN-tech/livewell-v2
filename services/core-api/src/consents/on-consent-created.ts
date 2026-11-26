@@ -1,5 +1,6 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 
+import { safeIdPart, toToken } from '../audit/audit-chain.js';
 import { FirestoreAuditLog, type AuditLog } from '../audit/audit-log.js';
 import { monitored } from '../observability/log.js';
 import {
@@ -15,16 +16,20 @@ export function consentAuditEntry(
   consentId: string,
   data: Record<string, unknown>,
 ) {
+  const u = safeIdPart(uid);
+  const c = safeIdPart(consentId);
   return {
-    id: `consent_${uid}_${consentId}`,
+    id: `consent_${u}_${c}`,
     entry: {
-      actor: uid,
-      action: data.granted === true ? 'consent.granted' : 'consent.revoked',
-      target: `users/${uid}/consents/${consentId}`,
+      actor: u,
+      action: data.granted === true ? ('consent.granted' as const) : ('consent.revoked' as const),
+      target: `users/${u}/consents/${c}`,
+      // These three are written by the app, so they are reduced to tokens:
+      // the audit log never holds free text (D-85).
       details: {
-        type: String(data.type ?? ''),
-        doc_version: String(data.doc_version ?? ''),
-        app_version: String(data.app_version ?? ''),
+        type: toToken(data.type),
+        doc_version: toToken(data.doc_version),
+        app_version: toToken(data.app_version),
       },
     },
   };

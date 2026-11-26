@@ -4,10 +4,10 @@ name: core-api
 
 on:
   pull_request:
-    paths: ["services/core-api/**", "firebase.json", "firebase/storage.rules", ".github/workflows/core-api.yml"]
+    paths: ["services/core-api/**", "content/coach/**", "content/routine/**", "firebase.json", "firebase/storage.rules", ".github/workflows/core-api.yml"]
   push:
     branches: [main]
-    paths: ["services/core-api/**", "firebase.json", "firebase/storage.rules", ".github/workflows/core-api.yml"]
+    paths: ["services/core-api/**", "content/coach/**", "content/routine/**", "firebase.json", "firebase/storage.rules", ".github/workflows/core-api.yml"]
 
 concurrency:
   group: core-api-${{ github.ref }}

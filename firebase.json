@@ -38,6 +38,7 @@
         "test",
         "src",
         "scripts",
+        "evals",
         "*.log",
         ".gitignore"
       ],

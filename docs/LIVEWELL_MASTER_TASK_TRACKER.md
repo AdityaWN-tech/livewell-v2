@@ -1,7 +1,7 @@
 # LiveWell V2 — Master Task Tracker
 
 The single task list for the whole project: the 71 spec tasks (section 17) and the new hierarchy requirements (Superadmin / Admin / User).
-Status as of 2026-11-21, checked against `main`, the open PRs and CI. Update this file whenever a task changes state.
+Status as of 2026-11-26, checked against `main`, the open PRs and CI. Update this file whenever a task changes state.
 
 **Statuses:** NOT STARTED · READY · IN PROGRESS · BLOCKED · NEEDS REVIEW · TESTING · VERIFIED · COMPLETED. COMPLETED = merged to `main` with CI green. NEEDS REVIEW = built, in an open PR, waiting for the owner. Acceptance criteria for spec tasks are the spec's "Done when" (section 17); tests follow spec 15.1 plus AGENTS.md rule 3.
 
@@ -11,19 +11,19 @@ Status as of 2026-11-21, checked against `main`, the open PRs and CI. Update thi
 
 | Status | Existing tasks | New tasks | Total |
 |---|---|---|---|
-| COMPLETED | 16 | 0 | 16 |
-| NEEDS REVIEW | 23 | 1 | 24 |
-| IN PROGRESS | 3 | 0 | 3 |
+| COMPLETED | 39 | 1 | 40 |
+| NEEDS REVIEW | 1 | 0 | 1 |
+| IN PROGRESS | 4 | 0 | 4 |
 | BLOCKED | 21 | 1 | 22 |
-| READY | 1 | 0 | 1 |
-| NOT STARTED | 7 | 18 | 25 |
+| READY | 0 | 0 | 0 |
+| NOT STARTED | 6 | 18 | 24 |
 | **Total** | **71** | **20** | **91** |
 
 ## A. New tasks (hierarchy requirements and reconciliation)
 
 | ID | Task | Source | Module | Status | Comparison | Required changes | Depends on | Pri | Size | Acceptance | Tests | Risks | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| T-PLN-00 | Task reconciliation and unified roadmap | Reconciliation | Docs | NEEDS REVIEW (roadmap approved by owner 2026-11-21) | COMPLETELY NEW | These six docs; D-97 recorded | - | P0 | S | Owner approves roadmap | n/a (docs) | Stale if not kept up to date | 0 |
+| T-PLN-00 | Task reconciliation and unified roadmap | Reconciliation | Docs | COMPLETED | COMPLETELY NEW | These six docs; D-97 recorded | - | P0 | S | Owner approves roadmap | n/a (docs) | Stale if not kept up to date | 0 |
 | T-IAM-00 | Decide tenancy model and change the spec (ADR-004, D-97) | New sir requirement | Architecture | BLOCKED | NEEDS DECISION + CONFLICTING | ADR-004: single-tenant per buyer vs multi-tenant orgs; invite-only vs open sign-up; what Admin can see; content/offers global or per org | - | P0 | M | ADR-004 approved by owner and client; AGENTS.md and spec addendum updated | Review only | Wrong choice forces data migration later | 0 |
 | T-IAM-01 | Role model: superadmin / org_admin / member + platform staff roles | New sir requirement | Auth, Core API | NOT STARTED | EXISTING BUT NEEDS MODIFICATION (PRT-02 staff_roles) | Custom claims {role, org_id, staff_roles, perms_v}; rename PRT-02 'admin' to platform role; claims only set server-side | T-IAM-00, PRT-02 merged | P0 | M | Claims set only via Admin SDK; client cannot change role; token refresh after change | Core API unit + emulator tests; escalation attempts | Claim drift between token and DB | 3 |
 | T-IAM-02 | Organization data model + migration (default org for existing users) | New sir requirement | Data model | NOT STARTED | COMPLETELY NEW | organizations/{orgId}, org_members, users.org_id; data-model.md; dry-run migration to a default org | T-IAM-00, FND-07 | P0 | L | Every user has exactly one org; migration dry-run + rollback documented | Migration tests on emulator | Breaks existing user paths if done ad hoc | 3 |
@@ -55,15 +55,15 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-FND-01 | Audit of the prototype code | COMPLETED | - | Unaffected | - | P1 | S | Audit doc merged and reviewed by the tech lead | - | 0 |
 | T-FND-02 | Monorepo and CI | COMPLETED | Mobile, media, API, rules, safety and iOS checks run on every PR | Unaffected | - | P0 | M | CI green on an empty PR; dev, staging and prod deployable | - | 0 |
-| T-FND-03 | Vendor and framework choices | NEEDS REVIEW | PR #101. LangGraph, Claude, Flutter Web admin and Next.js voice-owner page chosen (PR #101); morning-briefing prototype merged (PR #104) but not yet run against real Claude (the API account needs credit) | Unaffected | - | P0 | M | ADRs merged with scorecards against the Section 8.3 criteria; morning-briefing prototype runs end to end | - | 1 |
+| T-FND-03 | Vendor and framework choices | COMPLETED | Merged (PR #101): ADR-002 LangGraph + Claude, ADR-003 Flutter Web admin and Next.js voice-owner page (D-90). Morning-briefing prototype merged (PR #104); not yet run against real Claude (needs API credit) | Unaffected | - | P0 | M | ADRs merged with scorecards against the Section 8.3 criteria; morning-briefing prototype runs end to end | - | 1 |
 | T-FND-04 | App shell with 5 tabs | COMPLETED | - | NEEDS MODIFICATION: tabs/routes must hide unauthorised features (T-PRM-02) | - | P0 | M | All prototype screens reachable; golden tests for core components | - | 0 |
-| T-FND-05 | Consent service | NEEDS REVIEW | PR #88. Server deletes data after a revoke in PR #88; needs human review | Unaffected; consent stays per user and can never be hidden by permissions | FND-06 | P0 | M | Grant and revoke for every consent type; emulator tests; audit entries | - | 1 |
+| T-FND-05 | Consent service | COMPLETED | Merged (PR #88, owner approved): server-side 16.3 handling on revoke, hourly retry, audit. Open: D-76 client questions; memory/memory_sensitive revoke not handled yet (follow-up); hourly job needs Blaze | Unaffected; consent stays per user and can never be hidden by permissions | FND-06 | P0 | M | Grant and revoke for every consent type; emulator tests; audit entries | - | 1 |
 | T-FND-06 | Firestore security rules and tests | COMPLETED | - | NEEDS MODIFICATION: org isolation and role checks (T-IAM-03) | - | P0 | L | 100% rule coverage tests pass | - | 0 |
-| T-FND-07 | Moving data from the old app | NEEDS REVIEW | PR #96. Dry-run-first tool in PR #96; staging dry run needs the owner; dropped in D-01 unless old data turns up | Coordinate: org_id backfill is a second migration (T-IAM-02) | FND-06 | P2 | M | Dry run on a staging copy; reversible; counts reconcile Done when | Close if no prototype data (D-01) | 1 |
-| T-FND-08 | Encrypted on-phone database | NEEDS REVIEW | PR #98. Encrypted database and offline queue for check-ins in PR #98; habits, routines, goals and reflections still to move | Unaffected (on-device data) | - | P1 | L | Offline log, then reconnect, syncs exactly once (integration test) | - | 1 |
-| T-FND-09 | Audit log | NEEDS REVIEW | PR #97. Append-only, tamper-evident log with a write-only account in PR #97; needs security review; Terraform not applied | EXISTING BUT INCOMPLETE: reuse for admin/superadmin audit (T-SAD-04) | - | P0 | M | Write-only service account; tamper test fails as expected | - | 1 |
-| T-FND-10 | Crash reporting and monitoring | NEEDS REVIEW | PR #94. Crashlytics without health data, server logging and alerts in PR #94; agent tracing waits for the agents | EXISTING BUT INCOMPLETE: base for system monitoring (T-SAD-03) | - | P1 | M | Test crash shows no PHI; trace visible for a sample agent run | - | 2 |
-| T-FND-11 | Feature flags | NEEDS REVIEW | PR #85. Remote Config with safe defaults in PR #85 | EXISTING BUT INCOMPLETE: global flags; org-level visibility added in T-PRM-01 | - | P1 | M | Each flag in Section 10.2 toggles behavior in staging Done when | - | 1 |
+| T-FND-07 | Moving data from the old app | COMPLETED | Merged (PR #96): dry-run-first migration of the users arrays; staging dry run needs the owner | Coordinate: org_id backfill is a second migration (T-IAM-02) | FND-06 | P2 | M | Dry run on a staging copy; reversible; counts reconcile Done when | Close if no prototype data (D-01) | 1 |
+| T-FND-08 | Encrypted on-phone database | COMPLETED | Merged (PR #98, owner approved): SQLCipher Drift DB and exactly-once outbox for check-ins. Habits, routines, goals and reflections still to move; one device test of a restored backup suggested | Unaffected (on-device data) | - | P1 | L | Offline log, then reconnect, syncs exactly once (integration test) | - | 1 |
+| T-FND-09 | Audit log | COMPLETED | Merged (PR #97, owner approved): create-only hash-chained audit log, fixed action list (incl. migration, portal admin, voice gateway actions), write-only audit-writer. Terraform not applied (Blaze); logWriter is project-wide (review note) | EXISTING BUT INCOMPLETE: reuse for admin/superadmin audit (T-SAD-04) | - | P0 | M | Write-only service account; tamper test fails as expected | - | 1 |
+| T-FND-10 | Crash reporting and monitoring | COMPLETED | Merged (PR #94, owner approved): Crashlytics with allow-list scrubbing behind the analytics consent; turns off at sign-out even offline; server logs via monitored(). Agent tracing waits for the agents; counsel to confirm the consent wording covers crash reports | EXISTING BUT INCOMPLETE: base for system monitoring (T-SAD-03) | - | P1 | M | Test crash shows no PHI; trace visible for a sample agent run | - | 2 |
+| T-FND-11 | Feature flags | COMPLETED | Merged (PR #85): Remote Config flags with safe per-flavour defaults; prod-locked flags need a build-time allow. coachMemory, rewards and driverWheel added at merge | EXISTING BUT INCOMPLETE: global flags; org-level visibility added in T-PRM-01 | - | P1 | M | Each flag in Section 10.2 toggles behavior in staging Done when | - | 1 |
 
 ### Onboarding
 
@@ -89,19 +89,19 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | T-AVT-02 | Avatar creator | COMPLETED | 8 ready-made coaches and the Avatar Studio | Feature-visibility candidate | AVT-01 | P1 | L | FR-AVT-02 checklist met Done when | - | 0 |
 | T-AVT-03 | Avatar from a selfie | BLOCKED | Built, switched off: needs counsel review and the server deployed | Feature-visibility candidate | AVT-02, CMP-02 | P2 | L | Spoof tests fail as expected; job status polling works; raw media TTL enforced | Counsel review; server deploy | 1 |
 | T-AVT-04 | Avatar fallback and reduced motion | COMPLETED | - | Unaffected | AVT-01 | P1 | S | FR-AVT-05/06 tests pass offline | - | 0 |
-| T-AVT-05 | Delete my avatar | NEEDS REVIEW | PR #92. In PR #92; vendor confirmation waits for an avatar vendor | Unaffected (user right; never hidden) | FND-05 | P0 | M | Vendor API confirms; audit entry; UI updates Done when | - | 1 |
+| T-AVT-05 | Delete my avatar | COMPLETED | Merged (PR #92, owner approved): Delete my avatar deletes server media (D-76 code), clears phone caches; My coach section. Vendor deletion waits for an avatar vendor | Unaffected (user right; never hidden) | FND-05 | P0 | M | Vendor API confirms; audit entry; UI updates Done when | - | 1 |
 
 ### Voice
 
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-VOC-01 | Voice engine | BLOCKED | Coach uses the phone's own speech for now | Unaffected | - | P1 | L | Contract tests pass against the vendor sandbox | Voice vendor | 1 |
-| T-VOC-02 | Voice library | NEEDS REVIEW | PR #89. 6 of the 12 voices; "How this voice is made" in PR #89 | Feature-visibility candidate | VOC-01 | P2 | M | FR-VOC-01 met | 6 of 12 voices | 1 |
+| T-VOC-02 | Voice library | COMPLETED | Merged (PR #89): "How this voice is made" in voice settings; 6 of the 12 voices | Feature-visibility candidate | VOC-01 | P2 | M | FR-VOC-01 met | 6 of 12 voices | 1 |
 | T-VOC-03 | Clone your own voice | BLOCKED | Needs a voice vendor | Feature-visibility candidate | VOC-01, CMP-02 | P2 | L | E2E test; consent record matches Section 11 example | Voice vendor | 1 |
 | T-VOC-04 | Invite a loved one's voice | BLOCKED | Phase 2 | Separate from org invitations (different purpose); reuse signed-link pattern | VOC-01 | P3 | L | See the card in 17.3 | Phase 2 of spec | 1 |
 | T-VOC-05 | Loved one's consent recording | BLOCKED | - | Unaffected | VOC-04 | P3 | M | Uploaded files rejected; speaker match enforced | Phase 2 of spec | 1 |
 | T-VOC-06 | Voice owner's dashboard | BLOCKED | - | Unaffected | VOC-05 | P3 | M | Revoke deletes the vendor model within 24 h (job test); account | Phase 2 of spec | 1 |
-| T-VOC-07 | Closed-script voice gateway | NEEDS REVIEW | PR #102. Server gateway with 48 safety and pen-test cases in PR #102; needs a human safety review; no voice vendor connected yet | Unaffected; closed-script rule never configurable by Admin | - | P0 | M | Pen-test script cannot get arbitrary text spoken; safety categories use a neutral voice | - | 1 |
+| T-VOC-07 | Closed-script voice gateway | COMPLETED | Merged (PR #102, owner approved after a fix): closed-script gateway; library voices use the server catalogue only (bypass fixed at review, D-88). No voice vendor yet; external pen test still needed | Unaffected; closed-script rule never configurable by Admin | - | P0 | M | Pen-test script cannot get arbitrary text spoken; safety categories use a neutral voice | - | 1 |
 | T-VOC-08 | Dr. Gokula's voice | BLOCKED | Switched off; needs a licence | Unaffected | VOC-07 | P2 | M | Flag off by default; label visible legal sign- Done when | Licence | 1 |
 
 ### AI agents
@@ -112,9 +112,9 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | T-AGT-02 | Safety checks before and after AI | COMPLETED | Rules plus an AI classifier that can only make a check stricter, 805 safety cases at 100%, merged (PR #107); still needs clinical sign-off on the classifier prompts | Unaffected; never configurable by Admin | AGT-01 | P0 | L | 15.3 critical cases at 100% | Clinical sign-off (D-93/D-96) | 0 |
 | T-AGT-03 | Content pipeline | BLOCKED | Approved-only pipeline, chunking and search with precision@5 of 0.86 on synthetic lessons, merged (PR #106); production search service and real lessons still to come | Decide: content global or per org (D-97) | AGT-01 | P1 | L | Unapproved item not retrievable (test); retrieval precision@5 of 0.8 or more on the eval set | Prod embedding/vector store choice (D-94) | 1 |
 | T-AGT-04 | Coach Agent | COMPLETED | Merged (PR #111). Five modes on one pipeline, 2397 tests, 676 golden cases (gate PASS); offline 15.2 gates met, live tone/grounding unmeasured (no API credit) | Unaffected | AGT-02, AGT-03 | P0 | XL | Eval gates in 15.2 pass | - | 1 |
-| T-AGT-05 | Memory Agent | NEEDS REVIEW | Server side merged (PR #113, D-100). App screen "What my coach remembers" merged (PR #114, D-101), tested on a phone (D-102), dev flavor only until the Memory Agent is deployed | Unaffected (memory is per user, never visible to Admin) | AGT-04 | P1 | L | FR-CNV-05 met; sensitive categories need opt-in | Deploy the agent; turn on `coachMemory`; clinical/privacy review | 1 |
+| T-AGT-05 | Memory Agent | COMPLETED | Merged (PRs #113, #114, #115); owner safety and privacy sign-off 2026-11-25. Memory screen stays dev-only in staging/prod until the agent is deployed (D-101) | Unaffected (memory is per user, never visible to Admin) | AGT-04 | P1 | L | FR-CNV-05 met; sensitive categories need opt-in | Deploy the agent; turn on `coachMemory`; clinical/privacy review | 1 |
 | T-AGT-06 | Insights Agent | COMPLETED | Merged (PR #117). Built (D-104): deterministic weekly stats, `POST /v1/insights/weekly`, weekly review computes its own stats; 7 hand-worked fixtures match. Metrics not read yet (needs client). Not deployed | Unaffected | AGT-04 | P1 | M | Matches the deterministic statistics on fixtures | - | 1 |
-| T-AGT-07 | Portal Agent | NEEDS REVIEW | Built (D-105): 13.3 rules, scoring, grounded bridge line, `POST /v1/portal/recommend`; built against PR #105's catalog schema. No card for real accounts until safety events are recorded (D-22). Card not yet attached to Coach messages | Decide: offers global or per org (D-97) | AGT-04, PRT-02 | P2 | L | All 13.3 rules have unit tests; zero hallucinated offers in eval | - | 1 |
+| T-AGT-07 | Portal Agent | COMPLETED | Merged (PR #118); owner safety and product sign-off 2026-11-25. No card for real accounts until the portal catalog is live | Decide: offers global or per org (D-97) | AGT-04, PRT-02 | P2 | L | All 13.3 rules have unit tests; zero hallucinated offers in eval | - | 1 |
 | T-AGT-08 | AI evaluation tests | COMPLETED | 388-case golden set and a CI gate merged (PR #108); it found 36 real safety gaps; 35 are fixed (all 28 critical, PR #109), one harmless over-block is left for a clinician | Extend with authz cases later (T-SEC-01) | AGT-02 | P0 | L | CI blocks merge on a critical failure Done when | - | 0 |
 
 ### Daily loop
@@ -122,9 +122,9 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-DLY-01 | Home screen | IN PROGRESS | Spoken briefing is switched off until the Coach Agent exists | Unaffected | AGT-04 | P0 | M | FR-DLY-03 enforced in UI tests | Spoken briefing waits for AGT-04 | 1 |
-| T-DLY-02 | Daily check-in | NEEDS REVIEW | PR #83. Safety fixes waiting in PR #83 | Unaffected | ASM-02 | P0 | M | Timed usability test median under 30 s | - | 1 |
-| T-DLY-03 | Daily plan and briefing | NEEDS REVIEW | PR #93. Avatar moments and their settings (PR #93) built in the app; server jobs not built | Unaffected | AGT-04 | P1 | L | NFR-03 met in a staging load test | Server jobs not built | 1 |
-| T-DLY-04 | Reminder scheduling with caps | NEEDS REVIEW | PR #84. One cap of 4 a day across all reminders in PR #84 | Unaffected; frequency cap never configurable by Admin | - | P1 | M | FR-DLY-04, FR-TCH-01 tests Done when | - | 1 |
+| T-DLY-02 | Daily check-in | COMPLETED | Merged (PR #83, owner approved): check-in safety fixes; loading check-in counts as gentle for portal cards (Learn and lesson end). 72 h hold is phone-only until D-22 | Unaffected | ASM-02 | P0 | M | Timed usability test median under 30 s | - | 1 |
+| T-DLY-03 | Daily plan and briefing | IN PROGRESS | App side merged (PR #93): Daily plan settings, moment playback, Not today. Server briefing jobs not built | Unaffected | AGT-04 | P1 | L | NFR-03 met in a staging load test | Server jobs not built | 1 |
+| T-DLY-04 | Reminder scheduling with caps | COMPLETED | Merged (PR #84): one cap of 4 a day across plan and routine reminders | Unaffected; frequency cap never configurable by Admin | - | P1 | M | FR-DLY-04, FR-TCH-01 tests Done when | - | 1 |
 | T-DLY-05 | Evening reflection | IN PROGRESS | No AI reply yet | Unaffected | AGT-04 | P1 | M | FR-DLY-05 eval cases pass | AI reply waits for AGT-04 | 1 |
 | T-DLY-06 | Streaks | COMPLETED | - | Unaffected | - | P2 | S | FR-DLY-07/09 unit tests | - | 0 |
 | T-DLY-07 | Weekly review | IN PROGRESS | Weekly wins built; no AI-written review | Unaffected | AGT-06 | P2 | M | Generated for 100% of eligible test users | AI review waits for AGT-06 | 1 |
@@ -140,9 +140,9 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
-| T-TCH-01 | Push notifications | NEEDS REVIEW | PR #90. Server push with consent, quiet hours and the cap in PR #90; owner setup needed for real devices | Unaffected; no personal data in pushes | - | P1 | M | Each category toggles; no PHI on the lock screen | Owner FCM/APNs setup | 1 |
+| T-TCH-01 | Push notifications | COMPLETED | Merged (PR #90, owner approved): FCM registration with consent, server push with consent, toggle, quiet hours and cap. Owner setup (FCM API, APNs key) needed for real devices | Unaffected; no personal data in pushes | - | P1 | M | Each category toggles; no PHI on the lock screen | Owner FCM/APNs setup | 1 |
 | T-TCH-02 | iPhone widgets | COMPLETED | Builds in the cloud; not yet seen on a real iPhone | Unaffected | - | P2 | M | Done logs offline and syncs; snapshot tests | Not seen on a real iPhone | 0 |
-| T-TCH-03 | Android widgets | NEEDS REVIEW | PR #81, #82. Lock-screen privacy and analytics in PRs #81 and #82 | Unaffected | - | P2 | M | Parity checklist with iOS | - | 1 |
+| T-TCH-03 | Android widgets | COMPLETED | Merged (PRs #81, #82): Hide details on lock screen (default on; Android fallback hidden; switch in Profile > Daily plan) and widget_interaction analytics | Unaffected | - | P2 | M | Parity checklist with iOS | - | 1 |
 | T-TCH-04 | Apple Watch app | NOT STARTED | - | Unaffected | TCH-01 | P3 | L | FR-TCH-05 checklist | - | 1 |
 | T-TCH-05 | Wear OS app | NOT STARTED | - | Unaffected | TCH-01 | P3 | L | FR-TCH-05 checklist | - | 1 |
 | T-TCH-06 | Watch complications | NOT STARTED | - | Unaffected | TCH-04, TCH-05 | P3 | M | FR-TCH-04/06 Done when | - | 1 |
@@ -159,7 +159,7 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-GOL-01 | Goals and habits | COMPLETED | - | Unaffected | - | P1 | M | FR-GOL-01..06 | - | 0 |
-| T-GOL-02 | Tracking | NEEDS REVIEW | PR #86. Manual weight, blood pressure, glucose and meals with charts in PR #86 | Feature-visibility candidate | GOL-01 | P1 | M | Source and timestamp shown on every point | - | 1 |
+| T-GOL-02 | Tracking | COMPLETED | Merged (PR #86, owner approved): manual weight, blood pressure, glucose and meals with 7/30/90-day charts on Track; recorded, never interpreted; included in Download my data | Feature-visibility candidate | GOL-01 | P1 | M | Source and timestamp shown on every point | - | 1 |
 
 ### Travel
 
@@ -171,15 +171,15 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
-| T-GAM-01 | Badges and challenges | NEEDS REVIEW | PR #99. Badges, weekly challenges, unlockables and the driver wheel in PR #99; off outside dev until clinical review; driver names provisional | Feature-visibility candidate | - | P2 | M | FR-GAM-01..03; banned reward types absent Done when | Clinical review | 1 |
+| T-GAM-01 | Badges and challenges | COMPLETED | Merged (PR #99): badges, challenges, unlockables and driver wheel; off in staging/prod (Remote Config ff_rewards, ff_driver_wheel) until clinical review | Feature-visibility candidate | - | P2 | M | FR-GAM-01..03; banned reward types absent Done when | Clinical review | 1 |
 
 ### Portal
 
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-PRT-01 | Confirm the TagMango API | BLOCKED | Waiting on TagMango details | Decide: one TagMango account or one per org (D-97) | - | P1 | M | ADR with sample payloads captured in a sandbox or test course | TagMango API details | 1 |
-| T-PRT-02 | Portal catalog in Admin | NEEDS REVIEW | PR #105. Flutter Web Admin with draft, review, approve and publish in PR #105; the app sees active offers only; needs security review and an MFA choice | NEEDS MODIFICATION: staff role 'admin' collides with org Admin; becomes platform roles under Superadmin (T-IAM-01) | - | P1 | L | Editors can publish offers; clients see active ones only | MFA method | 1 |
-| T-PRT-03 | Portal card in the app | NEEDS REVIEW | PR #87. On Learn and after a lesson (PR #87); needs product sign-off | Feature-visibility candidate | PRT-02 | P1 | M | UTM and lw_cid present; click event logged | Product sign-off | 1 |
+| T-PRT-02 | Portal catalog in Admin | COMPLETED | Merged (PR #105, owner approved): Admin catalog with two-person review. Real MFA needs Blaze + Identity Platform (waiver until then); App Check and rate limits to add | NEEDS MODIFICATION: staff role 'admin' collides with org Admin; becomes platform roles under Superadmin (T-IAM-01) | - | P1 | L | Editors can publish offers; clients see active ones only | MFA method | 1 |
+| T-PRT-03 | Portal card in the app | COMPLETED | Merged (PR #87): portal card on Learn and at the lesson end, same 13.3 checks; flag off | Feature-visibility candidate | PRT-02 | P1 | M | UTM and lw_cid present; click event logged | Product sign-off | 1 |
 | T-PRT-04 | TagMango webhooks | BLOCKED | - | Org attribution of purchases (D-97) | PRT-01 | P1 | M | Duplicate events stored once; forged requests rejected | PRT-01 | 1 |
 | T-PRT-05 | Sales attribution | BLOCKED | - | Org attribution of purchases (D-97) | PRT-04 | P2 | M | Fixture-based attribution tests; dashboard live | PRT-01 | 1 |
 | T-PRT-06 | Account linking | BLOCKED | - | Unaffected | PRT-04 | P2 | M | Link and unlink flows; FR-SET-04 | PRT-01 | 1 |
@@ -191,14 +191,14 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 |---|---|---|---|---|---|---|---|---|---|---|
 | T-CMP-01 | Legal texts | BLOCKED | Drafts written; lawyer review needed | NEEDS MODIFICATION: Terms/Privacy must describe the Admin (buyer) role and what it can see | - | P0 | M | Signed off by counsel | Lawyer review | 1 |
 | T-CMP-02 | Counsel review of avatar and voice | BLOCKED | - | Unaffected | - | P1 | M | Written sign-off; required changes ticketed | Counsel | 1 |
-| T-CMP-03 | Data export | NEEDS REVIEW | PR #95. Download my data in PR #95; staging check needs Blaze; counsel to confirm what is left out | Unaffected; export stays the user's own right, never the Admin's | - | P0 | M | FR-SET-02 SLAs met in a staging test | - | 1 |
+| T-CMP-03 | Data export | COMPLETED | Merged (PR #95, owner approved): Download my data (zip, 15-min link, 7-day lifecycle); new collections classified (D-82). Needs Blaze for staging; counsel to confirm exclusions | Unaffected; export stays the user's own right, never the Admin's | - | P0 | M | FR-SET-02 SLAs met in a staging test | - | 1 |
 | T-CMP-04 | Penetration test | NOT STARTED | - | EXISTING BUT INCOMPLETE: scope adds privilege escalation and org isolation (T-SEC-01) | all | P0 | L | No high or critical findings open | - | 9 |
 
 ### Release
 
 | ID | Task | Status | Evidence / notes | Hierarchy impact | Depends on | Pri | Size | Acceptance (spec "Done when") | Blocker | Phase |
 |---|---|---|---|---|---|---|---|---|---|---|
-| T-REL-01 | Accessibility audit | NEEDS REVIEW | PR #103. WCAG 2.2 AA sweep of every prod screen and fixes in PR #103; your VoiceOver and TalkBack check on a phone is still open | Unaffected | - | P1 | M | Audit report with no AA blockers complete | Owner VoiceOver/TalkBack check | 2 |
+| T-REL-01 | Accessibility audit | COMPLETED | Merged (PR #103): WCAG 2.2 AA sweep incl. Daily plan; fixes for the Plan map wheel and phone country field. VoiceOver/TalkBack check on a phone still to do | Unaffected | - | P1 | M | Audit report with no AA blockers complete | Owner VoiceOver/TalkBack check | 2 |
 | T-REL-02 | Store listing and release | BLOCKED | Release checklist and signing ready; owner steps remain | NEEDS MODIFICATION: invite-only store review (demo account, D-97) | all | P0 | M | Beta KPIs collected for 4 weeks | Owner steps, Blaze, signing | 9 |
 
 ## Change log
@@ -217,3 +217,4 @@ Source for all rows: existing project (spec v1.0 section 17). "Hierarchy impact"
 | 2026-11-23 | Fix: cold start always showed "We couldn't start Live Well" (Firebase used before init); signed-in start reads the cached profile, Home in 1.3–1.9 s on the owner's phone (D-103). |
 | 2026-11-23 | T-AGT-06 Insights Agent built (D-104); NEEDS REVIEW. |
 | 2026-11-23 | T-AGT-06 merged (owner approved PR #117). T-AGT-07 Portal Agent built (D-105); NEEDS REVIEW. |
+| 2026-11-26 | Owner review-and-merge pass (2026-11-25/26): merged PRs #81, #82, #83, #84, #85, #86, #87, #88, #89, #90, #92, #93, #94, #95, #96, #97, #98, #99, #101, #102, #103, #105, #110; #91 closed (replaced by T-PLN-00); #100 Travel Mode on hold (Plan placement, Places key, privacy line, clinical content). T-AGT-05 and T-AGT-07 signed off. Fixes at merge: voice-gateway bypass (D-88), crash reports off at sign-out (D-80), widget hidden by default on Android (D-68), export classification (D-82), accessibility fixes (T-REL-01). |

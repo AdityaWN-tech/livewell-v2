@@ -20,6 +20,9 @@ export const EXPORTED_USER_COLLECTIONS = [
   'reflections',
   // Weight, blood pressure, glucose and meals the person recorded (T-GOL-02, D-72).
   'metrics',
+  // Badges earned and challenges joined (T-GAM-01, D-87).
+  'rewards',
+  'challenges',
   'routines',
   'routine_items',
   'routine_logs',

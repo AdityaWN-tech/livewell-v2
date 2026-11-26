@@ -130,6 +130,21 @@ class PlanDay {
   /// The plan's supporting habits (at most 2, FR-GOL-01), shown on Plan.
   final List<SupportingHabit> supporting;
 
+  /// The same step on another date (repeating a past week, D-109).
+  PlanDay onDate(String other) => PlanDay(
+    date: other,
+    dayNumber: dayNumber,
+    focus: focus,
+    title: title,
+    reason: reason,
+    anchor: anchor,
+    minutes: minutes,
+    smallerTitle: smallerTitle,
+    smallerMinutes: smallerMinutes,
+    gentle: gentle,
+    supporting: supporting,
+  );
+
   PlanDay withSupporting(List<SupportingHabit> habits) => PlanDay(
     date: date,
     dayNumber: dayNumber,

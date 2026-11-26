@@ -6,6 +6,7 @@ import { makeOnConsentCreated } from './consents/on-consent-created.js';
 import { makeRevokeSweep } from './consents/revoke-sweep.js';
 import { makePortalOfferCallables } from './portal/portal-offers.js';
 import { makeOnPushRequest } from './push/on-push-request.js';
+import { makeSpeakMessage } from './voice/speak-message.js';
 
 initializeApp();
 
@@ -30,6 +31,12 @@ export const { deleteAvatar, deleteVoice, deleteAccount } = makeDeletions();
  */
 export const { requestDataExport, onDataExportRequested, getDataExportLink } =
   makeDataExport();
+
+/**
+ * The closed-script voice gateway (T-VOC-07, FR-VOC-05/07): every synthesis
+ * in a coach voice goes through here, by approved message_id only.
+ */
+export const speakMessage = makeSpeakMessage();
 
 /**
  * Portal catalog for the Admin / CMS (T-PRT-02, D-92): staff-only,

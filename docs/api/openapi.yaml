@@ -547,6 +547,51 @@ paths:
                         type: boolean
                         description: true when a made-for-you coach was replaced by a ready-made one
         "401": {description: unauthenticated}
+  /speakMessage:
+    post:
+      summary: Closed-script TTS gateway (Core API callable `speakMessage`, T-VOC-07)
+      description: >
+        Spec 12.1 `GET /v1/tts/{message_id}/stream`, served for now as a
+        Firebase callable in the core-api codebase (`{data: ...}` in,
+        `{result: ...}` or `{error: {status, message, details.reason}}` out);
+        streaming comes with the vendor (T-VOC-01). The only way to get speech
+        in a coach voice. Takes an approved message_id, never text
+        (FR-VOC-05): the server looks up the approved, versioned text itself
+        (content/coach/moments, content/routine/catalog.json, approved
+        content_items lessons, or users/{uid}/messages that passed the safety
+        post-check). Cloned voices also need the voice's status active, the
+        cloned-voices kill switch on and an active, unrevoked voice_consents
+        record for this account; Dr. Gokula's voice is off until T-VOC-08.
+        Safety ids (`safety.…`) and safety-category messages answer
+        neutral_device with no reads (FR-VOC-07). Every refusal, synthesis
+        and neutral routing is audited (ids and counts only). Until a vendor
+        is configured an allowed request is refused as tts_unavailable.
+      servers:
+        - url: https://us-central1-PROJECT.cloudfunctions.net/  # Cloud Functions, per environment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [data]
+              properties:
+                data: {$ref: "#/components/schemas/SpeakRequest"}
+      responses:
+        "200":
+          description: Synthesized audio, or "use the phone's neutral voice"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result: {$ref: "#/components/schemas/SpeakResult"}
+        "400": {description: "free_text_refused | bad_request | bad_params"}
+        "401": {description: unauthenticated}
+        "403": {description: "user_text_not_allowed | unsupported_voice_kind | voice_inactive | cloned_voices_off | gokula_voice_off | consent_missing | consent_revoked | consent_wrong_account"}
+        "404": {description: "unknown_message | unknown_voice"}
+        "412": {description: "retired_message | not_approved | unknown_placeholder"}
+        "503": {description: tts_unavailable}
   /requestDataExport:
     post:
       summary: Ask for a copy of my data (core-api callable, FR-SET-02, T-CMP-03, D-82)
@@ -633,6 +678,39 @@ components:
     firebaseIdToken: {type: http, scheme: bearer}
     appCheck: {type: apiKey, in: header, name: X-Firebase-AppCheck}
   schemas:
+    SpeakRequest:
+      type: object
+      additionalProperties: false
+      required: [message_id, voice_id]
+      properties:
+        message_id:
+          type: string
+          maxLength: 400
+          description: "{file}.{variant}@v{n} | routine.{a}.{line}+…@v{n} | lesson.{item}.{c1…|habit}@v{n} | orchestrator id | safety.…"
+        voice_id: {type: string, pattern: "^[A-Za-z0-9_-]{1,64}$"}
+        params:
+          type: object
+          maxProperties: 12
+          description: >
+            Closed-set values for the line's placeholders only: step_minutes,
+            smaller_minutes, streak_days, weekly_count, routine_win_days
+            (whole numbers 0-999), time_of_day (morning | afternoon |
+            evening), time ("HH:MM"), routine_win (a catalog activity id).
+            Lines with first_name, coach_name, why or step_title are refused.
+          additionalProperties:
+            oneOf:
+              - {type: integer}
+              - {type: string, pattern: "^[a-z0-9_:]{1,40}$"}
+    SpeakResult:
+      type: object
+      required: [status, message_id]
+      properties:
+        status: {type: string, enum: [ok, neutral_device]}
+        message_id: {type: string}
+        voice_kind: {type: string, enum: [library, cloned, licensed]}
+        ai_voice_label: {type: boolean, description: "FR-VOC-08: true for cloned and licensed voices"}
+        mime: {type: string}
+        audio_base64: {type: string, description: "Played in the app only; never offered for export (FR-VOC-05)"}
     PortalOfferFields:
       type: object
       description: What an editor writes (T-PRT-02). Shown to app users exactly as entered.

@@ -1,3 +1,6 @@
 node_modules/
 lib/
 *.log
+
+# Made by scripts/bundle-scripts.mjs on every build from content/ (T-VOC-07).
+src/voice/scripts.generated.ts

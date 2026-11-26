@@ -293,6 +293,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // My Daily Routine (T-GOL-03e).
       case WidgetLink.routine:
         await context.push(RoutineScreen.path);
+      // The widget's tab buttons (D-110).
+      case WidgetLink.plan:
+        context.go('/plan');
+      case WidgetLink.track:
+        context.go('/track');
+      case WidgetLink.learn:
+        context.go('/learn');
+      case WidgetLink.care:
+        context.go('/care');
       case WidgetLink.routineDone:
         final payload = ref.read(widgetInboxProvider).takeRoutinePayload();
         if (payload != null) {

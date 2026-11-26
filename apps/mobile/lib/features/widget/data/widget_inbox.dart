@@ -17,6 +17,11 @@ enum WidgetLink {
   // My Daily Routine (T-GOL-03e).
   routine,
   routineDone,
+  // The widget's tab buttons (D-110).
+  plan,
+  track,
+  learn,
+  care,
 }
 
 /// `livewell://checkin`, `livewell://step` (`?smaller=1`, `?done=1`),
@@ -33,6 +38,10 @@ WidgetLink? parseWidgetLink(Uri? uri) {
     'step' => WidgetLink.step,
     'reflection' => WidgetLink.reflect,
     'home' => WidgetLink.home,
+    'plan' => WidgetLink.plan,
+    'track' => WidgetLink.track,
+    'learn' => WidgetLink.learn,
+    'care' => WidgetLink.care,
     _ => null,
   };
 }
@@ -47,6 +56,10 @@ String widgetActionIdOf(WidgetLink link) => switch (link) {
   WidgetLink.home => WidgetActionId.openHome.id,
   WidgetLink.routine => WidgetActionId.openRoutine.id,
   WidgetLink.routineDone => WidgetActionId.routineDone.id,
+  WidgetLink.plan => WidgetActionId.openPlan.id,
+  WidgetLink.track => WidgetActionId.openTrack.id,
+  WidgetLink.learn => WidgetActionId.openLearn.id,
+  WidgetLink.care => WidgetActionId.openCare.id,
 };
 
 /// The tap behind a widget link: its action, and the `size` and `slot` the

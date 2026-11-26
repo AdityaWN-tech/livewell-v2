@@ -7,6 +7,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -129,6 +137,8 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
         val home = open(context, "livewell://home", size, null)
         views.setOnClickPendingIntent(R.id.widget_primary, home)
         views.setOnClickPendingIntent(R.id.widget_root, home)
+        views.setViewVisibility(R.id.widget_goal, View.GONE)
+        bindTabs(context, views, size)
         return views
       }
 
@@ -136,7 +146,7 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
       val hide = snapshot.optBoolean("hide_details", true)
       views.setTextViewText(
           R.id.widget_headline,
-          if (hide) entry.optString("lock_headline") else entry.optString("headline"))
+          accentLastWord(if (hide) entry.optString("lock_headline") else entry.optString("headline")))
       val subline = if (hide || entry.isNull("subline")) "" else entry.optString("subline")
       views.setTextViewText(R.id.widget_subline, subline)
       views.setViewVisibility(R.id.widget_subline, if (subline.isEmpty()) View.GONE else View.VISIBLE)
@@ -161,7 +171,96 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
         bind(context, views, R.id.widget_secondary, secondary, size, slot)
       }
       views.setOnClickPendingIntent(R.id.widget_root, open(context, "livewell://home", size, slot))
+      bindGoal(context, views, snapshot, doneHere, size, slot)
+      bindTabs(context, views, size)
+      // Too short for the goal card and tabs (e.g. 2x2): hide them, never cut them.
+      val tall = (options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT) ?: 0) >= 250
+      if (!tall) {
+        views.setViewVisibility(R.id.widget_goal, View.GONE)
+        views.setViewVisibility(R.id.widget_tabs, View.GONE)
+      } else {
+        views.setViewVisibility(R.id.widget_tabs, View.VISIBLE)
+      }
       return views
+    }
+
+    private const val ACCENT = 0xFF7ED957.toInt()
+
+    /** The headline with its last word in the accent green (D-110). */
+    private fun accentLastWord(text: String): CharSequence {
+      val trimmed = text.trimEnd()
+      val start = trimmed.lastIndexOf(' ') + 1
+      if (trimmed.isEmpty() || start >= trimmed.length) return text
+      return SpannableString(trimmed).apply {
+        setSpan(ForegroundColorSpan(ACCENT), start, trimmed.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      }
+    }
+
+    /**
+     * Today's Goal: the day's moments done out of planned (check-in, step,
+     * reflection; the app's `routine` map), as a ring and "3 of 5 completed".
+     * Counts only, nothing personal (AGENTS.md).
+     */
+    private fun bindGoal(
+        context: Context,
+        views: RemoteViews,
+        snapshot: JSONObject,
+        doneHere: Boolean,
+        size: String,
+        slot: String,
+    ) {
+      val routine = snapshot.optJSONObject("routine")
+      val keys = routine?.keys()?.asSequence()?.toList() ?: emptyList()
+      if (keys.isEmpty()) {
+        views.setViewVisibility(R.id.widget_goal, View.GONE)
+        return
+      }
+      val done = keys.count { k ->
+        routine!!.optString(k) == "done" || (k == "step" && doneHere)
+      }
+      val total = keys.size
+      views.setViewVisibility(R.id.widget_goal, View.VISIBLE)
+      views.setTextViewText(
+          R.id.widget_goal_count, context.getString(R.string.widget_goal_count, done, total))
+      views.setImageViewBitmap(R.id.widget_goal_ring, ring(context, done, total))
+      views.setOnClickPendingIntent(R.id.widget_goal, open(context, "livewell://home", size, slot))
+    }
+
+    /** A progress ring with the percentage in the middle. */
+    private fun ring(context: Context, done: Int, total: Int): Bitmap {
+      val px = (44 * context.resources.displayMetrics.density).toInt().coerceAtLeast(44)
+      val bmp = Bitmap.createBitmap(px, px, Bitmap.Config.ARGB_8888)
+      val c = Canvas(bmp)
+      val stroke = px * 0.11f
+      val box = RectF(stroke / 2, stroke / 2, px - stroke / 2, px - stroke / 2)
+      val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = stroke
+        strokeCap = Paint.Cap.ROUND
+      }
+      paint.color = 0x33FFFFFF
+      c.drawArc(box, 0f, 360f, false, paint)
+      val pct = if (total == 0) 0 else (done * 100 / total)
+      if (pct > 0) {
+        paint.color = ACCENT
+        c.drawArc(box, -90f, 360f * pct / 100f, false, paint)
+      }
+      val text = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textAlign = Paint.Align.CENTER
+        textSize = px * 0.28f
+        isFakeBoldText = true
+      }
+      c.drawText("$pct%", px / 2f, px / 2f - (text.descent() + text.ascent()) / 2, text)
+      return bmp
+    }
+
+    /** The four tab buttons (D-110): each opens its tab in the app. */
+    private fun bindTabs(context: Context, views: RemoteViews, size: String) {
+      views.setOnClickPendingIntent(R.id.widget_tab_plan, open(context, "livewell://plan", size, null))
+      views.setOnClickPendingIntent(R.id.widget_tab_track, open(context, "livewell://track", size, null))
+      views.setOnClickPendingIntent(R.id.widget_tab_learn, open(context, "livewell://learn", size, null))
+      views.setOnClickPendingIntent(R.id.widget_tab_care, open(context, "livewell://care", size, null))
     }
 
     private fun bind(

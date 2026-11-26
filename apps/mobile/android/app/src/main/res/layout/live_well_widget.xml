@@ -1,79 +1,265 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The Live Well home-screen widget (D-61): the coach's line, an optional
-     streak and one or two buttons. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- The Live Well home-screen widget (D-61, redesigned D-110): logo and bell,
+     the coach's line with one action, today's goal ring and the four tabs.
+     Only RemoteViews-allowed classes (no plain View). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:orientation="vertical"
-    android:padding="14dp">
+    android:background="@drawable/widget_background">
 
-    <TextView
-        android:id="@+id/widget_headline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="3"
-        android:textColor="@color/widget_text"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/widget_subline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:textColor="@color/widget_secondary"
-        android:textSize="13sp" />
-
-    <TextView
-        android:id="@+id/widget_streak"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/widget_primary"
-        android:textSize="13sp"
-        android:visibility="gone" />
-
-    <!-- Spacer. Widgets (RemoteViews) can't inflate a plain View; FrameLayout is allowed. -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="140dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="10dp"
+        android:importantForAccessibility="no"
+        android:scaleType="fitEnd"
+        android:src="@drawable/widget_scene" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="14dp">
 
-        <Button
-            android:id="@+id/widget_primary"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/widget_button"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_ic_logo" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="LiveWell"
+                android:textColor="#FFFFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_ic_bell" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="64dp"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:textAllCaps="false"
-            android:textColor="@color/widget_on_primary"
-            android:textSize="14sp"
+            android:maxLines="3"
+            android:textColor="#FFFFFFFF"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/widget_secondary"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/widget_button_outline"
+        <TextView
+            android:id="@+id/widget_subline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="64dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAllCaps="false"
-            android:textColor="@color/widget_primary"
-            android:textSize="14sp"
+            android:textColor="#B3FFFFFF"
+            android:textSize="13sp"
             android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/widget_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF7ED957"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/widget_primary"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:minWidth="72dp"
+                android:paddingHorizontal="14dp"
+                android:background="@drawable/widget_button"
+                android:maxLines="1"
+                android:textAllCaps="false"
+                android:textColor="#FF0A1D15"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+            <Button
+                android:id="@+id/widget_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_marginStart="6dp"
+                android:minWidth="72dp"
+                android:paddingHorizontal="14dp"
+                android:background="@drawable/widget_card"
+                android:maxLines="1"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFFFF"
+                android:textSize="13sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/widget_goal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="10dp">
+            <ImageView
+                android:id="@+id/widget_goal_ring"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:importantForAccessibility="no" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/widget_goal_title"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/widget_goal_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp" />
+            </LinearLayout>
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_ic_chevron" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/widget_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="-3dp"
+            android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/widget_tab_plan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="3dp"
+            android:background="@drawable/widget_card"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_ic_plan" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:maxLines="1"
+                android:text="@string/widget_tab_plan"
+                android:textColor="#FFFFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/widget_tab_track"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="3dp"
+            android:background="@drawable/widget_card"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_ic_track" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:maxLines="1"
+                android:text="@string/widget_tab_track"
+                android:textColor="#FFFFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/widget_tab_learn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="3dp"
+            android:background="@drawable/widget_card"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_ic_learn" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:maxLines="1"
+                android:text="@string/widget_tab_learn"
+                android:textColor="#FFFFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/widget_tab_care"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="3dp"
+            android:background="@drawable/widget_card"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_ic_care" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:maxLines="1"
+                android:text="@string/widget_tab_care"
+                android:textColor="#FFFFFFFF"
+                android:textSize="12sp" />
+        </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

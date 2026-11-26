@@ -14,4 +14,10 @@
         <item quantity="one">%d-day streak</item>
         <item quantity="other">%d-day streak</item>
     </plurals>
+    <string name="widget_goal_title">Today\'s Goal</string>
+    <string name="widget_goal_count">%1$d of %2$d completed</string>
+    <string name="widget_tab_plan">Plan</string>
+    <string name="widget_tab_track">Track</string>
+    <string name="widget_tab_learn">Learn</string>
+    <string name="widget_tab_care">Care</string>
 </resources>

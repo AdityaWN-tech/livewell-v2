@@ -1,10 +1,18 @@
 rules_version = '2';
 
-// Cloud Storage rules (D-76). HUMAN REVIEW REQUIRED (security).
-// Personal media (selfies/{uid}/, avatars/{uid}/, voice_samples/{uid}/) is
-// written and read only by the server (Media Service, Core API) through the
-// Admin SDK, which bypasses these rules; the app gets short-lived signed
-// URLs from the server. Nothing is open to clients.
+// Live Well v2 Cloud Storage rules. HUMAN REVIEW REQUIRED (security, privacy).
+// Tests: firebase/test/storage.rules.test.ts (npm test).
+//
+// The app never reads or writes Cloud Storage directly (D-17, D-76, D-82).
+// Everything is written and read only by the server through the Admin SDK,
+// which bypasses these rules; the app gets short-lived signed URLs:
+// - selfies/{uid}/, avatars/{uid}/, voice_samples/{uid}/  personal media
+//   (Media Service, Core API); deleted on revoke (D-76).
+// - exports/{uid}/...  data export zips (T-CMP-03), downloaded only through
+//   a signed URL from getDataExportLink; deleted after 7 days by the bucket's
+//   lifecycle rule (firebase/storage-lifecycle.json).
+// Nothing is open to clients.
+
 service firebase.storage {
   match /b/{bucket}/o {
     match /{allPaths=**} {

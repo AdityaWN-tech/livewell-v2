@@ -739,6 +739,12 @@ service cloud.firestore {
         allow read: if isOwner(uid);
         allow write: if false; // linking and unlinking run on the server (FR-SET-04)
       }
+      // "Download my data" jobs (FR-SET-02, T-CMP-03, D-82): the app watches
+      // the status; only requestDataExport and its worker write them.
+      match /data_exports/{jobId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
 
       // ---------- devices: where server pushes go (T-TCH-01, D-77) ----------
       // One per app install (a random id). Only the FCM token, the platform

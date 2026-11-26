@@ -19,6 +19,8 @@ import '../../voice/domain/voice.dart';
 import '../../voice/presentation/voice_how_made.dart';
 import '../../voice/presentation/voice_screen.dart'
     show AiVoiceLabel, showOwnVoiceSheet;
+import '../../rewards/application/rewards_data.dart'
+    show unlockedBackgroundNamesProvider;
 import 'avatar_options_picker.dart';
 import 'studio_widgets.dart';
 
@@ -466,6 +468,7 @@ class _StudioScreenState extends ConsumerState<StudioScreen> {
         BackgroundChoices(
           selected: _choice.background,
           images: images,
+          unlocked: ref.watch(unlockedBackgroundNamesProvider),
           onPick: (i) =>
               setState(() => _choice = _choice.copyWith(background: i)),
         ),

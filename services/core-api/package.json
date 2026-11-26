@@ -8,9 +8,10 @@
     "node": "22"
   },
   "scripts": {
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
+    "build": "npm run bundle-scripts && tsc",
+    "typecheck": "npm run bundle-scripts && tsc --noEmit",
     "test": "npm run build && firebase emulators:exec --only auth,firestore,functions,storage --project demo-livewell \"vitest run\"",
+    "bundle-scripts": "node scripts/bundle-scripts.mjs",
     "migrate:user-arrays": "npm run build && node lib/migrations/user-arrays-cli.js"
   },
   "dependencies": {

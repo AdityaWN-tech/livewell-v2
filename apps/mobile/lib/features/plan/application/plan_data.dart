@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart' show TimeOfDay;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/config/feature_flags.dart' show driverWheelOnProvider;
 
 import '../../../core/time/clock.dart';
 import '../../auth/data/firebase_auth_service.dart';
@@ -9,7 +12,10 @@ import '../../dev/application/preview_samples.dart';
 import '../../goals/data/goal_repository.dart';
 import '../../goals/domain/goal.dart';
 import '../../home/application/home_data.dart';
+import '../../focus/presentation/focus_screen.dart' show focusMapProvider;
 import '../../starter_plan/data/plan_repository.dart';
+import '../../starter_plan/domain/starter_plan.dart' show PlanDay;
+import '../domain/driver_wheel.dart';
 import '../domain/plan_models.dart';
 
 /// Today's habits for the Plan tab: today's step (the same one Home shows,
@@ -108,23 +114,62 @@ final goalProvider = StreamProvider<Goal?>(
   (ref) => ref.watch(goalRepositoryProvider).watchGoal(),
 );
 
-/// The 8 drivers, in their fixed order.
-/// needs-product: Dr. Gokula's driver names and order aren't in the content
-/// files yet, so these are numbered placeholders (the mockup's names are
-/// samples). TODO(T-CNT): load content/drivers.json once it exists.
+/// content/plan/drivers.json (copied to assets/plan/): the one source of
+/// the 8 drivers. PROVISIONAL, pending clinical review (D-87): Dr. Gokula's
+/// driver names come with the assessment content (T-ASM-01), so the labels
+/// are numbers only (the mockup's names are samples).
+final driverCatalogProvider = FutureProvider<DriverCatalog>((ref) async {
+  try {
+    return DriverCatalog.parse(
+      await rootBundle.loadString('assets/plan/drivers.json', cache: false),
+    );
+  } catch (_) {
+    return DriverCatalog.fallback;
+  }
+});
+
+/// The 8 drivers, in their fixed order (numbered until the file loads).
 final driversProvider = Provider<List<Driver>>(
-  (ref) => [
-    for (var i = 0; i < 8; i++) Driver(index: i, label: 'Driver ${i + 1}'),
-  ],
+  (ref) => (ref.watch(driverCatalogProvider).value ?? DriverCatalog.fallback)
+      .drivers,
 );
 
-/// 30-day completion per driver (FR-GAM-02), or null before the 10-minute
-/// assessment: the wheel is then soft grey.
-/// TODO(T-ASM-01, T-GAM-02): compute from the assessment and habit logs.
-final driverCompletionProvider = Provider<List<double>?>(
-  (ref) =>
-      ref.watch(previewModeProvider) ? PreviewSamples.driverCompletion : null,
-);
+/// The plan's days and the habit logs of the last 30 days (FR-GAM-02).
+final _wheelDataProvider =
+    FutureProvider<({List<PlanDay> days, Set<String> logs})>((ref) async {
+      ref.watch(todayHabitLogsProvider);
+      final now = ref.watch(clockProvider)();
+      final from = localDateKey(
+        DateTime(now.year, now.month, now.day - (DriverWheel.days - 1)),
+      );
+      final to = localDateKey(now);
+      final days = await ref
+          .watch(planRepositoryProvider)
+          .daysBetween(from, to);
+      final logs = await ref
+          .watch(goalRepositoryProvider)
+          .logsBetween(from, to);
+      return (days: days, logs: {for (final l in logs) l.id});
+    });
+
+/// 30-day completion per driver (FR-GAM-02), or null before there is a
+/// plan: the wheel is then soft grey. Behind the `driverWheel` flag (dev
+/// only) while the drivers are provisional (D-87).
+final driverCompletionProvider = Provider<List<double>?>((ref) {
+  if (ref.watch(previewModeProvider)) return PreviewSamples.driverCompletion;
+  if (!ref.watch(driverWheelOnProvider)) return null;
+  final catalog = ref.watch(driverCatalogProvider).value;
+  final focus = ref.watch(focusMapProvider).value;
+  final data = ref.watch(_wheelDataProvider).value;
+  if (catalog == null || focus == null || data == null) return null;
+  return DriverWheel.completion(
+    catalog: catalog,
+    focus: focus,
+    planDays: data.days,
+    doneLogIds: data.logs,
+    today: localDateKey(ref.watch(clockProvider)()),
+  );
+});
 
 /// The 30-day goal card, or null before a goal is set.
 final planGoalProvider = Provider<PlanGoal?>((ref) {

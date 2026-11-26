@@ -40,6 +40,10 @@ export const AUDIT_ACTIONS = [
   'admin.portal_offer_unpublished',
   'admin.portal_offer_archived',
   'admin.portal_offer_restored',
+  // Closed-script voice gateway (T-VOC-07, D-88): ids and counts only.
+  'voice.tts_synthesized',
+  'voice.tts_refused',
+  'voice.tts_routed_neutral',
   // Reserved: voice and avatar consent (T-VOC-*, T-AVT-*).
   'voice_consent.granted',
   'voice_consent.revoked',

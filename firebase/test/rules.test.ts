@@ -225,13 +225,14 @@ describe('avatar', () => {
     );
   });
 
-  it('only known coaches, names of 1 to 20 characters, 6 backgrounds', async () => {
+  it('only known coaches, names of 1 to 20 characters, 13 backgrounds (6 + 7 unlockable, D-87)', async () => {
     await seedAdult(env);
     const ref = doc(as(ALICE), 'users/alice/avatar/current');
     await assertFails(setDoc(ref, coach({ coach_id: 'someone_else' })));
     await assertFails(setDoc(ref, coach({ coach_name: '' })));
     await assertFails(setDoc(ref, coach({ coach_name: 'x'.repeat(21) })));
-    await assertFails(setDoc(ref, coach({ background: 6 })));
+    await assertSucceeds(setDoc(ref, coach({ background: 12 })));
+    await assertFails(setDoc(ref, coach({ background: 13 })));
     await assertFails(setDoc(ref, coach({ raw_media_retained: true })));
   });
 
@@ -279,6 +280,22 @@ describe('voices (status and vendor ids server-only)', () => {
     );
     await assertFails(deleteDoc(doc(as(ALICE), 'users/alice/voices/v1')));
     await assertFails(getDoc(doc(as(BOB), 'users/alice/voices/v1')));
+  });
+  it('the voice gateway can trust kind and consent_id (T-VOC-07): the app sets neither', async () => {
+    await seed(env, {
+      'users/alice/voices/c1': { kind: 'loved_one', vendor_voice_id: 'v-c1', consent_id: 'vc_1', status: 'revoked', speed: 1, style: 'calm', ...meta() },
+    });
+    // A revoked clone can't be pointed at another consent or turned into a library voice.
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/c1'), { consent_id: 'vc_2' }));
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/c1'), { kind: 'library', status: 'active' }));
+    await assertFails(updateDoc(doc(as(ALICE), 'users/alice/voices/v1'), { kind: 'self_clone' }));
+    // Nor can a library voice be created carrying a consent id.
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/voices/lw-new'), {
+      kind: 'library', vendor_voice_id: 'x', consent_id: 'vc_1', status: 'inactive', speed: 1, style: 'calm', ...meta(),
+    }));
+    // Consent records and coach messages are server-only.
+    await assertFails(setDoc(doc(as(ALICE), 'voice_consents/vc_3'), { account_uid: 'alice', status: 'active' }));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/messages/m_new_0001'), { text: 'Say this', safety: { status: 'approved' } }));
   });
 });
 
@@ -990,6 +1007,88 @@ describe('content_progress (Step 4e: where the person is in a lesson)', () => {
   });
   it('nothing is stored before the 18+ gate', async () => {
     await assertFails(setDoc(ref(), prog()));
+  });
+});
+
+describe('rewards (T-GAM-01: badges earned and the chosen look, D-87)', () => {
+  const rewards = (o: Record<string, unknown> = {}) => ({
+    earned: { first_step: '2026-10-24' }, celebration: 'petals', ...meta(), ...o,
+  });
+  const ref = () => doc(as(ALICE), 'users/alice/rewards/current');
+
+  it('owner saves and adds badges; nobody else; never deleted', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), rewards()));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), rewards({
+        earned: { first_step: '2026-10-24', restart: '2026-10-26' },
+        created_at: saved.created_at, updated_at: meta().updated_at,
+      })),
+    );
+    await assertFails(deleteDoc(ref()));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/rewards/current')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/rewards/current'), rewards()));
+  });
+  it('only the current doc, known celebration styles, no other fields; meta required', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/rewards/other'), rewards()));
+    await assertFails(setDoc(ref(), rewards({ celebration: 'fireworks' })));
+    await assertFails(setDoc(ref(), rewards({ earned: 'all' })));
+    await assertFails(setDoc(ref(), rewards({ weight_lost: 2 })));
+    const { schema_version: _, ...noMeta } = rewards();
+    await assertFails(setDoc(ref(), noMeta));
+  });
+  it('created_at never changes', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/rewards/current': rewards() });
+    await assertFails(setDoc(ref(), rewards({ created_at: meta().created_at, updated_at: meta().updated_at })));
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), rewards()));
+  });
+});
+
+describe('challenges (T-GAM-01: one weekly challenge, days only)', () => {
+  const entry = (o: Record<string, unknown> = {}) => ({
+    challenge_id: 'post_meal_walk', days: ['2026-10-26'], ...meta(), ...o,
+  });
+  const ref = () => doc(as(ALICE), 'users/alice/challenges/2026-10-26');
+
+  it('owner joins and marks days; nobody else; never deleted', async () => {
+    await seedAdult(env);
+    await assertSucceeds(setDoc(ref(), entry({ days: [] })));
+    const saved = (await getDoc(ref())).data()!;
+    await assertSucceeds(
+      setDoc(ref(), entry({
+        days: ['2026-10-26', '2026-10-27'],
+        created_at: saved.created_at, updated_at: meta().updated_at,
+      })),
+    );
+    await assertFails(deleteDoc(ref()));
+    await assertFails(getDoc(doc(as(BOB), 'users/alice/challenges/2026-10-26')));
+    await assertFails(setDoc(doc(as(BOB), 'users/alice/challenges/2026-10-26'), entry()));
+  });
+  it('known challenges only, at most 7 days, no amounts, a date id; meta required', async () => {
+    await seedAdult(env);
+    await assertFails(setDoc(ref(), entry({ challenge_id: 'lose_5_kg' })));
+    await assertFails(setDoc(ref(), entry({ days: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] })));
+    await assertFails(setDoc(ref(), entry({ minutes: 60 })));
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/challenges/this-week'), entry()));
+    const { schema_version: _, ...noMeta } = entry();
+    await assertFails(setDoc(ref(), noMeta));
+  });
+  it('the challenge and created_at never change', async () => {
+    await seedAdult(env);
+    await seed(env, { 'users/alice/challenges/2026-10-26': entry() });
+    const saved = (await getDoc(ref())).data()!;
+    await assertFails(setDoc(ref(), entry({
+      challenge_id: 'steady_bedtime', created_at: saved.created_at, updated_at: meta().updated_at,
+    })));
+    await assertFails(setDoc(ref(), entry({ created_at: meta().created_at, updated_at: meta().updated_at })));
+  });
+  it('nothing is stored before the 18+ gate', async () => {
+    await assertFails(setDoc(ref(), entry()));
   });
 });
 

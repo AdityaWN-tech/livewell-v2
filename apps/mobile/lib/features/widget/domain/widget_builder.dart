@@ -166,10 +166,18 @@ class WidgetSnapshotBuilder {
 
   static WidgetSlot _coachSlotAt(WidgetInputs i, DateTime when) {
     if (!i.signedIn) return WidgetSlot.signedOut;
-    if (i.stepTitle == null) return WidgetSlot.none;
     final t = ClockTime(when.hour, when.minute);
     if (t.compareTo(i.times.evening) >= 0 && !i.reflected) {
       return WidgetSlot.evening;
+    }
+    // No step today (e.g. the starter plan has ended): the check-in still
+    // has its morning slot, so the widget always shows something to do.
+    if (i.stepTitle == null) {
+      // A routine item with Done comes first (slotAt turns none into it).
+      if (i.nextRoutine != null && !i.safetyHold) return WidgetSlot.none;
+      return !i.checkedIn && t.compareTo(i.times.midday) < 0
+          ? WidgetSlot.morningCheckIn
+          : WidgetSlot.none;
     }
     if (i.stepDone) return WidgetSlot.done;
     if (!i.checkedIn && t.compareTo(i.times.midday) < 0) {

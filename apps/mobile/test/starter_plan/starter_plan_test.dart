@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/core/time/clock.dart';
 import 'package:livewell/features/home/application/home_data.dart'
-    show stepProgressActionsProvider;
+    show repeatedPlanDay, stepProgressActionsProvider;
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/consent/data/consent_repository.dart';
 import 'package:livewell/features/consent/domain/consent.dart';
@@ -439,6 +439,30 @@ void main() {
       );
       expect(reminders.scheduled, isNotEmpty);
       expect(zone.zone, 'America/New_York');
+    });
+  });
+
+  group('after the starter plan ends (D-109)', () {
+    test(
+      'repeats the step from the same weekday of the last planned week',
+      () async {
+        final repo = InMemoryPlanRepository();
+        final p = plan();
+        await repo.save(p, const TouchpointTimes());
+        // Day 10 of a plan that starts 2026-10-15 (7 planned days).
+        final now = DateTime(2026, 10, 24, 14);
+        final day = await repeatedPlanDay(repo, now);
+        final lastWeek = p.days.firstWhere((d) => d.date == '2026-10-17');
+        expect(day, isNotNull);
+        expect(day!.date, '2026-10-24');
+        expect(day.title, lastWeek.title);
+      },
+    );
+    test('nothing to repeat: never planned, or over 8 weeks ago', () async {
+      final repo = InMemoryPlanRepository();
+      expect(await repeatedPlanDay(repo, DateTime(2026, 10, 24)), isNull);
+      await repo.save(plan(), const TouchpointTimes());
+      expect(await repeatedPlanDay(repo, DateTime(2027, 1, 30)), isNull);
     });
   });
 }

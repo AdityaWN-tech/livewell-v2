@@ -9,7 +9,10 @@ import '../../checkin/domain/checkin.dart';
 import '../../consent/data/consent_repository.dart';
 import '../../consent/domain/consent.dart';
 import '../../home/application/home_data.dart'
-    show coachNameProvider, stepProgressProvider;
+    show coachNameProvider, repeatedPlanDay, stepProgressProvider;
+import '../../routine/data/routine_repository.dart'
+    show routineRepositoryProvider;
+import '../data/notification_names.dart';
 import '../../moments/data/coach_faces.dart';
 import '../../routine/application/routine_moment.dart';
 import '../data/plan_repository.dart';
@@ -44,7 +47,17 @@ class PlanScheduler {
     }
     final plans = _ref.read(planRepositoryProvider);
     final now = _ref.read(clockProvider)();
-    final dates = await plans.datesFrom(localDateKey(now));
+    // The plan's saved days; once the starter plan has ended (the step
+    // repeats, D-109), the next 7 days too, so reminders go on. Nobody who
+    // never had a plan gets plan reminders.
+    final saved = await plans.datesFrom(localDateKey(now));
+    final repeats = await repeatedPlanDay(plans, now) != null;
+    final dates = {
+      ...saved,
+      if (repeats)
+        for (var d = 0; d < 7; d++)
+          localDateKey(DateTime(now.year, now.month, now.day + d)),
+    }.toList()..sort();
     final uid = _ref.read(authServiceProvider).currentUser?.uid;
     final settings = uid == null
         ? const <String, dynamic>{}
@@ -100,9 +113,46 @@ class PlanScheduler {
       texts,
       faces: faces,
       routine: capped.routine,
+      names: await _taskNames(plans, capped),
     );
     await ledgers.save(ReminderLedger.next(before, now, capped));
     await _ref.read(reminderZoneStoreProvider).save(await reminders.timeZone());
+  }
+
+  /// Task names for the step and single routine reminders, only when the
+  /// person turned "Show task names in notifications" on (D-111). A custom
+  /// routine item's own words are never used (as on the widget).
+  Future<Map<int, String>> _taskNames(
+    PlanRepository plans,
+    CappedReminders capped,
+  ) async {
+    // The loaded value only: never wait on storage here (off until loaded).
+    final on = _ref.read(notificationNamesProvider).value ?? false;
+    if (!on) return const {};
+    final names = <int, String>{};
+    for (final i in capped.plan) {
+      if (i.kind != TouchpointKind.nudge) continue;
+      final date = localDateKey(i.when);
+      final day =
+          await plans.watchDay(date).first ??
+          await repeatedPlanDay(plans, i.when);
+      if (day != null) names[i.id] = day.title;
+    }
+    if (capped.routine.isNotEmpty) {
+      final items = {
+        for (final it
+            in await _ref.read(routineRepositoryProvider).watchItems().first)
+          it.itemId: it,
+      };
+      for (final r in capped.routine) {
+        if (r.itemIds.length != 1) continue;
+        final it = items[r.itemIds.single];
+        if (it != null && !it.custom && it.label.isNotEmpty) {
+          names[r.id] = it.label;
+        }
+      }
+    }
+    return names;
   }
 
   /// The coach's face per reminder: its frames on the device, else the

@@ -2917,7 +2917,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetGentleSub => 'Let\'s keep today gentle.';
 
   @override
-  String get widgetNoPlan => 'Open Live Well to start your plan';
+  String get widgetNoPlan => 'Choose a small step for today';
 
   @override
   String get widgetSignedOut => 'Open Live Well to sign in';
@@ -4434,4 +4434,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dataExportPrivacyNote =>
       'The file is personal. Keep it somewhere safe and share it only with people you trust.';
+
+  @override
+  String get dailyPlanNotificationNames => 'Show task names in reminders';
+
+  @override
+  String get dailyPlanNotificationNamesBody =>
+      'Only while your phone is unlocked. The lock screen always says \"Your next step is ready\".';
+
+  @override
+  String get reminderDoneAction => 'Done';
 }

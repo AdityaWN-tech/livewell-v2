@@ -1775,7 +1775,7 @@
   "@widgetGentleSub": {
     "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
   },
-  "widgetNoPlan": "Open Live Well to start your plan",
+  "widgetNoPlan": "Choose a small step for today",
   "@widgetNoPlan": {
     "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
   },
@@ -3840,5 +3840,17 @@
   "dataExportPrivacyNote": "The file is personal. Keep it somewhere safe and share it only with people you trust.",
   "@dataExportPrivacyNote": {
     "description": "T-CMP-03 download my data (D-82)."
+  },
+  "dailyPlanNotificationNames": "Show task names in reminders",
+  "@dailyPlanNotificationNames": {
+    "description": "Daily plan switch (D-111): reminders name the task."
+  },
+  "dailyPlanNotificationNamesBody": "Only while your phone is unlocked. The lock screen always says \"Your next step is ready\".",
+  "@dailyPlanNotificationNamesBody": {
+    "description": "Subtitle of the task-names switch (D-111)."
+  },
+  "reminderDoneAction": "Done",
+  "@reminderDoneAction": {
+    "description": "Done button on a reminder notification (D-111)."
   }
 }

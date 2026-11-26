@@ -24,6 +24,7 @@ import '../../moments/application/moment_launcher.dart'
 /// Reminder texts in the coach's voice, generic on purpose (no name,
 /// personal or health details on the lock screen, AGENTS.md).
 ReminderTexts reminderTexts(AppLocalizations l) => ReminderTexts(
+  doneAction: l.reminderDoneAction,
   greetingTitle: l.reminderGreetingTitle,
   greetingBody: l.reminderGreetingBody,
   nudgeTitle: l.reminderNudgeTitle,

@@ -15,6 +15,10 @@ import '../domain/touchpoints.dart';
 /// personal or health-related on the lock screen (AGENTS.md), so no name,
 /// Why, mood or step text. Tapping it opens the Avatar Moment (T-DLY-03c),
 /// which says the rest.
+/// The notification's Done button (D-111) and the tap payload it produces.
+const doneActionId = 'done';
+const donePrefix = 'done:';
+
 class ReminderTexts {
   const ReminderTexts({
     required this.greetingTitle,
@@ -29,6 +33,7 @@ class ReminderTexts {
     required this.routineTitle,
     required this.routineBody,
     required this.routineBundleBody,
+    this.doneAction = 'Done',
     required this.routineChannelName,
   });
 
@@ -49,6 +54,9 @@ class ReminderTexts {
 
   /// Two or more items close together.
   final String routineBundleBody;
+
+  /// The notification's Done button label (D-111).
+  final String doneAction;
   final String routineChannelName;
 
   (String, String) of(TouchpointKind k) => switch (k) {
@@ -72,6 +80,7 @@ abstract class Reminders {
     ReminderTexts t, {
     Map<TouchpointKind, String> faces = const {},
     List<RoutineReminder> routine = const [],
+    Map<int, String> names = const {},
   });
 
   Future<void> cancelAll();
@@ -123,7 +132,9 @@ class LocalReminders implements Reminders {
       ),
       onDidReceiveNotificationResponse: (r) {
         final payload = r.payload;
-        if (payload != null) _taps.add(payload);
+        if (payload == null) return;
+        // The Done button (D-111) opens the app and marks the task done.
+        _taps.add(r.actionId == doneActionId ? '$donePrefix$payload' : payload);
       },
     );
     _ready = true;
@@ -170,33 +181,49 @@ class LocalReminders implements Reminders {
     ReminderTexts t, {
     Map<TouchpointKind, String> faces = const {},
     List<RoutineReminder> routine = const [],
+    Map<int, String> names = const {},
   }) async {
     await _init();
     await _plugin.cancelAll();
-    NotificationDetails details(String? face, {bool isRoutine = false}) =>
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            // Its own channel, so routine reminders can be muted on their own.
-            isRoutine ? 'routine' : 'daily_plan',
-            isRoutine ? t.routineChannelName : t.channelName,
-            importance: Importance.defaultImportance,
-            // Even the generic text stays hidden on a locked screen, and the
-            // coach's face with it.
-            visibility: NotificationVisibility.private,
-            largeIcon: face == null ? null : FilePathAndroidBitmap(face),
-          ),
-          // No face on iOS: an attachment can show on the lock screen, and the
-          // avatar may be drawn from the person's selfie (AGENTS.md).
-          iOS: const DarwinNotificationDetails(),
-        );
+    NotificationDetails details(
+      String? face, {
+      bool isRoutine = false,
+      bool withDone = false,
+    }) => NotificationDetails(
+      android: AndroidNotificationDetails(
+        // Its own channel, so routine reminders can be muted on their own.
+        isRoutine ? 'routine' : 'daily_plan',
+        isRoutine ? t.routineChannelName : t.channelName,
+        importance: Importance.defaultImportance,
+        // Even the generic text stays hidden on a locked screen, and the
+        // coach's face with it.
+        visibility: NotificationVisibility.private,
+        largeIcon: face == null ? null : FilePathAndroidBitmap(face),
+        actions: withDone
+            ? [
+                AndroidNotificationAction(
+                  doneActionId,
+                  t.doneAction,
+                  showsUserInterface: true,
+                ),
+              ]
+            : null,
+      ),
+      // No face on iOS: an attachment can show on the lock screen, and the
+      // avatar may be drawn from the person's selfie (AGENTS.md).
+      iOS: const DarwinNotificationDetails(),
+    );
     for (final i in items) {
       final (title, body) = t.of(i.kind);
       await _plugin.zonedSchedule(
         id: i.id,
         title: title,
-        body: body,
+        body: names[i.id] ?? body,
         scheduledDate: tz.TZDateTime.from(i.when, tz.local),
-        notificationDetails: details(faces[i.kind]),
+        notificationDetails: details(
+          faces[i.kind],
+          withDone: i.kind == TouchpointKind.nudge,
+        ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         payload: i.kind.name,
       );
@@ -205,11 +232,14 @@ class LocalReminders implements Reminders {
       await _plugin.zonedSchedule(
         id: r.id,
         title: t.routineTitle,
-        body: r.itemIds.length > 1 ? t.routineBundleBody : t.routineBody,
+        body:
+            names[r.id] ??
+            (r.itemIds.length > 1 ? t.routineBundleBody : t.routineBody),
         scheduledDate: tz.TZDateTime.from(r.when, tz.local),
         notificationDetails: details(
           faces[TouchpointKind.nudge],
           isRoutine: true,
+          withDone: true,
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         payload: r.payload,

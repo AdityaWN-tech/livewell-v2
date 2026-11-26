@@ -21,6 +21,7 @@ import '../../routine/domain/routine_reminders.dart';
 import '../../voice/data/voice_repository.dart';
 import '../../voice/domain/voice.dart';
 import '../application/plan_scheduler.dart';
+import '../data/notification_names.dart';
 import '../data/plan_repository.dart';
 import '../domain/touchpoints.dart';
 import 'plan_preview_screen.dart' show reminderTexts;
@@ -438,6 +439,21 @@ class _DailyPlanScreenState extends ConsumerState<DailyPlanScreen> {
                     value: ref.watch(widgetHideDetailsProvider).value ?? true,
                     onChanged: (hide) =>
                         ref.read(widgetHideDetailsProvider.notifier).set(hide),
+                  ),
+                  // Task names in reminders (D-111): off by default; never
+                  // on the lock screen.
+                  SwitchListTile(
+                    key: const Key('plan-notification-names'),
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l.dailyPlanNotificationNames),
+                    subtitle: Text(l.dailyPlanNotificationNamesBody),
+                    value: ref.watch(notificationNamesProvider).value ?? false,
+                    onChanged: (on) async {
+                      await ref
+                          .read(notificationNamesProvider.notifier)
+                          .set(on);
+                      await _reschedule();
+                    },
                   ),
                 ],
               ),

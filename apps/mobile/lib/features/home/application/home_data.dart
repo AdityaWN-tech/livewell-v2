@@ -61,9 +61,35 @@ final todayPlanProvider = StreamProvider<PlanDay?>((ref) {
       ref.watch(signedInUidProvider) == null) {
     return Stream.value(null);
   }
-  final today = localDateKey(ref.watch(clockProvider)());
-  return ref.watch(planRepositoryProvider).watchDay(today);
+  final now = ref.watch(clockProvider)();
+  final today = localDateKey(now);
+  final repo = ref.watch(planRepositoryProvider);
+  return repo
+      .watchDay(today)
+      .asyncMap((day) async => day ?? await repeatedPlanDay(repo, now));
 });
+
+/// No plan day for today (the 7-day starter plan has ended and the nightly
+/// plan isn't built yet): repeat the step from the same weekday of the most
+/// recent planned week, up to 8 weeks back, so Home, Plan and the widget
+/// always have a real step (D-109). Null when there was never a plan.
+Future<PlanDay?> repeatedPlanDay(PlanRepository repo, DateTime now) async {
+  final today = DateTime(now.year, now.month, now.day);
+  try {
+    final days = await repo.daysBetween(
+      localDateKey(today.subtract(const Duration(days: 56))),
+      localDateKey(today.subtract(const Duration(days: 1))),
+    );
+    final sameWeekday = [
+      for (final d in days)
+        if (DateTime.parse(d.date).weekday == today.weekday) d,
+    ]..sort((a, b) => b.date.compareTo(a.date));
+    if (sameWeekday.isEmpty) return null;
+    return sameWeekday.first.onDate(localDateKey(today));
+  } catch (_) {
+    return null;
+  }
+}
 
 /// Today's next step: the plan's step; sample data in the dev preview.
 final todayStepProvider = Provider<TodayStep?>((ref) {

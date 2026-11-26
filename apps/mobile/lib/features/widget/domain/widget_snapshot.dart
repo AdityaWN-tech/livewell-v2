@@ -32,7 +32,12 @@ enum WidgetActionId {
   openHome('open_home', 'livewell://home'),
   // T-GOL-03e: the link also names the item (see WidgetAction.link).
   routineDone('routine_done', 'livewell://routine?done=1'),
-  openRoutine('open_routine', 'livewell://routine');
+  openRoutine('open_routine', 'livewell://routine'),
+  // The widget's tab buttons (D-110): Plan, Track, Learn, Care.
+  openPlan('open_plan', 'livewell://plan'),
+  openTrack('open_track', 'livewell://track'),
+  openLearn('open_learn', 'livewell://learn'),
+  openCare('open_care', 'livewell://care');
 
   const WidgetActionId(this.id, this.link);
   final String id;

@@ -5160,7 +5160,7 @@ abstract class AppLocalizations {
   /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.
   ///
   /// In en, this message translates to:
-  /// **'Open Live Well to start your plan'**
+  /// **'Choose a small step for today'**
   String get widgetNoPlan;
 
   /// Home-screen widget (T-AVT-08g). Generic: never mood or health values.

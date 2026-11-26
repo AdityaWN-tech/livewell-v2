@@ -1775,7 +1775,7 @@
   "@widgetGentleSub": {
     "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
   },
-  "widgetNoPlan": "Open Live Well to start your plan",
+  "widgetNoPlan": "Choose a small step for today",
   "@widgetNoPlan": {
     "description": "Home-screen widget (T-AVT-08g). Generic: never mood or health values."
   },

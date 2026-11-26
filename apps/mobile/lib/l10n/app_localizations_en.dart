@@ -2917,7 +2917,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widgetGentleSub => 'Let\'s keep today gentle.';
 
   @override
-  String get widgetNoPlan => 'Open Live Well to start your plan';
+  String get widgetNoPlan => 'Choose a small step for today';
 
   @override
   String get widgetSignedOut => 'Open Live Well to sign in';

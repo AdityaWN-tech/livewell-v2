@@ -129,11 +129,16 @@ void main() {
     });
 
     test('no plan, and signed out (nothing personal kept)', () {
-      expect(now(day(9, plan: false)).slot, WidgetSlot.none);
+      // No step today (e.g. the starter plan has ended): the check-in and
+      // the evening reflection still show; otherwise a clear next action.
+      expect(now(day(9, plan: false)).slot, WidgetSlot.morningCheckIn);
+      expect(now(day(9, plan: false, checkedIn: true)).slot, WidgetSlot.none);
+      expect(now(day(14, plan: false)).slot, WidgetSlot.none);
       expect(
-        now(day(9, plan: false)).headline,
-        'Open Live Well to start your plan',
+        now(day(14, plan: false)).headline,
+        'Choose a small step for today',
       );
+      expect(now(day(21, plan: false)).slot, WidgetSlot.evening);
       final out = builder.build(day(9, signedIn: false));
       expect(out.current.slot, WidgetSlot.signedOut);
       expect(out.firstName, isNull);

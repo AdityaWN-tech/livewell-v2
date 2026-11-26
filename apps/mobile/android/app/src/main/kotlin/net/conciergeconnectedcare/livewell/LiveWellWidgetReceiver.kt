@@ -142,8 +142,10 @@ class LiveWellWidgetReceiver : HomeWidgetProvider() {
         return views
       }
 
-      // Missing setting = hidden: the private choice is the default (D-68).
-      val hide = snapshot.optBoolean("hide_details", true)
+      // Android puts widgets on the home screen only, never the lock screen,
+      // so the task name shows (D-111). "Hide details on lock screen" still
+      // keeps the iPhone lock-screen widget generic (D-68).
+      val hide = false
       views.setTextViewText(
           R.id.widget_headline,
           accentLastWord(if (hide) entry.optString("lock_headline") else entry.optString("headline")))

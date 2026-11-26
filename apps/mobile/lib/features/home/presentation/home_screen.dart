@@ -46,6 +46,7 @@ import '../../routine/domain/routine.dart'
 import '../../routine/domain/routine_reminders.dart';
 import '../../routine/presentation/routine_screen.dart';
 import '../../starter_plan/application/plan_scheduler.dart';
+import '../../starter_plan/data/notification_names.dart';
 import '../../starter_plan/data/reminders.dart';
 import '../../starter_plan/presentation/plan_preview_screen.dart'
     show reminderTexts;
@@ -101,6 +102,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// A reminder that started the app opens its moment (the moment offers
   /// the check-in); otherwise the usual first-open check-in.
   Future<void> _start() async {
+    // Load "Show task names in reminders" early, so the first reschedule
+    // has it (D-111; the scheduler never waits on storage).
+    ref.read(notificationNamesProvider);
     final reminders = ref.read(remindersProvider);
     String? launch;
     try {
@@ -164,6 +168,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// Tapping a reminder opens the coach's moment (T-DLY-03c); a routine
   /// reminder opens its own (T-GOL-03d).
   Future<bool> _openReminder(String payload) async {
+    // The notification's Done button (D-111): mark it, quietly, no screen.
+    if (payload.startsWith(donePrefix)) {
+      final inner = payload.substring(donePrefix.length);
+      final texts = reminderTexts(AppLocalizations.of(context));
+      if (parseRoutinePayload(inner) != null) {
+        await ref
+            .read(routineReminderActionsProvider)
+            .mark(
+              inner,
+              RoutineStatus.done,
+              source: RoutineSource.notification,
+            );
+      } else if (!ref.read(stepProgressProvider).done) {
+        ref.read(stepProgressActionsProvider).markDone();
+      }
+      try {
+        await ref.read(planSchedulerProvider).reschedule(texts);
+      } catch (_) {}
+      return true;
+    }
     if (parseRoutinePayload(payload) != null) {
       await _playRoutine(payload);
       return true;

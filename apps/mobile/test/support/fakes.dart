@@ -698,6 +698,9 @@ class FakeReminders implements Reminders {
   void tap(TouchpointKind k) => tapPayload(k.name);
   void tapPayload(String payload) => _taps.add(payload);
 
+  /// Task names per notification id (D-111).
+  Map<int, String> names = const {};
+
   @override
   Future<bool> requestPermission() async {
     permissionAsks++;
@@ -710,7 +713,9 @@ class FakeReminders implements Reminders {
     ReminderTexts t, {
     Map<TouchpointKind, String> faces = const {},
     List<RoutineReminder> routine = const [],
+    Map<int, String> names = const {},
   }) async {
+    this.names = names;
     scheduled = items;
     this.routine = routine;
     texts = t;

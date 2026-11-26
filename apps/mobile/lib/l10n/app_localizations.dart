@@ -7586,6 +7586,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The file is personal. Keep it somewhere safe and share it only with people you trust.'**
   String get dataExportPrivacyNote;
+
+  /// Daily plan switch (D-111): reminders name the task.
+  ///
+  /// In en, this message translates to:
+  /// **'Show task names in reminders'**
+  String get dailyPlanNotificationNames;
+
+  /// Subtitle of the task-names switch (D-111).
+  ///
+  /// In en, this message translates to:
+  /// **'Only while your phone is unlocked. The lock screen always says \"Your next step is ready\".'**
+  String get dailyPlanNotificationNamesBody;
+
+  /// Done button on a reminder notification (D-111).
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get reminderDoneAction;
 }
 
 class _AppLocalizationsDelegate

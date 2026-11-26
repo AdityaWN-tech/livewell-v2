@@ -31,6 +31,8 @@ import '../domain/chart_series.dart';
 import '../domain/metric_point.dart';
 import '../domain/track_stats.dart';
 import 'health_connect_sheet.dart';
+import '../../../core/config/feature_flags.dart' show rewardsOnProvider;
+import '../../rewards/presentation/rewards_screen.dart';
 import 'measures.dart';
 import 'weekly_wins_screen.dart';
 
@@ -108,6 +110,11 @@ class TrackScreen extends ConsumerWidget {
         _WeekStreakCard(ref.watch(streakProvider)),
         LwSectionHeader(l.trackWeeklyTitle),
         _WeeklyCard(onTap: () => context.push(WeeklyWinsScreen.path)),
+        // Badges and challenges (T-GAM-01), only while rewards are on.
+        if (ref.watch(rewardsOnProvider)) ...[
+          const SizedBox(height: LwSpacing.sm),
+          RewardsCard(onTap: () => context.push(RewardsScreen.path)),
+        ],
         const SizedBox(height: LwSpacing.sectionGap),
         const _ReflectionCard(),
       ],

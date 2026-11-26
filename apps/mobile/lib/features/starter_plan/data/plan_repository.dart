@@ -46,6 +46,10 @@ abstract class PlanRepository {
 
   /// The plan's dates from [from] on (for rescheduling reminders).
   Future<List<String>> datesFrom(String from);
+
+  /// The plan's days from [from] to [to] (inclusive), for the 8-driver
+  /// wheel (FR-GAM-02). Offline: what the phone has.
+  Future<List<PlanDay>> daysBetween(String from, String to);
 }
 
 class FirestorePlanRepository implements PlanRepository {
@@ -158,6 +162,20 @@ class FirestorePlanRepository implements PlanRepository {
         .timeout(_wait);
     return [for (final d in snap.docs) d.id];
   }
+
+  @override
+  Future<List<PlanDay>> daysBetween(String from, String to) async {
+    final query = _plans
+        .where(FieldPath.documentId, isGreaterThanOrEqualTo: from)
+        .where(FieldPath.documentId, isLessThanOrEqualTo: to);
+    QuerySnapshot<Map<String, dynamic>> snap;
+    try {
+      snap = await query.get().timeout(_wait);
+    } catch (_) {
+      snap = await query.get(const GetOptions(source: Source.cache));
+    }
+    return [for (final d in snap.docs) ?_day(d.id, d.data())];
+  }
 }
 
 /// Dev preview: kept in memory, nothing saved.
@@ -185,6 +203,12 @@ class InMemoryPlanRepository implements PlanRepository {
   @override
   Future<List<String>> datesFrom(String from) async =>
       _days.keys.where((d) => d.compareTo(from) >= 0).toList()..sort();
+
+  @override
+  Future<List<PlanDay>> daysBetween(String from, String to) async => [
+    for (final d in _days.values)
+      if (d.date.compareTo(from) >= 0 && d.date.compareTo(to) <= 0) d,
+  ];
 }
 
 final _previewPlansProvider = Provider<PlanRepository>(

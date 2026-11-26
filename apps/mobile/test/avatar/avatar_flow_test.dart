@@ -65,7 +65,8 @@ void main() {
       expect(c.toMap(), isNot(contains('frames_version')));
       final bad = CoachChoice.fromMap({
         'coach_id': 'nobody',
-        'background': 9,
+        // 0..12 are backgrounds (6..12 unlockable, T-GAM-01).
+        'background': 13,
         'coach_name': '   ',
         'source': 'magic',
       });

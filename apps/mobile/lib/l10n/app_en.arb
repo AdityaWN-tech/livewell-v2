@@ -3581,5 +3581,194 @@
         "type": "int"
       }
     }
+  },
+  "rewardsTitle": "Badges and challenges",
+  "@rewardsTitle": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsSubtitle": "Small rewards for showing up. Rest days and restarts count too.",
+  "@rewardsSubtitle": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsCardTitle": "Your badges",
+  "@rewardsCardTitle": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsCardBody": "{count, plural, =0{Your first badge comes with your first small step.} =1{1 badge so far} other{{count} badges so far}}",
+  "@rewardsCardBody": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsCardLabel": "Your badges, {count} so far. Opens badges and challenges.",
+  "@rewardsCardLabel": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsChallengeTitle": "This week's challenge",
+  "@rewardsChallengeTitle": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsChallengeTarget": "Any {days} days this week. Any day counts.",
+  "@rewardsChallengeTarget": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsChallengeJoin": "Join this challenge",
+  "@rewardsChallengeJoin": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsChallengeMark": "I did it today",
+  "@rewardsChallengeMark": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsChallengeDoneToday": "Done for today. Nice work.",
+  "@rewardsChallengeDoneToday": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsChallengeProgress": "{done} of {target} days",
+  "@rewardsChallengeProgress": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsChallengeComplete": "Challenge done. Well done!",
+  "@rewardsChallengeComplete": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsChallengeQuiet": "Challenges are resting for now. Take things gently; your badges stay yours.",
+  "@rewardsChallengeQuiet": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsChallengeNone": "No challenge this week. Your daily step is plenty.",
+  "@rewardsChallengeNone": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsBadgesTitle": "Badges",
+  "@rewardsBadgesTitle": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsBadgeNew": "New",
+  "@rewardsBadgeNew": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsBadgeEarnedLabel": "{title}, earned. {line}",
+  "@rewardsBadgeEarnedLabel": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardsBadgeNotYetLabel": "{title}, not yet. {how}",
+  "@rewardsBadgeNotYetLabel": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "how": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardsNotYet": "Not yet",
+  "@rewardsNotYet": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsHowDaysDone": "{count, plural, =1{Comes with your first small step.} other{Comes after {count} days with a small step.}}",
+  "@rewardsHowDaysDone": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsHowStreak": "Comes with a {count}-day streak. A rest day each week still counts.",
+  "@rewardsHowStreak": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsHowRestarts": "{count, plural, =1{Comes when you come back after a missed day.} other{Comes after {count} restarts.}}",
+  "@rewardsHowRestarts": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsHowLessons": "{count, plural, =1{Comes when you finish a lesson.} other{Comes after {count} lessons.}}",
+  "@rewardsHowLessons": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsHowChallenges": "{count, plural, =1{Comes when you finish a weekly challenge.} other{Comes after {count} weekly challenges.}}",
+  "@rewardsHowChallenges": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardsUnlocksTitle": "Looks for your coach",
+  "@rewardsUnlocksTitle": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsUnlocksBody": "Just for fun: they only change how things look.",
+  "@rewardsUnlocksBody": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsUnlockedBy": "Comes with the badge: {badge}",
+  "@rewardsUnlockedBy": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87).",
+    "placeholders": {
+      "badge": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardsBackgroundUnlocked": "Background. Pick it in Avatar Studio.",
+  "@rewardsBackgroundUnlocked": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsCelebrationTitle": "Done celebration",
+  "@rewardsCelebrationTitle": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
+  },
+  "rewardsCelebrationLeaves": "Leaves",
+  "@rewardsCelebrationLeaves": {
+    "description": "T-GAM-01 badges, challenges and unlockables (D-87)."
   }
 }

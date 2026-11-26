@@ -4,12 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../account/application/app_lock.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../studio/presentation/studio_screen.dart';
 import '../../studio/presentation/studio_widgets.dart' show StudioTab;
-import '../../../core/config/contact.dart';
 import '../../../core/config/flavor.dart';
 import '../../../core/design/components/lw_components.dart';
 import '../../../core/design/tokens.dart';
@@ -23,6 +21,7 @@ import '../../home/application/home_data.dart';
 import '../../starter_plan/presentation/daily_plan_screen.dart';
 import '../data/account_actions.dart';
 import '../data/appearance.dart';
+import 'data_export_sheet.dart';
 import 'my_coach_section.dart';
 import 'profile_button.dart';
 import '../../avatar/data/avatar_repository.dart';
@@ -192,21 +191,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } on AuthException catch (e) {
       if (mounted) showAuthMessage(context, authErrorText(l, e.failure));
     }
-  }
-
-  /// Opens an email to ask for a copy of my data (FR-SET-02 by hand, within
-  /// 72 hours, until the export function exists).
-  Future<void> _requestData() async {
-    final l = AppLocalizations.of(context);
-    final uri = Uri(
-      scheme: 'mailto',
-      path: dataRequestEmail,
-      queryParameters: {
-        'subject': l.profileRequestDataSubject,
-        'body': l.profileRequestDataBody(_uid),
-      },
-    );
-    if (!await launchUrl(uri) && mounted) _say(l.profileRequestDataNoMail);
   }
 
   /// Add a phone number (one-time code), or remove it.
@@ -548,17 +532,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     title: Text(l.profileMemory),
                     onTap: () => context.push(MemoryScreen.path),
                   ),
-                // Export by email
-                // until the export function exists (FR-SET-02; needs Blaze),
-                // only when an address is set (Step 4d, D-56).
-                if (dataRequestEmail.isNotEmpty)
-                  ListTile(
-                    key: const Key('profile-export'),
-                    leading: const Icon(Icons.download_outlined),
-                    title: Text(l.profileRequestData),
-                    subtitle: Text(l.profileRequestDataNote),
-                    onTap: _requestData,
-                  ),
+                // Download my data (FR-SET-02, T-CMP-03, D-82).
+                ListTile(
+                  key: const Key('profile-export'),
+                  leading: const Icon(Icons.download_outlined),
+                  title: Text(l.profileRequestData),
+                  subtitle: Text(l.dataExportRowNote),
+                  onTap: _signedIn
+                      ? () => showDataExport(context, uid: _uid)
+                      : null,
+                ),
                 ListTile(
                   key: const Key('profile-delete-voice'),
                   leading: const Icon(Icons.voice_over_off_outlined),

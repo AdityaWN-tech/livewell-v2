@@ -36,6 +36,7 @@ import 'package:livewell/features/learn/application/learn_data.dart';
 import 'package:livewell/features/rewards/data/rewards_repository.dart';
 import 'package:livewell/features/voice/data/voice_repository.dart';
 import 'package:livewell/features/profile/data/account_actions.dart';
+import 'package:livewell/features/profile/data/data_export.dart';
 import 'package:livewell/features/profile/data/appearance.dart';
 import 'package:livewell/features/notifications/data/device_registry.dart';
 import 'package:livewell/features/notifications/data/push_messaging.dart';
@@ -51,6 +52,7 @@ import 'package:livewell/features/track/data/metric_repository.dart';
 import 'package:livewell/features/widget/data/widget_publisher.dart';
 
 import '../consent/consent_test.dart' show FakeConsentRepository;
+import 'fake_data_exports.dart';
 import 'fake_onboarding_store.dart';
 import 'fakes.dart';
 import 'frames.dart';
@@ -145,6 +147,9 @@ class Harness {
   final photo = FakeProfilePhotoStore();
   final deletions = FakeDeletions();
   final avatarLocal = FakeAvatarLocalData();
+
+  /// Download my data (T-CMP-03).
+  final exports = FakeDataExports();
   final localData = FakeLocalData();
   final localDb = FakeLocalDatabaseWiper();
 
@@ -225,6 +230,8 @@ class Harness {
           profilePhotoStoreProvider.overrideWithValue(photo),
           deletionsProvider.overrideWithValue(deletions),
           avatarLocalDataProvider.overrideWithValue(avatarLocal),
+          dataExportsProvider.overrideWithValue(exports),
+          dataExportOpenerProvider.overrideWithValue(exports.open),
           localDataProvider.overrideWithValue(localData),
           localDatabaseWiperProvider.overrideWithValue(localDb),
           pushMessagingProvider.overrideWithValue(push),

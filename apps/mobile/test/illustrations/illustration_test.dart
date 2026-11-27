@@ -10,6 +10,7 @@ import 'package:livewell/core/design/theme.dart';
 import 'package:livewell/features/avatar/data/avatar_repository.dart';
 import 'package:livewell/features/avatar/domain/coach_choice.dart';
 import 'package:livewell/features/avatar/presentation/coach_avatar.dart';
+import 'package:livewell/features/avatar/domain/coaches.dart';
 import 'package:livewell/l10n/app_localizations.dart';
 
 import '../support/fakes.dart';
@@ -109,7 +110,7 @@ void main() {
     test('covers everything the task lists', () {
       int count(String kind, [String prefix = '']) =>
           items.where((e) => e.kind == kind && e.id.startsWith(prefix)).length;
-      expect(count('character', 'coach_'), 8);
+      expect(count('character', 'coach_'), ReadyCoach.values.length);
       expect(catalog['coach_wheelchair'], isNotNull);
       expect(count('scene', 'scene_'), 2);
       expect(count('scene', 'studio_bg_'), greaterThanOrEqualTo(3));

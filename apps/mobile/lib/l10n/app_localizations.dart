@@ -4797,6 +4797,102 @@ abstract class AppLocalizations {
   /// **'Auburn hair, wheelchair, 30s'**
   String get coachReadyWheelchair;
 
+  /// Under the first 8 ready-made coaches: shows the rest.
+  ///
+  /// In en, this message translates to:
+  /// **'Show {count} more coaches'**
+  String coachShowMore(int count);
+
+  /// No description provided for @coachReadySouthAsianMoustache.
+  ///
+  /// In en, this message translates to:
+  /// **'Moustache, 30s'**
+  String get coachReadySouthAsianMoustache;
+
+  /// No description provided for @coachReadySilverBob.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver bob, glasses, 60s'**
+  String get coachReadySilverBob;
+
+  /// No description provided for @coachReadyFullBeard.
+  ///
+  /// In en, this message translates to:
+  /// **'Full beard, 40s'**
+  String get coachReadyFullBeard;
+
+  /// No description provided for @coachReadyBlackFringe.
+  ///
+  /// In en, this message translates to:
+  /// **'Black hair, fringe, 40s'**
+  String get coachReadyBlackFringe;
+
+  /// No description provided for @coachReadySaltPepper.
+  ///
+  /// In en, this message translates to:
+  /// **'Salt-and-pepper beard, 50s'**
+  String get coachReadySaltPepper;
+
+  /// No description provided for @coachReadyLongWavy.
+  ///
+  /// In en, this message translates to:
+  /// **'Long wavy hair, 20s'**
+  String get coachReadyLongWavy;
+
+  /// No description provided for @coachReadyBindiBun.
+  ///
+  /// In en, this message translates to:
+  /// **'Bindi, low bun, 50s'**
+  String get coachReadyBindiBun;
+
+  /// No description provided for @coachReadyWhiteBeard.
+  ///
+  /// In en, this message translates to:
+  /// **'White beard, 70s'**
+  String get coachReadyWhiteBeard;
+
+  /// No description provided for @coachReadyKippah.
+  ///
+  /// In en, this message translates to:
+  /// **'Kippah, 30s'**
+  String get coachReadyKippah;
+
+  /// No description provided for @coachReadyPixieCut.
+  ///
+  /// In en, this message translates to:
+  /// **'Pixie cut, 20s'**
+  String get coachReadyPixieCut;
+
+  /// No description provided for @coachReadyGreyMoustache.
+  ///
+  /// In en, this message translates to:
+  /// **'Grey hair, moustache, 60s'**
+  String get coachReadyGreyMoustache;
+
+  /// No description provided for @coachReadyRedCurls.
+  ///
+  /// In en, this message translates to:
+  /// **'Red curls, 40s'**
+  String get coachReadyRedCurls;
+
+  /// No description provided for @coachReadyTopBun.
+  ///
+  /// In en, this message translates to:
+  /// **'Top bun, 20s'**
+  String get coachReadyTopBun;
+
+  /// No description provided for @coachReadyHeadwrap.
+  ///
+  /// In en, this message translates to:
+  /// **'Headwrap, 30s'**
+  String get coachReadyHeadwrap;
+
+  /// No description provided for @coachReadyWheelchairBeard.
+  ///
+  /// In en, this message translates to:
+  /// **'Beard, wheelchair, 50s'**
+  String get coachReadyWheelchairBeard;
+
   /// No description provided for @studioTabCoaches.
   ///
   /// In en, this message translates to:

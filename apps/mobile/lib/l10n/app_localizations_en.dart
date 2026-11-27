@@ -2716,6 +2716,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coachReadyWheelchair => 'Auburn hair, wheelchair, 30s';
 
   @override
+  String coachShowMore(int count) {
+    return 'Show $count more coaches';
+  }
+
+  @override
+  String get coachReadySouthAsianMoustache => 'Moustache, 30s';
+
+  @override
+  String get coachReadySilverBob => 'Silver bob, glasses, 60s';
+
+  @override
+  String get coachReadyFullBeard => 'Full beard, 40s';
+
+  @override
+  String get coachReadyBlackFringe => 'Black hair, fringe, 40s';
+
+  @override
+  String get coachReadySaltPepper => 'Salt-and-pepper beard, 50s';
+
+  @override
+  String get coachReadyLongWavy => 'Long wavy hair, 20s';
+
+  @override
+  String get coachReadyBindiBun => 'Bindi, low bun, 50s';
+
+  @override
+  String get coachReadyWhiteBeard => 'White beard, 70s';
+
+  @override
+  String get coachReadyKippah => 'Kippah, 30s';
+
+  @override
+  String get coachReadyPixieCut => 'Pixie cut, 20s';
+
+  @override
+  String get coachReadyGreyMoustache => 'Grey hair, moustache, 60s';
+
+  @override
+  String get coachReadyRedCurls => 'Red curls, 40s';
+
+  @override
+  String get coachReadyTopBun => 'Top bun, 20s';
+
+  @override
+  String get coachReadyHeadwrap => 'Headwrap, 30s';
+
+  @override
+  String get coachReadyWheelchairBeard => 'Beard, wheelchair, 50s';
+
+  @override
   String get studioTabCoaches => 'Coaches';
 
   @override

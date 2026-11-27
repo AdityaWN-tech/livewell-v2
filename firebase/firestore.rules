@@ -209,7 +209,11 @@ service cloud.firestore {
         }
         function readyCoaches() {
           return ['brown_hair', 'long_black_hair', 'green_hijab', 'navy_turban',
-                  'grey_glasses', 'short_curls', 'short_black_hair', 'wheelchair'];
+                  'grey_glasses', 'short_curls', 'short_black_hair', 'wheelchair',
+                  'south_asian_moustache', 'silver_bob', 'full_beard', 'black_fringe',
+                  'salt_pepper', 'long_wavy', 'bindi_bun', 'white_beard', 'kippah',
+                  'pixie_cut', 'grey_moustache', 'red_curls', 'top_bun', 'headwrap',
+                  'wheelchair_beard'];
         }
         function validAvatar(d) {
           return d.type in ['stylized', 'photoreal', '3d_adult']

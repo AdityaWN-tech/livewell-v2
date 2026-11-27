@@ -41,6 +41,6 @@ For the mouth pictures, add: *Keep the eyes, eyebrows and head exactly the same;
 
 The first four give the biggest step up: they're the pictures the coach shows most while talking and blinking.
 
-**Coach ids:** `brown_hair`, `long_black_hair`, `green_hijab`, `navy_turban`, `grey_glasses`, `short_curls`, `short_black_hair`, `wheelchair`.
+**Coach ids:** `brown_hair`, `long_black_hair`, `green_hijab`, `navy_turban`, `grey_glasses`, `short_curls`, `short_black_hair`, `wheelchair`, `south_asian_moustache`, `silver_bob`, `full_beard`, `black_fringe`, `salt_pepper`, `long_wavy`, `bindi_bun`, `white_beard`, `kippah`, `pixie_cut`, `grey_moustache`, `red_curls`, `top_bun`, `headwrap`, `wheelchair_beard`.
 
 **Before release:** the pictures are AI-generated, so their commercial use has to be checked against the generator's terms (`docs/design/asset-licences.md`). Until a coach is marked `final` in `apps/mobile/assets/illustrations/illustrations.json`, it shows in dev builds only.

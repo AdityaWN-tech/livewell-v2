@@ -1,4 +1,33 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "courses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "review_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visibility",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "courses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "review_status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "allowed_emails",
+          "arrayConfig": "CONTAINS"
+        }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

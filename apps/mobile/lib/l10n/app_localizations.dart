@@ -7604,6 +7604,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get reminderDoneAction;
+
+  /// Learn section of courses written by the team (D-113).
+  ///
+  /// In en, this message translates to:
+  /// **'Courses'**
+  String get learnCoursesTitle;
+
+  /// Course progress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done'**
+  String learnCourseProgress(int done, int total);
+
+  /// Opens the first lesson of a course.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get learnCourseStart;
+
+  /// Opens the next unfinished lesson of a course.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get learnCourseContinue;
+
+  /// Shown when every lesson is done.
+  ///
+  /// In en, this message translates to:
+  /// **'You finished this course. Well done.'**
+  String get learnCourseDone;
+
+  /// Lesson position in a course.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson {n}'**
+  String learnCourseLessonNumber(int n);
+
+  /// A course whose lessons are not available.
+  ///
+  /// In en, this message translates to:
+  /// **'This course has no lessons ready yet.'**
+  String get learnCourseEmpty;
 }
 
 class _AppLocalizationsDelegate

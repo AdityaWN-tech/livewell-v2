@@ -91,6 +91,13 @@
       },
       "description": "The Live Well Map's 30-day fill per driver (FR-GAM-02). Off in staging and prod until the 8 driver names are clinical content (T-ASM-01, D-87); dev always shows it.",
       "valueType": "BOOLEAN"
+    },
+    "ff_assessment": {
+      "defaultValue": {
+        "useInAppDefault": true
+      },
+      "description": "The 10-minute check (ASM-01, D-114): admin-written questions fill the Live Well Map. Off in staging and prod until clinically reviewed; dev always shows it.",
+      "valueType": "BOOLEAN"
     }
   },
   "parameterGroups": {}

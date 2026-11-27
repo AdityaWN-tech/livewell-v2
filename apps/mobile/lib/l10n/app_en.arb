@@ -3893,5 +3893,82 @@
   "learnCourseEmpty": "This course has no lessons ready yet.",
   "@learnCourseEmpty": {
     "description": "A course whose lessons are not available."
+  },
+  "assessmentTitle": "Your check",
+  "@assessmentTitle": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentIntroTitle": "How are things right now?",
+  "@assessmentIntroTitle": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentIntroBody": "{count} short questions about how you live. Tap from 1 (not at all) to 5 (completely). There are no right answers, and your answers stay private.",
+  "@assessmentIntroBody": {
+    "description": "10-minute check (ASM-01, D-114).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assessmentStart": "Start",
+  "@assessmentStart": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentProgress": "Question {n} of {total}",
+  "@assessmentProgress": {
+    "description": "10-minute check (ASM-01, D-114).",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "assessmentScale1": "Not at all",
+  "@assessmentScale1": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentScale2": "A little",
+  "@assessmentScale2": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentScale3": "Somewhat",
+  "@assessmentScale3": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentScale4": "Mostly",
+  "@assessmentScale4": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentScale5": "Completely",
+  "@assessmentScale5": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentBack": "Back",
+  "@assessmentBack": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentDoneTitle": "Your map is ready",
+  "@assessmentDoneTitle": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentDoneBody": "Your Live Well Map now shows where you are today. It is a starting point, not a score to judge.",
+  "@assessmentDoneBody": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentSeeMap": "See my map",
+  "@assessmentSeeMap": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "assessmentNoQuestions": "The check is not ready yet. Please come back soon.",
+  "@assessmentNoQuestions": {
+    "description": "10-minute check (ASM-01, D-114)."
+  },
+  "planMapStartCheck": "Take your 10-minute check",
+  "@planMapStartCheck": {
+    "description": "10-minute check (ASM-01, D-114)."
   }
 }

@@ -4469,4 +4469,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get learnCourseEmpty => 'This course has no lessons ready yet.';
+
+  @override
+  String get assessmentTitle => 'Your check';
+
+  @override
+  String get assessmentIntroTitle => 'How are things right now?';
+
+  @override
+  String assessmentIntroBody(int count) {
+    return '$count short questions about how you live. Tap from 1 (not at all) to 5 (completely). There are no right answers, and your answers stay private.';
+  }
+
+  @override
+  String get assessmentStart => 'Start';
+
+  @override
+  String assessmentProgress(int n, int total) {
+    return 'Question $n of $total';
+  }
+
+  @override
+  String get assessmentScale1 => 'Not at all';
+
+  @override
+  String get assessmentScale2 => 'A little';
+
+  @override
+  String get assessmentScale3 => 'Somewhat';
+
+  @override
+  String get assessmentScale4 => 'Mostly';
+
+  @override
+  String get assessmentScale5 => 'Completely';
+
+  @override
+  String get assessmentBack => 'Back';
+
+  @override
+  String get assessmentDoneTitle => 'Your map is ready';
+
+  @override
+  String get assessmentDoneBody =>
+      'Your Live Well Map now shows where you are today. It is a starting point, not a score to judge.';
+
+  @override
+  String get assessmentSeeMap => 'See my map';
+
+  @override
+  String get assessmentNoQuestions =>
+      'The check is not ready yet. Please come back soon.';
+
+  @override
+  String get planMapStartCheck => 'Take your 10-minute check';
 }

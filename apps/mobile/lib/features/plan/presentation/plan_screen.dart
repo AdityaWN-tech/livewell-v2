@@ -21,6 +21,9 @@ import '../../routine/presentation/label_check_flow.dart';
 import '../../routine/presentation/routine_sheets.dart' show LabelOutcome;
 import '../../routine/presentation/routine_screen.dart';
 import '../../profile/presentation/profile_button.dart';
+import '../../../core/config/feature_flags.dart' show assessmentOnProvider;
+import '../../assessment/application/assessment_data.dart';
+import '../../assessment/presentation/assessment_screen.dart';
 import '../application/plan_data.dart';
 import '../domain/plan_models.dart';
 import 'live_well_map.dart';
@@ -263,6 +266,13 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
                 drivers: ref.watch(driversProvider),
                 completion: ref.watch(driverCompletionProvider),
                 onOpen: _openDriver,
+                onStartCheck:
+                    ref.watch(assessmentOnProvider) &&
+                        (ref.watch(assessmentQuestionsProvider).value ??
+                                const [])
+                            .isNotEmpty
+                    ? () => context.push(AssessmentScreen.path)
+                    : null,
               ),
             ],
           ),

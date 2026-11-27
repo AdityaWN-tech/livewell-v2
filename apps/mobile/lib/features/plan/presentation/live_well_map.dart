@@ -18,7 +18,11 @@ class LiveWellMap extends StatelessWidget {
     required this.drivers,
     required this.completion,
     required this.onOpen,
+    this.onStartCheck,
   });
+
+  /// Opens the 10-minute check, when it is available (D-114).
+  final VoidCallback? onStartCheck;
 
   final List<Driver> drivers;
 
@@ -114,12 +118,21 @@ class LiveWellMap extends StatelessWidget {
         ),
         if (c == null) ...[
           const SizedBox(height: LwSpacing.sm),
-          Text(
-            l.planMapEmpty,
-            key: const Key('plan-map-empty'),
-            textAlign: TextAlign.center,
-            style: t.bodyMedium,
-          ),
+          if (onStartCheck != null)
+            Center(
+              child: FilledButton(
+                key: const Key('plan-start-check'),
+                onPressed: onStartCheck,
+                child: Text(l.planMapStartCheck),
+              ),
+            )
+          else
+            Text(
+              l.planMapEmpty,
+              key: const Key('plan-map-empty'),
+              textAlign: TextAlign.center,
+              style: t.bodyMedium,
+            ),
         ],
         if (bigText) ...[
           const SizedBox(height: LwSpacing.sm),

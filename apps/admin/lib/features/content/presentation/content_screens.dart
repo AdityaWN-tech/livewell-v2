@@ -44,10 +44,18 @@ class ContentScreen extends ConsumerWidget {
     final waiting = [
       ...?ref.watch(lessonsProvider).value?.map((l) => (l.state, l.authorUid)),
       ...?ref.watch(coursesProvider).value?.map((c) => (c.state, c.authorUid)),
+      ...?ref
+          .watch(driverSetsProvider)
+          .value
+          ?.map((d) => (d.state, d.authorUid)),
+      ...?ref
+          .watch(questionsProvider)
+          .value
+          ?.map((q) => (q.state, q.authorUid)),
     ].where((x) => x.$1 == ReviewState.pending && x.$2 != me).length;
     final superadmin = ref.watch(sessionProvider).value?.superadmin ?? false;
     return DefaultTabController(
-      length: 3,
+      length: 4,
       initialIndex: initialTab,
       child: AdminScaffold(
         title: 'Content',
@@ -65,6 +73,7 @@ class ContentScreen extends ConsumerWidget {
               tabs: [
                 const Tab(key: Key('tab-lessons'), text: 'Lessons'),
                 const Tab(key: Key('tab-courses'), text: 'Courses'),
+                const Tab(key: Key('tab-map'), text: 'Live Well Map'),
                 Tab(
                   key: const Key('tab-review'),
                   text: waiting == 0 ? 'Review' : 'Review ($waiting)',
@@ -73,7 +82,12 @@ class ContentScreen extends ConsumerWidget {
             ),
             const Expanded(
               child: TabBarView(
-                children: [_LessonList(), _CourseList(), _ReviewList()],
+                children: [
+                  _LessonList(),
+                  _CourseList(),
+                  _MapTab(),
+                  _ReviewList(),
+                ],
               ),
             ),
           ],
@@ -189,7 +203,16 @@ class _ReviewList extends ConsumerWidget {
     final courses = (ref.watch(coursesProvider).value ?? const [])
         .where((c) => c.state == ReviewState.pending)
         .toList();
-    if (lessons.isEmpty && courses.isEmpty) {
+    final sets = (ref.watch(driverSetsProvider).value ?? const [])
+        .where((d) => d.state == ReviewState.pending)
+        .toList();
+    final questions = (ref.watch(questionsProvider).value ?? const [])
+        .where((q) => q.state == ReviewState.pending)
+        .toList();
+    if (lessons.isEmpty &&
+        courses.isEmpty &&
+        sets.isEmpty &&
+        questions.isEmpty) {
       return const Center(child: Text('Nothing waiting for review.'));
     }
     Widget row(String key, String title, String author, String go) => ListTile(
@@ -218,6 +241,20 @@ class _ReviewList extends ConsumerWidget {
             'Course: ${c.title}',
             c.authorUid,
             '/content/courses/${c.id}',
+          ),
+        for (final d in sets)
+          row(
+            'review-drivers-${d.id}',
+            'Driver names (version ${d.version})',
+            d.authorUid,
+            '/content/drivers/${d.id}',
+          ),
+        for (final q in questions)
+          row(
+            'review-question-${q.id}',
+            'Question: ${q.text}',
+            q.authorUid,
+            '/content/questions/${q.id}',
           ),
       ],
     );
@@ -827,6 +864,347 @@ class _CourseEditorState extends ConsumerState<CourseEditorScreen> {
         const SizedBox(height: LwSpacing.md),
         _ReviewBar(
           collection: coursesCollection,
+          id: _id,
+          state: state,
+          authorUid: current?.authorUid ?? _me(ref),
+          version: current?.version ?? 1,
+          text: _doc(current).allText,
+          onSave: () => _save(current),
+        ),
+      ],
+    );
+  }
+}
+
+/// The newest approved driver names, or the placeholders.
+List<String> _liveLabels(List<DriverSetDoc> sets) =>
+    sets.where((d) => d.state == ReviewState.approved).firstOrNull?.labels ??
+    const DriverSetDoc().labels;
+
+/// Driver names and the 10-minute check's questions (D-114).
+class _MapTab extends ConsumerWidget {
+  const _MapTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = Theme.of(context).textTheme;
+    final sets = ref.watch(driverSetsProvider).value ?? const [];
+    final labels = _liveLabels(sets);
+    // A set being worked on (not live, not retired), to continue it.
+    final working = sets
+        .where(
+          (d) =>
+              d.state == ReviewState.draft ||
+              d.state == ReviewState.pending ||
+              d.state == ReviewState.rejected,
+        )
+        .firstOrNull;
+    final questions = ref.watch(questionsProvider).value ?? const [];
+    return ListView(
+      padding: const EdgeInsets.all(LwSpacing.md),
+      children: [
+        Text('Driver names', style: t.titleMedium),
+        const SizedBox(height: LwSpacing.xs),
+        Text(
+          [for (var i = 0; i < labels.length; i++) '${i + 1}. ${labels[i]}']
+              .join('   '),
+          key: const Key('live-driver-names'),
+        ),
+        const SizedBox(height: LwSpacing.xs),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton(
+            key: const Key('edit-driver-names'),
+            onPressed: () => context.go(
+              working == null
+                  ? '/content/drivers/new'
+                  : '/content/drivers/${working.id}',
+            ),
+            child: Text(
+              working == null
+                  ? 'Change the names'
+                  : 'Continue: ${working.state.label}',
+            ),
+          ),
+        ),
+        const Divider(height: LwSpacing.xl),
+        Text('Questions for the 10-minute check', style: t.titleMedium),
+        const SizedBox(height: LwSpacing.xs),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: FilledButton.icon(
+            key: const Key('new-question'),
+            onPressed: () => context.go('/content/questions/new'),
+            icon: const Icon(Icons.add),
+            label: const Text('New question'),
+          ),
+        ),
+        if (questions.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(LwSpacing.lg),
+            child: Text('No questions yet.'),
+          ),
+        for (final q in questions)
+          ListTile(
+            key: Key('question-${q.id}'),
+            title: Text(q.text),
+            subtitle: Text(
+              '${labels[int.parse(q.driverId.split('_').last) - 1]} · order ${q.order}',
+            ),
+            trailing: Chip(label: Text(q.state.label)),
+            onTap: () => context.go('/content/questions/${q.id}'),
+          ),
+      ],
+    );
+  }
+}
+
+/// Edit the 8 driver names (a new version), or review one.
+class DriverSetEditorScreen extends ConsumerStatefulWidget {
+  const DriverSetEditorScreen({super.key, this.id});
+  final String? id;
+
+  @override
+  ConsumerState<DriverSetEditorScreen> createState() => _DriverSetEditorState();
+}
+
+class _DriverSetEditorState extends ConsumerState<DriverSetEditorScreen> {
+  final _form = GlobalKey<FormState>();
+  final _names = List.generate(8, (_) => TextEditingController());
+  String? _id;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _id = widget.id;
+    for (final c in _names) {
+      c.addListener(() => setState(() {}));
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final c in _names) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _load(List<String> labels) {
+    if (_loaded) return;
+    _loaded = true;
+    for (var i = 0; i < 8 && i < labels.length; i++) {
+      _names[i].text = labels[i];
+    }
+  }
+
+  DriverSetDoc _doc(DriverSetDoc? from) => DriverSetDoc(
+    id: _id,
+    labels: [for (final c in _names) c.text],
+    state: from?.state ?? ReviewState.draft,
+    authorUid: from?.authorUid ?? '',
+    version: from?.version ?? 1,
+  );
+
+  Future<String?> _save(DriverSetDoc? from) async {
+    if (!_form.currentState!.validate()) return null;
+    try {
+      final id = await ref
+          .read(contentRepositoryProvider)
+          .saveDriverSet(_doc(from), uid: _me(ref));
+      if (mounted) setState(() => _id = id);
+      return id;
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Not saved. Try again.')));
+      }
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sets = ref.watch(driverSetsProvider).value ?? const [];
+    final current = _id == null
+        ? null
+        : sets.where((d) => d.id == _id).firstOrNull;
+    _load(current?.labels ?? _liveLabels(sets));
+    final state = current?.state ?? ReviewState.draft;
+    final editable =
+        state == ReviewState.draft || state == ReviewState.rejected;
+    return _Page(
+      title: 'Driver names · ${state.label}',
+      children: [
+        const Text(
+          'The 8 parts of the Live Well Map. The newest approved names show '
+          'in the app; the old names stay until a second admin approves.',
+        ),
+        const SizedBox(height: LwSpacing.sm),
+        Form(
+          key: _form,
+          child: Column(
+            children: [
+              for (var i = 0; i < 8; i++)
+                TextFormField(
+                  key: Key('driver-name-${i + 1}'),
+                  controller: _names[i],
+                  enabled: editable,
+                  maxLength: 30,
+                  decoration: InputDecoration(labelText: 'Driver ${i + 1}'),
+                  validator: _required,
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: LwSpacing.md),
+        _ReviewBar(
+          collection: driverSetsCollection,
+          id: _id,
+          state: state,
+          authorUid: current?.authorUid ?? _me(ref),
+          version: current?.version ?? 1,
+          text: _doc(current).allText,
+          onSave: () => _save(current),
+        ),
+      ],
+    );
+  }
+}
+
+/// Write or review one question of the 10-minute check.
+class QuestionEditorScreen extends ConsumerStatefulWidget {
+  const QuestionEditorScreen({super.key, this.id});
+  final String? id;
+
+  @override
+  ConsumerState<QuestionEditorScreen> createState() => _QuestionEditorState();
+}
+
+class _QuestionEditorState extends ConsumerState<QuestionEditorScreen> {
+  final _form = GlobalKey<FormState>();
+  final _text = TextEditingController();
+  final _order = TextEditingController(text: '0');
+  String _driver = 'driver_1';
+  String? _id;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _id = widget.id;
+    _text.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _text.dispose();
+    _order.dispose();
+    super.dispose();
+  }
+
+  QuestionDoc _doc(QuestionDoc? from) => QuestionDoc(
+    id: _id,
+    driverId: _driver,
+    text: _text.text,
+    order: int.tryParse(_order.text.trim()) ?? 0,
+    state: from?.state ?? ReviewState.draft,
+    authorUid: from?.authorUid ?? '',
+    version: from?.version ?? 1,
+  );
+
+  Future<String?> _save(QuestionDoc? from) async {
+    if (!_form.currentState!.validate()) return null;
+    try {
+      final id = await ref
+          .read(contentRepositoryProvider)
+          .saveQuestion(_doc(from), uid: _me(ref));
+      if (mounted) setState(() => _id = id);
+      return id;
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Not saved. Try again.')));
+      }
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final labels = _liveLabels(ref.watch(driverSetsProvider).value ?? const []);
+    final current = _id == null
+        ? null
+        : ref
+              .watch(questionsProvider)
+              .value
+              ?.where((q) => q.id == _id)
+              .firstOrNull;
+    if (current != null && !_loaded) {
+      _loaded = true;
+      _text.text = current.text;
+      _order.text = '${current.order}';
+      _driver = current.driverId;
+    }
+    final state = current?.state ?? ReviewState.draft;
+    final editable =
+        state == ReviewState.draft || state == ReviewState.rejected;
+    return _Page(
+      title: _id == null ? 'New question' : 'Question · ${state.label}',
+      children: [
+        const Text(
+          'People answer from 1 (not at all) to 5 (completely). Ask about '
+          'how they live, never about diagnoses or medicines.',
+        ),
+        const SizedBox(height: LwSpacing.sm),
+        Form(
+          key: _form,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DropdownButtonFormField<String>(
+                key: const Key('question-driver'),
+                initialValue: _driver,
+                decoration: const InputDecoration(labelText: 'Counts towards'),
+                items: [
+                  for (var i = 0; i < 8; i++)
+                    DropdownMenuItem(
+                      value: 'driver_${i + 1}',
+                      child: Text(labels[i]),
+                    ),
+                ],
+                onChanged: editable
+                    ? (v) => setState(() => _driver = v!)
+                    : null,
+              ),
+              TextFormField(
+                key: const Key('question-text'),
+                controller: _text,
+                enabled: editable,
+                maxLength: 200,
+                decoration: const InputDecoration(
+                  labelText: 'Question',
+                  hintText:
+                      'For example: How rested do you feel when you wake up?',
+                ),
+                validator: _required,
+              ),
+              TextFormField(
+                key: const Key('question-order'),
+                controller: _order,
+                enabled: editable,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Order (0 first)'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: LwSpacing.md),
+        _ReviewBar(
+          collection: questionsCollection,
           id: _id,
           state: state,
           authorUid: current?.authorUid ?? _me(ref),

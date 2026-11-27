@@ -47,6 +47,8 @@ final prodRoutes = <AuditRoute>[
   const AuditRoute('/plan'),
   const AuditRoute('/plan/framework'),
   const AuditRoute('/plan/routine'),
+  // The 10-minute check (D-114); with no questions it shows its empty line.
+  const AuditRoute('/plan/check'),
   const AuditRoute('/track'),
   const AuditRoute('/track/weekly'),
   const AuditRoute('/learn'),

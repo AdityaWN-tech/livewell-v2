@@ -98,10 +98,10 @@ Set<ReadyCoach> selected(WidgetTester tester) => {
     // The coaches behind "Show more" aren't built until it's tapped.
     if (find.byKey(Key('coach-${c.id}')).evaluate().isNotEmpty &&
         tester
-            .widget<Semantics>(find.byKey(Key('coach-${c.id}')))
-            .properties
-            .selected ==
-        true)
+                .widget<Semantics>(find.byKey(Key('coach-${c.id}')))
+                .properties
+                .selected ==
+            true)
       c,
 };
 

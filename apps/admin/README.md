@@ -83,3 +83,16 @@ flutter build web --release \
 ```
 
 Without them the page says the build has no Firebase settings.
+
+## Staff access: request → Superadmin approves (D-112, free plan)
+
+No Cloud Functions are needed; the Firestore rules (`firebase/firestore.rules`, tested in `firebase/test/rules.test.ts`) are the guard.
+
+1. Deploy the rules once: `firebase deploy --only firestore:rules --project my-livewell`.
+2. Turn on **Google** as a sign-in method (Firebase console → Authentication → Sign-in method).
+3. Sign in to this console with **Continue with Google** using your @whitenoiseacademy.com account.
+4. Make that account a Superadmin (owner only, on your laptop, after `gcloud auth application-default login`):
+   `cd services/core-api && node scripts/set-superadmin.mjs --project my-livewell --email you@whitenoiseacademy.com`
+5. Sign out and in again: you land on **Superadmin** (Requests, Admins, Activity).
+
+Anyone else who signs in sees **Request admin access**, then **Waiting for approval**, and gets the console only after a Superadmin taps **Approve**. Admins never see app users' data.

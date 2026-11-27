@@ -15,7 +15,7 @@ void main() {
     expect(api.listCalls, 0);
   });
 
-  testWidgets('an app user without a staff role sees No access', (
+  testWidgets('an app user without a staff role is asked to request access', (
     tester,
   ) async {
     final (_, api) = await pumpAdmin(
@@ -24,7 +24,7 @@ void main() {
       offers: [offer('a')],
       location: '/offers/a',
     );
-    expect(find.byKey(const Key('no-access-role')), findsOneWidget);
+    expect(find.byKey(const Key('request-access')), findsOneWidget);
     expect(find.text('Gut health in 30 days'), findsNothing);
     expect(api.listCalls, 0);
   });

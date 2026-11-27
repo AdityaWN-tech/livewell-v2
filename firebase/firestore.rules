@@ -828,6 +828,76 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // ---------- Staff access: request -> Superadmin approves (D-112) ----------
+    // Free plan: no Cloud Functions, so these rules are the guard.
+    // Superadmin: a custom claim the owner sets with a local script, on a
+    // verified @whitenoiseacademy.com Google account. Nobody can request it.
+    function isSuperadmin() {
+      return request.auth != null
+        && request.auth.token.superadmin == true
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower().matches('.*@whitenoiseacademy[.]com$');
+    }
+    // An approved, active staff Admin (approved by a Superadmin).
+    function isStaffAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/staff_members/$(request.auth.uid))
+        && get(/databases/$(database)/documents/staff_members/$(request.auth.uid)).data.status == 'active';
+    }
+    function validStaffText(v, max) {
+      return v is string && v.size() >= 1 && v.size() <= max;
+    }
+    // Anyone signed in asks once for themselves; only a Superadmin decides.
+    match /staff_requests/{uid} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isSuperadmin();
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'email', 'reason', 'status', 'created_at'])
+        && validStaffText(request.resource.data.name, 80)
+        && validStaffText(request.resource.data.reason, 300)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.status == 'pending'
+        && request.resource.data.created_at == request.time;
+      // A rejected person may ask again (back to pending, own words only).
+      allow update: if (request.auth != null && request.auth.uid == uid
+          && resource.data.status == 'rejected'
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['name', 'reason', 'status', 'created_at'])
+          && validStaffText(request.resource.data.name, 80)
+          && validStaffText(request.resource.data.reason, 300)
+          && request.resource.data.status == 'pending'
+          && request.resource.data.created_at == request.time)
+        || (isSuperadmin()
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['status', 'decided_by', 'decided_at'])
+          && request.resource.data.status in ['approved', 'rejected']
+          && request.resource.data.decided_by == request.auth.uid
+          && request.resource.data.decided_at == request.time);
+      allow delete: if false;
+    }
+    // Approved staff. Written only by a Superadmin; never by the person.
+    match /staff_members/{uid} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isSuperadmin();
+      allow create, update: if isSuperadmin()
+        && request.resource.data.keys().hasOnly(['email', 'name', 'role', 'status', 'approved_by', 'updated_at'])
+        && request.resource.data.role == 'admin'
+        && request.resource.data.status in ['active', 'removed']
+        && request.resource.data.approved_by == request.auth.uid
+        && request.resource.data.updated_at == request.time;
+      allow delete: if false;
+    }
+    // Who approved, rejected or removed whom. Append-only; ids and short
+    // tokens only.
+    match /staff_audit/{id} {
+      allow read: if isSuperadmin();
+      allow create: if isSuperadmin()
+        && request.resource.data.keys().hasOnly(['actor', 'action', 'target', 'at'])
+        && request.resource.data.actor == request.auth.uid
+        && request.resource.data.action in ['staff.approved', 'staff.rejected', 'staff.removed', 'staff.restored']
+        && request.resource.data.target is string && request.resource.data.target.size() <= 128
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+
     // Anything else: denied by default (no other match blocks).
   }
 }

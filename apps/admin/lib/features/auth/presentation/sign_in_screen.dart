@@ -27,6 +27,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     super.dispose();
   }
 
+  Future<void> _google() async {
+    if (_busy) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await ref.read(authRepositoryProvider).signInWithGoogle();
+    } on SignInFailure catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _submit() async {
     if (_busy || !_form.currentState!.validate()) return;
     setState(() {
@@ -111,6 +126,13 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       key: const Key('sign-in-submit'),
                       onPressed: _busy ? null : _submit,
                       child: Text(_busy ? 'Signing in…' : 'Sign in'),
+                    ),
+                    const SizedBox(height: LwSpacing.sm),
+                    // Staff and Superadmins sign in with Google (D-112).
+                    OutlinedButton(
+                      key: const Key('sign-in-google'),
+                      onPressed: _busy ? null : _google,
+                      child: const Text('Continue with Google'),
                     ),
                   ],
                 ),

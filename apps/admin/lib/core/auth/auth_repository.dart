@@ -11,6 +11,9 @@ abstract class AuthRepository {
 
   Future<void> signIn({required String email, required String password});
 
+  /// Google sign-in (D-112): how staff and Superadmins sign in.
+  Future<void> signInWithGoogle();
+
   /// Gets a fresh token, so roles the owner just changed apply.
   Future<void> refresh();
 
@@ -60,6 +63,23 @@ class FirebaseAuthRepository implements AuthRepository {
         'too-many-requests' => 'Too many tries. Wait a few minutes.',
         'network-request-failed' => 'No connection. Check your network.',
         _ => 'Email or password is not right.',
+      });
+    }
+  }
+
+  @override
+  Future<void> signInWithGoogle() async {
+    try {
+      await _auth.signInWithPopup(GoogleAuthProvider());
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'popup-closed-by-user' ||
+          e.code == 'cancelled-popup-request') {
+        return;
+      }
+      throw SignInFailure(switch (e.code) {
+        'popup-blocked' => 'Your browser blocked the sign-in window. Allow pop-ups and try again.',
+        'network-request-failed' => 'No connection. Check your network.',
+        _ => 'Google sign-in did not work. Try again.',
       });
     }
   }

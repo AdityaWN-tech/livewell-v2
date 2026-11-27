@@ -36,6 +36,7 @@ class StaffSession {
     required this.email,
     required this.roles,
     required this.mfaSatisfied,
+    this.superadmin = false,
   });
 
   /// Reads the ID token claims. Unknown roles are ignored; MFA counts when
@@ -56,6 +57,7 @@ class StaffSession {
       email: email,
       roles: roles,
       mfaSatisfied: _mfa(claims, now),
+      superadmin: isSuperadminClaims(claims, email),
     );
   }
 
@@ -76,6 +78,10 @@ class StaffSession {
   final Set<StaffRole> roles;
   final bool mfaSatisfied;
 
+  /// Owner-set claim on a verified @whitenoiseacademy.com account (D-112);
+  /// the Firestore rules check the same three things.
+  final bool superadmin;
+
   bool get isStaff => roles.isNotEmpty;
 
   /// Signed in, has a role and passed MFA: the console opens.
@@ -83,3 +89,12 @@ class StaffSession {
 
   bool hasAny(Iterable<StaffRole> any) => any.any(roles.contains);
 }
+
+/// Superadmins are verified accounts on this domain with the owner-set
+/// `superadmin` claim (D-112, scripts/set-superadmin.mjs).
+const superadminDomain = '@whitenoiseacademy.com';
+
+bool isSuperadminClaims(Map<String, Object?> claims, String? email) =>
+    claims['superadmin'] == true &&
+    claims['email_verified'] == true &&
+    (email ?? '').toLowerCase().endsWith(superadminDomain);

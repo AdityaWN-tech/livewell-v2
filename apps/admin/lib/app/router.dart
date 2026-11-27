@@ -11,12 +11,20 @@ import '../features/portal_offers/presentation/offer_detail_screen.dart';
 import '../features/portal_offers/presentation/offer_form_screen.dart';
 import '../features/portal_offers/presentation/offers_list_screen.dart';
 import '../core/widgets/loading_screen.dart';
+import '../features/staff/data/staff_access_repository.dart';
+import '../features/staff/domain/staff_access.dart';
+import '../features/staff/presentation/access_screens.dart';
+import '../features/staff/presentation/superadmin_screen.dart';
 
 /// The role gate (T-PRT-02, D-92). Pure, so it is unit-tested. Signed out:
 /// sign-in. Signed in without a staff role or without MFA: no-access.
 /// Editing routes need an editing role. The Core API checks again on every
 /// call; this only keeps people off screens they can't use.
-String? adminRedirect(AsyncValue<StaffSession?> session, Uri uri) {
+String? adminRedirect(
+  AsyncValue<StaffSession?> session,
+  Uri uri, {
+  AsyncValue<StaffAccess?> access = const AsyncData(null),
+}) {
   final path = uri.path;
   if (session.isLoading && !session.hasValue) {
     return path == '/loading'
@@ -28,8 +36,40 @@ String? adminRedirect(AsyncValue<StaffSession?> session, Uri uri) {
   }
   final s = session.value;
   if (s == null) return path == '/sign-in' ? null : '/sign-in';
-  if (!s.canUseConsole) return path == '/no-access' ? null : '/no-access';
-  if (path == '/sign-in' || path == '/no-access' || path == '/loading') {
+  const entry = {
+    '/',
+    '/sign-in',
+    '/no-access',
+    '/loading',
+    '/request-access',
+    '/pending',
+  };
+  // Superadmin (D-112): everything, starting at the Superadmin portal.
+  if (s.superadmin) {
+    if (!entry.contains(path)) return null;
+    final from = uri.queryParameters['from'];
+    return from != null && !entry.contains(Uri.parse(from).path)
+        ? from
+        : '/superadmin';
+  }
+  // Admin: approved by a Superadmin (free plan), or the earlier staff
+  // claims with two-step sign-in (T-PRT-02).
+  final a = access.value;
+  if (!s.canUseConsole && a != StaffAccess.active) {
+    if (access.isLoading && !access.hasValue) {
+      return path == '/loading' ? null : '/loading';
+    }
+    final target = s.isStaff
+        ? '/no-access'
+        : switch (a) {
+            StaffAccess.pending => '/pending',
+            StaffAccess.removed => '/no-access',
+            _ => '/request-access',
+          };
+    return path == target ? null : target;
+  }
+  if (path.startsWith('/superadmin')) return '/offers';
+  if (entry.contains(path)) {
     final from = uri.queryParameters['from'];
     return from != null && from.startsWith('/offers') ? from : '/offers';
   }
@@ -45,17 +85,29 @@ class _SessionListenable extends ChangeNotifier {
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = _SessionListenable();
   ref.listen(sessionProvider, (_, _) => refresh.ping());
+  ref.listen(staffAccessProvider, (_, _) => refresh.ping());
   ref.onDispose(refresh.dispose);
   final router = GoRouter(
-    initialLocation: '/offers',
+    // '/' sends each person to their own start page (D-112).
+    initialLocation: '/',
     refreshListenable: refresh,
-    redirect: (context, state) =>
-        adminRedirect(ref.read(sessionProvider), state.uri),
+    redirect: (context, state) => adminRedirect(
+      ref.read(sessionProvider),
+      state.uri,
+      access: ref.read(staffAccessProvider),
+    ),
     routes: [
       GoRoute(path: '/', redirect: (_, _) => '/offers'),
       GoRoute(path: '/loading', builder: (_, _) => const LoadingScreen()),
       GoRoute(path: '/sign-in', builder: (_, _) => const SignInScreen()),
       GoRoute(path: '/no-access', builder: (_, _) => const NoAccessScreen()),
+      // Staff access (D-112).
+      GoRoute(
+        path: '/request-access',
+        builder: (_, _) => const RequestAccessScreen(),
+      ),
+      GoRoute(path: '/pending', builder: (_, _) => const PendingScreen()),
+      GoRoute(path: '/superadmin', builder: (_, _) => const SuperadminScreen()),
       GoRoute(
         path: '/offers',
         builder: (_, _) => const OffersListScreen(),

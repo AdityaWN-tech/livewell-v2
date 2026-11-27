@@ -54,6 +54,8 @@ final prodRoutes = <AuditRoute>[
   const AuditRoute('/learn/search'),
   AuditRoute('/learn/item/$learnItemId', label: '/learn/item/:id'),
   const AuditRoute('/learn/breathe'),
+  // A course (D-113); an unknown id shows the empty state.
+  const AuditRoute('/learn/course/c1', label: '/learn/course/:id'),
   const AuditRoute('/care'),
   const AuditRoute('/moment/morning', label: '/moment/:name'),
   const AuditRoute(NotificationsScreen.path),

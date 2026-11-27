@@ -4444,4 +4444,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderDoneAction => 'Done';
+
+  @override
+  String get learnCoursesTitle => 'Courses';
+
+  @override
+  String learnCourseProgress(int done, int total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String get learnCourseStart => 'Start';
+
+  @override
+  String get learnCourseContinue => 'Continue';
+
+  @override
+  String get learnCourseDone => 'You finished this course. Well done.';
+
+  @override
+  String learnCourseLessonNumber(int n) {
+    return 'Lesson $n';
+  }
+
+  @override
+  String get learnCourseEmpty => 'This course has no lessons ready yet.';
 }

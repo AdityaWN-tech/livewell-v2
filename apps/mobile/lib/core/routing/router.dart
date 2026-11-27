@@ -33,6 +33,7 @@ import '../../features/starter_plan/presentation/plan_preview_screen.dart';
 import '../../features/focus/presentation/onboarding_checkin_screen.dart';
 import '../../features/learn/presentation/learn_search_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/learn/presentation/course_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
 import '../../features/plan/presentation/framework_screen.dart';
@@ -190,6 +191,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                         path: 'item/:id',
                         builder: (context, state) =>
                             LearnItemScreen(id: state.pathParameters['id']!),
+                      ),
+                    // A course (D-113): its lessons in order.
+                    if (path == '/learn')
+                      GoRoute(
+                        path: 'course/:id',
+                        builder: (context, state) =>
+                            CourseScreen(id: state.pathParameters['id']!),
                       ),
                     if (path == '/learn')
                       GoRoute(

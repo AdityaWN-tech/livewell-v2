@@ -9,6 +9,7 @@ import '../../auth/data/firebase_auth_service.dart';
 import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../domain/breathing.dart';
+import '../domain/course.dart';
 import '../domain/lesson.dart';
 import '../domain/portal.dart';
 
@@ -16,6 +17,10 @@ import '../domain/portal.dart';
 abstract class LearnRepository {
   /// Approved lessons and audio sessions (content_items).
   Stream<List<Lesson>> watchLessons();
+
+  /// Courses this person may see (D-113): approved, for everyone or for
+  /// their sign-in email.
+  Stream<List<Course>> watchCourses();
 
   /// Where the person is in each item (content_progress), by item id.
   Stream<Map<String, ContentProgress>> watchProgress();
@@ -45,10 +50,70 @@ abstract class LearnRepository {
 }
 
 class FirestoreLearnRepository implements LearnRepository {
-  FirestoreLearnRepository(this._db, this._uid);
+  FirestoreLearnRepository(this._db, this._uid, [String? Function()? email])
+    : _email = email ?? (() => null);
 
   final FirebaseFirestore _db;
   final String Function() _uid;
+  final String? Function() _email;
+
+  static List<Course> _courses(QuerySnapshot<Map<String, dynamic>> q) => [
+    for (final d in q.docs)
+      Course(
+        id: d.id,
+        title: d.data()['title'] as String? ?? '',
+        category: d.data()['category'] as String? ?? '',
+        summary: d.data()['summary'] as String?,
+        lessonIds: [
+          for (final x in (d.data()['lesson_ids'] as List?) ?? const [])
+            if (x is String) x,
+        ],
+      ),
+  ];
+
+  /// Two queries, each matching the rules exactly: courses for everyone,
+  /// and courses that list this person's email.
+  @override
+  Stream<List<Course>> watchCourses() {
+    final courses = _db.collection('courses');
+    final forAll = courses
+        .where('review_status', isEqualTo: 'approved')
+        .where('visibility', isEqualTo: 'all')
+        .snapshots()
+        .map(_courses);
+    final email = _email()?.trim().toLowerCase();
+    if (email == null || email.isEmpty) return forAll;
+    final forMe = courses
+        .where('review_status', isEqualTo: 'approved')
+        .where('allowed_emails', arrayContains: email)
+        .snapshots()
+        .map(_courses);
+    var a = const <Course>[];
+    var b = const <Course>[];
+    final out = StreamController<List<Course>>();
+    StreamSubscription<List<Course>>? sa;
+    StreamSubscription<List<Course>>? sb;
+    void emit() => out.add(
+      {
+        for (final c in [...a, ...b]) c.id: c,
+      }.values.toList()..sort((x, y) => x.title.compareTo(y.title)),
+    );
+    out.onListen = () {
+      sa = forAll.listen((v) {
+        a = v;
+        emit();
+      }, onError: out.addError);
+      sb = forMe.listen((v) {
+        b = v;
+        emit();
+      }, onError: (_) {});
+    };
+    out.onCancel = () async {
+      await sa?.cancel();
+      await sb?.cancel();
+    };
+    return out.stream;
+  }
 
   @override
   Stream<List<Lesson>> watchLessons() => _db
@@ -250,6 +315,9 @@ class PreviewLearnRepository implements LearnRepository {
   Stream<List<Lesson>> watchLessons() => Stream.value(PreviewSamples.lessons);
 
   @override
+  Stream<List<Course>> watchCourses() => Stream.value(const []);
+
+  @override
   Stream<Map<String, ContentProgress>> watchProgress() async* {
     yield Map.of(_progress);
     yield* _progressChanges.stream.map((_) => Map.of(_progress));
@@ -304,6 +372,7 @@ final learnRepositoryProvider = Provider<LearnRepository>((ref) {
   return FirestoreLearnRepository(
     ref.watch(firestoreProvider),
     () => auth.currentUser!.uid,
+    () => auth.currentUser?.email,
   );
 });
 

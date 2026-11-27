@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/features/checkin/domain/checkin.dart';
 import 'package:livewell/core/config/feature_flags.dart';
 import 'package:livewell/features/avatar/data/avatar_maker_api.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/design/avatar/avatar_art.dart';
+import 'package:livewell/core/design/illustration/illustration.dart';
 import 'package:livewell/core/design/theme.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/auth/domain/auth.dart';
@@ -111,6 +115,16 @@ Color previewBackground(WidgetTester tester) => tester
     .background!;
 
 void main() {
+  // The coaches' art is final (D-117), so prod builds load their frames
+  // too. A load left half-done by one test must not hang the next.
+  setUp(() {
+    rootBundle.clear();
+    IllustrationCatalog.debugValue = IllustrationCatalog.parse(
+      File('assets/illustrations/illustrations.json').readAsStringSync(),
+    );
+  });
+  tearDown(() => IllustrationCatalog.debugValue = null);
+
   group('Avatar Studio (T-AVT-08b)', () {
     testWidgets('the tabs; opens on the saved coach; pick another, save', (
       tester,
@@ -219,14 +233,22 @@ void main() {
       expect(find.byKey(const Key('studio-tab-adjust')), findsNothing);
     });
 
-    testWidgets('dev build: the coaches show their placeholder frames; '
-        'prod: the initial circle until the art is final', (tester) async {
+    testWidgets('prod: the coaches are final (D-117), so their frames show', (
+      tester,
+    ) async {
       await signedIn().boot(tester);
       await openStudio(tester);
-      final view = tester.widget<AvatarView>(
-        find.byKey(const Key('avatar-preview')),
-      );
-      expect(view.images, isNull, reason: 'prod: placeholder art hidden');
+      AvatarImages? images;
+      for (var i = 0; i < 250 && images == null; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump();
+        images = tester
+            .widget<AvatarView>(find.byKey(const Key('avatar-preview')))
+            .images;
+      }
+      expect(images, isNotNull, reason: 'prod shows final coach art');
     });
 
     testWidgets('dev build: the picked coach plays its placeholder frames', (
@@ -243,7 +265,7 @@ void main() {
       await toTop(tester);
       // The frames load from the asset bundle (real IO).
       AvatarImages? images;
-      for (var i = 0; i < 50 && images == null; i++) {
+      for (var i = 0; i < 250 && images == null; i++) {
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 20)),
         );

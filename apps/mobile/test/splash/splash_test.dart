@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:livewell/app.dart';
 import 'package:livewell/core/config/flavor.dart';
 import 'package:livewell/core/startup/app_startup.dart';
+import 'package:livewell/features/avatar/presentation/coach_avatar.dart'
+    show avatarIdleMotionProvider;
 import 'package:livewell/features/splash/application/splash_handoff.dart';
 import 'package:livewell/features/home/presentation/home_screen.dart';
 import 'package:livewell/features/splash/domain/splash_timing.dart';
@@ -16,6 +18,8 @@ import '../support/frames.dart';
 
 Widget app(Future<StartDestination> Function() startup) => ProviderScope(
   overrides: [
+    // The coach's idle motion never settles (its art is final, D-117).
+    avatarIdleMotionProvider.overrideWithValue(false),
     flavorProvider.overrideWithValue(Flavor.prod),
     splashHandoffProvider.overrideWithValue(SplashHandoff.instant),
     appStartupProvider.overrideWith((ref) => startup()),

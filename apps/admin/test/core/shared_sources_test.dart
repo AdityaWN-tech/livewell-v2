@@ -31,18 +31,22 @@ void main() {
     }
   });
 
-  test('the console never reads or writes Firestore directly', () {
-    // Every read and write goes through the Core API (role, MFA, audit).
+  test('only staff access talks to Firestore directly (D-112)', () {
+    // The catalog goes through the Core API (role, MFA, audit). Staff
+    // access on the free plan is the one exception: its Firestore rules
+    // are the guard (firebase/test/rules.test.ts). Nothing else may.
+    const allowed = {
+      'lib/features/staff/data/staff_access_repository.dart',
+      'lib/main.dart',
+    };
     for (final f in Directory('lib').listSync(recursive: true)) {
       if (f is! File || !f.path.endsWith('.dart')) continue;
+      final path = f.path.replaceAll(r'\', '/');
+      if (allowed.contains(path)) continue;
       final src = f.readAsStringSync();
-      expect(src, isNot(contains('cloud_firestore')), reason: f.path);
-      expect(src, isNot(contains('FirebaseFirestore')), reason: f.path);
+      expect(src, isNot(contains('cloud_firestore')), reason: path);
+      expect(src, isNot(contains('FirebaseFirestore')), reason: path);
     }
-    expect(
-      File('pubspec.yaml').readAsStringSync(),
-      isNot(contains('cloud_firestore')),
-    );
   });
 
   group('matches the Core API (services/core-api)', () {

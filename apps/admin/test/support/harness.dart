@@ -9,6 +9,8 @@ import 'package:livewell_admin/core/auth/auth_repository.dart';
 import 'package:livewell_admin/core/auth/staff.dart';
 import 'package:livewell_admin/features/portal_offers/data/portal_offers_api.dart';
 import 'package:livewell_admin/features/portal_offers/domain/portal_offer.dart';
+import 'package:livewell_admin/features/staff/data/staff_access_repository.dart';
+import 'package:livewell_admin/features/staff/domain/staff_access.dart';
 
 StaffSession staff(
   String uid,
@@ -55,6 +57,11 @@ class FakeAuthRepository implements AuthRepository {
       throw f;
     }
   }
+
+  final googleSignIns = <int>[];
+
+  @override
+  Future<void> signInWithGoogle() async => googleSignIns.add(1);
 
   @override
   Future<void> refresh() async {}
@@ -156,6 +163,7 @@ Future<(FakeAuthRepository, FakePortalOffersApi)> pumpAdmin(
   FakePortalOffersApi? api,
   String? location,
   Size size = const Size(1280, 900),
+  FakeStaffAccessRepository? staff,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -166,6 +174,9 @@ Future<(FakeAuthRepository, FakePortalOffersApi)> pumpAdmin(
     overrides: [
       authRepositoryProvider.overrideWithValue(auth),
       portalOffersApiProvider.overrideWithValue(fakeApi),
+      staffAccessRepositoryProvider.overrideWithValue(
+        staff ?? FakeStaffAccessRepository(),
+      ),
     ],
   );
   addTearDown(container.dispose);
@@ -180,3 +191,116 @@ Future<(FakeAuthRepository, FakePortalOffersApi)> pumpAdmin(
   }
   return (auth, fakeApi);
 }
+
+/// Staff access in memory (D-112): one person's state, plus the
+/// Superadmin's lists. Records what was asked, approved, rejected, removed.
+class FakeStaffAccessRepository implements StaffAccessRepository {
+  FakeStaffAccessRepository({
+    StaffAccess access = StaffAccess.none,
+    List<StaffRequest> requests = const [],
+    List<StaffMember> members = const [],
+  }) : _access = access, // ignore: prefer_initializing_formals
+       _requests = [...requests],
+       _members = [...members];
+
+  StaffAccess _access;
+  final List<StaffRequest> _requests;
+  final List<StaffMember> _members;
+  final _accessChanges = StreamController<StaffAccess>.broadcast();
+  final _reqChanges = StreamController<List<StaffRequest>>.broadcast();
+  final _memChanges = StreamController<List<StaffMember>>.broadcast();
+  final sent = <String>[];
+  final approved = <String>[];
+  final rejected = <String>[];
+  final removed = <String>[];
+
+  void setAccess(StaffAccess a) {
+    _access = a;
+    _accessChanges.add(a);
+  }
+
+  @override
+  Stream<StaffAccess> watch(String uid) async* {
+    yield _access;
+    yield* _accessChanges.stream;
+  }
+
+  @override
+  Future<void> request({
+    required String uid,
+    required String email,
+    required String name,
+    required String reason,
+    required bool again,
+  }) async {
+    sent.add('$name|$reason|$again');
+    setAccess(StaffAccess.pending);
+  }
+
+  @override
+  Stream<List<StaffRequest>> pendingRequests() async* {
+    yield [..._requests];
+    yield* _reqChanges.stream;
+  }
+
+  @override
+  Stream<List<StaffMember>> members() async* {
+    yield [..._members];
+    yield* _memChanges.stream;
+  }
+
+  @override
+  Stream<List<StaffAuditEntry>> activity() => Stream.value(const []);
+
+  @override
+  Future<void> approve(StaffRequest r, {required String superUid}) async {
+    approved.add(r.uid);
+    _requests.removeWhere((x) => x.uid == r.uid);
+    _members.add(
+      StaffMember(uid: r.uid, name: r.name, email: r.email, status: 'active'),
+    );
+    _reqChanges.add([..._requests]);
+    _memChanges.add([..._members]);
+  }
+
+  @override
+  Future<void> reject(StaffRequest r, {required String superUid}) async {
+    rejected.add(r.uid);
+    _requests.removeWhere((x) => x.uid == r.uid);
+    _reqChanges.add([..._requests]);
+  }
+
+  @override
+  Future<void> setActive(
+    StaffMember m, {
+    required bool active,
+    required String superUid,
+  }) async {
+    if (!active) removed.add(m.uid);
+    final i = _members.indexWhere((x) => x.uid == m.uid);
+    _members[i] = StaffMember(
+      uid: m.uid,
+      name: m.name,
+      email: m.email,
+      status: active ? 'active' : 'removed',
+    );
+    _memChanges.add([..._members]);
+  }
+}
+
+/// A Superadmin session (owner-set claim, verified domain account).
+StaffSession superadmin() => const StaffSession(
+  uid: 'super1',
+  email: 'owner@whitenoiseacademy.com',
+  roles: {},
+  mfaSatisfied: false,
+  superadmin: true,
+);
+
+/// A signed-in person with no staff claims (free-plan path).
+StaffSession person(String uid) => StaffSession(
+  uid: uid,
+  email: '$uid@gmail.com',
+  roles: const {},
+  mfaSatisfied: false,
+);

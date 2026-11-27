@@ -65,6 +65,9 @@ export const EXCLUDED_TOP_LEVEL_COLLECTIONS: Record<string, string> = {
   marketing_suppressions:
     'Marketing stop-list entry (D-76); the marketing consent records are exported.',
   push_outbox: 'Server queue of push requests (category and an id only), consumed on sending.',
+  staff_requests: 'Staff access requests (D-112): about staff, not app users\u2019 data.',
+  staff_members: 'Approved staff (D-112): about staff, not app users\u2019 data.',
+  staff_audit: 'Staff access log (D-112): who approved whom; not app users\u2019 data.',
 };
 
 /**

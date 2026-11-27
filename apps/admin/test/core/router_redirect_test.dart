@@ -16,15 +16,19 @@ void main() {
     expect(go(null, '/sign-in'), isNull);
   });
 
-  test('no staff role, or no MFA: no-access, never the catalog', () {
-    final appUser = staff('u', {});
+  test('staff role without MFA: no-access, never the catalog', () {
     final noMfa = staff('s', {StaffRole.admin}, mfa: false);
-    for (final s in [appUser, noMfa]) {
-      expect(go(s, '/offers'), '/no-access');
-      expect(go(s, '/offers/abc'), '/no-access');
-      expect(go(s, '/sign-in'), '/no-access');
-      expect(go(s, '/no-access'), isNull);
-    }
+    expect(go(noMfa, '/offers'), '/no-access');
+    expect(go(noMfa, '/offers/abc'), '/no-access');
+    expect(go(noMfa, '/sign-in'), '/no-access');
+    expect(go(noMfa, '/no-access'), isNull);
+  });
+
+  test('no staff role: asks for access (D-112), never the catalog', () {
+    final appUser = staff('u', {});
+    expect(go(appUser, '/offers'), '/request-access');
+    expect(go(appUser, '/offers/abc'), '/request-access');
+    expect(go(appUser, '/sign-in'), '/request-access');
   });
 
   test('staff: catalog; editing pages need an editing role', () {

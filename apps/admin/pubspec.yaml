@@ -14,6 +14,8 @@ dependencies:
   firebase_core: ^4.15.0
   firebase_auth: ^6.7.0
   cloud_functions: ^6.5.0
+  # Staff access on the free plan (D-112): requests and approvals.
+  cloud_firestore: ^6.10.0
 
 dev_dependencies:
   flutter_test:

@@ -14,6 +14,7 @@ import {
   limit,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
   Timestamp,
   updateDoc,
@@ -1423,5 +1424,147 @@ describe('portal_offer_workflow: server-only (D-92)', () => {
       await assertFails(setDoc(doc(db, 'portal_offer_workflow/x'), { rev: 1 }));
       await assertFails(updateDoc(doc(db, 'portal_offer_workflow/live'), { version_editors: [] }));
     }
+  });
+});
+
+// ---------- Staff access: request -> Superadmin approves (D-112) ----------
+const SUPER = 'super1';
+const PRIYA = 'priya';
+const RAVI = 'ravi';
+
+/** A verified @whitenoiseacademy.com account with the owner-set claim. */
+const asSuper = (claims: Record<string, unknown> = {}) =>
+  env
+    .authenticatedContext(SUPER, {
+      email: 'owner@whitenoiseacademy.com',
+      email_verified: true,
+      superadmin: true,
+      ...claims,
+    })
+    .firestore();
+const asUser = (uid: string, email = `${uid}@gmail.com`) =>
+  env.authenticatedContext(uid, { email, email_verified: true }).firestore();
+
+const request = (uid: string, over: Record<string, unknown> = {}) => ({
+  name: 'Priya',
+  email: `${uid}@gmail.com`,
+  reason: 'I write the sleep lessons',
+  status: 'pending',
+  created_at: serverTimestamp(),
+  ...over,
+});
+const member = (over: Record<string, unknown> = {}) => ({
+  email: 'priya@gmail.com',
+  name: 'Priya',
+  role: 'admin',
+  status: 'active',
+  approved_by: SUPER,
+  updated_at: serverTimestamp(),
+  ...over,
+});
+
+describe('staff_requests (D-112)', () => {
+  it('anyone signed in asks once, for themselves only, as pending', async () => {
+    await assertSucceeds(setDoc(doc(asUser(PRIYA), 'staff_requests', PRIYA), request(PRIYA)));
+    await assertSucceeds(getDoc(doc(asUser(PRIYA), 'staff_requests', PRIYA)));
+    // Not for someone else, not pre-approved, not another email, no extra keys.
+    await assertFails(setDoc(doc(asUser(RAVI), 'staff_requests', PRIYA), request(PRIYA)));
+    await assertFails(setDoc(doc(asUser(RAVI), 'staff_requests', RAVI), request(RAVI, { status: 'approved' })));
+    await assertFails(setDoc(doc(asUser(RAVI), 'staff_requests', RAVI), request(RAVI, { email: 'x@gmail.com' })));
+    await assertFails(setDoc(doc(asUser(RAVI), 'staff_requests', RAVI), request(RAVI, { role: 'admin' })));
+    await assertFails(setDoc(doc(asUser(RAVI), 'staff_requests', RAVI), request(RAVI, { name: '' })));
+    await assertFails(setDoc(doc(asUser(RAVI), 'staff_requests', RAVI), request(RAVI, { reason: 'x'.repeat(301) })));
+    await assertFails(setDoc(doc(anon(), 'staff_requests', 'nobody'), request('nobody')));
+  });
+
+  it('only the person and Superadmins read a request; others cannot list', async () => {
+    await seed(env, { [`staff_requests/${PRIYA}`]: { ...request(PRIYA), created_at: new Date() } });
+    await assertFails(getDoc(doc(asUser(RAVI), 'staff_requests', PRIYA)));
+    await assertFails(getDocs(collection(asUser(RAVI), 'staff_requests')));
+    await assertSucceeds(getDocs(collection(asSuper(), 'staff_requests')));
+  });
+
+  it('only a Superadmin approves or rejects; the person cannot approve themselves', async () => {
+    await seed(env, { [`staff_requests/${PRIYA}`]: { ...request(PRIYA), created_at: new Date() } });
+    const decide = (status: string) => ({ status, decided_by: SUPER, decided_at: serverTimestamp() });
+    await assertFails(updateDoc(doc(asUser(PRIYA), 'staff_requests', PRIYA), { ...decide('approved'), decided_by: PRIYA }));
+    await assertFails(updateDoc(doc(asSuper(), 'staff_requests', PRIYA), { ...decide('approved'), name: 'Other' }));
+    await assertFails(updateDoc(doc(asSuper(), 'staff_requests', PRIYA), { ...decide('approved'), decided_by: 'someone' }));
+    await assertSucceeds(updateDoc(doc(asSuper(), 'staff_requests', PRIYA), decide('approved')));
+    await assertFails(deleteDoc(doc(asSuper(), 'staff_requests', PRIYA)));
+  });
+
+  it('a rejected person may ask again (back to pending), nothing else', async () => {
+    await seed(env, {
+      [`staff_requests/${PRIYA}`]: { ...request(PRIYA), status: 'rejected', created_at: new Date() },
+    });
+    await assertFails(updateDoc(doc(asUser(PRIYA), 'staff_requests', PRIYA), { status: 'approved', created_at: serverTimestamp() }));
+    await assertSucceeds(
+      updateDoc(doc(asUser(PRIYA), 'staff_requests', PRIYA), {
+        status: 'pending',
+        reason: 'I lead the content team',
+        created_at: serverTimestamp(),
+      }),
+    );
+  });
+});
+
+describe('staff_members (D-112)', () => {
+  it('only a Superadmin makes someone an Admin; nobody promotes themselves', async () => {
+    await assertFails(setDoc(doc(asUser(PRIYA), 'staff_members', PRIYA), member({ approved_by: PRIYA })));
+    await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ role: 'superadmin' })));
+    await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ approved_by: 'someone' })));
+    await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ extra: true })));
+    await assertSucceeds(setDoc(doc(asSuper(), 'staff_members', PRIYA), member()));
+    await assertSucceeds(getDoc(doc(asUser(PRIYA), 'staff_members', PRIYA)));
+    await assertFails(getDoc(doc(asUser(RAVI), 'staff_members', PRIYA)));
+    await assertSucceeds(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ status: 'removed' })));
+    await assertFails(deleteDoc(doc(asSuper(), 'staff_members', PRIYA)));
+  });
+
+  it('the claim alone is not enough: wrong domain or unverified email is refused', async () => {
+    await assertFails(
+      setDoc(doc(asSuper({ email: 'owner@gmail.com' }), 'staff_members', PRIYA), member()),
+    );
+    await assertFails(
+      setDoc(doc(asSuper({ email_verified: false }), 'staff_members', PRIYA), member()),
+    );
+    await assertFails(
+      setDoc(doc(asSuper({ superadmin: false }), 'staff_members', PRIYA), member()),
+    );
+    // An approved Admin is not a Superadmin.
+    await seed(env, { [`staff_members/${PRIYA}`]: { ...member(), updated_at: new Date() } });
+    await assertFails(setDoc(doc(asUser(PRIYA), 'staff_members', RAVI), member({ approved_by: PRIYA })));
+  });
+
+  it('Admins never read users’ health data', async () => {
+    await seed(env, {
+      [`staff_members/${PRIYA}`]: { ...member(), updated_at: new Date() },
+      'users/alice/checkins/2026-11-27': { mood: 4 },
+    });
+    await assertFails(getDoc(doc(asUser(PRIYA), 'users/alice/checkins/2026-11-27')));
+    await assertFails(getDoc(doc(asSuper(), 'users/alice/checkins/2026-11-27')));
+  });
+});
+
+describe('staff_audit (D-112)', () => {
+  it('append-only, Superadmin only, fixed actions', async () => {
+    const entry = (over: Record<string, unknown> = {}) => ({
+      actor: SUPER,
+      action: 'staff.approved',
+      target: `staff_members/${PRIYA}`,
+      at: serverTimestamp(),
+      ...over,
+    });
+    await assertSucceeds(addDoc(collection(asSuper(), 'staff_audit'), entry()));
+    await assertFails(addDoc(collection(asSuper(), 'staff_audit'), entry({ actor: 'someone' })));
+    await assertFails(addDoc(collection(asSuper(), 'staff_audit'), entry({ action: 'free text here' })));
+    await assertFails(addDoc(collection(asSuper(), 'staff_audit'), entry({ target: 'x'.repeat(129) })));
+    await assertFails(addDoc(collection(asUser(PRIYA), 'staff_audit'), entry({ actor: PRIYA })));
+    await seed(env, { 'staff_audit/a1': { ...entry(), at: new Date() } });
+    await assertSucceeds(getDoc(doc(asSuper(), 'staff_audit/a1')));
+    await assertFails(getDoc(doc(asUser(PRIYA), 'staff_audit/a1')));
+    await assertFails(updateDoc(doc(asSuper(), 'staff_audit/a1'), { action: 'staff.removed' }));
+    await assertFails(deleteDoc(doc(asSuper(), 'staff_audit/a1')));
   });
 });

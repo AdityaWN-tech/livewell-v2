@@ -44,6 +44,9 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `vendor_requests/{kind_uid_hash}` | uid, kind (avatar_model_delete / voice_model_delete / portal_unlink / marketing_unsubscribe), vendor, vendor_ref, source (`consent_revoked:{consentId}` or `delete_my_avatar`, D-78), status (pending), requested_at, due_by (D-76). Queue for vendor adapters; no vendor is connected yet | **None** | revoke handling (adds); vendor adapters (drain, log confirmation) |
 | `marketing_suppressions/{uid}` | uid, suppressed (bool), since, source (D-76). Any marketing sender checks the consent **and** this list | **None** | revoke handling / new marketing grant |
 | `push_outbox/{id}` | uid, category (fixed list), ref_id (an id, never text); then result {status, reason}, processed_at, expire_at (TTL, 7 days) | **None** | other servers ask for a push (Media Service: `coach_{jobId}`); `onPushRequest` sends it through `sendPush` (D-77) |
+| `staff_requests/{uid}` | name (1–80), email (= the signed-in account), reason (1–300), status (pending / approved / rejected), created_at; decided_by, decided_at (D-112) | The person creates their own (pending only) and may ask again after a no; only a Superadmin decides; no delete | — (free plan: rules only) |
+| `staff_members/{uid}` | email, name, role (`admin`), status (active / removed), approved_by (the Superadmin), updated_at (D-112) | Written only by a Superadmin (verified @whitenoiseacademy.com account with the owner-set `superadmin` claim); the person reads their own; no delete. Admins never read users' data | — |
+| `staff_audit/{id}` | actor, action (staff.approved / rejected / removed / restored), target (≤ 128), at (D-112) | Superadmin create and read only; append-only | — |
 
 ## Cloud Storage (D-76)
 

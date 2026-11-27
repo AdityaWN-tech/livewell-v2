@@ -53,6 +53,7 @@ export const EXCLUDED_TOP_LEVEL_COLLECTIONS: Record<string, string> = {
     'Server-only consent evidence; may hold another person’s data (the loved-one voice owner). Needs counsel (D-82).',
   portal_offers: 'Shared catalogue, not personal data.',
   content_items: 'Shared catalogue, not personal data.',
+  courses: 'Shared catalogue of courses (D-113), not personal data.',
   safety_events:
     'Restricted safety-review records (spec 11.1). Needs counsel (D-82).',
   audit_log:

@@ -9,6 +9,8 @@ import 'package:livewell_admin/core/auth/auth_repository.dart';
 import 'package:livewell_admin/core/auth/staff.dart';
 import 'package:livewell_admin/features/portal_offers/data/portal_offers_api.dart';
 import 'package:livewell_admin/features/portal_offers/domain/portal_offer.dart';
+import 'package:livewell_admin/features/content/data/content_repository.dart';
+import 'package:livewell_admin/features/content/domain/content.dart';
 import 'package:livewell_admin/features/staff/data/staff_access_repository.dart';
 import 'package:livewell_admin/features/staff/domain/staff_access.dart';
 
@@ -164,6 +166,7 @@ Future<(FakeAuthRepository, FakePortalOffersApi)> pumpAdmin(
   String? location,
   Size size = const Size(1280, 900),
   FakeStaffAccessRepository? staff,
+  FakeContentRepository? content,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -176,6 +179,9 @@ Future<(FakeAuthRepository, FakePortalOffersApi)> pumpAdmin(
       portalOffersApiProvider.overrideWithValue(fakeApi),
       staffAccessRepositoryProvider.overrideWithValue(
         staff ?? FakeStaffAccessRepository(),
+      ),
+      contentRepositoryProvider.overrideWithValue(
+        content ?? FakeContentRepository(),
       ),
     ],
   );
@@ -304,3 +310,189 @@ StaffSession person(String uid) => StaffSession(
   roles: const {},
   mfaSatisfied: false,
 );
+
+/// Lessons and courses in memory (D-113/D-114), with the same state
+/// changes the rules allow.
+class FakeContentRepository implements ContentRepository {
+  FakeContentRepository({
+    List<LessonDoc> lessons = const [],
+    List<CourseDoc> courses = const [],
+  }) : _lessons = [...lessons],
+       _courses = [...courses];
+
+  final List<LessonDoc> _lessons;
+  final List<CourseDoc> _courses;
+  final _lessonChanges = StreamController<List<LessonDoc>>.broadcast();
+  final _courseChanges = StreamController<List<CourseDoc>>.broadcast();
+  final log = <String>[];
+  var _next = 0;
+
+  List<LessonDoc> get lessonsNow => [..._lessons];
+  List<CourseDoc> get coursesNow => [..._courses];
+
+  void _emit() {
+    _lessonChanges.add([..._lessons]);
+    _courseChanges.add([..._courses]);
+  }
+
+  @override
+  Stream<List<LessonDoc>> lessons() async* {
+    yield [..._lessons];
+    yield* _lessonChanges.stream;
+  }
+
+  @override
+  Stream<List<CourseDoc>> courses() async* {
+    yield [..._courses];
+    yield* _courseChanges.stream;
+  }
+
+  LessonDoc _lesson(
+    LessonDoc l, {
+    ReviewState? state,
+    int? version,
+    String? author,
+  }) => LessonDoc(
+    id: l.id,
+    audio: l.audio,
+    title: l.title,
+    category: l.category,
+    summary: l.summary,
+    cards: l.cards,
+    microhabitTitle: l.microhabitTitle,
+    microhabitMinutes: l.microhabitMinutes,
+    breathing: l.breathing,
+    state: state ?? l.state,
+    authorUid: author ?? l.authorUid,
+    version: version ?? l.version,
+  );
+
+  CourseDoc _course(
+    CourseDoc c, {
+    ReviewState? state,
+    int? version,
+    String? author,
+  }) => CourseDoc(
+    id: c.id,
+    title: c.title,
+    category: c.category,
+    summary: c.summary,
+    lessonIds: c.lessonIds,
+    visibility: c.visibility,
+    allowedEmails: c.allowedEmails,
+    state: state ?? c.state,
+    authorUid: author ?? c.authorUid,
+    version: version ?? c.version,
+  );
+
+  @override
+  Future<String> saveLesson(LessonDoc l, {required String uid}) async {
+    if (l.id == null) {
+      final id = 'l${_next++}';
+      _lessons.add(
+        _lesson(
+          LessonDoc(
+            id: id,
+            audio: l.audio,
+            title: l.title,
+            category: l.category,
+            summary: l.summary,
+            cards: l.cards,
+            microhabitTitle: l.microhabitTitle,
+            breathing: l.breathing,
+          ),
+          state: ReviewState.draft,
+          author: uid,
+        ),
+      );
+      log.add('create lesson $id');
+      _emit();
+      return id;
+    }
+    final i = _lessons.indexWhere((x) => x.id == l.id);
+    _lessons[i] = _lesson(
+      l,
+      state: _lessons[i].state,
+      author: _lessons[i].authorUid,
+    );
+    log.add('save lesson ${l.id}');
+    _emit();
+    return l.id!;
+  }
+
+  @override
+  Future<String> saveCourse(CourseDoc c, {required String uid}) async {
+    if (c.id == null) {
+      final id = 'c${_next++}';
+      _courses.add(
+        _course(
+          CourseDoc(
+            id: id,
+            title: c.title,
+            category: c.category,
+            summary: c.summary,
+            lessonIds: c.lessonIds,
+            visibility: c.visibility,
+            allowedEmails: c.allowedEmails,
+          ),
+          state: ReviewState.draft,
+          author: uid,
+        ),
+      );
+      log.add(
+        'create course $id ${c.lessonIds.join(',')} ${c.visibility.name}',
+      );
+      _emit();
+      return id;
+    }
+    final i = _courses.indexWhere((x) => x.id == c.id);
+    _courses[i] = _course(
+      c,
+      state: _courses[i].state,
+      author: _courses[i].authorUid,
+    );
+    log.add('save course ${c.id}');
+    _emit();
+    return c.id!;
+  }
+
+  void _set(String collection, String id, ReviewState s, {int? version}) {
+    if (collection == lessonsCollection) {
+      final i = _lessons.indexWhere((x) => x.id == id);
+      _lessons[i] = _lesson(_lessons[i], state: s, version: version);
+    } else {
+      final i = _courses.indexWhere((x) => x.id == id);
+      _courses[i] = _course(_courses[i], state: s, version: version);
+    }
+    _emit();
+  }
+
+  @override
+  Future<void> submit(String collection, String id) async {
+    log.add('submit $id');
+    _set(collection, id, ReviewState.pending);
+  }
+
+  @override
+  Future<void> review(
+    String collection,
+    String id, {
+    required bool approve,
+    required String uid,
+  }) async {
+    log.add('${approve ? 'approve' : 'reject'} $id by $uid');
+    _set(collection, id, approve ? ReviewState.approved : ReviewState.rejected);
+  }
+
+  @override
+  Future<void> reopen(String collection, String id, int version) async {
+    log.add('reopen $id v${version + 1}');
+    _set(collection, id, ReviewState.draft, version: version + 1);
+  }
+
+  @override
+  Future<void> retire(String collection, String id) async {
+    log.add('retire $id');
+    _set(collection, id, ReviewState.retired);
+  }
+}

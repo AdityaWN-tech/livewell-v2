@@ -1568,3 +1568,125 @@ describe('staff_audit (D-112)', () => {
     await assertFails(deleteDoc(doc(asSuper(), 'staff_audit/a1')));
   });
 });
+
+// ---------- Lessons and courses written by staff Admins (D-113/D-114) ----------
+const ADMIN_A = 'adminA';
+const ADMIN_B = 'adminB';
+async function seedAdmins() {
+  await seed(env, {
+    [`staff_members/${ADMIN_A}`]: { email: 'a@gmail.com', name: 'A', role: 'admin', status: 'active', approved_by: SUPER, updated_at: new Date() },
+    [`staff_members/${ADMIN_B}`]: { email: 'b@gmail.com', name: 'B', role: 'admin', status: 'active', approved_by: SUPER, updated_at: new Date() },
+    [`staff_members/gone`]: { email: 'g@gmail.com', name: 'G', role: 'admin', status: 'removed', approved_by: SUPER, updated_at: new Date() },
+  });
+}
+const lessonDraft = (over: Record<string, unknown> = {}) => ({
+  type: 'lesson',
+  title: 'Sleep starts in the evening',
+  category: 'Sleep',
+  cards: ['Dim the lights an hour before bed.'],
+  microhabit: { title: 'Lights low at 9 PM', minutes: 2 },
+  review_status: 'draft',
+  author_uid: ADMIN_A,
+  version: 1,
+  created_at: serverTimestamp(),
+  updated_at: serverTimestamp(),
+  ...over,
+});
+const courseDraft = (over: Record<string, unknown> = {}) => ({
+  title: 'Better sleep in 7 days',
+  category: 'Sleep',
+  lesson_ids: ['l1'],
+  visibility: 'all',
+  allowed_emails: [],
+  review_status: 'draft',
+  author_uid: ADMIN_A,
+  version: 1,
+  created_at: serverTimestamp(),
+  updated_at: serverTimestamp(),
+  ...over,
+});
+const review = (uid: string, status: string) => ({
+  review_status: status,
+  reviewed_by: uid,
+  reviewed_at: serverTimestamp(),
+  updated_at: serverTimestamp(),
+});
+
+describe('content_items written by Admins (D-114)', () => {
+  it('an approved Admin writes a draft as its author; app users and removed Admins cannot', async () => {
+    await seedAdmins();
+    await assertSucceeds(setDoc(doc(asUser(ADMIN_A), 'content_items/l1'), lessonDraft()));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'content_items/l2'), lessonDraft({ author_uid: ADMIN_B })));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'content_items/l3'), lessonDraft({ review_status: 'approved' })));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'content_items/l4'), lessonDraft({ title: '' })));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'content_items/l5'), lessonDraft({ extra: 1 })));
+    await assertFails(setDoc(doc(asUser('gone'), 'content_items/l6'), lessonDraft({ author_uid: 'gone' })));
+    await assertFails(setDoc(doc(as(ALICE), 'content_items/l7'), lessonDraft({ author_uid: ALICE })));
+  });
+
+  it('2-person rule: the author submits, a different Admin approves', async () => {
+    await seedAdmins();
+    await setDoc(doc(asUser(ADMIN_A), 'content_items/l1'), lessonDraft());
+    // App users can't see a draft; Admins can.
+    await assertFails(getDoc(doc(as(ALICE), 'content_items/l1')));
+    await assertSucceeds(getDoc(doc(asUser(ADMIN_B), 'content_items/l1')));
+    // Can't approve a draft directly, even another Admin.
+    await assertFails(updateDoc(doc(asUser(ADMIN_B), 'content_items/l1'), review(ADMIN_B, 'approved')));
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_A), 'content_items/l1'), { review_status: 'pending', updated_at: serverTimestamp() }));
+    // The author can't approve their own.
+    await assertFails(updateDoc(doc(asUser(ADMIN_A), 'content_items/l1'), review(ADMIN_A, 'approved')));
+    // No changing the words during review.
+    await assertFails(updateDoc(doc(asUser(ADMIN_B), 'content_items/l1'), { ...review(ADMIN_B, 'approved'), title: 'Other' }));
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'content_items/l1'), review(ADMIN_B, 'approved')));
+    await assertSucceeds(getDoc(doc(as(ALICE), 'content_items/l1')));
+  });
+
+  it('a live lesson: edit means a new draft version; or retire it', async () => {
+    await seedAdmins();
+    await seed(env, { 'content_items/l1': { ...lessonDraft(), review_status: 'approved', reviewed_by: ADMIN_B, created_at: new Date(), updated_at: new Date() } });
+    await assertFails(updateDoc(doc(asUser(ADMIN_A), 'content_items/l1'), { title: 'Changed live', updated_at: serverTimestamp() }));
+    await assertFails(updateDoc(doc(asUser(ADMIN_A), 'content_items/l1'), { review_status: 'draft', updated_at: serverTimestamp() }));
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_A), 'content_items/l1'), { review_status: 'draft', version: 2, title: 'Better title', updated_at: serverTimestamp() }));
+    await seed(env, { 'content_items/l2': { ...lessonDraft(), review_status: 'approved', created_at: new Date(), updated_at: new Date() } });
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'content_items/l2'), { review_status: 'retired', updated_at: serverTimestamp() }));
+    await assertFails(deleteDoc(doc(asUser(ADMIN_B), 'content_items/l2')));
+  });
+
+  it('a rejected item goes back to its author to fix and resubmit', async () => {
+    await seedAdmins();
+    await seed(env, { 'content_items/l1': { ...lessonDraft(), review_status: 'pending', created_at: new Date(), updated_at: new Date() } });
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'content_items/l1'), review(ADMIN_B, 'rejected')));
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_A), 'content_items/l1'), { title: 'Fixed', review_status: 'pending', updated_at: serverTimestamp() }));
+  });
+});
+
+describe('courses (D-113)', () => {
+  it('same 2-person flow as lessons', async () => {
+    await seedAdmins();
+    await assertSucceeds(setDoc(doc(asUser(ADMIN_A), 'courses/c1'), courseDraft()));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'courses/c2'), courseDraft({ visibility: 'some' })));
+    await assertFails(setDoc(doc(as(ALICE), 'courses/c3'), courseDraft({ author_uid: ALICE })));
+    await updateDoc(doc(asUser(ADMIN_A), 'courses/c1'), { review_status: 'pending', updated_at: serverTimestamp() });
+    await assertFails(updateDoc(doc(asUser(ADMIN_A), 'courses/c1'), review(ADMIN_A, 'approved')));
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'courses/c1'), review(ADMIN_B, 'approved')));
+  });
+
+  it('who sees a course: everyone, or only the chosen emails', async () => {
+    await seedAdmins();
+    await seed(env, {
+      'courses/open': { ...courseDraft(), review_status: 'approved', created_at: new Date(), updated_at: new Date() },
+      'courses/chosen': { ...courseDraft({ visibility: 'selected', allowed_emails: ['priya@gmail.com'] }), review_status: 'approved', created_at: new Date(), updated_at: new Date() },
+      'courses/draft': { ...courseDraft(), created_at: new Date(), updated_at: new Date() },
+    });
+    const priya = asUser('priya', 'priya@gmail.com');
+    const ravi = asUser('ravi', 'ravi@gmail.com');
+    await assertSucceeds(getDoc(doc(ravi, 'courses/open')));
+    await assertSucceeds(getDoc(doc(priya, 'courses/chosen')));
+    await assertFails(getDoc(doc(ravi, 'courses/chosen')));
+    await assertFails(getDoc(doc(priya, 'courses/draft')));
+    // The app's two queries are allowed (they match the rules).
+    await assertSucceeds(getDocs(query(collection(ravi, 'courses'), where('review_status', '==', 'approved'), where('visibility', '==', 'all'))));
+    await assertSucceeds(getDocs(query(collection(priya, 'courses'), where('review_status', '==', 'approved'), where('allowed_emails', 'array-contains', 'priya@gmail.com'))));
+    await assertFails(getDocs(query(collection(ravi, 'courses'), where('review_status', '==', 'approved'))));
+  });
+});

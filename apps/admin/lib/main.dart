@@ -10,6 +10,7 @@ import 'app/app.dart';
 import 'core/auth/auth_repository.dart';
 import 'core/firebase/firebase_env.dart';
 import 'features/portal_offers/data/portal_offers_api.dart';
+import 'features/content/data/content_repository.dart';
 import 'features/staff/data/staff_access_repository.dart';
 
 Future<void> main() async {
@@ -42,6 +43,10 @@ Future<void> main() async {
         // Staff access on the free plan (D-112).
         staffAccessRepositoryProvider.overrideWithValue(
           FirestoreStaffAccessRepository(FirebaseFirestore.instance),
+        ),
+        // Lessons and courses (D-113/D-114).
+        contentRepositoryProvider.overrideWithValue(
+          FirestoreContentRepository(FirebaseFirestore.instance),
         ),
         portalOffersApiProvider.overrideWithValue(
           CallablePortalOffersApi(functions),

@@ -30,9 +30,9 @@ void main() {
 
     test('approved Admin: the console, never the Superadmin portal', () {
       final p = person('priya');
-      expect(go(p, '/pending', StaffAccess.active), '/offers');
+      expect(go(p, '/pending', StaffAccess.active), '/content');
       expect(go(p, '/offers', StaffAccess.active), isNull);
-      expect(go(p, '/superadmin', StaffAccess.active), '/offers');
+      expect(go(p, '/superadmin', StaffAccess.active), '/content');
     });
 
     test('removed: no access', () {

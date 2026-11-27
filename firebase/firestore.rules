@@ -793,9 +793,106 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // ---------- lessons and courses written by staff Admins (D-113/D-114) ----------
+    // Free plan: the rules are the guard. Draft -> pending (submitted) ->
+    // approved by a DIFFERENT admin (2-person rule) -> live; rejected goes
+    // back to its author; editing a live item makes a new draft version.
+    // Uses isStaffAdmin() from the staff access block (D-112).
+    function reviewKeys() {
+      return ['review_status', 'reviewed_by', 'reviewed_at', 'updated_at'];
+    }
+    // A review: pending -> approved/rejected by someone who isn't the author.
+    function isReview(before, after) {
+      return before.review_status == 'pending'
+        && after.review_status in ['approved', 'rejected']
+        && after.reviewed_by == request.auth.uid
+        && before.author_uid != request.auth.uid
+        && after.reviewed_at == request.time
+        && after.updated_at == request.time
+        && after.diff(before).affectedKeys().hasOnly(reviewKeys());
+    }
+    // The author (or any admin) edits a draft/rejected item, or submits it.
+    function isEdit(before, after) {
+      return before.review_status in ['draft', 'rejected']
+        && after.review_status in ['draft', 'pending']
+        && after.author_uid == before.author_uid
+        && after.version == before.version
+        && after.updated_at == request.time
+        && !after.diff(before).affectedKeys().hasAny(['reviewed_by', 'reviewed_at', 'created_at']);
+    }
+    // A live item goes back to draft as the next version, or is retired.
+    function isReopenOrRetire(before, after) {
+      return before.review_status == 'approved'
+        && ((after.review_status == 'draft' && after.version == before.version + 1)
+            || (after.review_status == 'retired'
+                && after.diff(before).affectedKeys().hasOnly(['review_status', 'updated_at'])))
+        && after.updated_at == request.time;
+    }
+    function validLesson(d) {
+      return d.keys().hasOnly(['type', 'title', 'category', 'summary', 'read_minutes',
+               'art_id', 'cards', 'microhabit', 'breathing', 'review_status',
+               'author_uid', 'reviewed_by', 'reviewed_at', 'version',
+               'created_at', 'updated_at'])
+        && d.type in ['lesson', 'audio']
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 80
+        && d.category is string && d.category.size() >= 1 && d.category.size() <= 40
+        && (!('summary' in d) || (d.summary is string && d.summary.size() <= 240))
+        && (!('cards' in d) || (d.cards is list && d.cards.size() <= 20))
+        && (!('read_minutes' in d) || (d.read_minutes is int && d.read_minutes >= 1 && d.read_minutes <= 60))
+        && (!('breathing' in d) || d.breathing in ['box', 'calm', 'sleep'])
+        && d.review_status in ['draft', 'pending', 'approved', 'rejected', 'retired']
+        && d.version is int && d.version >= 1;
+    }
     match /content_items/{itemId} {
-      allow read: if signedIn() && resource.data.review_status == 'approved';
-      allow write: if false;
+      allow read: if (signedIn() && resource.data.review_status == 'approved')
+        || isStaffAdmin();
+      allow create: if isStaffAdmin()
+        && validLesson(request.resource.data)
+        && request.resource.data.review_status == 'draft'
+        && request.resource.data.author_uid == request.auth.uid
+        && request.resource.data.version == 1
+        && request.resource.data.created_at == request.time
+        && request.resource.data.updated_at == request.time;
+      allow update: if isStaffAdmin()
+        && validLesson(request.resource.data)
+        && (isEdit(resource.data, request.resource.data)
+            || isReview(resource.data, request.resource.data)
+            || isReopenOrRetire(resource.data, request.resource.data));
+      allow delete: if false;
+    }
+    // A course: an ordered list of lessons, for everyone or for chosen
+    // people (by their sign-in email).
+    function validCourse(d) {
+      return d.keys().hasOnly(['title', 'summary', 'category', 'lesson_ids',
+               'visibility', 'allowed_emails', 'review_status', 'author_uid',
+               'reviewed_by', 'reviewed_at', 'version', 'created_at', 'updated_at'])
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 80
+        && d.category is string && d.category.size() >= 1 && d.category.size() <= 40
+        && (!('summary' in d) || (d.summary is string && d.summary.size() <= 240))
+        && d.lesson_ids is list && d.lesson_ids.size() <= 50
+        && d.visibility in ['all', 'selected']
+        && d.allowed_emails is list && d.allowed_emails.size() <= 500
+        && d.review_status in ['draft', 'pending', 'approved', 'rejected', 'retired']
+        && d.version is int && d.version >= 1;
+    }
+    match /courses/{courseId} {
+      allow read: if isStaffAdmin()
+        || (signedIn() && resource.data.review_status == 'approved'
+            && (resource.data.visibility == 'all'
+                || request.auth.token.email in resource.data.allowed_emails));
+      allow create: if isStaffAdmin()
+        && validCourse(request.resource.data)
+        && request.resource.data.review_status == 'draft'
+        && request.resource.data.author_uid == request.auth.uid
+        && request.resource.data.version == 1
+        && request.resource.data.created_at == request.time
+        && request.resource.data.updated_at == request.time;
+      allow update: if isStaffAdmin()
+        && validCourse(request.resource.data)
+        && (isEdit(resource.data, request.resource.data)
+            || isReview(resource.data, request.resource.data)
+            || isReopenOrRetire(resource.data, request.resource.data));
+      allow delete: if false;
     }
 
     // ---------- server-only, never readable by clients (11.1) ----------

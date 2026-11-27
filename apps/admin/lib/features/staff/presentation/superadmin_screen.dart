@@ -39,7 +39,7 @@ class SuperadminScreen extends ConsumerWidget {
         actions: [
           TextButton(
             key: const Key('open-catalog'),
-            onPressed: () => context.go('/offers'),
+            onPressed: () => context.go('/content'),
             child: const Text('Admin console'),
           ),
         ],

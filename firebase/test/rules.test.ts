@@ -255,6 +255,7 @@ describe('avatar', () => {
     await assertSucceeds(updateDoc(ref, { coach_name: 'Mira' }));
     await assertFails(updateDoc(ref, { frames_version: 9 }));
     await assertSucceeds(updateDoc(ref, { source: 'default', coach_id: 'short_curls' }));
+    await assertSucceeds(updateDoc(ref, { source: 'default', coach_id: 'wheelchair_beard' })); // T-AVT-11
   });
 });
 

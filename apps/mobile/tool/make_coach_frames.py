@@ -1,4 +1,4 @@
-"""Builds the 8 ready-made coaches' frame sets from one portrait each
+"""Builds the ready-made coaches' frame sets from one portrait each
 (T-AVT-08b art, the owner's Gemini portraits in docs/design/).
 
 For each coach: removes the generator's corner mark, finds the eyes and lips
@@ -41,6 +41,11 @@ OUT = ROOT / "assets" / "avatar" / "frames" / "coaches"
 COACHES = [
     "brown_hair", "long_black_hair", "green_hijab", "navy_turban",
     "grey_glasses", "short_curls", "short_black_hair", "wheelchair",
+    # Batch 2 (Gemini, 2026-11-27, docs/design/coach-prompts-batch-2.md).
+    "south_asian_moustache", "silver_bob", "full_beard", "black_fringe",
+    "salt_pepper", "long_wavy", "bindi_bun", "white_beard", "kippah",
+    "pixie_cut", "grey_moustache", "red_curls", "top_bun", "headwrap",
+    "wheelchair_beard",
 ]
 
 FRAMES = [

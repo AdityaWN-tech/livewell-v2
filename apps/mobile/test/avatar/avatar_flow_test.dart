@@ -107,19 +107,23 @@ void main() {
     });
   });
 
-  testWidgets('the 8 coaches; "Use this coach" waits for a pick', (
+  testWidgets('the ready-made coaches; "Use this coach" waits for a pick', (
     tester,
   ) async {
     await atAvatar().boot(tester);
     expect(find.byType(AvatarScreen), findsOneWidget);
-    for (final c in ReadyCoach.values) {
-      expect(find.byKey(Key('coach-${c.id}')), findsOneWidget, reason: c.id);
-    }
     // No Voice tab here: the voice step comes next.
     expect(find.byKey(const Key('studio-tab-voice')), findsNothing);
     expect(canUse(tester), isFalse);
     await tapKey(tester, 'coach-green_hijab');
     expect(canUse(tester), isTrue);
+    // The first 8 at once; the rest behind "Show more" (T-AVT-11).
+    expect(find.byKey(const Key('coach-wheelchair_beard')), findsNothing);
+    await tapKey(tester, 'coach-more');
+    expect(find.byKey(const Key('coach-more')), findsNothing);
+    for (final c in ReadyCoach.values) {
+      expect(find.byKey(Key('coach-${c.id}')), findsOneWidget, reason: c.id);
+    }
   });
 
   testWidgets('pick, name and use: saved, then the voice step', (tester) async {

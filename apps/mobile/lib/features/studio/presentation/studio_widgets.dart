@@ -27,6 +27,21 @@ String readyCoachLabel(AppLocalizations l, ReadyCoach c) => switch (c) {
   ReadyCoach.shortCurls => l.coachReadyShortCurls,
   ReadyCoach.shortBlackHair => l.coachReadyShortBlackHair,
   ReadyCoach.wheelchair => l.coachReadyWheelchair,
+  ReadyCoach.southAsianMoustache => l.coachReadySouthAsianMoustache,
+  ReadyCoach.silverBob => l.coachReadySilverBob,
+  ReadyCoach.fullBeard => l.coachReadyFullBeard,
+  ReadyCoach.blackFringe => l.coachReadyBlackFringe,
+  ReadyCoach.saltPepper => l.coachReadySaltPepper,
+  ReadyCoach.longWavy => l.coachReadyLongWavy,
+  ReadyCoach.bindiBun => l.coachReadyBindiBun,
+  ReadyCoach.whiteBeard => l.coachReadyWhiteBeard,
+  ReadyCoach.kippah => l.coachReadyKippah,
+  ReadyCoach.pixieCut => l.coachReadyPixieCut,
+  ReadyCoach.greyMoustache => l.coachReadyGreyMoustache,
+  ReadyCoach.redCurls => l.coachReadyRedCurls,
+  ReadyCoach.topBun => l.coachReadyTopBun,
+  ReadyCoach.headwrap => l.coachReadyHeadwrap,
+  ReadyCoach.wheelchairBeard => l.coachReadyWheelchairBeard,
 };
 
 String voiceName(AppLocalizations l, LibraryVoice v) => switch (v.id) {
@@ -126,16 +141,34 @@ AvatarImages? coachThumb(AvatarImages? set) {
   return thumb == null ? null : AvatarImages.neutral(thumb);
 }
 
-/// The 8 ready-made coaches to pick from (T-AVT-08b): each one's small
-/// face and a short description.
-class CoachGrid extends ConsumerWidget {
+/// The ready-made coaches to pick from (T-AVT-08b): each one's small face
+/// and a short description. The first [firstShown] show at once; the rest
+/// (T-AVT-11) behind "Show more", or at once when one of them is chosen.
+class CoachGrid extends ConsumerStatefulWidget {
   const CoachGrid({super.key, required this.selected, required this.onPick});
 
   final ReadyCoach? selected;
   final ValueChanged<ReadyCoach> onPick;
 
+  static const firstShown = 8;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CoachGrid> createState() => _CoachGridState();
+}
+
+class _CoachGridState extends ConsumerState<CoachGrid> {
+  bool _all = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = widget.selected;
+    final onPick = widget.onPick;
+    const first = CoachGrid.firstShown;
+    final all = _all || (selected != null && selected.index >= first);
+    final coaches = all
+        ? ReadyCoach.values
+        : ReadyCoach.values.take(first).toList();
+    final hidden = ReadyCoach.values.length - coaches.length;
     final l = AppLocalizations.of(context);
     final p = LwPalette.of(context);
     final t = Theme.of(context).textTheme;
@@ -145,11 +178,11 @@ class CoachGrid extends ConsumerWidget {
         final big = MediaQuery.textScalerOf(context).scale(1) > 1.3;
         final columns = box.maxWidth < 360 || big ? 2 : 4;
         final width = (box.maxWidth - LwSpacing.xs * (columns - 1)) / columns;
-        return Wrap(
+        final grid = Wrap(
           spacing: LwSpacing.xs,
           runSpacing: LwSpacing.xs,
           children: [
-            for (final c in ReadyCoach.values)
+            for (final c in coaches)
               SizedBox(
                 width: width,
                 child: Semantics(
@@ -192,6 +225,22 @@ class CoachGrid extends ConsumerWidget {
                   ),
                 ),
               ),
+          ],
+        );
+        if (hidden == 0) return grid;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            grid,
+            const SizedBox(height: LwSpacing.xs),
+            Center(
+              child: TextButton.icon(
+                key: const Key('coach-more'),
+                onPressed: () => setState(() => _all = true),
+                icon: const Icon(Icons.expand_more),
+                label: Text(l.coachShowMore(hidden)),
+              ),
+            ),
           ],
         );
       },

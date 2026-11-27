@@ -1,4 +1,5 @@
-/// The 8 ready-made coaches (T-AVT-08b, Appendix C of the task): adults of
+/// The 23 ready-made coaches (T-AVT-08b, Appendix C of the task; 15 more
+/// in T-AVT-11): adults of
 /// different ages, skin tones and backgrounds, each with a bundled frame set
 /// in `assets/avatar/frames/coaches/<id>/`. Their art status (placeholder or
 /// final) is tracked in assets/illustrations/illustrations.json as
@@ -29,7 +30,52 @@ enum ReadyCoach {
   shortBlackHair('short_black_hair'),
 
   /// Woman in her 30s using a wheelchair, shoulder-length auburn hair.
-  wheelchair('wheelchair');
+  wheelchair('wheelchair'),
+
+  /// South Asian man in his 30s, short black hair, neat moustache.
+  southAsianMoustache('south_asian_moustache'),
+
+  /// Woman in her 60s with a short silver bob and round glasses.
+  silverBob('silver_bob'),
+
+  /// Black man in his 40s with short cropped hair and a full beard.
+  fullBeard('full_beard'),
+
+  /// East Asian woman in her 40s, shoulder-length black hair with a fringe.
+  blackFringe('black_fringe'),
+
+  /// Man in his 50s with a salt-and-pepper beard.
+  saltPepper('salt_pepper'),
+
+  /// Latina woman in her 20s with long wavy dark brown hair.
+  longWavy('long_wavy'),
+
+  /// South Asian woman in her 50s with a bindi and grey-streaked bun.
+  bindiBun('bindi_bun'),
+
+  /// Bald man in his 70s with a short white beard.
+  whiteBeard('white_beard'),
+
+  /// Man in his 30s wearing a small kippah.
+  kippah('kippah'),
+
+  /// Woman in her 20s with a short pixie cut.
+  pixieCut('pixie_cut'),
+
+  /// South Asian man in his 60s with grey hair, glasses and a white moustache.
+  greyMoustache('grey_moustache'),
+
+  /// Woman in her 40s with curly red hair and freckles.
+  redCurls('red_curls'),
+
+  /// Man in his 20s with long hair tied in a top bun.
+  topBun('top_bun'),
+
+  /// Black woman in her 30s wearing a soft patterned headwrap.
+  headwrap('headwrap'),
+
+  /// Man in his 50s using a wheelchair, short brown hair and a beard.
+  wheelchairBeard('wheelchair_beard');
 
   const ReadyCoach(this.id);
 

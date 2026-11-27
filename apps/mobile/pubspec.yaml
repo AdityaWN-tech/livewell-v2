@@ -147,6 +147,21 @@ flutter:
     - assets/avatar/frames/coaches/short_curls/
     - assets/avatar/frames/coaches/short_black_hair/
     - assets/avatar/frames/coaches/wheelchair/
+    - assets/avatar/frames/coaches/south_asian_moustache/
+    - assets/avatar/frames/coaches/silver_bob/
+    - assets/avatar/frames/coaches/full_beard/
+    - assets/avatar/frames/coaches/black_fringe/
+    - assets/avatar/frames/coaches/salt_pepper/
+    - assets/avatar/frames/coaches/long_wavy/
+    - assets/avatar/frames/coaches/bindi_bun/
+    - assets/avatar/frames/coaches/white_beard/
+    - assets/avatar/frames/coaches/kippah/
+    - assets/avatar/frames/coaches/pixie_cut/
+    - assets/avatar/frames/coaches/grey_moustache/
+    - assets/avatar/frames/coaches/red_curls/
+    - assets/avatar/frames/coaches/top_bun/
+    - assets/avatar/frames/coaches/headwrap/
+    - assets/avatar/frames/coaches/wheelchair_beard/
     # Design references (portal screenshots). Remove before the first store release
     # so they don't ship in the app (NFR-08 size budget).
     - assets/design-reference/

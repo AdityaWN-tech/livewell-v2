@@ -11,6 +11,7 @@ import '../features/portal_offers/presentation/offer_detail_screen.dart';
 import '../features/portal_offers/presentation/offer_form_screen.dart';
 import '../features/portal_offers/presentation/offers_list_screen.dart';
 import '../core/widgets/loading_screen.dart';
+import '../features/content/presentation/content_screens.dart';
 import '../features/staff/data/staff_access_repository.dart';
 import '../features/staff/domain/staff_access.dart';
 import '../features/staff/presentation/access_screens.dart';
@@ -68,10 +69,16 @@ String? adminRedirect(
           };
     return path == target ? null : target;
   }
-  if (path.startsWith('/superadmin')) return '/offers';
+  // Approved on the free plan: start at Content (D-113/D-114); staff with
+  // the earlier claims keep the catalog.
+  final home = s.canUseConsole ? '/offers' : '/content';
+  if (path.startsWith('/superadmin')) return home;
   if (entry.contains(path)) {
     final from = uri.queryParameters['from'];
-    return from != null && from.startsWith('/offers') ? from : '/offers';
+    return from != null &&
+            (from.startsWith('/offers') || from.startsWith('/content'))
+        ? from
+        : home;
   }
   final editing = path == '/offers/new' || path.endsWith('/edit');
   if (editing && !s.hasAny(editRoles)) return '/offers';
@@ -107,6 +114,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const RequestAccessScreen(),
       ),
       GoRoute(path: '/pending', builder: (_, _) => const PendingScreen()),
+      // Lessons and courses (D-113/D-114).
+      GoRoute(
+        path: '/content',
+        builder: (_, _) => const ContentScreen(),
+        routes: [
+          GoRoute(
+            path: 'lessons/new',
+            builder: (_, _) => const LessonEditorScreen(),
+          ),
+          GoRoute(
+            path: 'lessons/:id',
+            builder: (_, s) => LessonEditorScreen(id: s.pathParameters['id']),
+          ),
+          GoRoute(
+            path: 'courses/new',
+            builder: (_, _) => const CourseEditorScreen(),
+          ),
+          GoRoute(
+            path: 'courses/:id',
+            builder: (_, s) => CourseEditorScreen(id: s.pathParameters['id']),
+          ),
+        ],
+      ),
       GoRoute(path: '/superadmin', builder: (_, _) => const SuperadminScreen()),
       GoRoute(
         path: '/offers',

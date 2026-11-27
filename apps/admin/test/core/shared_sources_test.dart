@@ -37,6 +37,7 @@ void main() {
     // are the guard (firebase/test/rules.test.ts). Nothing else may.
     const allowed = {
       'lib/features/staff/data/staff_access_repository.dart',
+      'lib/features/content/data/content_repository.dart',
       'lib/main.dart',
     };
     for (final f in Directory('lib').listSync(recursive: true)) {

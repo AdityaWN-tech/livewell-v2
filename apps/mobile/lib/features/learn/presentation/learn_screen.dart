@@ -11,6 +11,7 @@ import '../application/learn_data.dart';
 import '../domain/lesson.dart';
 import 'breathing_screen.dart';
 import 'lesson_reader_screen.dart';
+import 'course_screen.dart';
 import 'portal_card.dart';
 
 /// The Learn filter chips (T-UI-02f).
@@ -52,6 +53,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         if (x.kind == LessonKind.audio) x,
     ];
     final next = ref.watch(continueLessonProvider);
+    final courses = ref.watch(coursesProvider).value ?? const [];
     final f = _filter;
     final showAll = f == LearnFilter.all;
 
@@ -103,6 +105,14 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         if (showAll && next != null) ...[
           LwSectionHeader(l.learnContinueTitle),
           _ContinueCard(next),
+        ],
+        // Courses written by the team (D-113).
+        if (showAll && courses.isNotEmpty) ...[
+          LwSectionHeader(l.learnCoursesTitle),
+          for (final c in courses) ...[
+            CourseCard(c),
+            const SizedBox(height: LwSpacing.sm),
+          ],
         ],
         if (showAll || f == LearnFilter.lessons) ...[
           if (lessons.isNotEmpty || f == LearnFilter.lessons)

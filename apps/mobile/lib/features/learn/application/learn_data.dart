@@ -12,6 +12,7 @@ import '../../home/application/home_data.dart' show todayCheckInProvider;
 import '../../moments/application/coach_state.dart'
     show recentSafetyEventProvider;
 import '../data/learn_repository.dart';
+import '../domain/course.dart';
 import '../domain/lesson.dart';
 import '../domain/portal.dart';
 
@@ -145,3 +146,28 @@ final continueLessonProvider = Provider<LessonProgress?>((ref) {
   }
   return null;
 });
+
+/// Courses this person may see (D-113), live.
+final coursesProvider = StreamProvider<List<Course>>(
+  (ref) => ref.watch(learnRepositoryProvider).watchCourses(),
+);
+
+/// One course by id, or null.
+final courseByIdProvider = Provider.family<Course?, String>(
+  (ref, id) =>
+      ref.watch(coursesProvider).value?.where((c) => c.id == id).firstOrNull,
+);
+
+/// A course's progress: lessons finished out of those available now
+/// (a lesson that was retired or isn't approved yet doesn't count).
+(int done, int total) courseProgress(
+  Course c,
+  Map<String, Lesson> lessons,
+  Map<String, ContentProgress> progress,
+) {
+  final ids = c.lessonIds.where(lessons.containsKey).toList();
+  return (
+    ids.where((id) => progress[id]?.completed ?? false).length,
+    ids.length,
+  );
+}

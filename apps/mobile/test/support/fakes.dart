@@ -32,6 +32,7 @@ import 'package:livewell/features/starter_plan/domain/daily_cap.dart';
 import 'package:livewell/features/starter_plan/domain/starter_plan.dart';
 import 'package:livewell/features/starter_plan/domain/touchpoints.dart';
 import 'package:livewell/features/voice/domain/voice.dart';
+import 'package:livewell/features/learn/domain/course.dart';
 import 'package:livewell/features/learn/domain/lesson.dart';
 import 'package:livewell/features/learn/domain/portal.dart';
 import 'package:livewell/features/account/application/app_lock.dart';
@@ -515,6 +516,12 @@ class FakeLearnRepository implements LearnRepository {
 
   @override
   Stream<List<Lesson>> watchLessons() => Stream.value(lessons);
+
+  /// Courses this person sees (D-113).
+  List<Course> courses = const [];
+
+  @override
+  Stream<List<Course>> watchCourses() => Stream.value(courses);
 
   /// Saved progress, by item id.
   final progress = <String, ContentProgress>{};

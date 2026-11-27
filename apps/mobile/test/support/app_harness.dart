@@ -19,6 +19,7 @@ import 'package:livewell/core/speech/dictation.dart';
 import 'package:livewell/core/time/clock.dart';
 import 'package:livewell/core/local_db/local_db_providers.dart';
 import 'package:livewell/core/startup/app_startup.dart';
+import 'package:livewell/features/assessment/data/assessment_repository.dart';
 import 'package:livewell/features/account/application/account_setup.dart';
 import 'package:livewell/features/account/data/profile_repository.dart';
 import 'package:livewell/features/checkin/data/checkin_repository.dart';
@@ -131,6 +132,9 @@ class Harness {
   /// Badges and weekly challenges, in memory (T-GAM-01).
   final rewards = InMemoryRewardsRepository();
 
+  /// The 10-minute check's questions, live driver names, results (D-114).
+  final assessment = InMemoryAssessmentRepository();
+
   /// Items the coach already asked about (T-GOL-03d).
   final routineAsked = FakeRoutineAskStore();
   final reminders = FakeReminders();
@@ -222,6 +226,7 @@ class Harness {
           routineRepositoryProvider.overrideWithValue(routines),
           goalRepositoryProvider.overrideWithValue(goals),
           rewardsRepositoryProvider.overrideWithValue(rewards),
+          assessmentRepositoryProvider.overrideWithValue(assessment),
           routineAskStoreProvider.overrideWithValue(routineAsked),
           remindersProvider.overrideWithValue(reminders),
           reminderZoneStoreProvider.overrideWithValue(reminderZone),

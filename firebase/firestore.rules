@@ -875,6 +875,61 @@ service cloud.firestore {
         && d.review_status in ['draft', 'pending', 'approved', 'rejected', 'retired']
         && d.version is int && d.version >= 1;
     }
+    // ---------- the Live Well Map, written by Admins (D-114) ----------
+    // Driver names as versioned sets (the newest approved set is live, so
+    // editing never hides the current names) and the 10-minute check's
+    // questions. Same 2-person flow as lessons.
+    function validDriverSet(d) {
+      return d.keys().hasOnly(['drivers', 'review_status', 'author_uid',
+               'reviewed_by', 'reviewed_at', 'version', 'created_at', 'updated_at'])
+        && d.drivers is list && d.drivers.size() == 8
+        && d.review_status in ['draft', 'pending', 'approved', 'rejected', 'retired']
+        && d.version is int && d.version >= 1;
+    }
+    function validQuestion(d) {
+      return d.keys().hasOnly(['driver_id', 'text', 'order', 'review_status',
+               'author_uid', 'reviewed_by', 'reviewed_at', 'version',
+               'created_at', 'updated_at'])
+        && d.driver_id is string && d.driver_id.matches('^driver_[1-8]$')
+        && d.text is string && d.text.size() >= 1 && d.text.size() <= 200
+        && d.order is int && d.order >= 0 && d.order <= 999
+        && d.review_status in ['draft', 'pending', 'approved', 'rejected', 'retired']
+        && d.version is int && d.version >= 1;
+    }
+    match /driver_sets/{setId} {
+      allow read: if (signedIn() && resource.data.review_status == 'approved')
+        || isStaffAdmin();
+      allow create: if isStaffAdmin()
+        && validDriverSet(request.resource.data)
+        && request.resource.data.review_status == 'draft'
+        && request.resource.data.author_uid == request.auth.uid
+        && request.resource.data.version == 1
+        && request.resource.data.created_at == request.time
+        && request.resource.data.updated_at == request.time;
+      allow update: if isStaffAdmin()
+        && validDriverSet(request.resource.data)
+        && (isEdit(resource.data, request.resource.data)
+            || isReview(resource.data, request.resource.data)
+            || isReopenOrRetire(resource.data, request.resource.data));
+      allow delete: if false;
+    }
+    match /assessment_questions/{questionId} {
+      allow read: if (signedIn() && resource.data.review_status == 'approved')
+        || isStaffAdmin();
+      allow create: if isStaffAdmin()
+        && validQuestion(request.resource.data)
+        && request.resource.data.review_status == 'draft'
+        && request.resource.data.author_uid == request.auth.uid
+        && request.resource.data.version == 1
+        && request.resource.data.created_at == request.time
+        && request.resource.data.updated_at == request.time;
+      allow update: if isStaffAdmin()
+        && validQuestion(request.resource.data)
+        && (isEdit(resource.data, request.resource.data)
+            || isReview(resource.data, request.resource.data)
+            || isReopenOrRetire(resource.data, request.resource.data));
+      allow delete: if false;
+    }
     match /courses/{courseId} {
       allow read: if isStaffAdmin()
         || (signedIn() && resource.data.review_status == 'approved'

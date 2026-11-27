@@ -33,6 +33,7 @@ import '../../features/starter_plan/presentation/plan_preview_screen.dart';
 import '../../features/focus/presentation/onboarding_checkin_screen.dart';
 import '../../features/learn/presentation/learn_search_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/assessment/presentation/assessment_screen.dart';
 import '../../features/learn/presentation/course_screen.dart';
 import '../../features/learn/presentation/library_screen.dart';
 import '../../features/safety/presentation/help_now_screen.dart';
@@ -156,6 +157,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: 'framework',
                         builder: (context, state) => const FrameworkScreen(),
+                      ),
+                    // The 10-minute check (ASM-01, D-114).
+                    if (path == '/plan')
+                      GoRoute(
+                        path: 'check',
+                        builder: (context, state) => const AssessmentScreen(),
                       ),
                     // My Daily Routine under Plan (T-GOL-03b).
                     if (path == '/plan')

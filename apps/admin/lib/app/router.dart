@@ -128,6 +128,23 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, s) => LessonEditorScreen(id: s.pathParameters['id']),
           ),
           GoRoute(
+            path: 'drivers/new',
+            builder: (_, _) => const DriverSetEditorScreen(),
+          ),
+          GoRoute(
+            path: 'drivers/:id',
+            builder: (_, s) =>
+                DriverSetEditorScreen(id: s.pathParameters['id']),
+          ),
+          GoRoute(
+            path: 'questions/new',
+            builder: (_, _) => const QuestionEditorScreen(),
+          ),
+          GoRoute(
+            path: 'questions/:id',
+            builder: (_, s) => QuestionEditorScreen(id: s.pathParameters['id']),
+          ),
+          GoRoute(
             path: 'courses/new',
             builder: (_, _) => const CourseEditorScreen(),
           ),

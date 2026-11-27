@@ -128,3 +128,78 @@ class CourseDoc {
         : <String>[],
   };
 }
+
+/// The 8 driver names for the Live Well Map (D-114). Versioned sets: the
+/// newest approved set is live.
+class DriverSetDoc {
+  const DriverSetDoc({
+    this.id,
+    this.labels = const [
+      'Driver 1',
+      'Driver 2',
+      'Driver 3',
+      'Driver 4',
+      'Driver 5',
+      'Driver 6',
+      'Driver 7',
+      'Driver 8',
+    ],
+    this.state = ReviewState.draft,
+    this.authorUid = '',
+    this.version = 1,
+    this.reviewedAt,
+  });
+
+  final String? id;
+
+  /// Labels for driver_1..driver_8, in order.
+  final List<String> labels;
+  final ReviewState state;
+  final String authorUid;
+  final int version;
+  final DateTime? reviewedAt;
+
+  String get allText => labels.join('\n');
+
+  Map<String, Object> contentFields() => {
+    'drivers': [
+      for (var i = 0; i < 8; i++)
+        {
+          'id': 'driver_${i + 1}',
+          'label': i < labels.length && labels[i].trim().isNotEmpty
+              ? labels[i].trim()
+              : 'Driver ${i + 1}',
+        },
+    ],
+  };
+}
+
+/// One question of the 10-minute check (D-114): answered 1 to 5, counts
+/// towards one driver.
+class QuestionDoc {
+  const QuestionDoc({
+    this.id,
+    this.driverId = 'driver_1',
+    this.text = '',
+    this.order = 0,
+    this.state = ReviewState.draft,
+    this.authorUid = '',
+    this.version = 1,
+  });
+
+  final String? id;
+  final String driverId;
+  final String text;
+  final int order;
+  final ReviewState state;
+  final String authorUid;
+  final int version;
+
+  String get allText => text;
+
+  Map<String, Object> contentFields() => {
+    'driver_id': driverId,
+    'text': text.trim(),
+    'order': order,
+  };
+}

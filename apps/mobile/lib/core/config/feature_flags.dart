@@ -25,6 +25,7 @@ class FeatureFlags {
     this.photorealStreaming = false,
     this.coachMemory = false,
     this.rewards = false,
+    this.assessment = false,
     this.driverWheel = false,
   });
 
@@ -85,6 +86,7 @@ class FeatureFlags {
     Flag.photorealStreaming => photorealStreaming,
     Flag.coachMemory => coachMemory,
     Flag.rewards => rewards,
+    Flag.assessment => assessment,
     Flag.driverWheel => driverWheel,
   };
 
@@ -102,6 +104,7 @@ class FeatureFlags {
     photorealStreaming: v[Flag.photorealStreaming] ?? false,
     coachMemory: v[Flag.coachMemory] ?? false,
     rewards: v[Flag.rewards] ?? false,
+    assessment: v[Flag.assessment] ?? false,
     driverWheel: v[Flag.driverWheel] ?? false,
   );
 
@@ -118,6 +121,11 @@ class FeatureFlags {
   /// FR-GAM-01/03). Off until the reward copy is clinically reviewed
   /// (D-87); the dev build has them anyway ([rewardsOnProvider]).
   final bool rewards;
+
+  /// The 10-minute check (ASM-01, D-114): admin-written questions fill the
+  /// Live Well Map. Off in staging and prod until clinically reviewed; dev
+  /// has it ([assessmentOnProvider]).
+  final bool assessment;
 
   /// The Live Well Map's 30-day fill per driver (FR-GAM-02). Off until the
   /// 8 driver names come from the clinical assessment content (T-ASM-01);
@@ -140,6 +148,7 @@ enum Flag {
   photorealStreaming('ff_photoreal_streaming', prodLocked: true),
   coachMemory('ff_coach_memory'),
   rewards('ff_rewards'),
+  assessment('ff_assessment'),
   driverWheel('ff_driver_wheel');
 
   const Flag(this.remoteKey, {this.prodLocked = false});
@@ -249,5 +258,12 @@ final rewardsOnProvider = Provider<bool>(
 final driverWheelOnProvider = Provider<bool>(
   (ref) =>
       ref.watch(featureFlagsProvider).driverWheel ||
+      ref.watch(flavorProvider) == Flavor.dev,
+);
+
+/// The 10-minute check (D-114): the flag, or always in dev.
+final assessmentOnProvider = Provider<bool>(
+  (ref) =>
+      ref.watch(featureFlagsProvider).assessment ||
       ref.watch(flavorProvider) == Flavor.dev,
 );

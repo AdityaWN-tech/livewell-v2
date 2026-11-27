@@ -322,6 +322,51 @@ class FakeContentRepository implements ContentRepository {
 
   final List<LessonDoc> _lessons;
   final List<CourseDoc> _courses;
+  final sets = <DriverSetDoc>[];
+  final questionsList = <QuestionDoc>[];
+  final _setChanges = StreamController<List<DriverSetDoc>>.broadcast();
+  final _questionChanges = StreamController<List<QuestionDoc>>.broadcast();
+
+  @override
+  Stream<List<DriverSetDoc>> driverSets() async* {
+    yield [...sets];
+    yield* _setChanges.stream;
+  }
+
+  @override
+  Stream<List<QuestionDoc>> questions() async* {
+    yield [...questionsList];
+    yield* _questionChanges.stream;
+  }
+
+  @override
+  Future<String> saveDriverSet(DriverSetDoc d, {required String uid}) async {
+    final id = d.id ?? 's${_next++}';
+    sets.removeWhere((x) => x.id == id);
+    sets.add(DriverSetDoc(id: id, labels: d.labels, authorUid: uid));
+    log.add('save drivers $id ${d.labels.first}');
+    _setChanges.add([...sets]);
+    return id;
+  }
+
+  @override
+  Future<String> saveQuestion(QuestionDoc q, {required String uid}) async {
+    final id = q.id ?? 'q${_next++}';
+    questionsList.removeWhere((x) => x.id == id);
+    questionsList.add(
+      QuestionDoc(
+        id: id,
+        driverId: q.driverId,
+        text: q.text,
+        order: q.order,
+        authorUid: uid,
+      ),
+    );
+    log.add('save question $id ${q.driverId}');
+    _questionChanges.add([...questionsList]);
+    return id;
+  }
+
   final _lessonChanges = StreamController<List<LessonDoc>>.broadcast();
   final _courseChanges = StreamController<List<CourseDoc>>.broadcast();
   final log = <String>[];
@@ -457,6 +502,34 @@ class FakeContentRepository implements ContentRepository {
   }
 
   void _set(String collection, String id, ReviewState s, {int? version}) {
+    if (collection == driverSetsCollection) {
+      final i = sets.indexWhere((x) => x.id == id);
+      final d = sets[i];
+      sets[i] = DriverSetDoc(
+        id: d.id,
+        labels: d.labels,
+        authorUid: d.authorUid,
+        state: s,
+        version: version ?? d.version,
+      );
+      _setChanges.add([...sets]);
+      return;
+    }
+    if (collection == questionsCollection) {
+      final i = questionsList.indexWhere((x) => x.id == id);
+      final q = questionsList[i];
+      questionsList[i] = QuestionDoc(
+        id: q.id,
+        driverId: q.driverId,
+        text: q.text,
+        order: q.order,
+        authorUid: q.authorUid,
+        state: s,
+        version: version ?? q.version,
+      );
+      _questionChanges.add([...questionsList]);
+      return;
+    }
     if (collection == lessonsCollection) {
       final i = _lessons.indexWhere((x) => x.id == id);
       _lessons[i] = _lesson(_lessons[i], state: s, version: version);

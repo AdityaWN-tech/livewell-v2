@@ -1690,3 +1690,54 @@ describe('courses (D-113)', () => {
     await assertFails(getDocs(query(collection(ravi, 'courses'), where('review_status', '==', 'approved'))));
   });
 });
+
+// ---------- Live Well Map content written by Admins (D-114) ----------
+const driverSet = (over: Record<string, unknown> = {}) => ({
+  drivers: Array.from({ length: 8 }, (_, i) => ({ id: `driver_${i + 1}`, label: `Name ${i + 1}` })),
+  review_status: 'draft',
+  author_uid: ADMIN_A,
+  version: 1,
+  created_at: serverTimestamp(),
+  updated_at: serverTimestamp(),
+  ...over,
+});
+const question = (over: Record<string, unknown> = {}) => ({
+  driver_id: 'driver_2',
+  text: 'How rested do you feel when you wake up?',
+  order: 1,
+  review_status: 'draft',
+  author_uid: ADMIN_A,
+  version: 1,
+  created_at: serverTimestamp(),
+  updated_at: serverTimestamp(),
+  ...over,
+});
+
+describe('driver_sets and assessment_questions (D-114)', () => {
+  it('Admins write drafts with the right shape; app users cannot', async () => {
+    await seedAdmins();
+    await assertSucceeds(setDoc(doc(asUser(ADMIN_A), 'driver_sets/s1'), driverSet()));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'driver_sets/s2'), driverSet({ drivers: [{ id: 'driver_1', label: 'Only one' }] })));
+    await assertFails(setDoc(doc(as(ALICE), 'driver_sets/s3'), driverSet({ author_uid: ALICE })));
+    await assertSucceeds(setDoc(doc(asUser(ADMIN_A), 'assessment_questions/q1'), question()));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'assessment_questions/q2'), question({ driver_id: 'driver_9' })));
+    await assertFails(setDoc(doc(asUser(ADMIN_A), 'assessment_questions/q3'), question({ text: 'x'.repeat(201) })));
+    await assertFails(setDoc(doc(as(ALICE), 'assessment_questions/q4'), question({ author_uid: ALICE })));
+  });
+
+  it('2-person approval; only approved ones reach the app', async () => {
+    await seedAdmins();
+    await setDoc(doc(asUser(ADMIN_A), 'assessment_questions/q1'), question());
+    await assertFails(getDoc(doc(as(ALICE), 'assessment_questions/q1')));
+    await updateDoc(doc(asUser(ADMIN_A), 'assessment_questions/q1'), { review_status: 'pending', updated_at: serverTimestamp() });
+    await assertFails(updateDoc(doc(asUser(ADMIN_A), 'assessment_questions/q1'), review(ADMIN_A, 'approved')));
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'assessment_questions/q1'), review(ADMIN_B, 'approved')));
+    await assertSucceeds(getDoc(doc(as(ALICE), 'assessment_questions/q1')));
+    await assertSucceeds(getDocs(query(collection(as(ALICE), 'assessment_questions'), where('review_status', '==', 'approved'))));
+
+    await setDoc(doc(asUser(ADMIN_A), 'driver_sets/s1'), driverSet());
+    await updateDoc(doc(asUser(ADMIN_A), 'driver_sets/s1'), { review_status: 'pending', updated_at: serverTimestamp() });
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'driver_sets/s1'), review(ADMIN_B, 'approved')));
+    await assertSucceeds(getDocs(query(collection(as(ALICE), 'driver_sets'), where('review_status', '==', 'approved'))));
+  });
+});

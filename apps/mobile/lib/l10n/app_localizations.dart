@@ -7646,6 +7646,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This course has no lessons ready yet.'**
   String get learnCourseEmpty;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Your check'**
+  String get assessmentTitle;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'How are things right now?'**
+  String get assessmentIntroTitle;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} short questions about how you live. Tap from 1 (not at all) to 5 (completely). There are no right answers, and your answers stay private.'**
+  String assessmentIntroBody(int count);
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get assessmentStart;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Question {n} of {total}'**
+  String assessmentProgress(int n, int total);
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Not at all'**
+  String get assessmentScale1;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'A little'**
+  String get assessmentScale2;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Somewhat'**
+  String get assessmentScale3;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Mostly'**
+  String get assessmentScale4;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Completely'**
+  String get assessmentScale5;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get assessmentBack;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Your map is ready'**
+  String get assessmentDoneTitle;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Your Live Well Map now shows where you are today. It is a starting point, not a score to judge.'**
+  String get assessmentDoneBody;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'See my map'**
+  String get assessmentSeeMap;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'The check is not ready yet. Please come back soon.'**
+  String get assessmentNoQuestions;
+
+  /// 10-minute check (ASM-01, D-114).
+  ///
+  /// In en, this message translates to:
+  /// **'Take your 10-minute check'**
+  String get planMapStartCheck;
 }
 
 class _AppLocalizationsDelegate

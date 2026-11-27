@@ -54,6 +54,8 @@ export const EXCLUDED_TOP_LEVEL_COLLECTIONS: Record<string, string> = {
   portal_offers: 'Shared catalogue, not personal data.',
   content_items: 'Shared catalogue, not personal data.',
   courses: 'Shared catalogue of courses (D-113), not personal data.',
+  driver_sets: 'Shared driver names for the Live Well Map (D-114), not personal data.',
+  assessment_questions: 'Shared question bank (D-114); the person\u2019s own answers are exported (assessments).',
   safety_events:
     'Restricted safety-review records (spec 11.1). Needs counsel (D-82).',
   audit_log:

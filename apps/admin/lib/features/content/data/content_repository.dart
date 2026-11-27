@@ -9,10 +9,14 @@ import '../domain/content.dart';
 abstract class ContentRepository {
   Stream<List<LessonDoc>> lessons();
   Stream<List<CourseDoc>> courses();
+  Stream<List<DriverSetDoc>> driverSets();
+  Stream<List<QuestionDoc>> questions();
 
   /// Creates a draft (returns its id) or saves the words of an editable one.
   Future<String> saveLesson(LessonDoc l, {required String uid});
   Future<String> saveCourse(CourseDoc c, {required String uid});
+  Future<String> saveDriverSet(DriverSetDoc d, {required String uid});
+  Future<String> saveQuestion(QuestionDoc q, {required String uid});
 
   /// draft/rejected -> pending.
   Future<void> submit(String collection, String id);
@@ -34,6 +38,8 @@ abstract class ContentRepository {
 
 const lessonsCollection = 'content_items';
 const coursesCollection = 'courses';
+const driverSetsCollection = 'driver_sets';
+const questionsCollection = 'assessment_questions';
 
 class FirestoreContentRepository implements ContentRepository {
   FirestoreContentRepository(this._db);
@@ -133,6 +139,58 @@ class FirestoreContentRepository implements ContentRepository {
   }
 
   @override
+  Stream<List<DriverSetDoc>> driverSets() => _db
+      .collection(driverSetsCollection)
+      .snapshots()
+      .map(
+        (q) => [
+          for (final d in q.docs)
+            DriverSetDoc(
+              id: d.id,
+              labels: [
+                for (final x in (d.data()['drivers'] as List?) ?? const [])
+                  if (x is Map) (x['label'] as String? ?? ''),
+              ],
+              state: ReviewState.of(d.data()['review_status']),
+              authorUid: d.data()['author_uid'] as String? ?? '',
+              version: (d.data()['version'] as num?)?.toInt() ?? 1,
+              reviewedAt: (d.data()['reviewed_at'] as Timestamp?)?.toDate(),
+            ),
+        ]..sort((a, b) => b.version.compareTo(a.version)),
+      );
+
+  @override
+  Stream<List<QuestionDoc>> questions() => _db
+      .collection(questionsCollection)
+      .snapshots()
+      .map(
+        (q) =>
+            [
+              for (final d in q.docs)
+                QuestionDoc(
+                  id: d.id,
+                  driverId: d.data()['driver_id'] as String? ?? 'driver_1',
+                  text: d.data()['text'] as String? ?? '',
+                  order: (d.data()['order'] as num?)?.toInt() ?? 0,
+                  state: ReviewState.of(d.data()['review_status']),
+                  authorUid: d.data()['author_uid'] as String? ?? '',
+                  version: (d.data()['version'] as num?)?.toInt() ?? 1,
+                ),
+            ]..sort((a, b) {
+              final c = a.driverId.compareTo(b.driverId);
+              return c != 0 ? c : a.order.compareTo(b.order);
+            }),
+      );
+
+  @override
+  Future<String> saveDriverSet(DriverSetDoc d, {required String uid}) =>
+      _save(driverSetsCollection, d.id, d.contentFields(), uid);
+
+  @override
+  Future<String> saveQuestion(QuestionDoc q, {required String uid}) =>
+      _save(questionsCollection, q.id, q.contentFields(), uid);
+
+  @override
   Future<String> saveLesson(LessonDoc l, {required String uid}) =>
       _save(lessonsCollection, l.id, l.contentFields(), uid);
 
@@ -185,4 +243,10 @@ final lessonsProvider = StreamProvider<List<LessonDoc>>(
 );
 final coursesProvider = StreamProvider<List<CourseDoc>>(
   (ref) => ref.watch(contentRepositoryProvider).courses(),
+);
+final driverSetsProvider = StreamProvider<List<DriverSetDoc>>(
+  (ref) => ref.watch(contentRepositoryProvider).driverSets(),
+);
+final questionsProvider = StreamProvider<List<QuestionDoc>>(
+  (ref) => ref.watch(contentRepositoryProvider).questions(),
 );

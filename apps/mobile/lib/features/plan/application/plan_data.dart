@@ -2,7 +2,9 @@ import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/config/feature_flags.dart' show driverWheelOnProvider;
+import '../../../core/config/feature_flags.dart'
+    show assessmentOnProvider, driverWheelOnProvider;
+import '../../assessment/application/assessment_data.dart';
 
 import '../../../core/time/clock.dart';
 import '../../auth/data/firebase_auth_service.dart';
@@ -129,10 +131,17 @@ final driverCatalogProvider = FutureProvider<DriverCatalog>((ref) async {
 });
 
 /// The 8 drivers, in their fixed order (numbered until the file loads).
-final driversProvider = Provider<List<Driver>>(
-  (ref) => (ref.watch(driverCatalogProvider).value ?? DriverCatalog.fallback)
-      .drivers,
-);
+final driversProvider = Provider<List<Driver>>((ref) {
+  final drivers =
+      (ref.watch(driverCatalogProvider).value ?? DriverCatalog.fallback)
+          .drivers;
+  // The newest names an admin approved (D-114), else the file's.
+  final live = ref.watch(liveDriverLabelsProvider).value;
+  if (live == null || live.length != drivers.length) return drivers;
+  return [
+    for (final d in drivers) Driver(index: d.index, label: live[d.index]),
+  ];
+});
 
 /// The plan's days and the habit logs of the last 30 days (FR-GAM-02).
 final _wheelDataProvider =
@@ -157,6 +166,13 @@ final _wheelDataProvider =
 /// only) while the drivers are provisional (D-87).
 final driverCompletionProvider = Provider<List<double>?>((ref) {
   if (ref.watch(previewModeProvider)) return PreviewSamples.driverCompletion;
+  // The 10-minute check's answers fill the map (D-114).
+  if (ref.watch(assessmentOnProvider)) {
+    final scores = ref.watch(latestDriverScoresProvider).value;
+    if (scores != null) {
+      return [for (var i = 0; i < 8; i++) scores['driver_${i + 1}'] ?? 0];
+    }
+  }
   if (!ref.watch(driverWheelOnProvider)) return null;
   final catalog = ref.watch(driverCatalogProvider).value;
   final focus = ref.watch(focusMapProvider).value;

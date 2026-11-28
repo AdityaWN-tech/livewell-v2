@@ -2711,6 +2711,31 @@
       }
     }
   },
+  "winsStreak": "{count, plural, =1{You're on a 1-day streak.} other{You're on a {count}-day streak.}}",
+  "@winsStreak": {
+    "description": "Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "winsTrendMood": "Your mood was a little better than the week before.",
+  "@winsTrendMood": {
+    "description": "Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named."
+  },
+  "winsTrendEnergy": "You had a bit more energy than the week before.",
+  "@winsTrendEnergy": {
+    "description": "Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named."
+  },
+  "winsTrendSleep": "Your sleep was a little better than the week before.",
+  "@winsTrendSleep": {
+    "description": "Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named."
+  },
+  "winsTrendStress": "You felt calmer than the week before.",
+  "@winsTrendStress": {
+    "description": "Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named."
+  },
   "authErrorPhoneInUse": "This number is already used by another Live Well account. Sign in with it there, or use a different number.",
   "@authErrorPhoneInUse": {
     "description": "Profile: add or remove a phone number (Step 4c, D-55)."

@@ -3654,6 +3654,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String winsStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You\'re on a $count-day streak.',
+      one: 'You\'re on a 1-day streak.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get winsTrendMood =>
+      'Your mood was a little better than the week before.';
+
+  @override
+  String get winsTrendEnergy =>
+      'You had a bit more energy than the week before.';
+
+  @override
+  String get winsTrendSleep =>
+      'Your sleep was a little better than the week before.';
+
+  @override
+  String get winsTrendStress => 'You felt calmer than the week before.';
+
+  @override
   String get authErrorPhoneInUse =>
       'This number is already used by another Live Well account. Sign in with it there, or use a different number.';
 

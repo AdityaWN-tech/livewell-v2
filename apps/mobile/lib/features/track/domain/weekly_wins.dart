@@ -3,6 +3,13 @@
 /// for next week picked by fixed rules from approved words, never by an AI.
 library;
 
+import '../../checkin/domain/checkin.dart';
+
+/// A check-in answer that went the kind way since the week before
+/// (FR-DLY-06 "check-in trends", T-DLY-07). Only improvements are named;
+/// a harder week is never pointed out (nothing to feel bad about).
+enum CheckInTrend { moodUp, energyUp, sleepUp, stressDown }
+
 /// What the next week could try. Each maps to one approved sentence.
 enum NextWeekChange {
   /// Nothing logged yet: start with one check-in a day.
@@ -27,7 +34,51 @@ class WeeklyWins {
     this.steadyStep,
     this.steadyDays = 0,
     required this.hasHabits,
+    this.streakDays = 0,
+    this.trends = const [],
   });
+
+  /// The current streak, in days (rest days don't break it, FR-DLY-07).
+  final int streakDays;
+
+  /// What went the kind way since the week before, in a fixed order.
+  final List<CheckInTrend> trends;
+
+  /// Answers needed in each week before comparing them.
+  static const minAnswers = 3;
+
+  /// How far the average must move (on the 1 to 5 scale) to count.
+  static const minChange = 0.5;
+
+  /// This week against the week before, by fixed rules: per answer, at
+  /// least [minAnswers] in both weeks and an average at least [minChange]
+  /// better (higher mood, energy and sleep; lower stress).
+  static List<CheckInTrend> trendsOf(
+    Iterable<CheckIn> thisWeek,
+    Iterable<CheckIn> lastWeek,
+  ) {
+    double? avg(Iterable<CheckIn> w, int? Function(CheckIn) f) {
+      final v = [for (final c in w) ?f(c)];
+      return v.length < minAnswers
+          ? null
+          : v.reduce((a, b) => a + b) / v.length;
+    }
+
+    bool better(int? Function(CheckIn) f, {bool lowerIsBetter = false}) {
+      final now = avg(thisWeek, f);
+      final before = avg(lastWeek, f);
+      if (now == null || before == null) return false;
+      final change = lowerIsBetter ? before - now : now - before;
+      return change >= minChange - 1e-9;
+    }
+
+    return [
+      if (better((c) => c.mood)) CheckInTrend.moodUp,
+      if (better((c) => c.energy)) CheckInTrend.energyUp,
+      if (better((c) => c.sleep)) CheckInTrend.sleepUp,
+      if (better((c) => c.stress, lowerIsBetter: true)) CheckInTrend.stressDown,
+    ];
+  }
 
   /// Days with a check-in, 0..7.
   final int checkInDays;

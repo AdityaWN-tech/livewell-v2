@@ -16,7 +16,7 @@ import '../../routine/application/routine_week_data.dart';
 import '../application/track_data.dart';
 import '../domain/track_stats.dart';
 import '../domain/weekly_wins.dart';
-import 'track_screen.dart' show scaleWord;
+import 'track_screen.dart' show scaleWord, streakProvider;
 
 /// The last 7 days' habit ticks; refreshed when today's change.
 final _weekHabitLogsProvider = FutureProvider<List<HabitLog>>((ref) async {
@@ -43,13 +43,22 @@ final weeklyWinsProvider = Provider<WeeklyWins>((ref) {
       steadyStep: 'a morning walk',
       steadyDays: 5,
       hasHabits: true,
+      streakDays: 14,
+      trends: [CheckInTrend.moodUp, CheckInTrend.sleepUp],
     );
   }
   final now = ref.watch(clockProvider)();
   final from = localDateKey(DateTime(now.year, now.month, now.day - 6));
+  final before = localDateKey(DateTime(now.year, now.month, now.day - 13));
+  final history = ref.watch(trackHistoryProvider).value ?? const <CheckIn>[];
   final week = [
-    for (final c in ref.watch(trackHistoryProvider).value ?? const <CheckIn>[])
+    for (final c in history)
       if (c.date.compareTo(from) >= 0) c,
+  ];
+  // The 7 days before this week, for the trends.
+  final lastWeek = [
+    for (final c in history)
+      if (c.date.compareTo(before) >= 0 && c.date.compareTo(from) < 0) c,
   ];
   final win = ref.watch(routineWinProvider);
   return WeeklyWins(
@@ -62,6 +71,8 @@ final weeklyWinsProvider = Provider<WeeklyWins>((ref) {
     hasHabits: ref
         .watch(planHabitsProvider)
         .any((h) => h.role == HabitRole.supporting),
+    streakDays: ref.watch(streakProvider)?.length ?? 0,
+    trends: WeeklyWins.trendsOf(week, lastWeek),
   );
 });
 
@@ -112,6 +123,24 @@ class WeeklyWinsScreen extends ConsumerWidget {
           const Key('wins-steady'),
           Icons.star_outline,
           l.winsSteady(step, w.steadyDays),
+        ),
+      if (w.streakDays > 1)
+        (
+          const Key('wins-streak'),
+          Icons.local_fire_department_outlined,
+          l.winsStreak(w.streakDays),
+        ),
+      // Check-in trends (T-DLY-07): only what went the kind way.
+      for (final trend in w.trends)
+        (
+          Key('wins-trend-${trend.name}'),
+          Icons.trending_up,
+          switch (trend) {
+            CheckInTrend.moodUp => l.winsTrendMood,
+            CheckInTrend.energyUp => l.winsTrendEnergy,
+            CheckInTrend.sleepUp => l.winsTrendSleep,
+            CheckInTrend.stressDown => l.winsTrendStress,
+          },
         ),
     ];
     final (changeTitle, changeBody) = switch (w.change) {

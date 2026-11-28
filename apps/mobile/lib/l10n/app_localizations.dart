@@ -6387,6 +6387,36 @@ abstract class AppLocalizations {
   /// **'You kept up {step} on {days} days.'**
   String winsSteady(String step, int days);
 
+  /// Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You\'re on a 1-day streak.} other{You\'re on a {count}-day streak.}}'**
+  String winsStreak(int count);
+
+  /// Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named.
+  ///
+  /// In en, this message translates to:
+  /// **'Your mood was a little better than the week before.'**
+  String get winsTrendMood;
+
+  /// Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named.
+  ///
+  /// In en, this message translates to:
+  /// **'You had a bit more energy than the week before.'**
+  String get winsTrendEnergy;
+
+  /// Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named.
+  ///
+  /// In en, this message translates to:
+  /// **'Your sleep was a little better than the week before.'**
+  String get winsTrendSleep;
+
+  /// Weekly wins: streak and check-in trends (T-DLY-07, D-120). Only kind changes are named.
+  ///
+  /// In en, this message translates to:
+  /// **'You felt calmer than the week before.'**
+  String get winsTrendStress;
+
   /// Profile: add or remove a phone number (Step 4c, D-55).
   ///
   /// In en, this message translates to:

@@ -19,6 +19,10 @@ import 'coach_state.dart';
 /// answers goes into a script.
 final momentContextProvider = Provider<MomentContext>((ref) {
   final step = ref.watch(todayStepProvider);
+  // Made smaller (by the person, or after last night's barrier, D-119):
+  // the coach names the smaller step.
+  final smaller =
+      step?.smallerTitle != null && ref.watch(stepProgressProvider).smaller;
   final why = ref.watch(previewModeProvider)
       ? 'I want energy to travel with my family.'
       : ref.watch(currentProfileProvider).value?.whyStatement;
@@ -31,6 +35,11 @@ final momentContextProvider = Provider<MomentContext>((ref) {
     why: why,
     step: step == null
         ? null
+        : smaller
+        ? MomentStep(
+            title: step.smallerTitle!,
+            minutes: step.smallerMinutes ?? step.minutes,
+          )
         : MomentStep(
             title: step.title,
             minutes: step.minutes,

@@ -34,14 +34,19 @@ class FirestoreReflectionRepository implements ReflectionRepository {
   Stream<Reflection?> watchDay(String date) => _doc(date).snapshots().map(
     (s) => s.data() == null
         ? null
-        : Reflection(date: date, text: s.data()!['text'] as String),
+        : Reflection(
+            date: date,
+            text: s.data()!['text'] as String? ?? '',
+            barrier: ReflectionBarrier.fromId(s.data()!['barrier']),
+          ),
   );
 
   @override
   Future<void> save(Reflection r) async {
     final ref = _doc(r.date);
     final fields = <String, Object>{
-      'text': r.text,
+      if (r.text.isNotEmpty) 'text': r.text,
+      'barrier': ?r.barrier?.id,
       'prompt': 'went_well',
       'source': 'app',
       'updated_at': FieldValue.serverTimestamp(),
@@ -49,8 +54,13 @@ class FirestoreReflectionRepository implements ReflectionRepository {
     };
     // Same pattern as check-ins: a same-day edit merges and never sends
     // created_at, so the first one is kept (the rules require it).
+    // A same-day edit can take the barrier or the text away again.
     final write = await _exists(ref)
-        ? ref.set(fields, SetOptions(merge: true))
+        ? ref.set({
+            ...fields,
+            if (r.text.isEmpty) 'text': FieldValue.delete(),
+            if (r.barrier == null) 'barrier': FieldValue.delete(),
+          }, SetOptions(merge: true))
         : ref.set({...fields, 'created_at': FieldValue.serverTimestamp()});
     await write.timeout(serverWait, onTimeout: () {});
   }

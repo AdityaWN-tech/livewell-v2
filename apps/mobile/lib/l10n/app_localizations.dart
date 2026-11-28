@@ -2140,6 +2140,54 @@ abstract class AppLocalizations {
   /// **'This was not saved.'**
   String get trackReflectionNotSaved;
 
+  /// No description provided for @trackReflectionBarrierQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What got in the way? (optional)'**
+  String get trackReflectionBarrierQuestion;
+
+  /// No description provided for @trackBarrierNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'No time'**
+  String get trackBarrierNoTime;
+
+  /// No description provided for @trackBarrierTired.
+  ///
+  /// In en, this message translates to:
+  /// **'Tired'**
+  String get trackBarrierTired;
+
+  /// No description provided for @trackBarrierFeltUnwell.
+  ///
+  /// In en, this message translates to:
+  /// **'Felt unwell'**
+  String get trackBarrierFeltUnwell;
+
+  /// No description provided for @trackBarrierPlansChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Plans changed'**
+  String get trackBarrierPlansChanged;
+
+  /// No description provided for @trackBarrierForgot.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot'**
+  String get trackBarrierForgot;
+
+  /// No description provided for @trackReflectionSavedSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Tomorrow\'s step will be a smaller one.'**
+  String get trackReflectionSavedSmaller;
+
+  /// No description provided for @homeStepSmallerAfterReflection.
+  ///
+  /// In en, this message translates to:
+  /// **'A smaller step today, after last night\'s reflection.'**
+  String get homeStepSmallerAfterReflection;
+
   /// No description provided for @learnEyebrow.
   ///
   /// In en, this message translates to:

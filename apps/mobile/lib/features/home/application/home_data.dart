@@ -13,6 +13,8 @@ import '../../dev/application/preview_mode.dart';
 import '../../dev/application/preview_samples.dart';
 import '../../goals/data/goal_repository.dart';
 import '../../goals/domain/goal.dart';
+import '../../track/data/reflection_repository.dart';
+import '../../track/domain/track_models.dart';
 import '../domain/home_models.dart';
 import '../../avatar/presentation/coach_avatar.dart' show coachChoiceProvider;
 
@@ -120,6 +122,7 @@ class StepProgress {
     this.done = false,
     this.smaller = false,
     this.doneAt,
+    this.afterBarrier,
   });
 
   /// Local date it applies to; another day starts fresh.
@@ -127,6 +130,10 @@ class StepProgress {
   final bool done;
   final bool smaller;
   final DateTime? doneAt;
+
+  /// Last night's reflection named this barrier, so today's step starts
+  /// smaller (T-DLY-05, D-119).
+  final ReflectionBarrier? afterBarrier;
 }
 
 class StepProgressNotifier extends Notifier<StepProgress> {
@@ -184,17 +191,48 @@ final stepProgressProvider = Provider<StepProgress>((ref) {
   final s = ref.watch(_stepProgressStore);
   final today = localDateKey(ref.watch(clockProvider)());
   final current = s.date == today ? s : StepProgress(date: today);
-  if (current.done) return current;
+  // A barrier in last night's reflection: today starts with the smaller
+  // step (FR-DLY-05, D-119).
+  final barrier = ref.watch(yesterdayBarrierProvider).value;
+  StepProgress withBarrier(StepProgress p) => barrier == null
+      ? p
+      : StepProgress(
+          date: p.date,
+          done: p.done,
+          smaller: true,
+          doneAt: p.doneAt,
+          afterBarrier: barrier,
+        );
+  if (current.done) return withBarrier(current);
   final saved = (ref.watch(_todayStepLogsProvider).value ?? const <HabitLog>[])
       .where((l) => l.habitId == dailyStepHabitId)
       .firstOrNull;
-  if (saved == null) return current;
-  return StepProgress(
-    date: today,
-    done: true,
-    smaller: current.smaller,
-    doneAt: saved.doneAt,
+  if (saved == null) return withBarrier(current);
+  return withBarrier(
+    StepProgress(
+      date: today,
+      done: true,
+      smaller: current.smaller,
+      doneAt: saved.doneAt,
+    ),
   );
+});
+
+/// What got in the way, from yesterday's evening reflection (T-DLY-05), or
+/// null. Never in the dev preview.
+final yesterdayBarrierProvider = StreamProvider<ReflectionBarrier?>((ref) {
+  if (ref.watch(previewModeProvider) ||
+      ref.watch(signedInUidProvider) == null) {
+    return Stream.value(null);
+  }
+  final now = ref.watch(clockProvider)();
+  final yesterday = localDateKey(
+    DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1)),
+  );
+  return ref
+      .watch(reflectionRepositoryProvider)
+      .watchDay(yesterday)
+      .map((r) => r?.barrier);
 });
 
 final _todayStepLogsProvider = StreamProvider<List<HabitLog>>((ref) {

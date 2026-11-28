@@ -1195,6 +1195,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackReflectionNotSaved => 'This was not saved.';
 
   @override
+  String get trackReflectionBarrierQuestion =>
+      'What got in the way? (optional)';
+
+  @override
+  String get trackBarrierNoTime => 'No time';
+
+  @override
+  String get trackBarrierTired => 'Tired';
+
+  @override
+  String get trackBarrierFeltUnwell => 'Felt unwell';
+
+  @override
+  String get trackBarrierPlansChanged => 'Plans changed';
+
+  @override
+  String get trackBarrierForgot => 'Forgot';
+
+  @override
+  String get trackReflectionSavedSmaller =>
+      'Saved. Tomorrow\'s step will be a smaller one.';
+
+  @override
+  String get homeStepSmallerAfterReflection =>
+      'A smaller step today, after last night\'s reflection.';
+
+  @override
   String get learnEyebrow => 'Approved knowledge';
 
   @override

@@ -1,11 +1,35 @@
 /// One evening reflection per local date (FR-DLY-05):
 /// "What went well today?"
+/// "What got in the way?" in the evening reflection (T-DLY-05, D-119):
+/// fixed choices, never free text, so no AI is needed to act on it. Any of
+/// them makes the next day's step the smaller one (FR-DLY-05).
+enum ReflectionBarrier {
+  noTime('no_time'),
+  tired('tired'),
+  feltUnwell('felt_unwell'),
+  plansChanged('plans_changed'),
+  forgot('forgot');
+
+  const ReflectionBarrier(this.id);
+
+  /// Stored id (the Firestore rules allow these only).
+  final String id;
+
+  static ReflectionBarrier? fromId(Object? id) =>
+      values.where((b) => b.id == id).firstOrNull;
+}
+
 class Reflection {
-  const Reflection({required this.date, required this.text});
+  const Reflection({required this.date, this.text = '', this.barrier});
 
   /// Local date, YYYY-MM-DD.
   final String date;
+
+  /// What went well; may be empty when only a barrier was chosen.
   final String text;
+
+  /// What got in the way, or null.
+  final ReflectionBarrier? barrier;
 
   /// Same limit as the Firestore rules.
   static const maxLength = 500;

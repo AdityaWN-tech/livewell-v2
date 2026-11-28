@@ -447,6 +447,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _stepReason(AppLocalizations l, TodayStep step, CheckIn? checkIn) {
     final reason = checkIn == null ? null : gentleReasonFor(checkIn);
     return switch (reason) {
+      null when ref.read(stepProgressProvider).afterBarrier != null =>
+        l.homeStepSmallerAfterReflection,
       null => step.reason,
       GentleReason.lowMood => l.homeStepGentleLowMood,
       GentleReason.highStress => l.homeStepGentleStress,

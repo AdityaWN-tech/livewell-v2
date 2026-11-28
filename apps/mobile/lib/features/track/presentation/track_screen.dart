@@ -986,6 +986,8 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
   bool _usedVoice = false;
   bool _saving = false;
   String? _saved;
+  ReflectionBarrier? _barrier;
+  ReflectionBarrier? _savedBarrier;
 
   @override
   void initState() {
@@ -1032,7 +1034,8 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
   Future<void> _save() async {
     final l = AppLocalizations.of(context);
     final text = _text.text.trim();
-    if (text.isEmpty || _saving) return;
+    final barrier = _barrier;
+    if ((text.isEmpty && barrier == null) || _saving) return;
     setState(() => _saving = true);
     if (_listening) {
       await _dictation.stop();
@@ -1040,9 +1043,10 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
     }
 
     // Red flags first (FR-SAF-01/02), as for the Why and the check-in note.
+    // The barrier is a fixed choice, so only the text is checked.
     final rules = await ref.read(safetyRulesProvider.future);
     final result = rules.check(text);
-    if (!result.isClear) {
+    if (text.isNotEmpty && !result.isClear) {
       final uid = ref.read(authServiceProvider).currentUser?.uid;
       final region = uid == null
           ? null
@@ -1076,7 +1080,7 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
     try {
       await ref
           .read(reflectionRepositoryProvider)
-          .save(Reflection(date: today, text: text));
+          .save(Reflection(date: today, text: text, barrier: barrier));
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -1094,9 +1098,19 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
       setState(() {
         _saving = false;
         _saved = text;
+        _savedBarrier = barrier;
       });
     }
   }
+
+  static String _barrierLabel(AppLocalizations l, ReflectionBarrier b) =>
+      switch (b) {
+        ReflectionBarrier.noTime => l.trackBarrierNoTime,
+        ReflectionBarrier.tired => l.trackBarrierTired,
+        ReflectionBarrier.feltUnwell => l.trackBarrierFeltUnwell,
+        ReflectionBarrier.plansChanged => l.trackBarrierPlansChanged,
+        ReflectionBarrier.forgot => l.trackBarrierForgot,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -1108,9 +1122,11 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
     if (stored != null && _saved == null && _text.text.isEmpty) {
       _saved = stored.text;
       _text.text = stored.text;
+      _barrier = _savedBarrier = stored.barrier;
     }
     final text = _text.text.trim();
-    final isSaved = _saved != null && text == _saved;
+    final isSaved =
+        _saved != null && text == _saved && _barrier == _savedBarrier;
 
     return Card(
       key: const Key('track-reflection'),
@@ -1146,6 +1162,26 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
               ),
             ),
             const SizedBox(height: LwSpacing.xs),
+            // What got in the way (T-DLY-05, D-119): fixed choices; any of
+            // them makes tomorrow's step the smaller one.
+            Text(l.trackReflectionBarrierQuestion, style: t.titleSmall),
+            const SizedBox(height: LwSpacing.xs),
+            Wrap(
+              spacing: LwSpacing.xs,
+              runSpacing: LwSpacing.xs,
+              children: [
+                for (final b in ReflectionBarrier.values)
+                  ChoiceChip(
+                    key: Key('barrier-${b.id}'),
+                    label: Text(_barrierLabel(l, b)),
+                    selected: _barrier == b,
+                    onSelected: _saving
+                        ? null
+                        : (on) => setState(() => _barrier = on ? b : null),
+                  ),
+              ],
+            ),
+            const SizedBox(height: LwSpacing.sm),
             if (isSaved)
               Row(
                 key: const Key('reflection-saved'),
@@ -1153,7 +1189,12 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
                   Icon(Icons.check_circle, color: p.success),
                   const SizedBox(width: LwSpacing.xs),
                   Expanded(
-                    child: Text(l.trackReflectionSaved, style: t.bodyMedium),
+                    child: Text(
+                      _savedBarrier == null
+                          ? l.trackReflectionSaved
+                          : l.trackReflectionSavedSmaller,
+                      style: t.bodyMedium,
+                    ),
                   ),
                 ],
               )
@@ -1162,7 +1203,9 @@ class _ReflectionCardState extends ConsumerState<_ReflectionCard> {
                 alignment: Alignment.centerRight,
                 child: FilledButton(
                   key: const Key('reflection-save'),
-                  onPressed: text.isEmpty || _saving ? null : _save,
+                  onPressed: (text.isEmpty && _barrier == null) || _saving
+                      ? null
+                      : _save,
                   child: Text(l.trackReflectionSave),
                 ),
               ),

@@ -695,6 +695,20 @@ describe('reflections (FR-DLY-05, T-UI-01d: one per local date)', () => {
     await assertFails(setDoc(ref(), reflection({ source: 'web' })));
     await assertSucceeds(setDoc(ref(), reflection({ text: 'x'.repeat(500) })));
   });
+  it('a barrier is one of the fixed choices, with or without text (T-DLY-05, D-119)', async () => {
+    await seedAdult(env);
+    const barriers = ['no_time', 'tired', 'felt_unwell', 'plans_changed', 'forgot'];
+    for (const [i, barrier] of barriers.entries()) {
+      await assertSucceeds(setDoc(doc(as(ALICE), `users/alice/reflections/2026-10-0${i + 1}`), reflection({ barrier })));
+    }
+    const { text: _t, ...noText } = reflection({ barrier: 'no_time' });
+    await assertSucceeds(setDoc(doc(as(ALICE), 'users/alice/reflections/2026-10-15'), noText));
+    await assertFails(setDoc(ref(), reflection({ barrier: 'my boss' })));
+    await assertFails(setDoc(ref(), reflection({ barrier: 3 })));
+    // Neither text nor a barrier: nothing to save.
+    const { text: _u, ...empty } = reflection();
+    await assertFails(setDoc(doc(as(ALICE), 'users/alice/reflections/2026-10-16'), empty));
+  });
   it('rejects bad date ids, unknown fields and missing meta', async () => {
     await seedAdult(env);
     await assertFails(setDoc(doc(as(ALICE), 'users/alice/reflections/today'), reflection()));

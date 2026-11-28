@@ -415,10 +415,16 @@ service cloud.firestore {
       // The app runs the text through the red-flag rules before saving;
       // emergency, crisis and disordered-eating text is never sent.
       match /reflections/{date} {
+        // What went well (text) and/or what got in the way (barrier, a
+        // fixed choice; T-DLY-05, D-119). At least one of them.
         function validReflection(d) {
-          return d.keys().hasOnly(['text', 'prompt', 'source', 'created_at',
-                   'updated_at', 'schema_version'])
-            && d.text is string && d.text.size() > 0 && d.text.size() <= 500
+          return d.keys().hasOnly(['text', 'barrier', 'prompt', 'source',
+                   'created_at', 'updated_at', 'schema_version'])
+            && ('text' in d || 'barrier' in d)
+            && (!('text' in d)
+                || (d.text is string && d.text.size() > 0 && d.text.size() <= 500))
+            && (!('barrier' in d) || d.barrier in ['no_time', 'tired',
+                   'felt_unwell', 'plans_changed', 'forgot'])
             && d.prompt in ['went_well']
             && d.source in ['app'];
         }

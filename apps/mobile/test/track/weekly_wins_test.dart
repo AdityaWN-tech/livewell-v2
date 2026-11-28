@@ -86,6 +86,73 @@ void main() {
       expect(WeeklyWins.usualOf([3, 4, 4, 2]), 4);
       expect(WeeklyWins.usualOf([2, 2, 4, 4]), 4);
     });
+
+    group('check-in trends (T-DLY-07)', () {
+      List<CheckIn> week(
+        String month,
+        List<int> moods, {
+        int? energy,
+        int? sleep,
+        int? stress,
+      }) => [
+        for (final (i, m) in moods.indexed)
+          CheckIn(
+            date: '2026-$month-${(10 + i).toString()}',
+            mood: m,
+            energy: energy,
+            sleep: sleep,
+            stress: stress,
+            gentleDay: false,
+          ),
+      ];
+
+      test('half a point better, with 3 answers each week, counts', () {
+        expect(
+          WeeklyWins.trendsOf(week('10', [4, 4, 3]), week('09', [3, 3, 3])),
+          [CheckInTrend.moodUp],
+        );
+        // 0.33 better: not enough.
+        expect(
+          WeeklyWins.trendsOf(week('10', [4, 3, 3]), week('09', [3, 3, 3])),
+          isEmpty,
+        );
+      });
+
+      test('fewer than 3 answers in either week: nothing compared', () {
+        expect(
+          WeeklyWins.trendsOf(week('10', [5, 5]), week('09', [1, 1, 1])),
+          isEmpty,
+        );
+        expect(
+          WeeklyWins.trendsOf(week('10', [5, 5, 5]), week('09', [1, 1])),
+          isEmpty,
+        );
+      });
+
+      test('a harder week is never named', () {
+        expect(
+          WeeklyWins.trendsOf(
+            week('10', [1, 1, 1], energy: 1, sleep: 1, stress: 5),
+            week('09', [5, 5, 5], energy: 5, sleep: 5, stress: 1),
+          ),
+          isEmpty,
+        );
+      });
+
+      test('energy and sleep up, stress down, in a fixed order', () {
+        expect(
+          WeeklyWins.trendsOf(
+            week('10', [3, 3, 3], energy: 4, sleep: 4, stress: 2),
+            week('09', [3, 3, 3], energy: 3, sleep: 3, stress: 3),
+          ),
+          [
+            CheckInTrend.energyUp,
+            CheckInTrend.sleepUp,
+            CheckInTrend.stressDown,
+          ],
+        );
+      });
+    });
   });
 
   group('weekly wins (Track > Weekly Reflection)', () {
@@ -147,10 +214,66 @@ void main() {
       expect(find.byKey(const Key('wins-change-moreCheckIns')), findsOne);
     });
 
+    testWidgets('streak and trends: the week against the one before', (
+      tester,
+    ) async {
+      final h = signedIn();
+      // This week (10-08 to 10-14): mood 4 and calmer; the week before: 3.
+      for (final date in ['2026-10-12', '2026-10-13', '2026-10-14']) {
+        h.checkIns.days[date] = CheckIn(
+          date: date,
+          mood: 4,
+          stress: 2,
+          gentleDay: false,
+        );
+      }
+      for (final date in ['2026-10-03', '2026-10-04', '2026-10-05']) {
+        h.checkIns.days[date] = CheckIn(
+          date: date,
+          mood: 3,
+          stress: 4,
+          gentleDay: false,
+        );
+      }
+      for (final date in ['2026-10-12', '2026-10-13', '2026-10-14']) {
+        await h.goals.saveLog(HabitLog(date: date, habitId: 'support_1'));
+      }
+      await h.boot(tester);
+      await openWins(tester);
+      expect(
+        find.text('Your mood was a little better than the week before.'),
+        findsOneWidget,
+      );
+      expect(find.text('You felt calmer than the week before.'), findsOne);
+      expect(find.byKey(const Key('wins-trend-sleepUp')), findsNothing);
+      expect(find.byKey(const Key('wins-streak')), findsOneWidget);
+    });
+
+    testWidgets('a harder week than the one before: no trend named', (
+      tester,
+    ) async {
+      final h = signedIn();
+      for (final date in ['2026-10-12', '2026-10-13', '2026-10-14']) {
+        h.checkIns.days[date] = checkIn(date, 2);
+      }
+      for (final date in ['2026-10-03', '2026-10-04', '2026-10-05']) {
+        h.checkIns.days[date] = checkIn(date, 5);
+      }
+      await h.boot(tester);
+      await openWins(tester);
+      expect(find.textContaining('week before'), findsNothing);
+      expect(find.textContaining('worse'), findsNothing);
+    });
+
     testWidgets('dev preview: sample week', (tester) async {
       await bootPreview(tester);
       await openWins(tester);
       expect(find.text('You checked in on 5 days.'), findsOneWidget);
+      expect(find.text("You're on a 14-day streak."), findsOneWidget);
+      expect(
+        find.text('Your sleep was a little better than the week before.'),
+        findsOneWidget,
+      );
       expect(
         find.text('You kept up a morning walk on 5 days.'),
         findsOneWidget,

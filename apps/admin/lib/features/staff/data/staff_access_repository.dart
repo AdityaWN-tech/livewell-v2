@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/auth/auth_repository.dart';
+import '../../../core/auth/staff.dart';
 import '../domain/staff_access.dart';
 
 /// Requests, approvals and the activity log (D-112). The only place the
@@ -33,6 +34,20 @@ abstract class StaffAccessRepository {
     required bool active,
     required String superUid,
   });
+
+  /// Gives an Admin their roles (D-118), with a log line.
+  Future<void> setRoles(
+    StaffMember m,
+    Set<StaffRole> roles, {
+    required String superUid,
+  });
+
+  /// Everyone who ever asked for access: uid -> "Name (email)", so the
+  /// activity log can show people instead of ids. Superadmin only.
+  Stream<Map<String, String>> people();
+
+  /// The signed-in Admin's own roles, live (empty when not an Admin).
+  Stream<Set<StaffRole>> myRoles(String uid);
 }
 
 class FirestoreStaffAccessRepository implements StaffAccessRepository {
@@ -125,6 +140,7 @@ class FirestoreStaffAccessRepository implements StaffAccessRepository {
           name: d['name'] as String? ?? '',
           email: d['email'] as String? ?? '',
           status: d['status'] as String? ?? 'active',
+          roles: rolesFrom(d.data()['roles']),
           updatedAt: _date(d.data()['updated_at']),
         ),
     ]..sort((a, b) => a.email.compareTo(b.email)),
@@ -171,6 +187,8 @@ class FirestoreStaffAccessRepository implements StaffAccessRepository {
         'email': r.email,
         'name': r.name,
         'role': 'admin',
+        // New Admins write content; the Superadmin adds reviewer roles.
+        'roles': [StaffRole.contentEditor.claim],
         'status': 'active',
         'approved_by': superUid,
         'updated_at': FieldValue.serverTimestamp(),
@@ -208,6 +226,7 @@ class FirestoreStaffAccessRepository implements StaffAccessRepository {
         'email': m.email,
         'name': m.name,
         'role': 'admin',
+        'roles': _roleList(m.roles),
         'status': active ? 'active' : 'removed',
         'approved_by': superUid,
         'updated_at': FieldValue.serverTimestamp(),
@@ -222,6 +241,52 @@ class FirestoreStaffAccessRepository implements StaffAccessRepository {
       );
     await batch.commit();
   }
+
+  static List<String> _roleList(Set<StaffRole> roles) => [
+    for (final r in assignableRoles)
+      if (roles.contains(r)) r.claim,
+  ];
+
+  @override
+  Future<void> setRoles(
+    StaffMember m,
+    Set<StaffRole> roles, {
+    required String superUid,
+  }) async {
+    final batch = _db.batch()
+      ..set(_members.doc(m.uid), {
+        'email': m.email,
+        'name': m.name,
+        'role': 'admin',
+        'roles': _roleList(roles),
+        'status': m.status,
+        'approved_by': superUid,
+        'updated_at': FieldValue.serverTimestamp(),
+      })
+      ..set(
+        _audit.doc(),
+        _auditEntry(superUid, 'staff.roles_changed', 'staff_members/${m.uid}'),
+      );
+    await batch.commit();
+  }
+
+  @override
+  Stream<Map<String, String>> people() => _requests.snapshots().map(
+    (q) => {
+      for (final d in q.docs)
+        d.id: '${d['name'] as String? ?? ''} (${d['email'] as String? ?? ''})',
+    },
+  );
+
+  @override
+  Stream<Set<StaffRole>> myRoles(String uid) => _members
+      .doc(uid)
+      .snapshots()
+      .map(
+        (s) => s.data()?['status'] == 'active'
+            ? rolesFrom(s.data()?['roles'])
+            : const <StaffRole>{},
+      );
 }
 
 final staffAccessRepositoryProvider = Provider<StaffAccessRepository>(
@@ -235,4 +300,13 @@ final staffAccessProvider = StreamProvider<StaffAccess?>((ref) {
   if (session == null) return Stream.value(null);
   if (session.superadmin) return Stream.value(StaffAccess.active);
   return ref.watch(staffAccessRepositoryProvider).watch(session.uid);
+});
+
+/// The signed-in person's staff roles (D-118); empty for a Superadmin who
+/// is not also an Admin. Decides whether Approve shows; the rules decide
+/// whether it works.
+final myStaffRolesProvider = StreamProvider<Set<StaffRole>>((ref) {
+  final session = ref.watch(sessionProvider).value;
+  if (session == null) return Stream.value(const <StaffRole>{});
+  return ref.watch(staffAccessRepositoryProvider).myRoles(session.uid);
 });

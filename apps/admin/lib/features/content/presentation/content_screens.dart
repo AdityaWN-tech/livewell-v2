@@ -3,14 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/auth/auth_repository.dart';
+import '../../../core/auth/staff.dart';
 import '../../../core/design/admin_layout.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/widgets/admin_scaffold.dart';
+import '../../staff/data/staff_access_repository.dart';
 import '../data/content_repository.dart';
 import '../domain/content.dart';
 import '../domain/content_check.dart';
 
 String _me(WidgetRef ref) => ref.read(sessionProvider).value?.uid ?? '';
+
+/// Only a clinical reviewer approves or sends back (D-118); the rules check
+/// it again.
+bool _isReviewer(WidgetRef ref) =>
+    ref
+        .watch(myStaffRolesProvider)
+        .value
+        ?.contains(StaffRole.clinicalReviewer) ??
+    false;
 
 Future<bool> _run(
   BuildContext context,
@@ -53,6 +64,7 @@ class ContentScreen extends ConsumerWidget {
           .value
           ?.map((q) => (q.state, q.authorUid)),
     ].where((x) => x.$1 == ReviewState.pending && x.$2 != me).length;
+    final reviewer = _isReviewer(ref);
     final superadmin = ref.watch(sessionProvider).value?.superadmin ?? false;
     return DefaultTabController(
       length: 4,
@@ -76,7 +88,9 @@ class ContentScreen extends ConsumerWidget {
                 const Tab(key: Key('tab-map'), text: 'Live Well Map'),
                 Tab(
                   key: const Key('tab-review'),
-                  text: waiting == 0 ? 'Review' : 'Review ($waiting)',
+                  text: waiting == 0 || !reviewer
+                      ? 'Review'
+                      : 'Review ($waiting)',
                 ),
               ],
             ),
@@ -197,6 +211,7 @@ class _ReviewList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.watch(sessionProvider).value?.uid;
+    final reviewer = _isReviewer(ref);
     final lessons = (ref.watch(lessonsProvider).value ?? const [])
         .where((l) => l.state == ReviewState.pending)
         .toList();
@@ -220,8 +235,10 @@ class _ReviewList extends ConsumerWidget {
       title: Text(title),
       subtitle: Text(
         author == me
-            ? 'Yours: waiting for another admin to review'
-            : 'Open to review',
+            ? 'Yours: waiting for a clinical reviewer'
+            : reviewer
+            ? 'Open to review'
+            : 'Waiting for a clinical reviewer',
       ),
       onTap: () => context.go(go),
     );
@@ -287,6 +304,7 @@ class _ReviewBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final repo = ref.watch(contentRepositoryProvider);
     final me = ref.watch(sessionProvider).value?.uid;
+    final reviewer = _isReviewer(ref);
     final issues = checkContent(text);
     final editable =
         state == ReviewState.draft || state == ReviewState.rejected;
@@ -336,7 +354,7 @@ class _ReviewBar extends ConsumerWidget {
                         await _run(
                           context,
                           () => repo.submit(collection, saved),
-                          'Sent for review. Another admin approves it.',
+                          'Sent for review. A clinical reviewer approves it.',
                         );
                       },
                 child: const Text('Submit for review'),
@@ -344,7 +362,8 @@ class _ReviewBar extends ConsumerWidget {
             ],
             if (state == ReviewState.pending &&
                 id != null &&
-                authorUid != me) ...[
+                authorUid != me &&
+                reviewer) ...[
               OutlinedButton(
                 key: const Key('content-reject'),
                 onPressed: () => _run(
@@ -377,8 +396,12 @@ class _ReviewBar extends ConsumerWidget {
               ),
             ],
             if (state == ReviewState.pending && authorUid == me)
+              const Text('Waiting for a clinical reviewer (2-person rule).'),
+            if (state == ReviewState.pending && authorUid != me && !reviewer)
               const Text(
-                'Waiting for another admin to review (2-person rule).',
+                'Only a clinical reviewer can approve this. Ask a '
+                'Superadmin if you should have that role.',
+                key: Key('content-not-reviewer'),
               ),
             if (state == ReviewState.approved && id != null) ...[
               OutlinedButton(

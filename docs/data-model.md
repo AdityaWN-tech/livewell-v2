@@ -48,8 +48,8 @@ App code gets Firestore only through `firestoreProvider` (D-16).
 | `marketing_suppressions/{uid}` | uid, suppressed (bool), since, source (D-76). Any marketing sender checks the consent **and** this list | **None** | revoke handling / new marketing grant |
 | `push_outbox/{id}` | uid, category (fixed list), ref_id (an id, never text); then result {status, reason}, processed_at, expire_at (TTL, 7 days) | **None** | other servers ask for a push (Media Service: `coach_{jobId}`); `onPushRequest` sends it through `sendPush` (D-77) |
 | `staff_requests/{uid}` | name (1–80), email (= the signed-in account), reason (1–300), status (pending / approved / rejected), created_at; decided_by, decided_at (D-112) | The person creates their own (pending only) and may ask again after a no; only a Superadmin decides; no delete | — (free plan: rules only) |
-| `staff_members/{uid}` | email, name, role (`admin`), status (active / removed), approved_by (the Superadmin), updated_at (D-112) | Written only by a Superadmin (verified @whitenoiseacademy.com account with the owner-set `superadmin` claim); the person reads their own; no delete. Admins never read users' data | — |
-| `staff_audit/{id}` | actor, action (staff.approved / rejected / removed / restored), target (≤ 128), at (D-112) | Superadmin create and read only; append-only | — |
+| `staff_members/{uid}` | email, name, role (`admin`), roles (list, any of content_editor / clinical_reviewer / safety_reviewer; D-118; missing = none), status (active / removed), approved_by (the Superadmin), updated_at (D-112) | Written only by a Superadmin (verified @whitenoiseacademy.com account with the owner-set `superadmin` claim); the person reads their own; no delete. Admins never read users' data | — |
+| `staff_audit/{id}` | actor, action (staff.approved / rejected / removed / restored / roles_changed), target (≤ 128), at (D-112, D-118) | Superadmin create and read only; append-only | — |
 
 ## Cloud Storage (D-76)
 

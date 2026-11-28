@@ -205,9 +205,20 @@ class FakeStaffAccessRepository implements StaffAccessRepository {
     StaffAccess access = StaffAccess.none,
     List<StaffRequest> requests = const [],
     List<StaffMember> members = const [],
+    Set<StaffRole> myRoles = const {},
+    List<StaffAuditEntry> activity = const [],
+    Map<String, String> people = const {},
   }) : _access = access, // ignore: prefer_initializing_formals
        _requests = [...requests],
-       _members = [...members];
+       _members = [...members],
+       _myRoles = myRoles, // ignore: prefer_initializing_formals
+       _activity = activity, // ignore: prefer_initializing_formals
+       _people = people; // ignore: prefer_initializing_formals
+
+  final Set<StaffRole> _myRoles;
+  final List<StaffAuditEntry> _activity;
+  final Map<String, String> _people;
+  final rolesSet = <String, Set<StaffRole>>{};
 
   StaffAccess _access;
   final List<StaffRequest> _requests;
@@ -256,14 +267,44 @@ class FakeStaffAccessRepository implements StaffAccessRepository {
   }
 
   @override
-  Stream<List<StaffAuditEntry>> activity() => Stream.value(const []);
+  Stream<List<StaffAuditEntry>> activity() => Stream.value(_activity);
+
+  @override
+  Stream<Map<String, String>> people() => Stream.value(_people);
+
+  @override
+  Stream<Set<StaffRole>> myRoles(String uid) => Stream.value(_myRoles);
+
+  @override
+  Future<void> setRoles(
+    StaffMember m,
+    Set<StaffRole> roles, {
+    required String superUid,
+  }) async {
+    rolesSet[m.uid] = roles;
+    final i = _members.indexWhere((x) => x.uid == m.uid);
+    _members[i] = StaffMember(
+      uid: m.uid,
+      name: m.name,
+      email: m.email,
+      status: m.status,
+      roles: roles,
+    );
+    _memChanges.add([..._members]);
+  }
 
   @override
   Future<void> approve(StaffRequest r, {required String superUid}) async {
     approved.add(r.uid);
     _requests.removeWhere((x) => x.uid == r.uid);
     _members.add(
-      StaffMember(uid: r.uid, name: r.name, email: r.email, status: 'active'),
+      StaffMember(
+        uid: r.uid,
+        name: r.name,
+        email: r.email,
+        status: 'active',
+        roles: const {StaffRole.contentEditor},
+      ),
     );
     _reqChanges.add([..._requests]);
     _memChanges.add([..._members]);
@@ -289,6 +330,7 @@ class FakeStaffAccessRepository implements StaffAccessRepository {
       name: m.name,
       email: m.email,
       status: active ? 'active' : 'removed',
+      roles: m.roles,
     );
     _memChanges.add([..._members]);
   }

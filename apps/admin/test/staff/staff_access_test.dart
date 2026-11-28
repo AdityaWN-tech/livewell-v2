@@ -119,7 +119,15 @@ void main() {
 
     await tester.tap(find.byKey(const Key('approve-priya')));
     await tester.pumpAndSettle();
+    // Reject asks first; Cancel does nothing.
     await tester.tap(find.byKey(const Key('reject-ravi')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('confirm-cancel')));
+    await tester.pumpAndSettle();
+    expect(staff.rejected, isEmpty);
+    await tester.tap(find.byKey(const Key('reject-ravi')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('confirm-ok')));
     await tester.pumpAndSettle();
     expect(staff.approved, ['priya']);
     expect(staff.rejected, ['ravi']);
@@ -128,10 +136,119 @@ void main() {
     await tester.tap(find.byKey(const Key('tab-admins')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('member-priya')), findsOneWidget);
+    // A new Admin starts as a Content editor.
+    expect(find.text('Content editor'), findsOneWidget);
     await tester.tap(find.byKey(const Key('remove-priya')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('confirm-ok')));
     await tester.pumpAndSettle();
     expect(staff.removed, ['priya']);
     expect(find.byKey(const Key('restore-priya')), findsOneWidget);
+  });
+
+  testWidgets('Superadmin gives an Admin the clinical reviewer role', (
+    tester,
+  ) async {
+    final staff = FakeStaffAccessRepository(
+      members: const [
+        StaffMember(
+          uid: 'anita',
+          name: 'Anita',
+          email: 'anita@gmail.com',
+          status: 'active',
+          roles: {StaffRole.contentEditor},
+        ),
+      ],
+    );
+    await pumpAdmin(tester, session: superadmin(), staff: staff);
+    // No reviewer yet: the Content tab says nothing can go live.
+    await tester.tap(find.byKey(const Key('tab-content')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('no-reviewer')), findsOneWidget);
+    await expectLater(tester, meetsGuideline(textContrastGuideline));
+
+    await tester.tap(find.byKey(const Key('tab-admins')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('roles-anita')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('role-clinical_reviewer')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('roles-save')));
+    await tester.pumpAndSettle();
+    expect(staff.rolesSet['anita'], {
+      StaffRole.contentEditor,
+      StaffRole.clinicalReviewer,
+    });
+    expect(find.text('Content editor, Clinical reviewer'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('tab-content')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('no-reviewer')), findsNothing);
+    expect(find.text('1 clinical reviewer'), findsOneWidget);
+  });
+
+  testWidgets('search narrows Requests and Admins by name or email', (
+    tester,
+  ) async {
+    final staff = FakeStaffAccessRepository(
+      requests: const [
+        StaffRequest(
+          uid: 'priya',
+          name: 'Priya',
+          email: 'priya@gmail.com',
+          reason: 'lessons',
+          status: 'pending',
+        ),
+        StaffRequest(
+          uid: 'ravi',
+          name: 'Ravi',
+          email: 'ravi@clinic.org',
+          reason: 'reviews',
+          status: 'pending',
+        ),
+      ],
+    );
+    await pumpAdmin(tester, session: superadmin(), staff: staff);
+    await tester.enterText(find.byKey(const Key('staff-search')), 'CLINIC');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('request-ravi')), findsOneWidget);
+    expect(find.byKey(const Key('request-priya')), findsNothing);
+    await tester.enterText(find.byKey(const Key('staff-search')), 'nobody');
+    await tester.pumpAndSettle();
+    expect(find.text('No requests match your search.'), findsOneWidget);
+  });
+
+  testWidgets('Activity shows people, not account ids', (tester) async {
+    final staff = FakeStaffAccessRepository(
+      people: const {'priya': 'Priya (priya@gmail.com)'},
+      activity: const [
+        StaffAuditEntry(
+          actor: 'super1',
+          action: 'staff.roles_changed',
+          target: 'staff_members/priya',
+        ),
+        StaffAuditEntry(
+          actor: 'super2',
+          action: 'staff.rejected',
+          target: 'staff_requests/ghost',
+        ),
+      ],
+    );
+    await pumpAdmin(tester, session: superadmin(), staff: staff);
+    await tester.tap(find.byKey(const Key('tab-activity')));
+    await tester.pumpAndSettle();
+    expect(find.text('Roles changed: Priya (priya@gmail.com)'), findsOneWidget);
+    expect(find.textContaining('by you'), findsOneWidget);
+    expect(find.text('Rejected: Unknown person (ghost)'), findsOneWidget);
+    expect(find.textContaining('by another Superadmin'), findsOneWidget);
+  });
+
+  test('roles from Firestore: only the three known ones', () {
+    expect(rolesFrom(['clinical_reviewer', 'admin', 'superadmin', 3]), {
+      StaffRole.clinicalReviewer,
+    });
+    expect(rolesFrom(null), isEmpty);
+    expect(uidOfTarget('staff_members/abc'), 'abc');
   });
 
   testWidgets('sign-in offers Google', (tester) async {

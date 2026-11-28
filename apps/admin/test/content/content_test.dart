@@ -1,6 +1,7 @@
 // Lessons and courses written by Admins (D-113/D-114).
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:livewell_admin/core/auth/staff.dart';
 import 'package:livewell_admin/features/content/domain/content.dart';
 import 'package:livewell_admin/features/content/domain/content_check.dart';
 import 'package:livewell_admin/features/staff/domain/staff_access.dart';
@@ -77,7 +78,7 @@ void main() {
     expect(content.log, ['create lesson l0', 'submit l0']);
     expect(content.lessonsNow.single.state, ReviewState.pending);
     expect(
-      find.text('Waiting for another admin to review (2-person rule).'),
+      find.text('Waiting for a clinical reviewer (2-person rule).'),
       findsOneWidget,
     );
     expect(find.byKey(const Key('content-approve')), findsNothing);
@@ -109,14 +110,46 @@ void main() {
     expect(submit.onPressed, isNull);
   });
 
-  testWidgets('a different Admin approves; it goes live', (tester) async {
+  testWidgets('an Admin without the reviewer role cannot approve (D-118)', (
+    tester,
+  ) async {
     final content = FakeContentRepository(
       lessons: [_lesson('l1', ReviewState.pending, author: 'priya')],
     );
     await pumpAdmin(
       tester,
       session: person('ravi'),
-      staff: FakeStaffAccessRepository(access: StaffAccess.active),
+      staff: FakeStaffAccessRepository(
+        access: StaffAccess.active,
+        myRoles: const {StaffRole.contentEditor, StaffRole.safetyReviewer},
+      ),
+      content: content,
+    );
+    await tester.tap(find.byKey(const Key('tab-review')));
+    await tester.pumpAndSettle();
+    expect(find.text('Review'), findsOneWidget);
+    expect(find.text('Waiting for a clinical reviewer'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('review-lesson-l1')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('content-approve')), findsNothing);
+    expect(find.byKey(const Key('content-reject')), findsNothing);
+    expect(find.byKey(const Key('content-not-reviewer')), findsOneWidget);
+    expect(content.log, isEmpty);
+  });
+
+  testWidgets('a clinical reviewer (not the author) approves; it goes live', (
+    tester,
+  ) async {
+    final content = FakeContentRepository(
+      lessons: [_lesson('l1', ReviewState.pending, author: 'priya')],
+    );
+    await pumpAdmin(
+      tester,
+      session: person('ravi'),
+      staff: FakeStaffAccessRepository(
+        access: StaffAccess.active,
+        myRoles: const {StaffRole.clinicalReviewer},
+      ),
       content: content,
     );
     await tester.tap(find.byKey(const Key('tab-review')));

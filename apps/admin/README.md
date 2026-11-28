@@ -93,6 +93,17 @@ No Cloud Functions are needed; the Firestore rules (`firebase/firestore.rules`, 
 3. Sign in to this console with **Continue with Google** using your @whitenoiseacademy.com account.
 4. Make that account a Superadmin (owner only, on your laptop, after `gcloud auth application-default login`):
    `cd services/core-api && node scripts/set-superadmin.mjs --project my-livewell --email you@whitenoiseacademy.com`
-5. Sign out and in again: you land on **Superadmin** (Requests, Admins, Activity).
+5. Sign out and in again: you land on **Superadmin** (Requests, Admins, Content, Activity).
+6. On **Admins**, tap **Roles** and give at least one person **Clinical reviewer**. Until then nothing can be approved, so nothing goes live (D-118).
 
 Anyone else who signs in sees **Request admin access**, then **Waiting for approval**, and gets the console only after a Superadmin taps **Approve**. Admins never see app users' data.
+
+### Staff roles (D-118)
+
+| Role | Can |
+|---|---|
+| Content editor | write lessons, courses, Map driver names and questions; submit them for review (new Admins start with this) |
+| Clinical reviewer | approve or send back what **someone else** wrote (2-person rule) |
+| Safety reviewer | label only for now; any Admin can retire a live item |
+
+The Firestore rules check the Clinical reviewer role, not the console. Role changes show in **Activity**.

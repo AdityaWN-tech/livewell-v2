@@ -805,9 +805,11 @@ service cloud.firestore {
     function reviewKeys() {
       return ['review_status', 'reviewed_by', 'reviewed_at', 'updated_at'];
     }
-    // A review: pending -> approved/rejected by someone who isn't the author.
+    // A review: pending -> approved/rejected by a clinical reviewer who
+    // isn't the author (staff roles, D-118).
     function isReview(before, after) {
-      return before.review_status == 'pending'
+      return isClinicalReviewer()
+        && before.review_status == 'pending'
         && after.review_status in ['approved', 'rejected']
         && after.reviewed_by == request.auth.uid
         && before.author_uid != request.auth.uid
@@ -849,7 +851,7 @@ service cloud.firestore {
     }
     match /content_items/{itemId} {
       allow read: if (signedIn() && resource.data.review_status == 'approved')
-        || isStaffAdmin();
+        || isStaffAdmin() || isSuperadmin();
       allow create: if isStaffAdmin()
         && validLesson(request.resource.data)
         && request.resource.data.review_status == 'draft'
@@ -902,7 +904,7 @@ service cloud.firestore {
     }
     match /driver_sets/{setId} {
       allow read: if (signedIn() && resource.data.review_status == 'approved')
-        || isStaffAdmin();
+        || isStaffAdmin() || isSuperadmin();
       allow create: if isStaffAdmin()
         && validDriverSet(request.resource.data)
         && request.resource.data.review_status == 'draft'
@@ -919,7 +921,7 @@ service cloud.firestore {
     }
     match /assessment_questions/{questionId} {
       allow read: if (signedIn() && resource.data.review_status == 'approved')
-        || isStaffAdmin();
+        || isStaffAdmin() || isSuperadmin();
       allow create: if isStaffAdmin()
         && validQuestion(request.resource.data)
         && request.resource.data.review_status == 'draft'
@@ -935,7 +937,7 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /courses/{courseId} {
-      allow read: if isStaffAdmin()
+      allow read: if isStaffAdmin() || isSuperadmin()
         || (signedIn() && resource.data.review_status == 'approved'
             && (resource.data.visibility == 'all'
                 || request.auth.token.email in resource.data.allowed_emails));
@@ -1000,6 +1002,16 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/staff_members/$(request.auth.uid))
         && get(/databases/$(database)/documents/staff_members/$(request.auth.uid)).data.status == 'active';
     }
+    // Staff roles a Superadmin gives an Admin (D-118). Only a clinical
+    // reviewer may approve or send back content (2-person rule, D-114).
+    function staffRoleNames() {
+      return ['content_editor', 'clinical_reviewer', 'safety_reviewer'];
+    }
+    function isClinicalReviewer() {
+      return isStaffAdmin()
+        && get(/databases/$(database)/documents/staff_members/$(request.auth.uid))
+             .data.get('roles', []).hasAny(['clinical_reviewer']);
+    }
     function validStaffText(v, max) {
       return v is string && v.size() >= 1 && v.size() <= max;
     }
@@ -1034,8 +1046,12 @@ service cloud.firestore {
     match /staff_members/{uid} {
       allow read: if (request.auth != null && request.auth.uid == uid) || isSuperadmin();
       allow create, update: if isSuperadmin()
-        && request.resource.data.keys().hasOnly(['email', 'name', 'role', 'status', 'approved_by', 'updated_at'])
+        && request.resource.data.keys().hasOnly(['email', 'name', 'role', 'roles', 'status', 'approved_by', 'updated_at'])
         && request.resource.data.role == 'admin'
+        && (!('roles' in request.resource.data)
+            || (request.resource.data.roles is list
+                && request.resource.data.roles.size() <= 3
+                && request.resource.data.roles.hasOnly(staffRoleNames())))
         && request.resource.data.status in ['active', 'removed']
         && request.resource.data.approved_by == request.auth.uid
         && request.resource.data.updated_at == request.time;
@@ -1048,7 +1064,7 @@ service cloud.firestore {
       allow create: if isSuperadmin()
         && request.resource.data.keys().hasOnly(['actor', 'action', 'target', 'at'])
         && request.resource.data.actor == request.auth.uid
-        && request.resource.data.action in ['staff.approved', 'staff.rejected', 'staff.removed', 'staff.restored']
+        && request.resource.data.action in ['staff.approved', 'staff.rejected', 'staff.removed', 'staff.restored', 'staff.roles_changed']
         && request.resource.data.target is string && request.resource.data.target.size() <= 128
         && request.resource.data.at == request.time;
       allow update, delete: if false;

@@ -1516,6 +1516,13 @@ describe('staff_members (D-112)', () => {
     await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ role: 'superadmin' })));
     await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ approved_by: 'someone' })));
     await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ extra: true })));
+    // Roles (D-118): only the three known roles, as a list.
+    await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ roles: ['superadmin'] })));
+    await assertFails(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ roles: 'clinical_reviewer' })));
+    await assertFails(
+      setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ roles: ['content_editor', 'clinical_reviewer', 'safety_reviewer', 'content_editor'] })),
+    );
+    await assertSucceeds(setDoc(doc(asSuper(), 'staff_members', PRIYA), member({ roles: ['content_editor', 'clinical_reviewer'] })));
     await assertSucceeds(setDoc(doc(asSuper(), 'staff_members', PRIYA), member()));
     await assertSucceeds(getDoc(doc(asUser(PRIYA), 'staff_members', PRIYA)));
     await assertFails(getDoc(doc(asUser(RAVI), 'staff_members', PRIYA)));
@@ -1558,6 +1565,7 @@ describe('staff_audit (D-112)', () => {
       ...over,
     });
     await assertSucceeds(addDoc(collection(asSuper(), 'staff_audit'), entry()));
+    await assertSucceeds(addDoc(collection(asSuper(), 'staff_audit'), entry({ action: 'staff.roles_changed' })));
     await assertFails(addDoc(collection(asSuper(), 'staff_audit'), entry({ actor: 'someone' })));
     await assertFails(addDoc(collection(asSuper(), 'staff_audit'), entry({ action: 'free text here' })));
     await assertFails(addDoc(collection(asSuper(), 'staff_audit'), entry({ target: 'x'.repeat(129) })));
@@ -1573,10 +1581,12 @@ describe('staff_audit (D-112)', () => {
 // ---------- Lessons and courses written by staff Admins (D-113/D-114) ----------
 const ADMIN_A = 'adminA';
 const ADMIN_B = 'adminB';
+const ADMIN_C = 'adminC';
 async function seedAdmins() {
   await seed(env, {
+    [`staff_members/${ADMIN_C}`]: { email: 'c@gmail.com', name: 'C', role: 'admin', roles: ['content_editor', 'safety_reviewer'], status: 'active', approved_by: SUPER, updated_at: new Date() },
     [`staff_members/${ADMIN_A}`]: { email: 'a@gmail.com', name: 'A', role: 'admin', status: 'active', approved_by: SUPER, updated_at: new Date() },
-    [`staff_members/${ADMIN_B}`]: { email: 'b@gmail.com', name: 'B', role: 'admin', status: 'active', approved_by: SUPER, updated_at: new Date() },
+    [`staff_members/${ADMIN_B}`]: { email: 'b@gmail.com', name: 'B', role: 'admin', roles: ['clinical_reviewer'], status: 'active', approved_by: SUPER, updated_at: new Date() },
     [`staff_members/gone`]: { email: 'g@gmail.com', name: 'G', role: 'admin', status: 'removed', approved_by: SUPER, updated_at: new Date() },
   });
 }
@@ -1651,6 +1661,43 @@ describe('content_items written by Admins (D-114)', () => {
     await seed(env, { 'content_items/l2': { ...lessonDraft(), review_status: 'approved', created_at: new Date(), updated_at: new Date() } });
     await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'content_items/l2'), { review_status: 'retired', updated_at: serverTimestamp() }));
     await assertFails(deleteDoc(doc(asUser(ADMIN_B), 'content_items/l2')));
+  });
+
+  it('only a clinical reviewer approves or sends back (D-118)', async () => {
+    await seedAdmins();
+    await seed(env, { 'content_items/l1': { ...lessonDraft(), review_status: 'pending', created_at: new Date(), updated_at: new Date() } });
+    // ADMIN_C is an active Admin, but not a clinical reviewer.
+    await assertFails(updateDoc(doc(asUser(ADMIN_C), 'content_items/l1'), review(ADMIN_C, 'approved')));
+    await assertFails(updateDoc(doc(asUser(ADMIN_C), 'content_items/l1'), review(ADMIN_C, 'rejected')));
+    // An Admin approved before roles existed has none: cannot review either.
+    await seed(env, { [`staff_members/old`]: { email: 'o@gmail.com', name: 'O', role: 'admin', status: 'active', approved_by: SUPER, updated_at: new Date() } });
+    await assertFails(updateDoc(doc(asUser('old'), 'content_items/l1'), review('old', 'approved')));
+    // A removed Admin who still has the role cannot.
+    await seed(env, { [`staff_members/gone2`]: { email: 'g2@gmail.com', name: 'G2', role: 'admin', roles: ['clinical_reviewer'], status: 'removed', approved_by: SUPER, updated_at: new Date() } });
+    await assertFails(updateDoc(doc(asUser('gone2'), 'content_items/l1'), review('gone2', 'approved')));
+    // A clinical reviewer who is the author still cannot (2-person rule).
+    await seed(env, { 'content_items/l2': { ...lessonDraft({ author_uid: ADMIN_B }), review_status: 'pending', created_at: new Date(), updated_at: new Date() } });
+    await assertFails(updateDoc(doc(asUser(ADMIN_B), 'content_items/l2'), review(ADMIN_B, 'approved')));
+    // Editing and writing drafts still works without the role.
+    await assertSucceeds(setDoc(doc(asUser(ADMIN_C), 'content_items/l3'), lessonDraft({ author_uid: ADMIN_C })));
+    await assertSucceeds(updateDoc(doc(asUser(ADMIN_B), 'content_items/l1'), review(ADMIN_B, 'approved')));
+  });
+
+  it('a Superadmin can read content to see what is waiting, but never write it', async () => {
+    await seedAdmins();
+    await seed(env, {
+      'content_items/l1': { ...lessonDraft(), review_status: 'pending', created_at: new Date(), updated_at: new Date() },
+      'courses/c1': { ...courseDraft(), review_status: 'pending', created_at: new Date(), updated_at: new Date() },
+      'driver_sets/s1': { ...driverSet(), review_status: 'pending', created_at: new Date(), updated_at: new Date() },
+      'assessment_questions/q1': { ...question(), review_status: 'pending', created_at: new Date(), updated_at: new Date() },
+    });
+    for (const path of ['content_items/l1', 'courses/c1', 'driver_sets/s1', 'assessment_questions/q1']) {
+      await assertSucceeds(getDoc(doc(asSuper(), path)));
+      await assertFails(updateDoc(doc(asSuper(), path), review(SUPER, 'approved')));
+    }
+    await assertFails(setDoc(doc(asSuper(), 'content_items/l9'), lessonDraft({ author_uid: SUPER })));
+    // The claim alone is not a Superadmin.
+    await assertFails(getDoc(doc(asSuper({ email: 'owner@gmail.com' }), 'content_items/l1')));
   });
 
   it('a rejected item goes back to its author to fix and resubmit', async () => {

@@ -117,7 +117,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Lessons and courses (D-113/D-114).
       GoRoute(
         path: '/content',
-        builder: (_, _) => const ContentScreen(),
+        builder: (_, s) => ContentScreen(
+          initialTab: s.uri.queryParameters['tab'] == 'review' ? 3 : 0,
+        ),
         routes: [
           GoRoute(
             path: 'lessons/new',
